@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes blink-caret {
+    50% {
+      background: transparent;
+    }
+  }
+  
+  @keyframes shake {
+    25% {
+      transform: translateX(10px);
+    }
+    75% {
+      transform: translateX(-10px);
+    }
+  }
+  
+  @keyframes pulse-border {
+    50% {
+      border-color: var(--segment-color);
+      box-shadow: var(--segment-color) 0 0 0 1px;
+    }
+  }
