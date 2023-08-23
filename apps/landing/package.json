@@ -9,30 +9,30 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@rive-app/react-canvas": "^4.1.4",
+    "@rive-app/react-canvas": "^4.2.1",
     "@vercel/analytics": "^1.0.2",
-    "framer-motion": "^10.16.0",
-    "lucide-react": "^0.268.0",
-    "next": "^13.4.16",
+    "framer-motion": "^10.16.4",
+    "lucide-react": "^0.276.0",
+    "next": "^13.4.19",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ui": "workspace:*"
   },
   "devDependencies": {
-    "@total-typescript/ts-reset": "^0.4.2",
-    "@types/node": "^20.5.0",
-    "@types/react": "^18.2.20",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/node": "^20.6.0",
+    "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.6",
     "autoprefixer": "^10.4.15",
     "clsx": "^2.0.0",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.28",
+    "postcss": "^8.4.29",
     "prettier-config-custom": "workspace:*",
     "tailwind-config": "workspace:*",
     "tailwind-merge": "^1.13.2",
     "tailwindcss": "^3.3.2",
     "tsconfig": "workspace:*",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   },
   "prettier": "prettier-config-custom"
 }

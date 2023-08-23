@@ -1,24 +1,23 @@
 import "@/styles/globals.css";
 import "ui/styles.css";
 
-import {Inter} from "next/font/google";
+import { Inter } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 
-import Header from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
-import { AnalyticsWrapper } from "@/app/components/analytics";
+import { AnalyticsWrapper } from "@/components/analytics";
 
 const SITE_NAME = "Acme";
 
 const SHORT_DESCRIPTION = "The one template to rule them all";
 
-const LONG_DESCRIPTION =
-  "Monorepo for base projects";
+const LONG_DESCRIPTION = "Monorepo for base projects";
 
-const TWITTER_HANDLE = "acme"
-  
+const TWITTER_HANDLE = "acme";
+
 const SITE_URL = "https://www.acme-monorepo.com";
 
 const metadata = {
@@ -66,7 +65,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body
         className={cn(
           "relative min-h-screen font-sans antialiased",
-          inter.variable
+          inter.variable,
         )}
       >
         <>

@@ -1,7 +1,13 @@
-import { StorybookConfig } from "@storybook/react-webpack5";
+import { StorybookConfig } from "@storybook/react-vite";
+import { dirname, join } from "path";
+
+const getAbsolutePath = (value: string): any => {
+  return dirname(require.resolve(join(value, "package.json")));
+};
 
 const config: StorybookConfig = {
   stories: ["../src/stories/**/*.stories.@(js|jsx|ts|tsx)"],
+
   addons: [
     {
       name: "@storybook/addon-essentials",
@@ -9,17 +15,17 @@ const config: StorybookConfig = {
         actions: false,
       },
     },
-    "@storybook/addon-a11y",
-    "@storybook/addon-interactions",
+    getAbsolutePath("@storybook/addon-a11y"),
   ],
-  framework: {
-    name: "@storybook/react-webpack5",
-    options: {},
-  },
+  core: {},
   docs: {
     autodocs: "tag",
   },
   staticDirs: ["../public"],
+  framework: {
+    name: getAbsolutePath("@storybook/react-vite"),
+    options: {},
+  },
 };
 
 export default config;

@@ -8,6 +8,7 @@ import {
   DEFAULT_THEME,
   withTailwindTheme,
 } from "./withTailwindTheme.decorator";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 const preview: Preview = {
   parameters: {
@@ -34,6 +35,13 @@ const preview: Preview = {
         <Story />
       </div>
     ),
+    (story) => {
+      const router = createMemoryRouter([{ path: "/", element: story() }], {
+        initialEntries: ["/"],
+      });
+
+      return <RouterProvider router={router} />;
+    },
     withTailwindTheme,
   ],
 };

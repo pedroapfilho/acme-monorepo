@@ -2,7 +2,6 @@
 
 import { Button } from "ui";
 
-
 const Footer = () => {
   return (
     <footer className="border-t">
