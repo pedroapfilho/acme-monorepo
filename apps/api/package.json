@@ -1,0 +1,43 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "tsup src/index.ts --format cjs --watch --onSuccess \"node dist/index.js\"",
+    "lint": "tsc --noEmit && eslint \"src/**/*.ts*\"",
+    "start": "node dist/index.js",
+    "test": "jest --detectOpenHandles"
+  },
+  "jest": {
+    "preset": "jest-presets/jest/node"
+  },
+  "dependencies": {
+    "@fastify/cors": "^8.3.0",
+    "@fastify/env": "^4.2.0",
+    "@fastify/helmet": "^11.0.0",
+    "@fastify/jwt": "^7.2.1",
+    "@fastify/redis": "^6.1.1",
+    "db": "workspace:*",
+    "fastify": "^4.23.0",
+    "resend": "^1.0.0",
+    "twilio": "^4.17.0",
+    "undici": "^5.24.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.3",
+    "@types/node": "^20.6.0",
+    "@types/supertest": "^2.0.12",
+    "eslint": "^8.49.0",
+    "eslint-config-custom-server": "workspace:*",
+    "jest": "^29.6.1",
+    "jest-presets": "workspace:*",
+    "pino": "^8.15.1",
+    "pino-pretty": "^10.0.1",
+    "supertest": "^6.3.3",
+    "tsconfig": "workspace:*",
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6"
+  }
+}

@@ -1,7 +1,7 @@
 import React from "react";
 
 import "ui/styles.css";
-import "../styles.css";
+import "@/styles.css";
 
 import { Preview } from "@storybook/react";
 import {
