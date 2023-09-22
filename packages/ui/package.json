@@ -22,12 +22,12 @@
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.21",
+    "@types/react": "^18.2.22",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "eslint": "^8.49.0",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.29",
+    "postcss": "^8.4.30",
     "prettier-config-custom": "workspace:*",
     "react": "^18.2.0",
     "tailwind-config": "workspace:*",
@@ -41,8 +41,8 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
-    "lucide-react": "^0.276.0",
-    "react-hook-form": "^7.46.1",
+    "lucide-react": "^0.279.0",
+    "react-hook-form": "^7.46.2",
     "zod": "^3.22.2"
   },
   "prettier": "prettier-config-custom"
