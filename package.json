@@ -1,9 +1,14 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint"
+    "start": "turbo start",
+    "dev": "turbo dev --concurrency 20",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "build": "turbo build",
+    "db:generate": "turbo run db:generate",
+    "db:push": "turbo run db:push",
+    "db:seed": "turbo run db:seed"
   },
   "devDependencies": {
     "turbo": "^1.10.14"

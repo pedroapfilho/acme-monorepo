@@ -27,7 +27,7 @@
     "clsx": "^2.0.0",
     "eslint": "^8.50.0",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.30",
+    "postcss": "^8.4.31",
     "prettier-config-custom": "workspace:*",
     "react": "^18.2.0",
     "tailwind-config": "workspace:*",
