@@ -50,12 +50,23 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           return { error: "INVALID_ID_OR_PASSWORD" };
         }
 
+        const EXPIRATION_TIME = 14400; // 4h
+
         const token = app.jwt.sign(
           { id: user.id, name: user.name, email: user.email },
           {
-            expiresIn: "4h",
+            expiresIn: EXPIRATION_TIME,
           }
         );
+
+        reply.setCookie("token", token, {
+          path: "/",
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: EXPIRATION_TIME,
+          signed: true,
+        });
 
         return token;
       } catch (error) {

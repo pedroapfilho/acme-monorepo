@@ -4,6 +4,7 @@ import fastifyEnv from "@fastify/env";
 import fastifyHelmet from "@fastify/helmet";
 import fastifyRedis from "@fastify/redis";
 import fastifyJwt, { JWT } from "@fastify/jwt";
+import fastifyCookie from "@fastify/cookie";
 
 import authRoutes from "@/routes/auth";
 import usersRoutes from "@/routes/users";
@@ -43,7 +44,7 @@ declare module "@fastify/jwt" {
 
 const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
-    return request.jwtVerify();
+    return await request.jwtVerify();
   } catch (e) {
     reply.code(403);
 
@@ -107,6 +108,14 @@ const createServer = async () => {
 
   app.register(fastifyJwt, {
     secret: app.config.SECRET,
+    cookie: {
+      cookieName: "token",
+      signed: true,
+    },
+  });
+
+  app.register(fastifyCookie, {
+    secret: app.config.SECRET,
   });
 
   app.decorate("authenticate", authenticate);
@@ -126,7 +135,7 @@ const createServer = async () => {
 
   app.register(fastifyRedis, {
     url: app.config.REDIS_URL,
-    tls: {},
+    tls: app.config.NODE_ENV === "production" ? {} : undefined,
   });
 
   app.get("/healthz", () => {

@@ -3,13 +3,15 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "NODE_ENV",
+
     "NEXTAUTH_SECRET",
-    "NEXTAUTH_URL",
     "API_URL",
-    "SECRET",
-    "HTTP_PORT",
-    "HTTP_HOST",
+
     "CORS_ORIGIN_URL",
+    "PORT",
+    "REDIS_URL",
+
+    "SECRET",
     "DATABASE_URL"
   ],
   "pipeline": {
