@@ -31,11 +31,19 @@
     "clsx": "^2.0.0",
     "eslint-config-custom": "workspace:*",
     "postcss": "^8.4.31",
-    "prettier-config-custom": "workspace:*",
+    "prettier": "^3.0.3",
+    "prettier-plugin-organize-imports": "^3.2.3",
+    "prettier-plugin-tailwindcss": "^0.5.6",
     "tailwind-config": "workspace:*",
     "tailwind-merge": "^1.13.2",
     "tailwindcss": "^3.3.2",
     "tsconfig": "workspace:*",
     "typescript": "^5.2.2"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-organize-imports",
+      "prettier-plugin-tailwindcss"
+    ]
   }
 }

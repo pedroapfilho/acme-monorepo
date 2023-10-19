@@ -2,7 +2,6 @@
   "name": "workshop",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "storybook dev -p 6006 --disable-telemetry --quiet --no-open",
     "build": "storybook build",
@@ -27,9 +26,17 @@
     "@types/react-dom": "^18.2.13",
     "@vitejs/plugin-react": "^4.1.0",
     "eslint-plugin-storybook": "^0.6.15",
-    "prettier-config-custom": "workspace:*",
+    "prettier": "^3.0.3",
+    "prettier-plugin-organize-imports": "^3.2.3",
+    "prettier-plugin-tailwindcss": "^0.5.6",
     "storybook": "^7.4.6",
     "tsconfig": "workspace:*",
     "vite": "^4.4.11"
+  },
+  "prettier": {
+    "plugins": [
+      "prettier-plugin-organize-imports",
+      "prettier-plugin-tailwindcss"
+    ]
   }
 }

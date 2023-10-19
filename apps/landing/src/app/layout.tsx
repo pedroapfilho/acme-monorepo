@@ -5,8 +5,8 @@ import { Inter } from "next/font/google";
 
 import { cn } from "@/lib/utils";
 
-import Header from "@/components/header";
 import Footer from "@/components/footer";
+import Header from "@/components/header";
 
 import { AnalyticsWrapper } from "@/components/analytics";
 

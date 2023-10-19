@@ -1,7 +1,7 @@
 /**
  * @type {import('eslint').Linter.Config}
  */
-module.exports = {
+export default {
   extends: ["eslint:recommended", "turbo"],
   env: {
     node: true,

@@ -4,9 +4,9 @@ import { Button } from "ui";
 
 type Story = StoryObj<typeof Button>;
 
-const meta = {
+const meta: Meta<typeof Button> = {
   component: Button,
-} satisfies Meta<typeof Button>;
+};
 
 const Playground: Story = {
   args: {
@@ -21,6 +21,6 @@ const Disabled: Story = {
   },
 };
 
-export { Playground, Disabled };
+export { Disabled, Playground };
 
 export default meta;

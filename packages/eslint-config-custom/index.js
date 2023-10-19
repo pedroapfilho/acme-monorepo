@@ -1,7 +1,7 @@
 /**
  * @type {import('eslint').Linter.Config}
  */
-module.exports = {
+export default {
   extends: ["next/core-web-vitals", "turbo", "prettier"],
   rules: {
     "@next/next/no-html-link-for-pages": "off",
