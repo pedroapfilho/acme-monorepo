@@ -46,11 +46,5 @@
     "lucide-react": "^0.287.0",
     "react-hook-form": "^7.47.0",
     "zod": "^3.22.4"
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-organize-imports",
-      "prettier-plugin-tailwindcss"
-    ]
   }
 }

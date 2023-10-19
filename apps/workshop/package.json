@@ -32,11 +32,5 @@
     "storybook": "^7.4.6",
     "tsconfig": "workspace:*",
     "vite": "^4.4.11"
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-organize-imports",
-      "prettier-plugin-tailwindcss"
-    ]
   }
 }
