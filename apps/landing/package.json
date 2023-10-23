@@ -1,22 +1,26 @@
 {
-  "name": "landing",
+  "name": "web",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.2",
     "@rive-app/react-canvas": "^4.4.0",
     "@vercel/analytics": "^1.1.1",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.287.0",
     "next": "^13.5.4",
+    "next-auth": "^4.23.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ui": "workspace:*"
+    "react-hook-form": "^7.47.0",
+    "ui": "workspace:*",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
@@ -28,7 +32,7 @@
     "eslint-config-custom": "workspace:*",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
-    "prettier-plugin-organize-imports": "^3.2.3",
+    "@trivago/prettier-plugin-sort-imports": "^4.2.1",
     "prettier-plugin-tailwindcss": "^0.5.6",
     "tailwind-config": "workspace:*",
     "tailwind-merge": "^1.13.2",

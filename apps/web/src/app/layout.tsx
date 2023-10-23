@@ -1,6 +1,5 @@
-import "./globals.css";
-
 import "ui/styles.css";
+import "../styles/globals.css";
 
 import { NextAuthProvider } from "./providers";
 
