@@ -11,6 +11,6 @@
     "db:seed": "turbo run db:seed"
   },
   "devDependencies": {
-    "turbo": "^1.10.15"
+    "turbo": "^1.10.16"
   }
 }
