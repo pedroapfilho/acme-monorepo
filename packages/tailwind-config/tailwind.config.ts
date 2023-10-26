@@ -1,7 +1,7 @@
 import { fontFamily } from "tailwindcss/defaultTheme";
+import type { Config } from "tailwindcss";
 
-/** @type {import('tailwindcss').Config} */
-export default {
+const config: Config = {
   content: [`src/**/*.{js,ts,jsx,tsx}`, "../../packages/**/*.{js,ts,jsx,tsx}"],
   darkMode: ["class", '[data-mode="dark"]'],
   theme: {
@@ -12,12 +12,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: { height: 0 },
+          from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
+          to: { height: "0" },
         },
         "blink-caret": {
           "50%": { background: "transparent" },
@@ -39,5 +39,7 @@ export default {
       },
     },
   },
-  plugins: ["tailwindcss-animate", "@tailwindcss/typography"],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
+
+export default config;

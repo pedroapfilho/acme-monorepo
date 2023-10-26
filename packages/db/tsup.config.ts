@@ -1,10 +1,12 @@
-import { defineConfig, Options } from "tsup";
+import { defineConfig } from "tsup";
 
-export default defineConfig((options: Options) => ({
-  entry: ["src/index.ts"],
-  format: ["esm", "cjs"],
-  dts: true,
+const isProduction = process.env.NODE_ENV === "production";
+
+export default defineConfig({
   clean: true,
+  dts: true,
+  entry: ["src/index.ts"],
+  format: ["cjs", "esm"],
+  minify: isProduction,
   sourcemap: true,
-  ...options,
-}));
+});

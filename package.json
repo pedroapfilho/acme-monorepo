@@ -11,6 +11,7 @@
     "db:seed": "turbo run db:seed"
   },
   "devDependencies": {
+    "tsconfig": "workspace:*",
     "turbo": "^1.10.16"
   }
 }
