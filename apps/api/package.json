@@ -22,14 +22,14 @@
     "@fastify/redis": "^6.1.1",
     "db": "workspace:*",
     "fastify": "^4.24.1",
-    "resend": "^1.1.0",
+    "resend": "^2.0.0",
     "twilio": "^4.18.1",
-    "undici": "^5.27.0"
+    "undici": "^5.27.1"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.2.1",
-    "@types/jest": "^29.5.5",
-    "@types/node": "^20.8.9",
+    "@types/jest": "^29.5.7",
+    "@types/node": "^20.8.10",
     "@types/supertest": "^2.0.14",
     "eslint": "^8.52.0",
     "eslint-config-custom-server": "workspace:*",
