@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "ui-bg-red-600 ui-text-white hover:ui-bg-red-800 disabled:ui-opacity-50",
         outline:
-          "ui-border-neutral-800 ui-border-2 ui-bg-white ui-text-neutral-800 hover:ui-bg-neutral-50 active:ui-bg-neutral-100 disabled:ui-opacity-50",
+          "ui-border-2 ui-border-neutral-800 ui-bg-white ui-text-neutral-800 hover:ui-bg-neutral-50 active:ui-bg-neutral-100 disabled:ui-opacity-50",
         link: "ui-bg-transparent ui-text-neutral-800 ui-underline-offset-4 hover:ui-underline",
       },
       size: {
@@ -39,7 +39,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button";
 
     return (
-      <button
+      <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
