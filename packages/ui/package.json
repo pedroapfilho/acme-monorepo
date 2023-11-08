@@ -22,10 +22,10 @@
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.2.1",
-    "@types/react": "^18.2.34",
+    "@types/react": "^18.2.37",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "eslint": "^8.52.0",
+    "eslint": "^8.53.0",
     "eslint-config-custom": "workspace:*",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
@@ -44,7 +44,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
     "lucide-react": "^0.292.0",
-    "react-hook-form": "^7.47.0",
+    "react-hook-form": "^7.48.2",
     "zod": "^3.22.4"
   }
 }

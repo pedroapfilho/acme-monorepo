@@ -24,14 +24,14 @@
     "fastify": "^4.24.1",
     "resend": "^2.0.0",
     "twilio": "^4.18.1",
-    "undici": "^5.27.1"
+    "undici": "^5.27.2"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.2.1",
-    "@types/jest": "^29.5.7",
-    "@types/node": "^20.8.10",
-    "@types/supertest": "^2.0.14",
-    "eslint": "^8.52.0",
+    "@types/jest": "^29.5.8",
+    "@types/node": "^20.9.0",
+    "@types/supertest": "^2.0.16",
+    "eslint": "^8.53.0",
     "eslint-config-custom-server": "workspace:*",
     "jest": "^29.7.0",
     "jest-presets": "workspace:*",
