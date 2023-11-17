@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.18.0",
+    "react-router-dom": "^6.19.0",
     "ui": "workspace:*"
   },
   "devDependencies": {
@@ -25,12 +25,12 @@
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
-    "@vitejs/plugin-react": "^4.1.1",
+    "@vitejs/plugin-react": "^4.2.0",
     "eslint-plugin-storybook": "^0.6.15",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7",
     "storybook": "^7.5.3",
     "tsconfig": "workspace:*",
-    "vite": "^4.4.11"
+    "vite": "^5.0.0"
   }
 }
