@@ -113,7 +113,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           data: { ...rest, salt, password: hash, id },
         });
 
-        await resend.sendEmail({
+        await resend.emails.send({
           from: "no-reply@no-reply.acme.com",
           to: user.email,
           subject: "Acme - Account Information",
