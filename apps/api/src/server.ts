@@ -1,13 +1,12 @@
-import fastify, { FastifyReply, FastifyRequest } from "fastify";
+import authRoutes from "@/routes/auth";
+import usersRoutes from "@/routes/users";
+import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import fastifyEnv from "@fastify/env";
 import fastifyHelmet from "@fastify/helmet";
-import fastifyRedis from "@fastify/redis";
 import fastifyJwt, { JWT } from "@fastify/jwt";
-import fastifyCookie from "@fastify/cookie";
-
-import authRoutes from "@/routes/auth";
-import usersRoutes from "@/routes/users";
+import fastifyRedis from "@fastify/redis";
+import fastify, { FastifyReply, FastifyRequest } from "fastify";
 
 declare module "fastify" {
   interface FastifyInstance {

@@ -13,7 +13,7 @@ const start = async () => {
         }
 
         app.log.info(`Server listening on ${address}`);
-      }
+      },
     );
   } catch (e) {
     console.error(e);

@@ -1,9 +1,8 @@
-import crypto from "crypto";
-
-import prisma from "@/utils/prisma";
 import { hashPassword, verifyPassword } from "@/utils/hash";
-import { FastifyInstance } from "fastify";
 import getResendClient from "@/utils/resend";
+import crypto from "crypto";
+import { prisma } from "db";
+import { FastifyInstance } from "fastify";
 
 const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
   const resend = getResendClient();
@@ -56,7 +55,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           { id: user.id, name: user.name, email: user.email },
           {
             expiresIn: EXPIRATION_TIME,
-          }
+          },
         );
 
         reply.setCookie("token", token, {
@@ -76,7 +75,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
 
         return { error: "SOMETHING_WENT_WRONG" };
       }
-    }
+    },
   );
 
   app.post<{
@@ -128,7 +127,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
 
         return { error: "SOMETHING_WENT_WRONG" };
       }
-    }
+    },
   );
 
   app.post<{
@@ -160,7 +159,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
 
         return { error: "SOMETHING_WENT_WRONG" };
       }
-    }
+    },
   );
 
   app.get(
@@ -189,7 +188,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           { id: user.id, name: user.name, email: user.email },
           {
             expiresIn: "4h",
-          }
+          },
         );
 
         return token;
@@ -200,7 +199,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
 
         return { error: "SOMETHING_WENT_WRONG" };
       }
-    }
+    },
   );
 
   done();

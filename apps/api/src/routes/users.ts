@@ -1,4 +1,4 @@
-import prisma from "@/utils/prisma";
+import { prisma } from "db";
 import { FastifyInstance } from "fastify";
 
 const usersRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
@@ -33,7 +33,7 @@ const usersRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
 
         return { error: "SOMETHING_WENT_WRONG" };
       }
-    }
+    },
   );
 
   done();

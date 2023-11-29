@@ -33,8 +33,8 @@ const DEFAULT_USERS = [
           create: {
             ...user,
           },
-        })
-      )
+        }),
+      ),
     );
   } catch (error) {
     console.error(error);
