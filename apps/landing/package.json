@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
-    "@rive-app/react-canvas": "^4.5.4",
+    "@rive-app/react-canvas": "^4.5.5",
     "@vercel/analytics": "^1.1.1",
-    "framer-motion": "^10.16.5",
-    "lucide-react": "^0.293.0",
+    "framer-motion": "^10.16.8",
+    "lucide-react": "^0.294.0",
     "next": "^14.0.3",
     "next-auth": "^4.24.5",
     "react": "^18.2.0",
@@ -25,7 +25,7 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.10.0",
+    "@types/node": "^20.10.1",
     "@types/react": "^18.2.39",
     "@types/react-dom": "^18.2.17",
     "autoprefixer": "^10.4.16",

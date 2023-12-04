@@ -43,7 +43,7 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
-    "lucide-react": "^0.293.0",
+    "lucide-react": "^0.294.0",
     "react-hook-form": "^7.48.2",
     "zod": "^3.22.4"
   }
