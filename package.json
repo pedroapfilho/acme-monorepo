@@ -12,6 +12,6 @@
   },
   "devDependencies": {
     "tsconfig": "workspace:*",
-    "turbo": "^1.10.16"
+    "turbo": "^1.11.0"
   }
 }
