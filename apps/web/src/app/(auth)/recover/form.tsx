@@ -1,9 +1,8 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { recover } from "@/app/(auth)/recover/action";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
+import { useForm } from "react-hook-form";
 import {
   Input,
   Form,
@@ -14,6 +13,7 @@ import {
   FormMessage,
   Button,
 } from "ui";
+import * as z from "zod";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -29,15 +29,9 @@ const RecoverForm = () => {
 
   const onSubmit = form.handleSubmit(async (data) => {
     try {
-      const response = await fetch(`/api/users/recover`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const hasRequestedRecoverySuccessfully = await recover(data);
 
-      if (!response.ok) {
+      if (!hasRequestedRecoverySuccessfully) {
         throw new Error("SOMETHING_WENT_WRONG");
       }
     } catch (e) {

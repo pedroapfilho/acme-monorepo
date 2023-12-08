@@ -1,3 +1,6 @@
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -7,5 +10,13 @@
 
   html[data-mode="dark"] {
     background-color: black;
+  }
+
+  :root {
+    --font-sans: Inter, sans-serif;
+    font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+  }
+  @supports (font-variation-settings: normal) {
+    :root { --font-sans: InterVariable, sans-serif; }
   }
 </style>

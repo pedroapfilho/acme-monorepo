@@ -1,12 +1,10 @@
-import "ui/styles.css";
 import "../styles/globals.css";
-
 import { NextAuthProvider } from "./providers";
-
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
+import "ui/styles.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata = {
   title: "Acme",

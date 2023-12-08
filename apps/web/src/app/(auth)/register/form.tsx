@@ -1,9 +1,8 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { register } from "@/app/(auth)/register/action";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
+import { useForm } from "react-hook-form";
 import {
   Input,
   Form,
@@ -14,6 +13,7 @@ import {
   FormMessage,
   Button,
 } from "ui";
+import * as z from "zod";
 
 const formSchema = z.object({
   name: z.string().min(3).max(32),
@@ -35,15 +35,9 @@ const RegisterForm = () => {
 
   const onSubmit = form.handleSubmit(async (data) => {
     try {
-      const response = await fetch(`/api/users/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const hasRegisteredSuccessfully = await register(data);
 
-      if (!response.ok) {
+      if (!hasRegisteredSuccessfully) {
         throw new Error("SOMETHING_WENT_WRONG");
       }
     } catch (e) {

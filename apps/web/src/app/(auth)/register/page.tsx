@@ -1,5 +1,5 @@
-import Link from "next/link";
 import RegisterForm from "@/app/(auth)/register/form";
+import Link from "next/link";
 
 const Page = async () => {
   return (
@@ -15,7 +15,7 @@ const Page = async () => {
           <p className="text-center text-sm">
             Already a member?{" "}
             <Link
-              href="/auth/login"
+              href="/login"
               className="font-semibold leading-6 hover:text-neutral-600"
             >
               Log in into your account

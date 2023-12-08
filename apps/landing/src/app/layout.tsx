@@ -1,14 +1,10 @@
-import "@/styles/globals.css";
-import "ui/styles.css";
-
-import { Inter } from "next/font/google";
-
-import { cn } from "@/lib/utils";
-
+import { AnalyticsWrapper } from "@/components/analytics";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-
-import { AnalyticsWrapper } from "@/components/analytics";
+import { cn } from "@/lib/utils";
+import "@/styles/globals.css";
+import { Inter } from "next/font/google";
+import "ui/styles.css";
 
 const SITE_NAME = "Acme";
 
@@ -56,7 +52,7 @@ const metadata = {
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
 });
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {

@@ -24,12 +24,12 @@
     "fastify": "^4.24.1",
     "resend": "^2.0.0",
     "twilio": "^4.19.3",
-    "undici": "^6.0.0"
+    "undici": "^6.0.1"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/jest": "^29.5.10",
-    "@types/node": "^20.10.3",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.4",
     "@types/supertest": "^2.0.16",
     "eslint": "^8.55.0",
     "eslint-config-custom-server": "workspace:*",
@@ -41,6 +41,6 @@
     "supertest": "^6.3.3",
     "tsconfig": "workspace:*",
     "tsup": "^8.0.1",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   }
 }

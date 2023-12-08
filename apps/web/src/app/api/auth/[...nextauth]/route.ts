@@ -1,5 +1,5 @@
-import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 
 const credentialsSchema = z.object({
@@ -13,11 +13,13 @@ const userSchema = z.object({
   name: z.string(),
 });
 
+const MAX_AGE = 4 * 60 * 60; // 4 hours
+
 const handler = NextAuth({
   debug: true,
   session: {
     strategy: "jwt",
-    maxAge: 4 * 60 * 60,
+    maxAge: MAX_AGE,
   },
   providers: [
     CredentialsProvider({

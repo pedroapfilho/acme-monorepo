@@ -1,5 +1,5 @@
-import Link from "next/link";
 import RecoverForm from "@/app/(auth)/recover/form";
+import Link from "next/link";
 
 const Page = () => {
   return (
@@ -15,7 +15,7 @@ const Page = () => {
           <p className="text-center text-sm">
             Remembered your address?{" "}
             <Link
-              href="/auth/login"
+              href="/login"
               className="font-semibold leading-6 hover:text-neutral-600"
             >
               Log in into your account
