@@ -1,3 +1,3 @@
-import "./styles.css";
+import "@/styles.css";
 
-export * from "./components";
+export * from "@/components";

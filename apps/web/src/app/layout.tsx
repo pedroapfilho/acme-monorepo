@@ -1,5 +1,5 @@
-import "../styles/globals.css";
-import { NextAuthProvider } from "./providers";
+import { NextAuthProvider } from "@/app/providers";
+import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import "ui/styles.css";
