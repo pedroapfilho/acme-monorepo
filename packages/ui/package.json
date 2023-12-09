@@ -1,8 +1,9 @@
 {
   "name": "ui",
   "version": "0.0.0",
+  "main": "./dist/index.js",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist",
     "./styles.css": "./dist/index.css"

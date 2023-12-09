@@ -16,18 +16,14 @@
   ],
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**",
-        "storybook-static/**"
-      ]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
+      "dependsOn": ["^build"]
     },
     "lint": {
       "outputs": []
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
