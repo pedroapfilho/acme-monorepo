@@ -18,13 +18,8 @@ declare module "fastify" {
       HTTP_HOST: string;
       HTTP_PORT: number;
       REDIS_URL: string;
-      AUTOMATION_URL: string;
       CORS_ORIGIN_URL: string;
       RESEND_API_KEY: string;
-      TWILIO_ACCOUNT_SID: string;
-      TWILIO_AUTH_TOKEN: string;
-      TWILLIO_DEVICE_PORT: number;
-      EV_API_KEY: string;
     };
   }
 
