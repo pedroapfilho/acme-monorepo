@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@fastify/cookie": "^9.2.0",
-    "@fastify/cors": "^8.4.2",
+    "@fastify/cors": "^8.5.0",
     "@fastify/env": "^4.3.0",
     "@fastify/helmet": "^11.1.1",
     "@fastify/jwt": "^7.2.4",
@@ -28,9 +28,9 @@
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/jest": "^29.5.11",
-    "@types/node": "^20.10.4",
+    "@types/node": "^20.10.5",
     "@types/supertest": "^2.0.16",
-    "eslint": "^8.55.0",
+    "eslint": "^8.56.0",
     "eslint-config-custom-server": "workspace:*",
     "jest": "^29.7.0",
     "jest-presets": "workspace:*",
