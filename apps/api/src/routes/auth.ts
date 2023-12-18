@@ -49,23 +49,12 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           return { error: "INVALID_ID_OR_PASSWORD" };
         }
 
-        const EXPIRATION_TIME = 14400; // 4h
-
         const token = app.jwt.sign(
           { id: user.id, name: user.name, email: user.email },
           {
-            expiresIn: EXPIRATION_TIME,
+            expiresIn: "8h",
           },
         );
-
-        reply.setCookie("token", token, {
-          path: "/",
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: EXPIRATION_TIME,
-          signed: true,
-        });
 
         return token;
       } catch (error) {
@@ -112,12 +101,16 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           data: { ...rest, salt, password: hash, id },
         });
 
-        await resend.emails.send({
-          from: "no-reply@no-reply.acme.com",
+        const response = await resend.emails.send({
+          from: "no-reply@no-reply.hasteo.com",
           to: user.email,
-          subject: "Acme - Account Information",
+          subject: "Hasteo - Account Information",
           text: `Hey ${user.name}, your account ID is: ${id}, use it to login into your account with the password you created. We suggest you to write this information somewhere, and delete this email.`,
         });
+
+        if (response.error) {
+          throw new Error("RESEND_ERROR");
+        }
 
         return { id };
       } catch (error) {
@@ -151,7 +144,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
       try {
         // TODO: create a ticket on Plain
 
-        return "OK";
+        return;
       } catch (error) {
         reply.code(500);
 
@@ -199,6 +192,116 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
 
         return { error: "SOMETHING_WENT_WRONG" };
       }
+    },
+  );
+
+  app.post<{
+    Body: {
+      email: string;
+      password: string;
+    };
+  }>(
+    "/reset-link",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: {
+            email: { type: "string" },
+          },
+        },
+      },
+      preHandler: [app.authenticate],
+    },
+    async (request, reply) => {
+      try {
+        const { email } = request.body;
+
+        const token = app.jwt.sign(
+          { email },
+          {
+            expiresIn: "1h",
+          },
+        );
+
+        const resetLink = new URL("https://hasteo.com/reset-password");
+
+        resetLink.searchParams.append("email", email);
+        resetLink.searchParams.append("token", token);
+
+        const response = await resend.emails.send({
+          from: "no-reply@no-reply.hasteo.com",
+          to: email,
+          subject: "Hasteo - Reset Password",
+          text: `Hey, you requested to recover your account, click here to recover it: ${resetLink.href}`,
+        });
+
+        if (response.error) {
+          throw new Error("RESEND_ERROR");
+        }
+
+        return;
+      } catch (error) {
+        reply.code(500);
+
+        app.log.error(error);
+
+        return { error: "SOMETHING_WENT_WRONG" };
+      }
+    },
+  );
+
+  app.post<{
+    Body: {
+      email: string;
+      token: string;
+      password: string;
+    };
+  }>(
+    "/reset-password",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: {
+            email: { type: "string" },
+            token: { type: "string" },
+            password: { type: "string" },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { email, token, password } = request.body;
+
+      const jwt = request.jwt.decode<{ email: string }>(token);
+
+      if (!jwt) {
+        reply.code(403);
+
+        return { error: "INVALID_TOKEN" };
+      }
+
+      if (jwt.email !== email) {
+        reply.code(403);
+
+        return { error: "INVALID_TOKEN" };
+      }
+
+      const { hash, salt } = hashPassword(password);
+
+      const user = await prisma.user.update({
+        where: { email },
+        data: { password: hash, salt },
+      });
+
+      if (!user) {
+        reply.code(404);
+
+        return { error: "USER_NOT_FOUND" };
+      }
+
+      return;
     },
   );
 
