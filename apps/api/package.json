@@ -23,7 +23,7 @@
     "db": "workspace:*",
     "fastify": "^4.25.1",
     "resend": "^2.0.0",
-    "undici": "^6.0.1"
+    "undici": "^6.2.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
