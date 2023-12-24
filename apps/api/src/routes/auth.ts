@@ -198,7 +198,6 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
   app.post<{
     Body: {
       email: string;
-      password: string;
     };
   }>(
     "/reset-link",
