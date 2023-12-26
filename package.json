@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "turbo start",
-    "dev": "turbo dev --concurrency 20",
+    "dev": "turbo dev",
     "lint": "turbo lint",
     "test": "turbo test",
     "build": "turbo build",
