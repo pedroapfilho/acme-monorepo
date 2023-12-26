@@ -12,7 +12,10 @@
     "dev": "tsup --dts --watch --onSuccess \"node dist/index.js\"",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\"",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate"
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "tsx src/seed.ts",
+    "prebuild": "pnpm run generate",
+    "predev": "pnpm run generate"
   },
   "dependencies": {
     "@prisma/client": "^5.7.1"
@@ -22,9 +25,9 @@
     "@types/node": "^20.10.5",
     "prettier": "^3.1.1",
     "prisma": "^5.7.1",
-    "ts-node": "^10.9.2",
     "tsconfig": "workspace:*",
     "tsup": "^8.0.1",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
 }
