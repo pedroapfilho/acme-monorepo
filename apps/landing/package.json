@@ -6,14 +6,15 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.3.3",
+    "@hookform/resolvers": "^3.3.4",
     "@rive-app/react-canvas": "^4.7.0",
     "@vercel/analytics": "^1.1.1",
-    "framer-motion": "^10.16.16",
-    "lucide-react": "^0.303.0",
+    "framer-motion": "^10.17.9",
+    "lucide-react": "^0.307.0",
     "next": "^14.0.4",
     "next-auth": "^4.24.5",
     "react": "^18.2.0",
@@ -25,18 +26,18 @@
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.10.6",
-    "@types/react": "^18.2.46",
+    "@types/node": "^20.10.7",
+    "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.16",
     "clsx": "^2.1.0",
     "eslint-config-custom": "workspace:*",
-    "postcss": "^8.4.32",
+    "postcss": "^8.4.33",
     "prettier": "^3.1.1",
-    "prettier-plugin-tailwindcss": "^0.5.10",
+    "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwind-config": "workspace:*",
     "tailwind-merge": "^2.2.0",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "^3.4.1",
     "tsconfig": "workspace:*",
     "typescript": "^5.3.3"
   }

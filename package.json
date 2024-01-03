@@ -1,17 +1,18 @@
 {
   "private": true,
   "scripts": {
-    "start": "turbo start",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "test": "turbo test",
-    "build": "turbo build",
+    "start": "turbo run start",
+    "dev": "turbo run dev --concurrency 12",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "build": "turbo run build",
+    "clean": "turbo run clean && rm -rf node_modules",
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
     "db:seed": "turbo run db:seed"
   },
   "devDependencies": {
     "tsconfig": "workspace:*",
-    "turbo": "^1.11.2"
+    "turbo": "^1.11.3"
   }
 }
