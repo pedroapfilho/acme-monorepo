@@ -14,16 +14,15 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
     "db:seed": "tsx src/seed.ts",
-    "prebuild": "pnpm run generate",
-    "predev": "pnpm run generate"
+    "postinstall": "pnpm run db:generate"
   },
   "dependencies": {
     "@prisma/client": "^5.8.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.10.8",
-    "prettier": "^3.1.1",
+    "@types/node": "^20.11.0",
+    "prettier": "^3.2.1",
     "prisma": "^5.8.0",
     "tsconfig": "workspace:*",
     "tsup": "^8.0.1",

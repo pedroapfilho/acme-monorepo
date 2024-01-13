@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "turbo run start",
-    "dev": "turbo run dev --concurrency 12",
+    "dev": "turbo run dev --concurrency 16",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "build": "turbo run build",

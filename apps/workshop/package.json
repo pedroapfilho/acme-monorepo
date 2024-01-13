@@ -13,24 +13,24 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.1",
+    "react-router-dom": "^6.21.2",
     "ui": "workspace:*"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^7.6.7",
-    "@storybook/addon-essentials": "^7.6.7",
-    "@storybook/blocks": "^7.6.7",
-    "@storybook/react": "^7.6.7",
-    "@storybook/react-vite": "^7.6.7",
+    "@storybook/addon-a11y": "^7.6.8",
+    "@storybook/addon-essentials": "^7.6.8",
+    "@storybook/blocks": "^7.6.8",
+    "@storybook/react": "^7.6.8",
+    "@storybook/react-vite": "^7.6.8",
     "@storybook/testing-library": "^0.2.2",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/react": "^18.2.47",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "eslint-plugin-storybook": "^0.6.15",
-    "prettier": "^3.1.1",
+    "prettier": "^3.2.1",
     "prettier-plugin-tailwindcss": "^0.5.11",
-    "storybook": "^7.6.7",
+    "storybook": "^7.6.8",
     "tsconfig": "workspace:*",
     "vite": "^5.0.11"
   }
