@@ -1,13 +1,11 @@
-import React from "react";
-
-import "ui/styles.css";
-import "@/styles.css";
-
-import { Preview } from "@storybook/react";
 import {
   DEFAULT_THEME,
   withTailwindTheme,
 } from "./withTailwindTheme.decorator";
+import "@/styles.css";
+import "@repo/ui/styles.css";
+import { Preview } from "@storybook/react";
+import React from "react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 
 const preview: Preview = {

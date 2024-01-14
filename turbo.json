@@ -10,25 +10,37 @@
     "CORS_ORIGIN_URL",
     "PORT",
     "REDIS_URL",
+    "EV_JOB_KEY",
 
     "SECRET",
-    "DATABASE_URL"
+    "JOB_URL",
+    "DATABASE_URL",
+    "RESEND_API_KEY",
+    "EV_API_KEY"
   ],
   "pipeline": {
     "build": {
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/dist/**"],
       "dependsOn": ["^build"]
     },
-    "lint": {
-      "outputs": []
+    "test": {
+      "outputs": ["coverage/**"],
+      "dependsOn": []
     },
-    "clean": {
-      "cache": false
+    "lint": {
+      "dependsOn": ["^build"]
     },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
+    },
+    "start": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "clean": {
+      "cache": false
     },
     "db:generate": {
       "cache": false

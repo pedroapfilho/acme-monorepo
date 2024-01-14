@@ -11,6 +11,9 @@
   "sideEffects": [
     "**/*.css"
   ],
+  "files": [
+    "dist/**"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "tsup",

@@ -20,7 +20,7 @@
     "@fastify/helmet": "^11.1.1",
     "@fastify/jwt": "^8.0.0",
     "@fastify/redis": "^6.1.1",
-    "db": "workspace:*",
+    "@repo/db": "workspace:*",
     "fastify": "^4.25.2",
     "resend": "^2.1.0",
     "undici": "^6.3.0"

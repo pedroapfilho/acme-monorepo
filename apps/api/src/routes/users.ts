@@ -1,4 +1,4 @@
-import { prisma } from "db";
+import { prisma } from "@repo/db";
 import { FastifyInstance } from "fastify";
 
 const usersRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {

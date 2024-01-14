@@ -1,7 +1,7 @@
 import { hashPassword, verifyPassword } from "@/utils/hash";
 import getResendClient from "@/utils/resend";
+import { prisma } from "@repo/db";
 import crypto from "crypto";
-import { prisma } from "db";
 import { FastifyInstance } from "fastify";
 
 const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
