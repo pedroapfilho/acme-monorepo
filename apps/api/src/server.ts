@@ -72,6 +72,7 @@ const createServer = async () => {
         "HTTP_HOST",
         "HTTP_PORT",
         "CORS_ORIGIN_URL",
+        "RESEND_API_KEY",
       ],
       properties: {
         NODE_ENV: {

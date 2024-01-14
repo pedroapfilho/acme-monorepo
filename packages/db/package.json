@@ -25,6 +25,7 @@
     "prettier": "^3.2.1",
     "prisma": "^5.8.0",
     "@repo/tsconfig": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
     "tsup": "^8.0.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"

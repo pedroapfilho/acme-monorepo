@@ -10,13 +10,10 @@
     "CORS_ORIGIN_URL",
     "PORT",
     "REDIS_URL",
-    "EV_JOB_KEY",
 
     "SECRET",
-    "JOB_URL",
     "DATABASE_URL",
-    "RESEND_API_KEY",
-    "EV_API_KEY"
+    "RESEND_API_KEY"
   ],
   "pipeline": {
     "build": {
