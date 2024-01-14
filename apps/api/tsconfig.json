@@ -1,5 +1,5 @@
 {
-  "extends": "tsconfig/server.json",
+  "extends": "@repo/tsconfig/server.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
