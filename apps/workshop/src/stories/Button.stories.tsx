@@ -1,5 +1,5 @@
+import { Button } from "@repo/ui";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "ui";
 
 type Story = StoryObj<typeof Button>;
 

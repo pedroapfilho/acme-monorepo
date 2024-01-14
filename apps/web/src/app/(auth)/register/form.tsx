@@ -2,7 +2,6 @@
 
 import { register } from "@/app/(auth)/register/action";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Input,
   Form,
@@ -12,7 +11,8 @@ import {
   FormLabel,
   FormMessage,
   Button,
-} from "ui";
+} from "@repo/ui";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const formSchema = z.object({

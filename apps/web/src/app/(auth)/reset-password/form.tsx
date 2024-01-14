@@ -2,9 +2,6 @@
 
 import { resetPassword } from "./action";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signOut } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
 import {
   Input,
   Form,
@@ -14,7 +11,10 @@ import {
   FormLabel,
   FormMessage,
   Button,
-} from "ui";
+} from "@repo/ui";
+import { signOut } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const formSchema = z.object({

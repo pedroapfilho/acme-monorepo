@@ -1,4 +1,4 @@
 module.exports = {
   root: true,
-  extends: ["custom", "plugin:storybook/recommended"],
+  extends: ["@repo/eslint-config", "plugin:storybook/recommended"],
 };

@@ -14,9 +14,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.2",
-    "ui": "workspace:*"
+    "@repo/ui": "workspace:*"
   },
   "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
     "@storybook/addon-a11y": "^7.6.8",
     "@storybook/addon-essentials": "^7.6.8",
     "@storybook/blocks": "^7.6.8",

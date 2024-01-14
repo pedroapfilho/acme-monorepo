@@ -1,5 +1,5 @@
 {
-  "name": "ui",
+  "name": "@repo/ui",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -27,7 +27,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "eslint": "^8.56.0",
-    "@repo/eslint-config-custom": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
     "postcss": "^8.4.33",
     "prettier": "^3.2.1",
     "prettier-plugin-tailwindcss": "^0.5.11",

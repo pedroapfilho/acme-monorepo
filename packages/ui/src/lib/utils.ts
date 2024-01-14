@@ -1,7 +1,7 @@
 import { ClassValue, clsx } from "clsx";
 import { createTailwindMerge, getDefaultConfig } from "tailwind-merge";
 
-const PREFIX = "ui";
+const PREFIX = "@repo/ui";
 
 const twMerge = createTailwindMerge(() => {
   const config = getDefaultConfig();
