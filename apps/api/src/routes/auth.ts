@@ -142,7 +142,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
     },
     async (request, reply) => {
       try {
-        // TODO: create a ticket on Plain
+        // TODO: create a ticket somewhere
 
         return;
       } catch (error) {

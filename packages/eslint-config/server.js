@@ -24,14 +24,6 @@ module.exports = {
       },
     },
   },
-  overrides: [
-    {
-      files: ["**/__tests__/**/*"],
-      env: {
-        jest: true,
-      },
-    },
-  ],
   ignorePatterns: ["node_modules/", "dist/"],
   rules: {
     "import/no-default-export": "off",
