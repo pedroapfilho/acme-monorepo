@@ -1,10 +1,5 @@
 {
-  "extends": "@repo/tsconfig/base.json",
-  "compilerOptions": {
-    "lib": ["ES2021"],
-    "module": "CommonJS",
-    "target": "ES2021"
-  },
+  "extends": "@repo/typescript-config/library.json",
   "include": ["src/**/*.ts", "tsup.config.ts"],
   "exclude": ["node_modules"]
 }

@@ -26,7 +26,7 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: [".*.js", "node_modules/", "dist/"],
+  ignorePatterns: ["node_modules/", "dist/", ".eslintrc.js", "**/*.css"],
   overrides: [
     {
       files: ["*.js?(x)", "*.ts?(x)"],

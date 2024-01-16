@@ -1,11 +1,13 @@
 {
-  "extends": "@repo/tsconfig/react-library.json",
+  "extends": "@repo/typescript-config/react-library.json",
   "compilerOptions": {
+    "lib": ["dom", "ES2015"],
+    "types": ["node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }

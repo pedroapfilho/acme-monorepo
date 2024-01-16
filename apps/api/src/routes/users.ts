@@ -36,7 +36,12 @@ const usersRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
     },
   );
 
-  app.put(
+  app.put<{
+    Body: {
+      name: string;
+      phone: string;
+    };
+  }>(
     "/edit",
     {
       preHandler: [app.authenticate],
@@ -61,10 +66,7 @@ const usersRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           return { error: "USER_NOT_FOUND" };
         }
 
-        const { name, phone } = request.body as {
-          name: string;
-          phone: string;
-        };
+        const { name, phone } = request.body;
 
         const updatedUser = await prisma.user.update({
           where: { id },
