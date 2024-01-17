@@ -52,7 +52,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
         const token = app.jwt.sign(
           { id: user.id, name: user.name, email: user.email },
           {
-            expiresIn: "8h",
+            expiresIn: "30d",
           },
         );
 
@@ -102,7 +102,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
         });
 
         const response = await resend.emails.send({
-          from: "no-reply@no-reply.hasteo.com",
+          from: "no-reply@no-reply.acme.com",
           to: user.email,
           subject: "Hasteo - Account Information",
           text: `Hey ${user.name}, your account ID is: ${id}, use it to login into your account with the password you created. We suggest you to write this information somewhere, and delete this email.`,
@@ -180,7 +180,7 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
         const token = app.jwt.sign(
           { id: user.id, name: user.name, email: user.email },
           {
-            expiresIn: "4h",
+            expiresIn: "30d",
           },
         );
 
@@ -223,13 +223,13 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
           },
         );
 
-        const resetLink = new URL("https://hasteo.com/reset-password");
+        const resetLink = new URL("https://acme.com/reset-password");
 
         resetLink.searchParams.append("email", email);
         resetLink.searchParams.append("token", token);
 
         const response = await resend.emails.send({
-          from: "no-reply@no-reply.hasteo.com",
+          from: "no-reply@no-reply.acme.com",
           to: email,
           subject: "Hasteo - Reset Password",
           text: `Hey, you requested to recover your account, click here to recover it: ${resetLink.href}`,
