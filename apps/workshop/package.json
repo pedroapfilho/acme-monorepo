@@ -13,14 +13,14 @@
   "dependencies": {
     "@repo/ui": "workspace:*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.2"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@storybook/addon-a11y": "^7.6.8",
     "@storybook/addon-essentials": "^7.6.8",
+    "@storybook/addon-themes": "^7.6.9",
     "@storybook/react": "^7.6.8",
     "@storybook/react-vite": "^7.6.8",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
