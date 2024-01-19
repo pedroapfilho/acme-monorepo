@@ -142,7 +142,16 @@ const authRoutes = (app: FastifyInstance, _: unknown, done: () => void) => {
     },
     async (request, reply) => {
       try {
+        const { email } = request.body;
+
         // TODO: create a ticket somewhere
+        const result = await new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(email);
+          }, 2000);
+        });
+
+        console.log(result);
 
         return;
       } catch (error) {

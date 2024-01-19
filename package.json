@@ -11,7 +11,7 @@
     "db:seed": "turbo run db:seed"
   },
   "devDependencies": {
-    "turbo": "^1.11.3"
+    "turbo": "^1.12.2"
   },
   "packageManager": "pnpm@8.14.1"
 }
