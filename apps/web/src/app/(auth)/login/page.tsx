@@ -1,5 +1,6 @@
 import LoginForm from "@/app/(auth)/login/form";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const Page = async () => {
   return (
@@ -8,7 +9,9 @@ const Page = async () => {
         <div className="space-y-8 bg-white px-6 py-12 shadow sm:rounded-md sm:px-12">
           <h2 className="text-lg font-semibold">Log In to Acme</h2>
 
-          <LoginForm />
+          <Suspense>
+            <LoginForm />
+          </Suspense>
         </div>
 
         <div className="flex flex-col gap-2">

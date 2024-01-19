@@ -1,5 +1,6 @@
 import ResetPasswordForm from "@/app/(auth)/reset-password/form";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const Page = () => {
   return (
@@ -8,7 +9,9 @@ const Page = () => {
         <div className="space-y-8 bg-white px-6 py-12 shadow sm:rounded-md sm:px-12">
           <h2 className="text-lg font-semibold">Reset your password</h2>
 
-          <ResetPasswordForm />
+          <Suspense>
+            <ResetPasswordForm />
+          </Suspense>
         </div>
 
         <div>
