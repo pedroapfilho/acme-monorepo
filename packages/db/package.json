@@ -17,15 +17,15 @@
     "postinstall": "pnpm run db:generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.9.0"
+    "@prisma/client": "^5.9.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.11.15",
-    "prettier": "^3.2.4",
-    "prisma": "^5.9.0",
+    "@types/node": "^20.11.17",
+    "prettier": "^3.2.5",
+    "prisma": "^5.9.1",
     "tsup": "^8.0.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
