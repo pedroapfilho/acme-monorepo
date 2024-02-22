@@ -17,17 +17,17 @@
     "@fastify/jwt": "^8.0.0",
     "@fastify/redis": "^6.1.1",
     "@repo/db": "workspace:*",
-    "fastify": "^4.26.1",
+    "fastify": "^4.26.2",
     "resend": "^3.2.0",
-    "undici": "^6.6.2"
+    "undici": "^6.7.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.11.17",
-    "eslint": "^8.56.0",
-    "pino": "^8.18.0",
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "pino": "^8.19.0",
     "pino-pretty": "^10.3.1",
     "prettier": "^3.2.5",
     "tsup": "^8.0.2",
