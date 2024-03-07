@@ -25,12 +25,12 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.11.24",
+    "@types/node": "^20.11.25",
     "eslint": "^8.57.0",
     "pino": "^8.19.0",
     "pino-pretty": "^10.3.1",
     "prettier": "^3.2.5",
     "tsup": "^8.0.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.2"
   }
 }
