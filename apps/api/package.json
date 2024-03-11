@@ -19,7 +19,7 @@
     "@repo/db": "workspace:*",
     "fastify": "^4.26.2",
     "resend": "^3.2.0",
-    "undici": "^6.7.0"
+    "undici": "^6.7.1"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
