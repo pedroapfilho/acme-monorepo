@@ -29,10 +29,10 @@
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/react": "^18.2.74",
+    "@types/react": "^18.2.78",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.13",
@@ -40,15 +40,15 @@
     "tailwind-merge": "^2.2.2",
     "tailwindcss": "^3.4.3",
     "tsup": "^8.0.2",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tabs": "^1.0.4",
-    "lucide-react": "^0.364.0",
-    "react-hook-form": "^7.51.2",
+    "lucide-react": "^0.368.0",
+    "react-hook-form": "^7.51.3",
     "zod": "^3.22.4"
   }
 }
