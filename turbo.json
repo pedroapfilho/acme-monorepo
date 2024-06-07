@@ -15,7 +15,7 @@
     "DATABASE_URL",
     "RESEND_API_KEY"
   ],
-  "pipeline": {
+  "tasks": {
     "build": {
       "outputs": [
         "dist/**",
