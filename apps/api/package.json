@@ -27,9 +27,9 @@
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^20.14.2",
     "eslint": "^9.4.0",
-    "pino": "^9.1.0",
-    "pino-pretty": "^11.1.0",
-    "prettier": "^3.3.1",
+    "pino": "^9.2.0",
+    "pino-pretty": "^11.2.0",
+    "prettier": "^3.3.2",
     "tsup": "^8.1.0",
     "typescript": "^5.4.5"
   }
