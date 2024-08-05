@@ -1,30 +1,50 @@
 import RegisterForm from "@/app/(auth)/register/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui";
+import { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+
+const metadata: Metadata = {
+  title: "Create an account - Hasteo",
+};
 
 const Page = async () => {
   return (
-    <>
-      <div className="flex flex-col gap-4 sm:mx-auto sm:w-full sm:max-w-[480px]">
-        <div className="space-y-8 bg-white px-6 py-12 shadow sm:rounded-md sm:px-12">
-          <h2 className="text-lg font-semibold">Register to Acme</h2>
+    <div className="flex flex-col gap-4 sm:mx-auto sm:w-full sm:max-w-[480px]">
+      <Card>
+        <CardHeader>
+          <CardTitle>Create an account</CardTitle>
 
-          <RegisterForm />
-        </div>
+          <CardDescription>
+            Please enter your details to create an account
+          </CardDescription>
+        </CardHeader>
 
-        <div>
-          <p className="text-center text-sm">
+        <CardContent className="flex flex-col gap-4">
+          <Suspense>
+            <RegisterForm />
+          </Suspense>
+          <p className="text-sm">
             Already a member?{" "}
             <Link
               href="/login"
-              className="font-semibold leading-6 hover:text-neutral-600"
+              className="font-semibold hover:text-neutral-600"
             >
               Log in into your account
             </Link>
           </p>
-        </div>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
+
+export { metadata };
 
 export default Page;

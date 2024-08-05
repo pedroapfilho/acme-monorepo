@@ -1,50 +1,43 @@
-import { getToken } from "next-auth/jwt";
-import { withAuth } from "next-auth/middleware";
+import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-export default withAuth(
-  async function middleware(req) {
-    const token = await getToken({ req });
+export default auth((req) => {
+  const hasAuthenticated = req.auth;
 
-    const hasAuthenticated = !!token;
+  const isAuthenticating =
+    req.nextUrl.pathname.startsWith("/login") ||
+    req.nextUrl.pathname.startsWith("/register") ||
+    req.nextUrl.pathname.startsWith("/recover");
 
-    const isAuthenticating =
-      req.nextUrl.pathname.startsWith("/login") ||
-      req.nextUrl.pathname.startsWith("/register") ||
-      req.nextUrl.pathname.startsWith("/recover");
+  const isResettingPassword =
+    req.nextUrl.pathname.startsWith("/reset-password");
 
-    if (isAuthenticating) {
-      if (hasAuthenticated) {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-
-      return null;
+  if (isAuthenticating) {
+    if (hasAuthenticated && !isResettingPassword) {
+      return NextResponse.redirect(new URL("/", req.url));
     }
 
-    if (!hasAuthenticated) {
-      let from = req.nextUrl.pathname;
+    return;
+  }
 
-      if (req.nextUrl.search) {
-        from += req.nextUrl.search;
-      }
+  if (!hasAuthenticated) {
+    let from = req.nextUrl.pathname;
 
-      return NextResponse.redirect(
-        new URL(`/login?from=${encodeURIComponent(from)}`, req.url),
-      );
+    if (req.nextUrl.search) {
+      from += req.nextUrl.search;
     }
-  },
-  {
-    callbacks: {
-      async authorized() {
-        // This is a work-around for handling redirect on auth pages.
-        // We return true here so that the middleware function above
-        // is always called.
-        return true;
-      },
-    },
-  },
-);
+
+    return NextResponse.redirect(
+      new URL(`/login?from=${encodeURIComponent(from)}`, req.url),
+    );
+  }
+});
 
 export const config = {
-  matcher: ["/:path*", "/login", "/register", "/recover"],
+  matcher: [
+    "/login",
+    "/register",
+    "/recover",
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

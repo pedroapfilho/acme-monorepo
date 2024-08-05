@@ -1,6 +1,6 @@
 "use client";
 
-import { register } from "@/app/(auth)/register/action";
+import { register } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Input,
@@ -12,6 +12,7 @@ import {
   FormMessage,
   Button,
 } from "@repo/ui";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -20,9 +21,11 @@ const formSchema = z.object({
   phone: z.string().min(5).max(20),
   email: z.string().email(),
   password: z.string().min(8),
+  confirmPassword: z.string().min(8),
 });
 
 const RegisterForm = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,17 +33,35 @@ const RegisterForm = () => {
       phone: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
     try {
-      const hasRegisteredSuccessfully = await register(data);
+      const { confirmPassword, ...rest } = data;
+
+      if (rest.password !== confirmPassword) {
+        form.setError("confirmPassword", {
+          type: "manual",
+          message: "Passwords do not match.",
+        });
+
+        return;
+      }
+
+      const hasRegisteredSuccessfully = await register(rest);
 
       if (!hasRegisteredSuccessfully) {
         throw new Error("SOMETHING_WENT_WRONG");
       }
+
+      console.log("Registered successfully, check your email.");
+
+      router.push("/login");
     } catch (e) {
+      console.error("Failed to register. Please try again later.");
+
       console.error(e);
     }
   });
@@ -107,6 +128,21 @@ const RegisterForm = () => {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
+              <FormControl>
+                <Input placeholder="supersecret" type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button className="w-full" type="submit">
           Register
         </Button>

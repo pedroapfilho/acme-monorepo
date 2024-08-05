@@ -1,6 +1,6 @@
 "use client";
 
-import { resetPassword } from "./action";
+import { resetPassword } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Input,
@@ -26,6 +26,9 @@ const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const email = searchParams.get("email");
+  const token = searchParams.get("token");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,9 +42,6 @@ const ResetPasswordForm = () => {
       if (data.password !== data.confirmPassword) {
         throw new Error("PASSWORDS_DO_NOT_MATCH");
       }
-
-      const email = searchParams.get("email");
-      const token = searchParams.get("token");
 
       if (!email || !token) {
         router.replace("/login");
@@ -59,8 +59,12 @@ const ResetPasswordForm = () => {
         throw new Error("SOMETHING_WENT_WRONG");
       }
 
+      console.log("Password changed, please login again.");
+
       await signOut({ callbackUrl: "/" });
     } catch (e) {
+      console.error("Failed to reset the password. Please try again later.");
+
       console.error(e);
     }
   });

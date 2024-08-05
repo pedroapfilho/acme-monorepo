@@ -1,5 +1,6 @@
 "use client";
 
+import { login } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Input,
@@ -11,8 +12,6 @@ import {
   FormMessage,
   Button,
 } from "@repo/ui";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -22,8 +21,6 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
-  const searchParams = useSearchParams();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,25 +29,25 @@ const LoginForm = () => {
     },
   });
 
-  const onSubmit = form.handleSubmit(async ({ id, password }) => {
+  const handleSubmit = async (formData: FormData) => {
     try {
-      const response = await signIn("credentials", {
-        id,
-        password,
-        callbackUrl: searchParams?.get("from") || "/",
+      await login(formData);
+    } catch (error) {
+      form.setError("id", {
+        type: "manual",
+        message: "Invalid credentials",
       });
 
-      if (!response?.ok) {
-        throw new Error("SOMETHING_WENT_WRONG");
-      }
-    } catch (e) {
-      console.error(e);
+      form.setError("password", {
+        type: "manual",
+        message: "Invalid credentials",
+      });
     }
-  });
+  };
 
   return (
     <Form {...form}>
-      <form className="space-y-4" onSubmit={onSubmit}>
+      <form className="space-y-4" action={handleSubmit}>
         <FormField
           control={form.control}
           name="id"

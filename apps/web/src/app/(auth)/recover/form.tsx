@@ -1,6 +1,6 @@
 "use client";
 
-import { recover } from "@/app/(auth)/recover/action";
+import { recover } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Input,
@@ -12,6 +12,7 @@ import {
   FormMessage,
   Button,
 } from "@repo/ui";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -20,6 +21,8 @@ const formSchema = z.object({
 });
 
 const RecoverForm = () => {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,7 +37,15 @@ const RecoverForm = () => {
       if (!hasRequestedRecoverySuccessfully) {
         throw new Error("SOMETHING_WENT_WRONG");
       }
+
+      console.log("Successfully submitted the recovery.");
+
+      router.push("/login");
     } catch (e) {
+      console.error(
+        "Failed to submit the recovery. Please get in touch with support.",
+      );
+
       console.error(e);
     }
   });
