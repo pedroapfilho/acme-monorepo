@@ -1,4 +1,3 @@
-import "@/styles.css";
 import "@repo/ui/styles.css";
 import { withThemeByDataAttribute } from "@storybook/addon-themes";
 import { Preview, ReactRenderer } from "@storybook/react";
