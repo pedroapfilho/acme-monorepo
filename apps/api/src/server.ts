@@ -40,6 +40,8 @@ const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
     return await request.jwtVerify();
   } catch (e) {
+    request.log.error(e);
+
     reply.code(403);
 
     return { error: "NOT_AUTHORIZED" };

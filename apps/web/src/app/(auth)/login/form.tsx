@@ -32,7 +32,9 @@ const LoginForm = () => {
   const handleSubmit = async (formData: FormData) => {
     try {
       await login(formData);
-    } catch (error) {
+    } catch (e) {
+      console.error(e);
+
       form.setError("id", {
         type: "manual",
         message: "Invalid credentials",
