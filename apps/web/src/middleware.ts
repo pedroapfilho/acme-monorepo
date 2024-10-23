@@ -1,43 +1,42 @@
 import { auth } from "@/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export default auth((req) => {
-  const hasAuthenticated = req.auth;
+const middleware = auth((request: NextRequest) => {
+  const hasAuthenticated = "auth" in request && request.auth;
 
   const isAuthenticating =
-    req.nextUrl.pathname.startsWith("/login") ||
-    req.nextUrl.pathname.startsWith("/register") ||
-    req.nextUrl.pathname.startsWith("/recover");
+    request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/register") ||
+    request.nextUrl.pathname.startsWith("/recover");
 
   const isResettingPassword =
-    req.nextUrl.pathname.startsWith("/reset-password");
+    request.nextUrl.pathname.startsWith("/reset-password");
 
   if (isAuthenticating) {
     if (hasAuthenticated && !isResettingPassword) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     return;
   }
 
   if (!hasAuthenticated) {
-    let from = req.nextUrl.pathname;
+    let from = request.nextUrl.pathname;
 
-    if (req.nextUrl.search) {
-      from += req.nextUrl.search;
+    if (request.nextUrl.search) {
+      from += request.nextUrl.search;
     }
 
     return NextResponse.redirect(
-      new URL(`/login?from=${encodeURIComponent(from)}`, req.url),
+      new URL(`/login?from=${encodeURIComponent(from)}`, request.url),
     );
   }
 });
 
-export const config = {
-  matcher: [
-    "/login",
-    "/register",
-    "/recover",
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
+
+export { config };
+
+export default middleware;
