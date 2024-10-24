@@ -73,6 +73,7 @@ const createServer = async () => {
         "SECRET",
         "HTTP_HOST",
         "HTTP_PORT",
+        "REDIS_URL",
         "CORS_ORIGIN_URL",
         "RESEND_API_KEY",
       ],
@@ -90,6 +91,9 @@ const createServer = async () => {
         HTTP_PORT: {
           type: "number",
           default: 8000,
+        },
+        REDIS_URL: {
+          type: "string",
         },
         CORS_ORIGIN_URL: {
           type: "string",

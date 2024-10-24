@@ -7,13 +7,15 @@
     "NEXTAUTH_SECRET",
     "API_URL",
 
-    "CORS_ORIGIN_URL",
     "PORT",
-    "REDIS_URL",
-
     "SECRET",
-    "DATABASE_URL",
-    "RESEND_API_KEY"
+    "HTTP_HOST",
+    "HTTP_PORT",
+    "REDIS_URL",
+    "CORS_ORIGIN_URL",
+    "RESEND_API_KEY",
+
+    "DATABASE_URL"
   ],
   "tasks": {
     "build": {
