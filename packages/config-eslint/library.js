@@ -1,11 +1,11 @@
-import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
-import ts from "typescript-eslint";
+import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginOnlyWarn from "eslint-plugin-only-warn";
-import path from "path";
-import { fileURLToPath } from "url";
 import globals from "globals";
+import path from "path";
+import ts from "typescript-eslint";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -48,5 +48,5 @@ export default ts.config(
       },
     },
   }),
-  eslintConfigPrettier
+  eslintConfigPrettier,
 );

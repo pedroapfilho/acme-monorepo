@@ -1,13 +1,13 @@
-import js from "@eslint/js";
+import { fixupConfigRules } from "@eslint/compat";
 import { FlatCompat } from "@eslint/eslintrc";
-import ts from "typescript-eslint";
+import js from "@eslint/js";
+import next from "@vercel/style-guide/eslint/next";
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginOnlyWarn from "eslint-plugin-only-warn";
-import path from "path";
-import { fileURLToPath } from "url";
 import globals from "globals";
-import next from "@vercel/style-guide/eslint/next";
-import { fixupConfigRules } from "@eslint/compat";
+import path from "path";
+import ts from "typescript-eslint";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,11 +18,7 @@ const compat = new FlatCompat({
 
 export default ts.config(
   {
-    ignores: [
-      // Ignore dotfiles
-      ".*.js",
-      "node_modules/",
-    ],
+    ignores: [".*.js", "node_modules/"],
   },
   {
     languageOptions: {
@@ -56,5 +52,5 @@ export default ts.config(
       },
     },
   }),
-  eslintConfigPrettier
+  eslintConfigPrettier,
 );
