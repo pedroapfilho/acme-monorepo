@@ -23,7 +23,7 @@
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/node": "^22.13.2",
+    "@types/node": "^22.13.4",
     "prettier": "^3.5.1",
     "prisma": "^6.3.1",
     "tsup": "^8.3.6",
