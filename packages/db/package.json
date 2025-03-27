@@ -7,9 +7,9 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "bunchee",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "tsup --dts --watch --onSuccess \"node dist/index.js\"",
+    "dev": "bunchee --watch",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\"",
     "db:generate": "prisma generate",
     "db:push": "prisma db push --skip-generate",
@@ -24,10 +24,10 @@
     "@repo/typescript-config": "workspace:*",
     "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/node": "22.13.14",
+    "bunchee": "6.5.0",
     "prettier": "3.5.3",
     "prisma": "6.5.0",
-    "tsup": "8.4.0",
-    "tsx": "4.19.3",
+    "tsx": "4.19.2",
     "typescript": "5.8.2"
   }
 }
