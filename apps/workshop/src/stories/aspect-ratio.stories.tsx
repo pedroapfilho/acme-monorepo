@@ -1,4 +1,4 @@
-import { AspectRatio } from "@repo/ui/components/aspect-ratio";
+import { AspectRatio } from "@repo/ui";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof AspectRatio> = {

@@ -1,8 +1,6 @@
 import { Meta, StoryObj } from "@storybook/react";
 
-import { Checkbox } from "@repo/ui/components/checkbox";
-import { Label } from "@repo/ui/components/label";
-import { Button } from "@repo/ui/components/button";
+import { Label,Checkbox, Button } from "@repo/ui";
 import { useState } from "storybook/internal/preview-api";
 
 const meta: Meta<typeof Checkbox> = {

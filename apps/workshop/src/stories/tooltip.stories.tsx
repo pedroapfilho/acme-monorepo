@@ -19,13 +19,13 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import { Button } from "@repo/ui/components/button";
-import { Input } from "@repo/ui/components/input";
 import {
+  Button,
+  Input,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@repo/ui/components/tooltip";
+} from "@repo/ui";
 
 const meta: Meta<typeof Tooltip> = {
   title: "ui/Tooltip",

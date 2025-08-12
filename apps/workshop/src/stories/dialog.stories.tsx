@@ -12,19 +12,16 @@ import {
   Plus,
 } from "lucide-react";
 
-import { Button } from "@repo/ui/components/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@repo/ui/components/dialog";
-import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
-import { Checkbox } from "@repo/ui/components/checkbox";
+  DialogTrigger,Input, Label,Checkbox
+} from "@repo/ui";
 
 const meta: Meta<typeof Dialog> = {
   title: "ui/Dialog",

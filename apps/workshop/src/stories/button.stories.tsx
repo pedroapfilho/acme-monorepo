@@ -15,7 +15,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import { Button } from "@repo/ui/components/button";
+import { Button } from "@repo/ui";
 
 const meta: Meta<typeof Button> = {
   title: "ui/Button",

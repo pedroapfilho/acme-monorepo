@@ -1,6 +1,5 @@
 import { NextAuthProvider } from "@/app/providers";
 import "@/styles/globals.css";
-import "@repo/ui/styles.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 

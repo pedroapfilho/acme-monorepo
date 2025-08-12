@@ -1,10 +1,7 @@
 import { Meta, StoryObj } from "@storybook/react";
 import { Mail, User, Lock, Phone, Calendar, DollarSign } from "lucide-react";
 
-import { Label } from "@repo/ui/components/label";
-import { Input } from "@repo/ui/components/input";
-import { Checkbox } from "@repo/ui/components/checkbox";
-import { Button } from "@repo/ui/components/button";
+import { Label, Input, Checkbox, Button } from "@repo/ui";
 
 const meta: Meta<typeof Label> = {
   title: "ui/Label",

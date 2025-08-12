@@ -2,16 +2,16 @@
 
 import { login } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@repo/ui/components/button";
 import {
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@repo/ui/components/form";
-import { Input } from "@repo/ui/components/input";
+  Input,
+} from "@repo/ui";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 

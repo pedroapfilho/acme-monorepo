@@ -8,10 +8,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/ui/components/table";
-import { Badge } from "@repo/ui/components/badge";
-import { Button } from "@repo/ui/components/button";
-import { Checkbox } from "@repo/ui/components/checkbox";
+  Badge,
+  Button,
+  Checkbox,
+} from "@repo/ui";
 
 const meta: Meta<typeof Table> = {
   title: "ui/Table",

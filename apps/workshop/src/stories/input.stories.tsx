@@ -12,9 +12,8 @@ import {
   Calendar,
 } from "lucide-react";
 
-import { Button } from "@repo/ui/components/button";
-import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
+import { Button,Input, Label } from "@repo/ui";
+
 
 const meta: Meta<typeof Input> = {
   title: "ui/Input",

@@ -17,9 +17,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-import { Label } from "@repo/ui/components/label";
-import { Switch } from "@repo/ui/components/switch";
-import { Button } from "@repo/ui/components/button";
+import { Label, Switch, Button } from "@repo/ui";
 
 const meta: Meta<typeof Switch> = {
   title: "ui/Switch",

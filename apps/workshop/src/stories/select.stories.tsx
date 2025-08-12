@@ -8,7 +8,6 @@ import {
   Star,
   Flag,
   Users,
-  Tag,
 } from "lucide-react";
 
 import {
@@ -20,9 +19,9 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "@repo/ui/components/select";
-import { Label } from "@repo/ui/components/label";
-import { Button } from "@repo/ui/components/button";
+  Label,
+  Button
+} from "@repo/ui";
 
 const meta: Meta<typeof Select> = {
   title: "ui/Select",

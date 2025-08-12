@@ -2,7 +2,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@repo/ui/components/avatar";
+} from "@repo/ui";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof Avatar> = {

@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/components/card";
+} from "@repo/ui";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";

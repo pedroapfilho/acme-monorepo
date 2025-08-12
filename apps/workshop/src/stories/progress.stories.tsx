@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Progress } from "@repo/ui/components/progress";
+import { Progress } from "@repo/ui";
 import { useState, useEffect } from "react";
 
 const meta: Meta<typeof Progress> = {

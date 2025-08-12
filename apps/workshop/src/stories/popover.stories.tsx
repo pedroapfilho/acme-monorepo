@@ -20,15 +20,16 @@ import {
   Bell,
 } from "lucide-react";
 
-import { Button } from "@repo/ui/components/button";
-import { Input } from "@repo/ui/components/input";
-import { Label } from "@repo/ui/components/label";
-import { Checkbox } from "@repo/ui/components/checkbox";
 import {
+  Button,
+  Input,
+  Checkbox,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@repo/ui/components/popover";
+  Label
+} from "@repo/ui";
+
 
 const meta: Meta<typeof Popover> = {
   title: "ui/Popover",
