@@ -32,13 +32,12 @@
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "autoprefixer": "^10.4.20",
     "clsx": "^2.1.1",
     "postcss": "^8.5.2",
     "prettier": "^3.5.1",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss": "^3.4.16",
+    "tailwindcss": "^4.1.11",
     "typescript": "^5.7.3"
   }
 }

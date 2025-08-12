@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@repo/tailwind-config";
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
