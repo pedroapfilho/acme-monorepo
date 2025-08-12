@@ -2,16 +2,16 @@
 
 import { resetPassword } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@repo/ui/components/button";
 import {
-  Input,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Button,
-} from "@repo/ui";
+} from "@repo/ui/components/form";
+import { Input } from "@repo/ui/components/input";
 import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
