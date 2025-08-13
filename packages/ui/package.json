@@ -30,7 +30,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "peerDependencies": {
-    "react": "^18.2.0"
+    "react": "^19.0.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
