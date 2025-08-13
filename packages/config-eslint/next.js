@@ -1,56 +1,49 @@
-import { fixupConfigRules } from "@eslint/compat";
-import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
-import next from "@vercel/style-guide/eslint/next";
 import eslintConfigPrettier from "eslint-config-prettier";
-import eslintPluginOnlyWarn from "eslint-plugin-only-warn";
+import tseslint from "typescript-eslint";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import pluginReact from "eslint-plugin-react";
 import globals from "globals";
-import path from "path";
-import ts from "typescript-eslint";
-import { fileURLToPath } from "url";
+import pluginNext from "@next/eslint-plugin-next";
+import { config as baseConfig } from "./base.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
-
-export default ts.config(
+/**
+ * A custom ESLint configuration for libraries that use Next.js.
+ *
+ * @type {import("eslint").Linter.Config}
+ * */
+export const nextJsConfig = [
+  ...baseConfig,
+  js.configs.recommended,
+  eslintConfigPrettier,
+  ...tseslint.configs.recommended,
   {
-    ignores: [".*.js", "node_modules/"],
-  },
-  {
+    ...pluginReact.configs.flat.recommended,
     languageOptions: {
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
+      ...pluginReact.configs.flat.recommended.languageOptions,
       globals: {
-        ...globals.node,
-        ...globals.browser,
+        ...globals.serviceworker,
       },
     },
   },
   {
     plugins: {
-      ["only-warn"]: eslintPluginOnlyWarn,
+      "@next/next": pluginNext,
+    },
+    rules: {
+      ...pluginNext.configs.recommended.rules,
+      ...pluginNext.configs["core-web-vitals"].rules,
     },
   },
-  js.configs.recommended,
-  ...fixupConfigRules(compat.config(next)),
-  ...compat.extends("turbo"),
-  ...ts.config({
-    files: ["**/*.js?(x)", "**/*.ts?(x)"],
-    extends: [...ts.configs.recommended],
-    languageOptions: {
-      parserOptions: {
-        projectService: {
-          allowDefaultProject: ["eslint.config.?(m)js"],
-        },
-      },
+  {
+    plugins: {
+      "react-hooks": pluginReactHooks,
     },
-  }),
-  eslintConfigPrettier,
-);
+    settings: { react: { version: "detect" } },
+    rules: {
+      ...pluginReactHooks.configs.recommended.rules,
+      // React scope no longer necessary with new JSX transform.
+      "react/react-in-jsx-scope": "off",
+    },
+  },
+];

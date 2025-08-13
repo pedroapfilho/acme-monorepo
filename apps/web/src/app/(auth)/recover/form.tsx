@@ -3,14 +3,14 @@
 import { recover } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Input,
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Button,
+  Input,
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";

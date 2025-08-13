@@ -1,7 +1,7 @@
-<link rel="preconnect" href="https://rsms.me/">
-<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<link rel="preconnect" href="https://rsms.me/" />
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
 
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
 <style>
   html {
@@ -12,12 +12,16 @@
     background-color: black;
     color: white;
   }
-  
+
   :root {
     --font-sans: Inter, sans-serif;
-    font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+    font-feature-settings:
+      "liga" 1,
+      "calt" 1; /* fix for Chrome */
   }
   @supports (font-variation-settings: normal) {
-    :root { --font-sans: InterVariable, sans-serif; }
+    :root {
+      --font-sans: InterVariable, sans-serif;
+    }
   }
 </style>

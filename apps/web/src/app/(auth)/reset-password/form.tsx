@@ -3,14 +3,14 @@
 import { resetPassword } from "@/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Input,
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  Button,
+  Input,
 } from "@repo/ui";
 import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";

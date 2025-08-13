@@ -3,7 +3,6 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
-import "@repo/ui/styles.css";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
 
