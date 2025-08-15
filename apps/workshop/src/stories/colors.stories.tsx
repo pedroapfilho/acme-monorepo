@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta = {
   title: "Design System/Colors",
@@ -10,45 +10,45 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-interface ColorSwatchProps {
+type ColorSwatchProps = {
   name: string;
   variable: string;
   description?: string;
-}
+};
 
 const ColorSwatch = ({ name, variable, description }: ColorSwatchProps) => (
-  <div className="flex items-center gap-4 p-4 border border-border rounded-lg">
+  <div className="border-border flex items-center gap-4 rounded-lg border p-4">
     <div
-      className="w-16 h-16 rounded-lg border border-border shadow-sm"
+      className="border-border h-16 w-16 rounded-lg border shadow-sm"
       style={{ backgroundColor: `var(${variable})` }}
     />
     <div className="flex-1">
-      <h3 className="font-medium text-foreground">{name}</h3>
-      <code className="text-sm text-muted-foreground font-mono">
+      <h3 className="text-foreground font-medium">{name}</h3>
+      <code className="text-muted-foreground font-mono text-sm">
         {variable}
       </code>
       {description && (
-        <p className="text-sm text-muted-foreground mt-1">{description}</p>
+        <p className="text-muted-foreground mt-1 text-sm">{description}</p>
       )}
     </div>
   </div>
 );
 
-interface ColorSectionProps {
+type ColorSectionProps = {
   title: string;
   colors: Array<{
     name: string;
     variable: string;
     description?: string;
   }>;
-}
+};
 
 const ColorSection = ({ title, colors }: ColorSectionProps) => (
   <div className="space-y-4">
-    <h2 className="text-xl font-semibold text-foreground border-b border-border pb-2">
+    <h2 className="text-foreground border-border border-b pb-2 text-xl font-semibold">
       {title}
     </h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {colors.map((color) => (
         <ColorSwatch
           key={color.variable}
@@ -63,9 +63,9 @@ const ColorSection = ({ title, colors }: ColorSectionProps) => (
 
 export const AllColors: Story = {
   render: () => (
-    <div className="max-w-6xl mx-auto space-y-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Color System</h1>
+    <div className="mx-auto max-w-6xl space-y-8">
+      <div className="space-y-2 text-center">
+        <h1 className="text-foreground text-3xl font-bold">Color System</h1>
         <p className="text-muted-foreground">
           Complete overview of all colors in the design system with their CSS
           variables

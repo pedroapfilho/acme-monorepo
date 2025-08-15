@@ -1,23 +1,7 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
-import {
-  Wifi,
-  Bluetooth,
-  Volume2,
-  VolumeX,
-  Bell,
-  BellOff,
-  Moon,
-  Sun,
-  Shield,
-  Lock,
-  Eye,
-  EyeOff,
-  Mail,
-  MessageSquare,
-} from "lucide-react";
-
 import { Label, Switch, Button } from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
+import { Wifi, Bluetooth, Bell, BellOff, Moon, Shield } from "lucide-react";
+import { useState } from "react";
 
 const meta: Meta<typeof Switch> = {
   title: "ui/Switch",
@@ -153,10 +137,10 @@ export const SettingsPanel: Story = {
     };
 
     return (
-      <div className="space-y-6 max-w-md">
+      <div className="max-w-md space-y-6">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Account Settings</h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Manage your account preferences and notifications
           </p>
         </div>
@@ -173,7 +157,7 @@ export const SettingsPanel: Story = {
                   >
                     Push notifications
                   </Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Receive push notifications on your devices
                   </p>
                 </div>
@@ -190,7 +174,7 @@ export const SettingsPanel: Story = {
                   <Label htmlFor="email-alerts" className="text-sm font-normal">
                     Email alerts
                   </Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Receive important updates via email
                   </p>
                 </div>
@@ -213,7 +197,7 @@ export const SettingsPanel: Story = {
                   <Label htmlFor="auto-save" className="text-sm font-normal">
                     Auto-save
                   </Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Automatically save your work
                   </p>
                 </div>
@@ -230,7 +214,7 @@ export const SettingsPanel: Story = {
                   <Label htmlFor="dark-theme" className="text-sm font-normal">
                     Dark theme
                   </Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Use dark mode interface
                   </p>
                 </div>
@@ -250,7 +234,7 @@ export const SettingsPanel: Story = {
                   >
                     Sound effects
                   </Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Play sounds for interactions
                   </p>
                 </div>
@@ -272,7 +256,7 @@ export const SettingsPanel: Story = {
                 <Label htmlFor="analytics" className="text-sm font-normal">
                   Analytics
                 </Label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Help improve our service with usage data
                 </p>
               </div>
@@ -308,16 +292,16 @@ export const SystemControls: Story = {
     };
 
     return (
-      <div className="space-y-4 max-w-sm">
+      <div className="max-w-sm space-y-4">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">System Controls</h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Quick access to system settings
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2 p-3 border rounded-lg">
+          <div className="space-y-2 rounded-lg border p-3">
             <div className="flex items-center justify-between">
               <Wifi
                 className={`h-5 w-5 ${
@@ -331,13 +315,13 @@ export const SystemControls: Story = {
             </div>
             <div>
               <p className="text-sm font-medium">WiFi</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {controls.wifi ? "Connected" : "Disconnected"}
               </p>
             </div>
           </div>
 
-          <div className="space-y-2 p-3 border rounded-lg">
+          <div className="space-y-2 rounded-lg border p-3">
             <div className="flex items-center justify-between">
               <Bluetooth
                 className={`h-5 w-5 ${
@@ -353,18 +337,18 @@ export const SystemControls: Story = {
             </div>
             <div>
               <p className="text-sm font-medium">Bluetooth</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {controls.bluetooth ? "On" : "Off"}
               </p>
             </div>
           </div>
 
-          <div className="space-y-2 p-3 border rounded-lg">
+          <div className="space-y-2 rounded-lg border p-3">
             <div className="flex items-center justify-between">
               {controls.doNotDisturb ? (
                 <BellOff className="h-5 w-5 text-orange-500" />
               ) : (
-                <Bell className="h-5 w-5 text-muted-foreground" />
+                <Bell className="text-muted-foreground h-5 w-5" />
               )}
               <Switch
                 checked={controls.doNotDisturb}
@@ -375,13 +359,13 @@ export const SystemControls: Story = {
             </div>
             <div>
               <p className="text-sm font-medium">Do Not Disturb</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {controls.doNotDisturb ? "Enabled" : "Disabled"}
               </p>
             </div>
           </div>
 
-          <div className="space-y-2 p-3 border rounded-lg">
+          <div className="space-y-2 rounded-lg border p-3">
             <div className="flex items-center justify-between">
               <Shield
                 className={`h-5 w-5 ${
@@ -397,7 +381,7 @@ export const SystemControls: Story = {
             </div>
             <div>
               <p className="text-sm font-medium">Location</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {controls.location ? "Enabled" : "Disabled"}
               </p>
             </div>
@@ -410,10 +394,10 @@ export const SystemControls: Story = {
 
 export const FormIntegration: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Project Preferences</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Configure your project settings
         </p>
       </div>
@@ -424,7 +408,7 @@ export const FormIntegration: Story = {
             <Label htmlFor="public-project" className="text-sm">
               Make project public
             </Label>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Allow others to view this project
             </p>
           </div>
@@ -436,7 +420,7 @@ export const FormIntegration: Story = {
             <Label htmlFor="allow-comments" className="text-sm">
               Allow comments
             </Label>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Let viewers leave feedback
             </p>
           </div>
@@ -448,7 +432,7 @@ export const FormIntegration: Story = {
             <Label htmlFor="email-updates" className="text-sm">
               Email updates
             </Label>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Receive notifications about project activity
             </p>
           </div>
@@ -460,7 +444,7 @@ export const FormIntegration: Story = {
             <Label htmlFor="auto-backup" className="text-sm">
               Automatic backups
             </Label>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Backup project data daily
             </p>
           </div>

@@ -1,15 +1,3 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
-import {
-  User,
-  MapPin,
-  Calendar,
-  Clock,
-  Star,
-  Flag,
-  Users,
-} from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -20,8 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
   Label,
-  Button
+  Button,
 } from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
+import { User, Calendar, Clock, Star, Flag, Users } from "lucide-react";
+import { useState } from "react";
 
 const meta: Meta<typeof Select> = {
   title: "ui/Select",
@@ -98,7 +89,7 @@ export const WithGroups: Story = {
 
 export const States: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Normal Select</Label>
         <Select>
@@ -148,7 +139,7 @@ export const Sizes: Story = {
       <div className="space-y-2">
         <Label>Small Select</Label>
         <Select>
-          <SelectTrigger className="h-8 text-sm w-40">
+          <SelectTrigger className="h-8 w-40 text-sm">
             <SelectValue placeholder="Small" />
           </SelectTrigger>
           <SelectContent>
@@ -174,7 +165,7 @@ export const Sizes: Story = {
       <div className="space-y-2">
         <Label>Large Select</Label>
         <Select>
-          <SelectTrigger className="h-12 text-base w-56">
+          <SelectTrigger className="h-12 w-56 text-base">
             <SelectValue placeholder="Large size" />
           </SelectTrigger>
           <SelectContent>
@@ -189,7 +180,7 @@ export const Sizes: Story = {
 
 export const WithIcons: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>User Role</Label>
         <Select>
@@ -253,7 +244,7 @@ export const WithIcons: Story = {
 
 export const CountrySelect: Story = {
   render: () => (
-    <div className="space-y-2 w-80">
+    <div className="w-80 space-y-2">
       <Label>Country</Label>
       <Select>
         <SelectTrigger>
@@ -291,10 +282,10 @@ export const CountrySelect: Story = {
 
 export const FormExample: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Project Settings</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Configure your project preferences
         </p>
       </div>
@@ -427,7 +418,7 @@ export const Controlled: Story = {
     const [value, setValue] = useState("");
 
     return (
-      <div className="space-y-4 w-80">
+      <div className="w-80 space-y-4">
         <div className="space-y-2">
           <Label>Controlled Select</Label>
           <Select value={value} onValueChange={setValue}>
@@ -442,7 +433,7 @@ export const Controlled: Story = {
             </SelectContent>
           </Select>
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Selected value: {value || "None"}
         </div>
         <div className="flex gap-2">
@@ -460,7 +451,7 @@ export const Controlled: Story = {
 
 export const SearchableSelect: Story = {
   render: () => (
-    <div className="space-y-2 w-80">
+    <div className="w-80 space-y-2">
       <Label>Technology Stack</Label>
       <Select>
         <SelectTrigger>
@@ -499,7 +490,7 @@ export const SearchableSelect: Story = {
 
 export const MultipleSelects: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Delivery Information</h3>
       </div>
@@ -544,19 +535,19 @@ export const MultipleSelects: Story = {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="standard">
-              <div className="flex items-center justify-between w-full">
+              <div className="flex w-full items-center justify-between">
                 <span>Standard (5-7 days)</span>
                 <span className="text-muted-foreground">Free</span>
               </div>
             </SelectItem>
             <SelectItem value="express">
-              <div className="flex items-center justify-between w-full">
+              <div className="flex w-full items-center justify-between">
                 <span>Express (2-3 days)</span>
                 <span className="text-muted-foreground">$9.99</span>
               </div>
             </SelectItem>
             <SelectItem value="overnight">
-              <div className="flex items-center justify-between w-full">
+              <div className="flex w-full items-center justify-between">
                 <span>Overnight (1 day)</span>
                 <span className="text-muted-foreground">$24.99</span>
               </div>

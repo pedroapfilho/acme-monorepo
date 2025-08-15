@@ -1,4 +1,5 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Button } from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Loader2,
   Mail,
@@ -14,8 +15,6 @@ import {
   Search,
   ArrowRight,
 } from "lucide-react";
-
-import { Button } from "@repo/ui";
 
 const meta: Meta<typeof Button> = {
   title: "ui/Button",
@@ -301,7 +300,7 @@ export const ActionButtons: Story = {
 
 export const FullWidth: Story = {
   render: () => (
-    <div className="space-y-4 max-w-md">
+    <div className="max-w-md space-y-4">
       <Button className="w-full">Sign In</Button>
       <Button variant="outline" className="w-full">
         <Mail className="mr-2 h-4 w-4" />
@@ -316,12 +315,12 @@ export const FullWidth: Story = {
 
 export const InContext: Story = {
   render: () => (
-    <div className="space-y-8 max-w-2xl">
+    <div className="max-w-2xl space-y-8">
       {/* Card with buttons */}
-      <div className="border border-border rounded-lg p-6 space-y-4">
+      <div className="border-border space-y-4 rounded-lg border p-6">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Project Settings</h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Manage your project configuration and preferences.
           </p>
         </div>
@@ -347,7 +346,7 @@ export const InContext: Story = {
           <input
             type="email"
             placeholder="Enter your email"
-            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
           />
         </div>
         <div className="flex gap-3">
@@ -357,10 +356,10 @@ export const InContext: Story = {
       </div>
 
       {/* Alert with buttons */}
-      <div className="border border-destructive/20 bg-destructive/10 rounded-lg p-4 space-y-3">
+      <div className="border-destructive/20 bg-destructive/10 space-y-3 rounded-lg border p-4">
         <div className="space-y-1">
-          <h4 className="font-medium text-destructive">Delete Project</h4>
-          <p className="text-sm text-muted-foreground">
+          <h4 className="text-destructive font-medium">Delete Project</h4>
+          <p className="text-muted-foreground text-sm">
             This action cannot be undone. This will permanently delete your
             project.
           </p>

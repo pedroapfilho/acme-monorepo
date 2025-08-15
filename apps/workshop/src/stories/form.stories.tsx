@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -7,13 +7,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Button, Input, Checkbox
+  Button,
+  Input,
+  Checkbox,
 } from "@repo/ui";
-
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useState } from "storybook/internal/preview-api";
+import * as z from "zod";
 
 const meta: Meta = {
   title: "ui/Form",
@@ -52,8 +53,8 @@ export const LoginForm: Story = {
     }
 
     return (
-      <div className="max-w-md mx-auto space-y-6">
-        <div className="text-center space-y-2">
+      <div className="mx-auto max-w-md space-y-6">
+        <div className="space-y-2 text-center">
           <h2 className="text-2xl font-bold">Sign In</h2>
           <p className="text-muted-foreground">
             Enter your credentials to access your account
@@ -94,7 +95,7 @@ export const LoginForm: Story = {
               control={form.control}
               name="remember"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -156,7 +157,7 @@ export const ProfileForm: Story = {
     }
 
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6">
         <div className="space-y-2">
           <h2 className="text-2xl font-bold">Profile Settings</h2>
           <p className="text-muted-foreground">
@@ -166,7 +167,7 @@ export const ProfileForm: Story = {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="firstName"
@@ -238,7 +239,7 @@ export const ProfileForm: Story = {
                   <FormLabel>Bio</FormLabel>
                   <FormControl>
                     <textarea
-                      className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                       placeholder="Tell us about yourself..."
                       {...field}
                     />
@@ -258,7 +259,7 @@ export const ProfileForm: Story = {
                 control={form.control}
                 name="notifications"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
@@ -279,7 +280,7 @@ export const ProfileForm: Story = {
                 control={form.control}
                 name="marketing"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
@@ -343,17 +344,17 @@ export const ContactForm: Story = {
     }
 
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
+      <div className="mx-auto max-w-2xl space-y-6">
+        <div className="space-y-2 text-center">
           <h2 className="text-2xl font-bold">Contact Us</h2>
           <p className="text-muted-foreground">
-            We'd love to hear from you. Send us a message!
+            We&apos;d love to hear from you. Send us a message!
           </p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="name"
@@ -383,7 +384,7 @@ export const ContactForm: Story = {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="md:col-span-2">
                 <FormField
                   control={form.control}
@@ -408,7 +409,7 @@ export const ContactForm: Story = {
                     <FormLabel>Priority</FormLabel>
                     <FormControl>
                       <select
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                         {...field}
                       >
                         <option value="low">Low</option>
@@ -430,7 +431,7 @@ export const ContactForm: Story = {
                   <FormLabel>Message</FormLabel>
                   <FormControl>
                     <textarea
-                      className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[120px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                       placeholder="Tell us more about your inquiry..."
                       {...field}
                     />
@@ -447,7 +448,7 @@ export const ContactForm: Story = {
               control={form.control}
               name="subscribe"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -487,15 +488,15 @@ export const FormValidation: Story = {
 
     const [submitted, setSubmitted] = useState(false);
 
-    function onSubmit(values: any) {
+    function onSubmit(values: unknown) {
       setSubmitted(true);
       console.log(values);
       setTimeout(() => setSubmitted(false), 2000);
     }
 
     return (
-      <div className="max-w-md mx-auto space-y-6">
-        <div className="text-center space-y-2">
+      <div className="mx-auto max-w-md space-y-6">
+        <div className="space-y-2 text-center">
           <h2 className="text-2xl font-bold">Validation Examples</h2>
           <p className="text-muted-foreground">
             Try submitting with invalid data to see validation
@@ -587,7 +588,7 @@ export const FormValidation: Story = {
                 required: "You must accept the terms",
               }}
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
@@ -627,8 +628,8 @@ export const FormStates: Story = {
     });
 
     return (
-      <div className="max-w-md mx-auto space-y-6">
-        <div className="text-center space-y-2">
+      <div className="mx-auto max-w-md space-y-6">
+        <div className="space-y-2 text-center">
           <h2 className="text-2xl font-bold">Form Field States</h2>
           <p className="text-muted-foreground">
             Different states of form fields

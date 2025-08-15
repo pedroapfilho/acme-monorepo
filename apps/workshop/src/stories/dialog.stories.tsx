@@ -1,5 +1,17 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+  Label,
+  Checkbox,
+} from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Trash2,
   AlertTriangle,
@@ -11,17 +23,7 @@ import {
   Phone,
   Plus,
 } from "lucide-react";
-
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,Input, Label,Checkbox
-} from "@repo/ui";
+import { useState } from "react";
 
 const meta: Meta<typeof Dialog> = {
   title: "ui/Dialog",
@@ -46,7 +48,7 @@ export const Default: Story = {
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Make changes to your profile here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -91,7 +93,7 @@ export const Confirmation: Story = {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
+            <AlertTriangle className="text-destructive h-5 w-5" />
             Delete Account
           </DialogTitle>
           <DialogDescription>
@@ -132,25 +134,25 @@ export const Information: Story = {
             Information
           </DialogTitle>
           <DialogDescription>
-            Here's some important information you should know about.
+            Here&apos;s some important information you should know about.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+              <CheckCircle className="mt-0.5 h-4 w-4 text-green-500" />
               <div>
                 <p className="text-sm font-medium">Feature Enabled</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   This feature is now active on your account.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 text-yellow-500" />
               <div>
                 <p className="text-sm font-medium">Limited Access</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Some features may be restricted during the trial period.
                 </p>
               </div>
@@ -185,7 +187,7 @@ export const ContactForm: Story = {
           <div className="space-y-2">
             <Label htmlFor="contact-name">Full Name</Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input
                 id="contact-name"
                 placeholder="John Doe"
@@ -196,7 +198,7 @@ export const ContactForm: Story = {
           <div className="space-y-2">
             <Label htmlFor="contact-email">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Mail className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input
                 id="contact-email"
                 type="email"
@@ -208,7 +210,7 @@ export const ContactForm: Story = {
           <div className="space-y-2">
             <Label htmlFor="contact-phone">Phone</Label>
             <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Phone className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input
                 id="contact-phone"
                 type="tel"
@@ -243,14 +245,14 @@ export const Settings: Story = {
             Manage your account settings and preferences.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-6">
+        <div className="space-y-6 py-4">
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Notifications</h4>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-sm">Email notifications</Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Receive email about your account activity
                   </p>
                 </div>
@@ -259,7 +261,7 @@ export const Settings: Story = {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-sm">Push notifications</Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Receive push notifications on your devices
                   </p>
                 </div>
@@ -274,7 +276,7 @@ export const Settings: Story = {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-sm">Profile visibility</Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Make your profile visible to other users
                   </p>
                 </div>
@@ -298,17 +300,17 @@ export const LargeContent: Story = {
       <DialogTrigger asChild>
         <Button variant="outline">View Terms</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[600px]">
+      <DialogContent className="max-h-[600px] sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
           <DialogDescription>
             Please read and accept our terms of service.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 max-h-[400px] overflow-y-auto">
+        <div className="max-h-[400px] overflow-y-auto py-4">
           <div className="space-y-4 text-sm">
             <section>
-              <h3 className="font-semibold mb-2">1. Acceptance of Terms</h3>
+              <h3 className="mb-2 font-semibold">1. Acceptance of Terms</h3>
               <p className="text-muted-foreground">
                 By accessing and using this service, you accept and agree to be
                 bound by the terms and provision of this agreement. If you do
@@ -317,7 +319,7 @@ export const LargeContent: Story = {
             </section>
 
             <section>
-              <h3 className="font-semibold mb-2">2. Use License</h3>
+              <h3 className="mb-2 font-semibold">2. Use License</h3>
               <p className="text-muted-foreground">
                 Permission is granted to temporarily download one copy of the
                 materials on our website for personal, non-commercial transitory
@@ -327,16 +329,17 @@ export const LargeContent: Story = {
             </section>
 
             <section>
-              <h3 className="font-semibold mb-2">3. Disclaimer</h3>
+              <h3 className="mb-2 font-semibold">3. Disclaimer</h3>
               <p className="text-muted-foreground">
-                The materials on our website are provided on an 'as is' basis.
-                We make no warranties, expressed or implied, and hereby disclaim
-                and negate all other warranties including without limitation.
+                The materials on our website are provided on an &apos;as
+                is&apos; basis. We make no warranties, expressed or implied, and
+                hereby disclaim and negate all other warranties including
+                without limitation.
               </p>
             </section>
 
             <section>
-              <h3 className="font-semibold mb-2">4. Limitations</h3>
+              <h3 className="mb-2 font-semibold">4. Limitations</h3>
               <p className="text-muted-foreground">
                 In no event shall our company or its suppliers be liable for any
                 damages (including, without limitation, damages for loss of data
@@ -345,7 +348,7 @@ export const LargeContent: Story = {
             </section>
 
             <section>
-              <h3 className="font-semibold mb-2">5. Privacy Policy</h3>
+              <h3 className="mb-2 font-semibold">5. Privacy Policy</h3>
               <p className="text-muted-foreground">
                 Your personal information is kept private and is not shared with
                 third parties except as described in our privacy policy.
@@ -375,7 +378,7 @@ export const Controlled: Story = {
             Close Dialog
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Dialog is currently {open ? "open" : "closed"}
         </p>
 
@@ -384,7 +387,8 @@ export const Controlled: Story = {
             <DialogHeader>
               <DialogTitle>Controlled Dialog</DialogTitle>
               <DialogDescription>
-                This dialog's open state is controlled by the parent component.
+                This dialog&apos;s open state is controlled by the parent
+                component.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -418,10 +422,10 @@ export const NoHeader: Story = {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <div className="py-6">
-          <p className="text-center text-lg font-medium mb-4">
+          <p className="mb-4 text-center text-lg font-medium">
             Are you sure you want to continue?
           </p>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-center text-sm">
             This action will save your changes and close the dialog.
           </p>
         </div>

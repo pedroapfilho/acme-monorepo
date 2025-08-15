@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import { Progress } from "@repo/ui";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState, useEffect } from "react";
 
 const meta: Meta<typeof Progress> = {
@@ -145,23 +145,23 @@ export const WithLabels: Story = {
   render: () => (
     <div className="w-80 space-y-6">
       <div className="space-y-2">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <label className="text-sm font-medium">Upload Progress</label>
-          <span className="text-sm text-muted-foreground">45%</span>
+          <span className="text-muted-foreground text-sm">45%</span>
         </div>
         <Progress value={45} />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           Uploading file... 2.3 MB of 5.1 MB
         </p>
       </div>
 
       <div className="space-y-2">
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <label className="text-sm font-medium">Installation</label>
-          <span className="text-sm text-muted-foreground">78%</span>
+          <span className="text-muted-foreground text-sm">78%</span>
         </div>
         <Progress value={78} />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           Installing dependencies...
         </p>
       </div>
@@ -171,11 +171,11 @@ export const WithLabels: Story = {
 
 export const InCard: Story = {
   render: () => (
-    <div className="w-80 p-6 border border-border rounded-lg bg-card">
+    <div className="border-border bg-card w-80 rounded-lg border p-6">
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold">Project Setup</h3>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Setting up your new project
           </p>
         </div>

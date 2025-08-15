@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import { Badge } from "@repo/ui";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof Badge> = {
   title: "ui/Badge",
@@ -65,7 +65,7 @@ export const WithIcons: Story = {
     <div className="flex flex-wrap gap-4">
       <Badge variant="default">
         <svg
-          className="w-3 h-3"
+          className="h-3 w-3"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -81,7 +81,7 @@ export const WithIcons: Story = {
       </Badge>
       <Badge variant="destructive">
         <svg
-          className="w-3 h-3"
+          className="h-3 w-3"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -97,7 +97,7 @@ export const WithIcons: Story = {
       </Badge>
       <Badge variant="outline">
         <svg
-          className="w-3 h-3"
+          className="h-3 w-3"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

@@ -1,5 +1,11 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import {
+  Button,
+  Input,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Plus,
   Edit,
@@ -18,14 +24,7 @@ import {
   AlertTriangle,
   CheckCircle,
 } from "lucide-react";
-
-import {
-  Button,
-  Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui";
+import { useState } from "react";
 
 const meta: Meta<typeof Tooltip> = {
   title: "ui/Tooltip",
@@ -200,7 +199,7 @@ export const RichContent: Story = {
               <span className="font-medium">John Doe</span>
             </div>
             <p className="text-sm">Senior Developer</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Last active 2 hours ago
             </p>
           </div>
@@ -262,9 +261,9 @@ export const InteractiveElements: Story = {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center gap-1 cursor-help">
+          <div className="flex cursor-help items-center gap-1">
             <span>Advanced Settings</span>
-            <HelpCircle className="h-3 w-3 text-muted-foreground" />
+            <HelpCircle className="text-muted-foreground h-3 w-3" />
           </div>
         </TooltipTrigger>
         <TooltipContent>
@@ -291,7 +290,7 @@ export const ActionTooltips: Story = {
             >
               <Heart
                 className={`h-4 w-4 ${
-                  liked ? "text-red-500 fill-red-500" : ""
+                  liked ? "fill-red-500 text-red-500" : ""
                 }`}
               />
             </Button>
@@ -310,7 +309,7 @@ export const ActionTooltips: Story = {
             >
               <Star
                 className={`h-4 w-4 ${
-                  starred ? "text-yellow-500 fill-yellow-500" : ""
+                  starred ? "fill-yellow-500 text-yellow-500" : ""
                 }`}
               />
             </Button>
@@ -370,7 +369,7 @@ export const DelayedTooltip: Story = {
 
 export const NavigationTooltips: Story = {
   render: () => (
-    <div className="flex gap-2 p-4 bg-muted rounded-lg">
+    <div className="bg-muted flex gap-2 rounded-lg p-4">
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="ghost" size="icon">
@@ -380,7 +379,7 @@ export const NavigationTooltips: Story = {
         <TooltipContent side="bottom">
           <div className="flex items-center gap-2">
             <span>Search</span>
-            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none">
               ⌘K
             </kbd>
           </div>
@@ -425,13 +424,13 @@ export const NavigationTooltips: Story = {
 
 export const FormTooltips: Story = {
   render: () => (
-    <div className="space-y-4 max-w-md">
+    <div className="max-w-md space-y-4">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium">Password</label>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+              <Info className="text-muted-foreground h-3 w-3 cursor-help" />
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
               <p>
@@ -449,7 +448,7 @@ export const FormTooltips: Story = {
           <label className="text-sm font-medium">API Key</label>
           <Tooltip>
             <TooltipTrigger asChild>
-              <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+              <HelpCircle className="text-muted-foreground h-3 w-3 cursor-help" />
             </TooltipTrigger>
             <TooltipContent>
               <p>You can find your API key in the dashboard settings</p>
@@ -464,12 +463,12 @@ export const FormTooltips: Story = {
           <label className="text-sm font-medium">Webhook URL</label>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+              <Info className="text-muted-foreground h-3 w-3 cursor-help" />
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
               <div className="space-y-1">
                 <p className="font-medium">Webhook Requirements:</p>
-                <ul className="text-xs space-y-1">
+                <ul className="space-y-1 text-xs">
                   <li>• Must be HTTPS</li>
                   <li>• Should respond with 200 status</li>
                   <li>• Timeout after 30 seconds</li>
@@ -491,8 +490,8 @@ export const StatusTooltips: Story = {
         <span className="text-sm">Server Status:</span>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 cursor-help">
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+            <div className="flex cursor-help items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-green-500" />
               <span className="text-sm text-green-600">Online</span>
             </div>
           </TooltipTrigger>
@@ -510,8 +509,8 @@ export const StatusTooltips: Story = {
         <span className="text-sm">Database:</span>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 cursor-help">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+            <div className="flex cursor-help items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-yellow-500" />
               <span className="text-sm text-yellow-600">Warning</span>
             </div>
           </TooltipTrigger>
@@ -529,8 +528,8 @@ export const StatusTooltips: Story = {
         <span className="text-sm">API:</span>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 cursor-help">
-              <div className="w-2 h-2 bg-red-500 rounded-full" />
+            <div className="flex cursor-help items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-red-500" />
               <span className="text-sm text-red-600">Error</span>
             </div>
           </TooltipTrigger>

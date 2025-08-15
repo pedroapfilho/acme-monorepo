@@ -10,7 +10,7 @@ export const config = [
       ".next/**",
       "node_modules/**",
       "coverage/**",
-      "build/**"
-    ]
-  }
+      "build/**",
+    ],
+  },
 ];

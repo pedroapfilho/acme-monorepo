@@ -1,11 +1,11 @@
 import { cn } from "../lib/utils";
 import { ComponentProps, cloneElement, ReactElement } from "react";
 
-interface InputProps extends Omit<ComponentProps<"input">, "className"> {
+type InputProps = Omit<ComponentProps<"input">, "className"> & {
   className?: string;
   startIcon?: ReactElement<{ className?: string }>;
   endIcon?: ReactElement<{ className?: string }>;
-}
+};
 
 function Input({ className, type, startIcon, endIcon, ...props }: InputProps) {
   if (startIcon || endIcon) {
