@@ -1,4 +1,3 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import {
   Table,
   TableBody,
@@ -12,6 +11,7 @@ import {
   Button,
   Checkbox,
 } from "@repo/ui";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof Table> = {
   title: "ui/Table",

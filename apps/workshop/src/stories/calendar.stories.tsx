@@ -1,6 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import { Calendar } from "@repo/ui";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import type { DateRange } from "react-day-picker";
 
 const meta: Meta<typeof Calendar> = {
   title: "ui/Calendar",
@@ -30,7 +31,7 @@ const meta: Meta<typeof Calendar> = {
 
 export default meta;
 
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof Calendar>;
 
 export const Default: Story = {
   args: {
@@ -45,7 +46,7 @@ export const SingleSelection: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Selected: {date ? date.toLocaleDateString() : "None"}
         </div>
         <Calendar
@@ -65,7 +66,7 @@ export const MultipleSelection: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Selected: {dates.length} date{dates.length !== 1 ? "s" : ""}
           {dates.length > 0 && (
             <div className="mt-1">
@@ -74,9 +75,10 @@ export const MultipleSelection: Story = {
           )}
         </div>
         <Calendar
+          required
           mode="multiple"
           selected={dates}
-          onSelect={setDates as any}
+          onSelect={setDates}
           className="rounded-md border"
         />
       </div>
@@ -86,18 +88,18 @@ export const MultipleSelection: Story = {
 
 export const RangeSelection: Story = {
   render: () => {
-    const [range, setRange] = useState<{ from: Date; to?: Date } | undefined>();
+    const [range, setRange] = useState<DateRange | undefined>();
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Range: {range?.from ? range.from.toLocaleDateString() : "None"} -{" "}
           {range?.to ? range.to.toLocaleDateString() : "None"}
         </div>
         <Calendar
           mode="range"
           selected={range}
-          onSelect={setRange as any}
+          onSelect={setRange}
           className="rounded-md border"
         />
       </div>
@@ -111,7 +113,7 @@ export const WithDropdowns: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Calendar with month/year dropdowns
         </div>
         <Calendar
@@ -119,8 +121,8 @@ export const WithDropdowns: Story = {
           selected={date}
           onSelect={setDate}
           captionLayout="dropdown"
-          fromYear={2020}
-          toYear={2030}
+          startMonth={new Date(2020, 0)}
+          endMonth={new Date(2030, 0)}
           className="rounded-md border"
         />
       </div>
@@ -134,7 +136,7 @@ export const WithoutOutsideDays: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Calendar without outside days
         </div>
         <Calendar
@@ -160,7 +162,7 @@ export const DisabledDates: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Weekends and past dates are disabled
         </div>
         <Calendar
@@ -188,7 +190,7 @@ export const CustomModifiers: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Calendar with booked dates highlighted
         </div>
         <Calendar
@@ -203,7 +205,7 @@ export const CustomModifiers: Story = {
           }}
           className="rounded-md border"
         />
-        <div className="text-xs text-muted-foreground">
+        <div className="text-muted-foreground text-xs">
           Red dates are booked and cannot be selected
         </div>
       </div>
@@ -217,7 +219,7 @@ export const WeekNumbers: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Calendar with week numbers
         </div>
         <Calendar
@@ -234,17 +236,17 @@ export const WeekNumbers: Story = {
 
 export const MultipleMonths: Story = {
   render: () => {
-    const [range, setRange] = useState<{ from: Date; to?: Date } | undefined>();
+    const [range, setRange] = useState<DateRange | undefined>();
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Two months for range selection
         </div>
         <Calendar
           mode="range"
           selected={range}
-          onSelect={setRange as any}
+          onSelect={setRange}
           numberOfMonths={2}
           className="rounded-md border"
         />
@@ -259,7 +261,7 @@ export const DatePicker: Story = {
 
     return (
       <div className="space-y-4">
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           Date picker example with input
         </div>
         <div className="flex flex-col gap-2">
@@ -268,7 +270,7 @@ export const DatePicker: Story = {
             value={date ? date.toLocaleDateString() : ""}
             placeholder="Select a date"
             readOnly
-            className="px-3 py-2 border border-input rounded-md bg-background text-sm"
+            className="border-input bg-background rounded-md border px-3 py-2 text-sm"
           />
           <Calendar
             mode="single"
@@ -284,10 +286,9 @@ export const DatePicker: Story = {
 
 export const BookingCalendar: Story = {
   render: () => {
-    const [range, setRange] = useState<{ from: Date; to?: Date } | undefined>();
+    const [range, setRange] = useState<DateRange | undefined>();
 
     const today = new Date();
-    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
     const bookedRanges = [
       {
@@ -301,10 +302,10 @@ export const BookingCalendar: Story = {
     ];
 
     return (
-      <div className="space-y-4 max-w-2xl">
+      <div className="max-w-2xl space-y-4">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Book Your Stay</h3>
-          <div className="text-sm text-muted-foreground">
+          <div className="text-muted-foreground text-sm">
             {range?.from && range?.to ? (
               <>
                 Check-in: {range.from.toLocaleDateString()} • Check-out:{" "}
@@ -323,14 +324,14 @@ export const BookingCalendar: Story = {
         <Calendar
           mode="range"
           selected={range}
-          onSelect={setRange as any}
+          onSelect={setRange}
           numberOfMonths={2}
           disabled={[{ before: today }, ...bookedRanges]}
           modifiers={{
             booked: bookedRanges.flatMap((range) => {
               const dates = [];
               const currentDate = new Date(range.from);
-              while (currentDate <= range.to) {
+              while (currentDate <= (range.to || range.from)) {
                 dates.push(new Date(currentDate));
                 currentDate.setDate(currentDate.getDate() + 1);
               }
@@ -342,13 +343,13 @@ export const BookingCalendar: Story = {
           }}
           className="rounded-md border"
         />
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-100 rounded border"></div>
+            <div className="h-3 w-3 rounded border bg-red-100"></div>
             <span>Booked</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-primary rounded"></div>
+            <div className="bg-primary h-3 w-3 rounded"></div>
             <span>Selected</span>
           </div>
         </div>
@@ -364,15 +365,6 @@ export const Playground: Story = {
     captionLayout: "label",
   },
   render: (args) => {
-    const [selected, setSelected] = useState<any>();
-
-    return (
-      <Calendar
-        {...args}
-        selected={selected}
-        onSelect={setSelected}
-        className="rounded-md border"
-      />
-    );
+    return <Calendar {...args} className="rounded-md border" />;
   },
 };

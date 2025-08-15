@@ -9,7 +9,7 @@
     "build": "storybook build --docs -o storybook-static",
     "preview-storybook": "serve storybook-static",
     "clean": "rm -rf .turbo node_modules",
-    "lint": "eslint ./stories/*.stories.tsx --max-warnings 0"
+    "lint": "eslint \"src/**/*.ts*\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

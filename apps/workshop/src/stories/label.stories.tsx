@@ -1,7 +1,6 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { Mail, User, Lock, Phone, Calendar, DollarSign } from "lucide-react";
-
 import { Label, Input, Checkbox, Button } from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
+import { Mail, User, Lock, Phone, Calendar, DollarSign } from "lucide-react";
 
 const meta: Meta<typeof Label> = {
   title: "ui/Label",
@@ -29,7 +28,7 @@ export const Default: Story = {
 
 export const BasicUsage: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email Address</Label>
         <Input id="email" type="email" placeholder="Enter your email" />
@@ -52,7 +51,7 @@ export const BasicUsage: Story = {
 
 export const WithIcons: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email-icon" className="flex items-center gap-2">
           <Mail className="h-4 w-4" />
@@ -84,25 +83,25 @@ export const WithIcons: Story = {
 
 export const WithHelpText: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="w-80 space-y-6">
       <div className="space-y-2">
         <Label htmlFor="username">Username</Label>
         <Input id="username" placeholder="johndoe" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           This will be your unique identifier on the platform.
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="email-help">Email Address</Label>
         <Input id="email-help" type="email" placeholder="john@example.com" />
-        <p className="text-sm text-muted-foreground">
-          We'll never share your email with anyone else.
+        <p className="text-muted-foreground text-sm">
+          We&apos;ll never share your email with anyone else.
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="phone">Phone Number</Label>
         <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Optional: Used for account recovery and notifications.
         </p>
       </div>
@@ -112,7 +111,7 @@ export const WithHelpText: Story = {
 
 export const Required: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label htmlFor="required-name">
           Full Name <span className="text-destructive">*</span>
@@ -139,7 +138,7 @@ export const Required: Story = {
 
 export const ErrorStates: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label htmlFor="error-email" className="text-destructive">
           Email Address
@@ -150,7 +149,7 @@ export const ErrorStates: Story = {
           placeholder="Enter your email"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-sm text-destructive">
+        <p className="text-destructive text-sm">
           Please enter a valid email address
         </p>
       </div>
@@ -164,7 +163,7 @@ export const ErrorStates: Story = {
           placeholder="Enter password"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-sm text-destructive">
+        <p className="text-destructive text-sm">
           Password must be at least 8 characters
         </p>
       </div>
@@ -174,7 +173,7 @@ export const ErrorStates: Story = {
 
 export const WithCheckboxes: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="flex items-center space-x-2">
         <Checkbox id="terms" />
         <Label htmlFor="terms">
@@ -200,7 +199,7 @@ export const WithCheckboxes: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label htmlFor="small" className="text-sm">
           Small Label
@@ -227,10 +226,10 @@ export const Sizes: Story = {
 
 export const FormExample: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Create Account</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Fill out the form below to create your account
         </p>
       </div>
@@ -256,7 +255,7 @@ export const FormExample: Story = {
           Email Address <span className="text-destructive">*</span>
         </Label>
         <Input id="form-email" type="email" placeholder="john@example.com" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           This will be used to sign in to your account
         </p>
       </div>
@@ -267,7 +266,7 @@ export const FormExample: Story = {
           Phone Number
         </Label>
         <Input id="form-phone" type="tel" placeholder="+1 (555) 123-4567" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Optional: For account recovery
         </p>
       </div>
@@ -278,7 +277,7 @@ export const FormExample: Story = {
           Password <span className="text-destructive">*</span>
         </Label>
         <Input id="form-password" type="password" placeholder="••••••••" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Must be at least 8 characters with numbers and letters
         </p>
       </div>
@@ -312,7 +311,7 @@ export const FormExample: Story = {
 
 export const SpecialCases: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="w-80 space-y-6">
       <div className="space-y-2">
         <Label htmlFor="date" className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
@@ -327,7 +326,7 @@ export const SpecialCases: Story = {
           Amount
         </Label>
         <div className="flex">
-          <div className="inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-md">
+          <div className="text-muted-foreground bg-muted border-input inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
             $
           </div>
           <Input
@@ -346,19 +345,19 @@ export const SpecialCases: Story = {
           id="file"
           type="file"
           accept="image/*"
-          className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+          className="file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:mr-4 file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-medium"
         />
-        <p className="text-sm text-muted-foreground">PNG, JPG up to 10MB</p>
+        <p className="text-muted-foreground text-sm">PNG, JPG up to 10MB</p>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="bio">Bio</Label>
         <textarea
           id="bio"
-          className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           placeholder="Tell us about yourself..."
         />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Brief description for your profile
         </p>
       </div>

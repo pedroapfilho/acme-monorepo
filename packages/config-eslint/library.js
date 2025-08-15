@@ -14,7 +14,7 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-export default ts.config(
+export const config = ts.config(
   {
     ignores: [".*.js", "node_modules/", "dist/"],
   },

@@ -1,5 +1,13 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import {
+  Button,
+  Input,
+  Checkbox,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Label,
+} from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Settings2,
   HelpCircle,
@@ -19,17 +27,7 @@ import {
   Search,
   Bell,
 } from "lucide-react";
-
-import {
-  Button,
-  Input,
-  Checkbox,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Label
-} from "@repo/ui";
-
+import { useState } from "react";
 
 const meta: Meta<typeof Popover> = {
   title: "ui/Popover",
@@ -56,8 +54,8 @@ export const Default: Story = {
       <PopoverContent className="w-80">
         <div className="grid gap-4">
           <div className="space-y-2">
-            <h4 className="font-medium leading-none">Dimensions</h4>
-            <p className="text-sm text-muted-foreground">
+            <h4 className="leading-none font-medium">Dimensions</h4>
+            <p className="text-muted-foreground text-sm">
               Set the dimensions for the layer.
             </p>
           </div>
@@ -115,10 +113,10 @@ export const HelpPopover: Story = {
             <Info className="h-4 w-4 text-blue-500" />
             <h4 className="font-medium">Help & Support</h4>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Need help with this feature? Here are some quick tips:
           </p>
-          <ul className="text-sm space-y-1 text-muted-foreground">
+          <ul className="text-muted-foreground space-y-1 text-sm">
             <li>• Use keyboard shortcuts for faster navigation</li>
             <li>• Click and drag to reorder items</li>
             <li>• Right-click for additional options</li>
@@ -145,12 +143,12 @@ export const UserProfilePopover: Story = {
       <PopoverContent className="w-80">
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-purple-500 font-bold text-white">
               JD
             </div>
             <div>
               <h4 className="font-medium">John Doe</h4>
-              <p className="text-sm text-muted-foreground">john@example.com</p>
+              <p className="text-muted-foreground text-sm">john@example.com</p>
             </div>
           </div>
           <div className="space-y-1">
@@ -170,7 +168,7 @@ export const UserProfilePopover: Story = {
           <div className="border-t pt-2">
             <Button
               variant="ghost"
-              className="w-full justify-start text-destructive"
+              className="text-destructive w-full justify-start"
             >
               Sign Out
             </Button>
@@ -211,10 +209,10 @@ export const ActionsMenu: Story = {
             <ExternalLink className="mr-2 h-4 w-4" />
             Open in new tab
           </Button>
-          <div className="border-t my-1" />
+          <div className="my-1 border-t" />
           <Button
             variant="ghost"
-            className="w-full justify-start text-destructive"
+            className="text-destructive w-full justify-start"
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
@@ -238,7 +236,7 @@ export const DateTimePicker: Story = {
         <div className="space-y-4">
           <div className="space-y-2">
             <h4 className="font-medium">Schedule Meeting</h4>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Choose a date and time for your meeting.
             </p>
           </div>
@@ -278,12 +276,6 @@ export const DateTimePicker: Story = {
 
 export const FilterPopover: Story = {
   render: () => {
-    const [filters, setFilters] = useState({
-      status: [],
-      priority: [],
-      assignee: [],
-    });
-
     return (
       <Popover>
         <PopoverTrigger asChild>
@@ -296,7 +288,7 @@ export const FilterPopover: Story = {
           <div className="space-y-4">
             <div className="space-y-2">
               <h4 className="font-medium">Filter Tasks</h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Narrow down your task list.
               </p>
             </div>
@@ -378,7 +370,7 @@ export const SearchPopover: Story = {
           <div className="space-y-2">
             <h4 className="font-medium">Quick Search</h4>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
               <Input placeholder="Search anything..." className="pl-10" />
             </div>
           </div>
@@ -388,21 +380,21 @@ export const SearchPopover: Story = {
             <div className="space-y-1">
               <Button
                 variant="ghost"
-                className="w-full justify-start text-sm h-8"
+                className="h-8 w-full justify-start text-sm"
               >
                 <Clock className="mr-2 h-3 w-3" />
                 user interface design
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start text-sm h-8"
+                className="h-8 w-full justify-start text-sm"
               >
                 <Clock className="mr-2 h-3 w-3" />
                 project management
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start text-sm h-8"
+                className="h-8 w-full justify-start text-sm"
               >
                 <Clock className="mr-2 h-3 w-3" />
                 team collaboration
@@ -415,14 +407,14 @@ export const SearchPopover: Story = {
             <div className="space-y-1">
               <Button
                 variant="ghost"
-                className="w-full justify-start text-sm h-8"
+                className="h-8 w-full justify-start text-sm"
               >
                 <Plus className="mr-2 h-3 w-3" />
                 Create new project
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start text-sm h-8"
+                className="h-8 w-full justify-start text-sm"
               >
                 <User className="mr-2 h-3 w-3" />
                 Add team member
@@ -441,7 +433,7 @@ export const NotificationPopover: Story = {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-4 w-4" />
-          <div className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full flex items-center justify-center">
+          <div className="bg-destructive absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full">
             <span className="text-xs text-white">3</span>
           </div>
         </Button>
@@ -456,36 +448,36 @@ export const NotificationPopover: Story = {
           </div>
 
           <div className="space-y-3">
-            <div className="flex gap-3 p-2 rounded-lg bg-blue-50 dark:bg-blue-950">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+            <div className="flex gap-3 rounded-lg bg-blue-50 p-2 dark:bg-blue-950">
+              <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
               <div className="space-y-1">
                 <p className="text-sm font-medium">New message received</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   John sent you a message about the project update
                 </p>
-                <p className="text-xs text-muted-foreground">2 minutes ago</p>
+                <p className="text-muted-foreground text-xs">2 minutes ago</p>
               </div>
             </div>
 
             <div className="flex gap-3 p-2">
-              <div className="w-2 h-2 bg-gray-300 rounded-full mt-2 flex-shrink-0" />
+              <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-gray-300" />
               <div className="space-y-1">
                 <p className="text-sm font-medium">Task completed</p>
-                <p className="text-xs text-muted-foreground">
-                  "Design system update" has been marked as complete
+                <p className="text-muted-foreground text-xs">
+                  &quot;Design system update&quot; has been marked as complete
                 </p>
-                <p className="text-xs text-muted-foreground">1 hour ago</p>
+                <p className="text-muted-foreground text-xs">1 hour ago</p>
               </div>
             </div>
 
             <div className="flex gap-3 p-2">
-              <div className="w-2 h-2 bg-gray-300 rounded-full mt-2 flex-shrink-0" />
+              <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-gray-300" />
               <div className="space-y-1">
                 <p className="text-sm font-medium">Meeting reminder</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   Team standup in 30 minutes
                 </p>
-                <p className="text-xs text-muted-foreground">3 hours ago</p>
+                <p className="text-muted-foreground text-xs">3 hours ago</p>
               </div>
             </div>
           </div>
@@ -513,7 +505,7 @@ export const Controlled: Story = {
             Close Popover
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Popover is currently {open ? "open" : "closed"}
         </p>
 
@@ -524,8 +516,9 @@ export const Controlled: Story = {
           <PopoverContent className="w-80">
             <div className="space-y-3">
               <h4 className="font-medium">Controlled Popover</h4>
-              <p className="text-sm text-muted-foreground">
-                This popover's open state is controlled by the parent component.
+              <p className="text-muted-foreground text-sm">
+                This popover&apos;s open state is controlled by the parent
+                component.
               </p>
               <Button size="sm" onClick={() => setOpen(false)}>
                 Close from inside
@@ -547,7 +540,7 @@ export const Playground: Story = {
       <PopoverContent className="w-80">
         <div className="space-y-3">
           <h4 className="font-medium">Playground</h4>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             This is a playground popover for testing purposes.
           </p>
           <Button size="sm">Action Button</Button>

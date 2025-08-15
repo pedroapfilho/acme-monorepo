@@ -1,5 +1,5 @@
-import { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import { Button, Input, Label } from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Search,
   Eye,
@@ -11,9 +11,7 @@ import {
   CreditCard,
   Calendar,
 } from "lucide-react";
-
-import { Button,Input, Label } from "@repo/ui";
-
+import { useState } from "react";
 
 const meta: Meta<typeof Input> = {
   title: "ui/Input",
@@ -58,7 +56,7 @@ export const Default: Story = {
 
 export const Types: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Text Input</Label>
         <Input type="text" placeholder="Enter text" />
@@ -89,7 +87,7 @@ export const Types: Story = {
 
 export const States: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Normal</Label>
         <Input placeholder="Normal input" />
@@ -108,7 +106,7 @@ export const States: Story = {
           placeholder="Invalid input"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-sm text-destructive">This field is required</p>
+        <p className="text-destructive text-sm">This field is required</p>
       </div>
     </div>
   ),
@@ -116,7 +114,7 @@ export const States: Story = {
 
 export const WithIcons: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Search</Label>
         <Input placeholder="Search..." startIcon={<Search />} />
@@ -142,7 +140,7 @@ export const PasswordInput: Story = {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-      <div className="space-y-4 w-80">
+      <div className="w-80 space-y-4">
         <div className="space-y-2">
           <Label>Password with Toggle</Label>
           <Input
@@ -167,7 +165,7 @@ export const PasswordInput: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Small</Label>
         <Input placeholder="Small input" className="h-8 text-sm" />
@@ -186,25 +184,25 @@ export const Sizes: Story = {
 
 export const WithLabelsAndHelp: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="w-80 space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email">Email Address</Label>
         <Input id="email" type="email" placeholder="john@example.com" />
-        <p className="text-sm text-muted-foreground">
-          We'll never share your email with anyone else.
+        <p className="text-muted-foreground text-sm">
+          We&apos;ll never share your email with anyone else.
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="username">Username</Label>
         <Input id="username" placeholder="Choose a username" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           This will be your unique identifier on the platform.
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="website">Website</Label>
         <Input id="website" type="url" placeholder="https://yoursite.com" />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Optional: Link to your personal or professional website.
         </p>
       </div>
@@ -214,7 +212,7 @@ export const WithLabelsAndHelp: Story = {
 
 export const InputGroups: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="w-80 space-y-6">
       <div className="space-y-2">
         <Label>Email Subscription</Label>
         <div className="flex">
@@ -242,7 +240,7 @@ export const InputGroups: Story = {
       <div className="space-y-2">
         <Label>Amount</Label>
         <div className="flex">
-          <div className="inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-md">
+          <div className="text-muted-foreground bg-muted border-input inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
             $
           </div>
           <Input
@@ -257,7 +255,7 @@ export const InputGroups: Story = {
       <div className="space-y-2">
         <Label>Website URL</Label>
         <div className="flex">
-          <div className="inline-flex items-center px-3 text-sm text-muted-foreground bg-muted border border-r-0 border-input rounded-l-md">
+          <div className="text-muted-foreground bg-muted border-input inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
             https://
           </div>
           <Input placeholder="example.com" className="rounded-l-none" />
@@ -269,10 +267,10 @@ export const InputGroups: Story = {
 
 export const FormExample: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Contact Information</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Please provide your contact details.
         </p>
       </div>
@@ -320,7 +318,7 @@ export const FormExample: Story = {
 
 export const ValidationStates: Story = {
   render: () => (
-    <div className="space-y-6 w-80">
+    <div className="w-80 space-y-6">
       <div className="space-y-2">
         <Label>Valid Input</Label>
         <Input
@@ -336,7 +334,7 @@ export const ValidationStates: Story = {
           placeholder="Invalid input"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-sm text-destructive">✗ This field is required</p>
+        <p className="text-destructive text-sm">✗ This field is required</p>
       </div>
 
       <div className="space-y-2">
@@ -355,7 +353,7 @@ export const ValidationStates: Story = {
 
 export const SpecialInputs: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Credit Card</Label>
         <Input
@@ -379,7 +377,7 @@ export const SpecialInputs: Story = {
         <Label>File Upload</Label>
         <Input
           type="file"
-          className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+          className="file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:mr-4 file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-medium"
         />
       </div>
     </div>
@@ -388,7 +386,7 @@ export const SpecialInputs: Story = {
 
 export const IconExamples: Story = {
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Start Icon Only</Label>
         <Input placeholder="Search..." startIcon={<Search />} />
@@ -435,10 +433,10 @@ export const IconExamples: Story = {
 
 export const FormWithIcons: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Enhanced Form</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           All inputs with relevant icons for better UX.
         </p>
       </div>

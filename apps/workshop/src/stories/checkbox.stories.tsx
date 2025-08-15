@@ -1,6 +1,5 @@
-import { Meta, StoryObj } from "@storybook/react";
-
-import { Label,Checkbox, Button } from "@repo/ui";
+import { Label, Checkbox, Button } from "@repo/ui";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "storybook/internal/preview-api";
 
 const meta: Meta<typeof Checkbox> = {
@@ -68,7 +67,7 @@ export const WithLabel: Story = {
       <Checkbox id="terms1" />
       <div className="grid gap-1.5 leading-none">
         <Label htmlFor="terms1">Accept terms and conditions</Label>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           You agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
@@ -141,9 +140,9 @@ export const CheckboxGroup: Story = {
             Select All
           </Label>
         </div>
-        <div className="border-t pt-4 space-y-3">
+        <div className="space-y-3 border-t pt-4">
           {items.map((item) => (
-            <div key={item.id} className="flex items-center space-x-2 ml-4">
+            <div key={item.id} className="ml-4 flex items-center space-x-2">
               <Checkbox
                 id={item.id}
                 checked={item.checked}
@@ -162,10 +161,10 @@ export const CheckboxGroup: Story = {
 
 export const FormExample: Story = {
   render: () => (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Account Preferences</h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Choose your notification preferences
         </p>
       </div>
@@ -175,7 +174,7 @@ export const FormExample: Story = {
           <Checkbox id="email-notifications" />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="email-notifications">Email notifications</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Receive email about your account activity
             </p>
           </div>
@@ -185,7 +184,7 @@ export const FormExample: Story = {
           <Checkbox id="marketing-emails" />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="marketing-emails">Marketing emails</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Receive emails about new products and features
             </p>
           </div>
@@ -195,7 +194,7 @@ export const FormExample: Story = {
           <Checkbox id="security-emails" checked />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="security-emails">Security emails</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Receive emails about your account security
             </p>
           </div>
@@ -205,7 +204,7 @@ export const FormExample: Story = {
           <Checkbox id="sms-notifications" disabled />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="sms-notifications">SMS notifications</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Receive SMS about urgent account activity (coming soon)
             </p>
           </div>
@@ -238,10 +237,10 @@ export const TaskList: Story = {
     const completedCount = tasks.filter((task) => task.completed).length;
 
     return (
-      <div className="space-y-4 max-w-md">
+      <div className="max-w-md space-y-4">
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Today's Tasks</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-lg font-semibold">Today&apos;s Tasks</h3>
+          <p className="text-muted-foreground text-sm">
             {completedCount} of {tasks.length} completed
           </p>
         </div>
@@ -257,7 +256,7 @@ export const TaskList: Story = {
               <Label
                 htmlFor={`task-${task.id}`}
                 className={`flex-1 ${
-                  task.completed ? "line-through text-muted-foreground" : ""
+                  task.completed ? "text-muted-foreground line-through" : ""
                 }`}
               >
                 {task.text}
@@ -306,14 +305,14 @@ export const CustomStyling: Story = {
       <div className="flex items-center space-x-2">
         <Checkbox
           id="custom2"
-          className="border-purple-500 data-[state=checked]:bg-purple-500 rounded-full"
+          className="rounded-full border-purple-500 data-[state=checked]:bg-purple-500"
         />
         <Label htmlFor="custom2">Purple rounded checkbox</Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox
           id="custom3"
-          className="border-orange-500 data-[state=checked]:bg-orange-500 h-5 w-5"
+          className="h-5 w-5 border-orange-500 data-[state=checked]:bg-orange-500"
         />
         <Label htmlFor="custom3">Orange large checkbox</Label>
       </div>
