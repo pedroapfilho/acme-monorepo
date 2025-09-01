@@ -9,33 +9,72 @@ generator client {
 }
 
 model User {
-  id    String @id @unique
-  name  String
-  email String @unique
-
-  address Address?
-
-  phone String
-
-  password String
-  salt     String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Custom fields
+  username      String?   @unique
+  displayName   String?
+  
+  accounts      Account[]
+  sessions      Session[]
+  
+  @@index([email])
 }
 
-model Address {
-  id         String @id @unique
-  city       String
-  country    String
-  line1      String
-  line2      String
-  postalCode String
-  state      String
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String @unique
-
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  ipAddress String?
+  userAgent String?
+  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+}
+
+model Account {
+  id           String @id @default(cuid())
+  accountId    String
+  providerId   String
+  userId       String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  accessToken  String? @db.Text
+  refreshToken String? @db.Text
+  idToken      String? @db.Text
+  
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  
+  scope     String?
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([identifier, value])
+  @@index([identifier])
 }

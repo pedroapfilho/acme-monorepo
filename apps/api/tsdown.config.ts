@@ -15,5 +15,5 @@ export default defineConfig({
       entries: [{ find: "@", replacement: path.resolve(process.cwd(), "src") }],
     }),
   ],
-  external: ["@repo/db"],
+  external: ["@repo/db", "@repo/auth"],
 });

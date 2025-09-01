@@ -1,10 +1,15 @@
 "use client";
 
-import { SessionProvider } from "next-auth/react";
+import { AuthProvider } from "@/providers/auth-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { ReactNode } from "react";
 
-const NextAuthProvider = ({ children }: { children: ReactNode }) => {
-  return <SessionProvider>{children}</SessionProvider>;
+const Providers = ({ children }: { children: ReactNode }) => {
+  return (
+    <ErrorBoundary>
+      <AuthProvider>{children}</AuthProvider>
+    </ErrorBoundary>
+  );
 };
 
-export { NextAuthProvider };
+export { Providers };
