@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { env } from "./lib/env";
 import { logger } from "./lib/logger";
 import { errorHandler, notFound } from "./middleware/error-handler";
@@ -14,6 +13,7 @@ import { v1UserRoutes } from "./routes/v1/users";
 import { serve } from "@hono/node-server";
 import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
+import "dotenv/config";
 import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
@@ -43,11 +43,11 @@ app.use("*", async (c, next) => {
   if (c.req.path === "/healthz") {
     return next();
   }
-  
+
   const start = Date.now();
   await next();
   const ms = Date.now() - start;
-  
+
   logger.info({
     method: c.req.method,
     url: c.req.url,

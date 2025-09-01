@@ -1,6 +1,6 @@
 "use client";
 
-import { recover } from "@/actions/auth";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -13,6 +13,7 @@ import {
   Input,
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -20,39 +21,52 @@ const formSchema = z.object({
   email: z.string().email(),
 });
 
+type FormData = z.infer<typeof formSchema>;
+
 const RecoverForm = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
+  const onSubmit = async (data: FormData) => {
     try {
-      const hasRequestedRecoverySuccessfully = await recover(data);
+      setIsLoading(true);
 
-      if (!hasRequestedRecoverySuccessfully) {
-        throw new Error("SOMETHING_WENT_WRONG");
+      const result = await authClient.requestPasswordReset({
+        email: data.email,
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (result.error) {
+        form.setError("root", {
+          type: "manual",
+          message:
+            result.error.message || "Failed to send password reset email",
+        });
+        return;
       }
 
-      console.log("Successfully submitted the recovery.");
-
-      router.push("/login");
-    } catch (e) {
-      console.error(
-        "Failed to submit the recovery. Please get in touch with support.",
-      );
-
-      console.error(e);
+      router.push("/login?message=password-reset-sent");
+    } catch (error) {
+      console.error("Password reset request error:", error);
+      form.setError("root", {
+        type: "manual",
+        message: "An error occurred. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
   return (
     <Form {...form}>
-      <form className="space-y-4" onSubmit={onSubmit}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -63,6 +77,7 @@ const RecoverForm = () => {
                 <Input
                   placeholder="email@address.com"
                   type="email"
+                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -71,8 +86,14 @@ const RecoverForm = () => {
           )}
         />
 
-        <Button className="w-full" type="submit">
-          Submit Request
+        {form.formState.errors.root && (
+          <div className="text-sm text-red-500">
+            {form.formState.errors.root.message}
+          </div>
+        )}
+
+        <Button className="w-full" type="submit" disabled={isLoading}>
+          {isLoading ? "Sending..." : "Submit Request"}
         </Button>
       </form>
     </Form>

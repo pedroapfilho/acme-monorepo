@@ -7,7 +7,7 @@ const passwordSchema = z
   .max(128, "Password must be less than 128 characters")
   .regex(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-    "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
   );
 
 // Email validation with better error messages
@@ -23,7 +23,10 @@ const nameSchema = z
   .min(1, "Name is required")
   .min(2, "Name must be at least 2 characters")
   .max(50, "Name must be less than 50 characters")
-  .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters, spaces, apostrophes, and hyphens");
+  .regex(
+    /^[a-zA-Z\s'-]+$/,
+    "Name can only contain letters, spaces, apostrophes, and hyphens",
+  );
 
 // Login schema
 export const loginSchema = z.object({
@@ -93,7 +96,9 @@ export const validatePassword = (password: string): boolean => {
   return passwordSchema.safeParse(password).success;
 };
 
-export const getPasswordStrength = (password: string): {
+export const getPasswordStrength = (
+  password: string,
+): {
   score: number;
   feedback: string[];
 } => {

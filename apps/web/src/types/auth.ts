@@ -32,7 +32,7 @@ export interface AuthError {
   message: string;
   code?: string;
   statusCode?: number;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export interface SignInCredentials {
@@ -64,23 +64,23 @@ export interface UpdateProfileData {
   image?: string;
 }
 
-export interface AuthResponse<T = any> {
+export interface AuthResponse<T = unknown> {
   data?: T;
   error?: AuthError;
 }
 
-export type AuthEventType = 
-  | 'SESSION_CREATED'
-  | 'SESSION_REFRESHED'
-  | 'SESSION_EXPIRED'
-  | 'SIGN_IN'
-  | 'SIGN_OUT'
-  | 'SIGN_UP'
-  | 'USER_UPDATED'
-  | 'ERROR';
+export type AuthEventType =
+  | "SESSION_CREATED"
+  | "SESSION_REFRESHED"
+  | "SESSION_EXPIRED"
+  | "SIGN_IN"
+  | "SIGN_OUT"
+  | "SIGN_UP"
+  | "USER_UPDATED"
+  | "ERROR";
 
 export interface AuthEvent {
   type: AuthEventType;
-  payload?: any;
+  payload?: unknown;
   timestamp: Date;
 }

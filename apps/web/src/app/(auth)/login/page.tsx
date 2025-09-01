@@ -12,7 +12,8 @@ import { Suspense } from "react";
 
 const metadata: Metadata = {
   title: "Sign In",
-  description: "Sign in to your Acme account to access your dashboard and manage your profile.",
+  description:
+    "Sign in to your Acme account to access your dashboard and manage your profile.",
   robots: {
     index: false, // Don't index auth pages
     follow: false,

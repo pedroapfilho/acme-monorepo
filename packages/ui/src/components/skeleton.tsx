@@ -1,5 +1,5 @@
-import * as React from "react";
 import { cn } from "../lib/utils";
+import * as React from "react";
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "text" | "circular" | "rectangular" | "rounded";
@@ -19,7 +19,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       style,
       ...props
     },
-    ref
+    ref,
   ) => {
     const variantClasses = {
       text: "rounded-md",
@@ -41,7 +41,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
           "bg-muted",
           variantClasses[variant],
           animationClasses[animation],
-          className
+          className,
         )}
         style={{
           width: width || "100%",
@@ -52,7 +52,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 Skeleton.displayName = "Skeleton";
@@ -63,59 +63,61 @@ interface SkeletonContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   spacing?: "sm" | "md" | "lg";
 }
 
-const SkeletonContainer = React.forwardRef<HTMLDivElement, SkeletonContainerProps>(
-  ({ children, className, count = 1, spacing = "md", ...props }, ref) => {
-    const spacingClasses = {
-      sm: "space-y-2",
-      md: "space-y-3",
-      lg: "space-y-4",
-    };
+const SkeletonContainer = React.forwardRef<
+  HTMLDivElement,
+  SkeletonContainerProps
+>(({ children, className, count = 1, spacing = "md", ...props }, ref) => {
+  const spacingClasses = {
+    sm: "space-y-2",
+    md: "space-y-3",
+    lg: "space-y-4",
+  };
 
-    if (count > 1 && !children) {
-      return (
-        <div
-          ref={ref}
-          className={cn(spacingClasses[spacing], className)}
-          {...props}
-        >
-          {Array.from({ length: count }).map((_, i) => (
-            <Skeleton key={i} />
-          ))}
-        </div>
-      );
-    }
-
+  if (count > 1 && !children) {
     return (
       <div
         ref={ref}
         className={cn(spacingClasses[spacing], className)}
         {...props}
       >
-        {children}
+        {Array.from({ length: count }).map((_, i) => (
+          <Skeleton key={i} />
+        ))}
       </div>
     );
   }
-);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(spacingClasses[spacing], className)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
 
 SkeletonContainer.displayName = "SkeletonContainer";
 
 // Pre-built skeleton patterns
-const SkeletonCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    return (
-      <div
-        ref={ref}
-        className={cn("space-y-3 p-4 border rounded-lg", className)}
-        {...props}
-      >
-        <Skeleton variant="rectangular" height={200} className="mb-4" />
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="80%" />
-        <Skeleton variant="text" width="40%" />
-      </div>
-    );
-  }
-);
+const SkeletonCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("space-y-3 rounded-lg border p-4", className)}
+      {...props}
+    >
+      <Skeleton variant="rectangular" height={200} className="mb-4" />
+      <Skeleton variant="text" width="60%" />
+      <Skeleton variant="text" width="80%" />
+      <Skeleton variant="text" width="40%" />
+    </div>
+  );
+});
 
 SkeletonCard.displayName = "SkeletonCard";
 
@@ -131,7 +133,7 @@ const SkeletonAvatar = React.forwardRef<HTMLDivElement, SkeletonProps>(
         {...props}
       />
     );
-  }
+  },
 );
 
 SkeletonAvatar.displayName = "SkeletonAvatar";

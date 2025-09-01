@@ -2,11 +2,12 @@
   "name": "landing",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "dependencies": {
@@ -17,7 +18,6 @@
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.542.0",
     "next": "^15.5.2",
-    "next-auth": "^4.24.11",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",

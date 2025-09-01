@@ -1,7 +1,7 @@
 "use client";
 
-import React, { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "@repo/ui";
+import React, { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to error reporting service
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    
+
     // Call optional error handler
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
@@ -53,36 +53,38 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Default error UI
       return (
-        <div className="min-h-screen flex items-center justify-center px-4">
-          <div className="max-w-md w-full space-y-8 text-center">
+        <div className="flex min-h-screen items-center justify-center px-4">
+          <div className="w-full max-w-md space-y-8 text-center">
             <div className="space-y-4">
               <div className="text-6xl">😵</div>
               <h1 className="text-2xl font-bold text-gray-900">
                 Oops! Something went wrong
               </h1>
               <p className="text-gray-600">
-                We apologize for the inconvenience. An unexpected error has occurred.
+                We apologize for the inconvenience. An unexpected error has
+                occurred.
               </p>
-              
+
               {process.env.NODE_ENV === "development" && this.state.error && (
-                <details className="mt-4 p-4 bg-gray-100 rounded-lg text-left">
+                <details className="mt-4 rounded-lg bg-gray-100 p-4 text-left">
                   <summary className="cursor-pointer font-medium text-gray-700">
                     Error Details (Development Only)
                   </summary>
-                  <pre className="mt-2 text-xs text-gray-600 overflow-auto">
+                  <pre className="mt-2 overflow-auto text-xs text-gray-600">
                     {this.state.error.toString()}
-                    {this.state.errorInfo && this.state.errorInfo.componentStack}
+                    {this.state.errorInfo &&
+                      this.state.errorInfo.componentStack}
                   </pre>
                 </details>
               )}
             </div>
 
-            <div className="flex gap-4 justify-center">
+            <div className="flex justify-center gap-4">
               <Button onClick={this.handleReset} variant="default">
                 Try Again
               </Button>
               <Button
-                onClick={() => window.location.href = "/"}
+                onClick={() => (window.location.href = "/")}
                 variant="outline"
               >
                 Go Home
@@ -116,7 +118,7 @@ export const useErrorHandler = () => {
 // Higher-order component for wrapping components with error boundary
 export const withErrorBoundary = <P extends object>(
   Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<Props, "children">
+  errorBoundaryProps?: Omit<Props, "children">,
 ) => {
   const WrappedComponent = (props: P) => (
     <ErrorBoundary {...errorBoundaryProps}>

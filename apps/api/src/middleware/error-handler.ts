@@ -1,8 +1,8 @@
-import { Context, Next } from "hono";
+import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
-import { logger } from "@/lib/logger";
-import { env } from "@/lib/env";
 
 export class AppError extends Error {
   public readonly statusCode: number;
@@ -13,7 +13,7 @@ export class AppError extends Error {
     message: string,
     statusCode: number = 500,
     isOperational: boolean = true,
-    code?: string
+    code?: string,
   ) {
     super(message);
     this.statusCode = statusCode;
@@ -42,7 +42,7 @@ export const errorHandler = async (err: Error, c: Context) => {
           code: "HTTP_EXCEPTION",
         },
       },
-      err.status
+      err.status,
     );
   }
 
@@ -52,13 +52,13 @@ export const errorHandler = async (err: Error, c: Context) => {
         error: {
           message: "Validation failed",
           code: "VALIDATION_ERROR",
-          details: err.errors.map((e) => ({
-            field: e.path.join("."),
-            message: e.message,
+          details: err.issues.map((issue) => ({
+            field: issue.path.join("."),
+            message: issue.message,
           })),
         },
       },
-      400
+      400 as const,
     );
   }
 
@@ -70,7 +70,7 @@ export const errorHandler = async (err: Error, c: Context) => {
           code: err.code || "APP_ERROR",
         },
       },
-      err.statusCode
+      err.statusCode as 400 | 401 | 403 | 404 | 409 | 422 | 500,
     );
   }
 
@@ -83,7 +83,7 @@ export const errorHandler = async (err: Error, c: Context) => {
           code: "DUPLICATE_ENTRY",
         },
       },
-      409
+      409 as const,
     );
   }
 
@@ -95,14 +95,15 @@ export const errorHandler = async (err: Error, c: Context) => {
           code: "NOT_FOUND",
         },
       },
-      404
+      404 as const,
     );
   }
 
   // Generic error response
-  const message = env.NODE_ENV === "production" 
-    ? "An unexpected error occurred" 
-    : err.message;
+  const message =
+    env.NODE_ENV === "production"
+      ? "An unexpected error occurred"
+      : err.message;
 
   return c.json(
     {
@@ -112,7 +113,7 @@ export const errorHandler = async (err: Error, c: Context) => {
         ...(env.NODE_ENV !== "production" && { stack: err.stack }),
       },
     },
-    500
+    500 as const,
   );
 };
 
@@ -124,17 +125,6 @@ export const notFound = (c: Context) => {
         code: "NOT_FOUND",
       },
     },
-    404
+    404 as const,
   );
-};
-
-// Async error wrapper for route handlers
-export const asyncHandler = (fn: Function) => {
-  return async (c: Context, next: Next) => {
-    try {
-      return await fn(c, next);
-    } catch (error) {
-      throw error;
-    }
-  };
 };

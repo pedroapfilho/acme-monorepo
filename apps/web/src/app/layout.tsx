@@ -1,11 +1,10 @@
-import { Providers } from "@/app/providers";
 import "@/styles/globals.css";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
-import type { Metadata, Viewport } from "next";
 
-const inter = Inter({ 
-  subsets: ["latin"], 
+const inter = Inter({
+  subsets: ["latin"],
   variable: "--font-sans",
   display: "swap", // Improve font loading performance
 });
@@ -13,14 +12,22 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     default: "Acme - Secure Authentication Platform",
-    template: "%s | Acme"
+    template: "%s | Acme",
   },
-  description: "A modern, secure authentication platform built with Better Auth and Next.js. Fast, reliable, and developer-friendly.",
-  keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
+  description:
+    "A modern, secure authentication platform built with Better Auth and Next.js. Fast, reliable, and developer-friendly.",
+  keywords: [
+    "authentication",
+    "security",
+    "next.js",
+    "better-auth",
+    "login",
+    "registration",
+  ],
   authors: [{ name: "Acme Team" }],
   creator: "Acme",
   publisher: "Acme",
-  
+
   // Open Graph
   openGraph: {
     type: "website",
@@ -28,7 +35,8 @@ export const metadata: Metadata = {
     url: "https://acme.example.com",
     siteName: "Acme",
     title: "Acme - Secure Authentication Platform",
-    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
+    description:
+      "A modern, secure authentication platform built with Better Auth and Next.js.",
     images: [
       {
         url: "/og-image.png",
@@ -38,15 +46,16 @@ export const metadata: Metadata = {
       },
     ],
   },
-  
+
   // Twitter
   twitter: {
     card: "summary_large_image",
     title: "Acme - Secure Authentication Platform",
-    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
+    description:
+      "A modern, secure authentication platform built with Better Auth and Next.js.",
     images: ["/twitter-image.png"],
   },
-  
+
   // Robots
   robots: {
     index: true,
@@ -59,17 +68,17 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  
+
   // Icons
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
-  
+
   // Manifest
   manifest: "/site.webmanifest",
-  
+
   // Other
   category: "technology",
 };
@@ -91,22 +100,26 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       <head>
         {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+
         {/* DNS prefetch for better performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        
+
         {/* Additional meta tags */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-TileColor" content="#000000" />
-        
+
         {/* Security headers (additional to Next.js config) */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );
