@@ -1,6 +1,6 @@
 "use client";
 
-import { resetPassword } from "@/actions/auth";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -12,24 +12,28 @@ import {
   FormMessage,
   Input,
 } from "@repo/ui";
-import { signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const formSchema = z.object({
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  password: z.string().min(12, "Password must be at least 12 characters"),
+  confirmPassword: z
+    .string()
+    .min(12, "Password must be at least 12 characters"),
 });
+
+type FormData = z.infer<typeof formSchema>;
 
 const ResetPasswordForm = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const email = searchParams.get("email");
   const token = searchParams.get("token");
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
@@ -37,49 +41,67 @@ const ResetPasswordForm = () => {
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
+  const onSubmit = async (data: FormData) => {
     try {
+      setIsLoading(true);
+
       if (data.password !== data.confirmPassword) {
-        throw new Error("PASSWORDS_DO_NOT_MATCH");
+        form.setError("confirmPassword", {
+          type: "manual",
+          message: "Passwords do not match",
+        });
+        return;
       }
 
-      if (!email || !token) {
-        router.replace("/login");
-
-        return null;
+      if (!token) {
+        form.setError("root", {
+          type: "manual",
+          message: "Invalid reset token. Please request a new password reset.",
+        });
+        return;
       }
 
-      const hasRequestedResetPasswordSuccessfully = await resetPassword({
-        email,
+      const result = await authClient.resetPassword({
+        newPassword: data.password,
         token,
-        password: data.password,
       });
 
-      if (!hasRequestedResetPasswordSuccessfully) {
-        throw new Error("SOMETHING_WENT_WRONG");
+      if (result.error) {
+        form.setError("root", {
+          type: "manual",
+          message: result.error.message || "Failed to reset password",
+        });
+        return;
       }
 
-      console.log("Password changed, please login again.");
-
-      await signOut({ callbackUrl: "/" });
-    } catch (e) {
-      console.error("Failed to reset the password. Please try again later.");
-
-      console.error(e);
+      router.push("/login?message=password-reset-success");
+    } catch (error) {
+      console.error("Password reset error:", error);
+      form.setError("root", {
+        type: "manual",
+        message: "An error occurred. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
   return (
     <Form {...form}>
-      <form className="space-y-4" onSubmit={onSubmit}>
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>New Password</FormLabel>
               <FormControl>
-                <Input placeholder="supersecret" type="password" {...field} />
+                <Input
+                  placeholder="Enter your new password"
+                  type="password"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,17 +112,28 @@ const ResetPasswordForm = () => {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
+              <FormLabel>Confirm New Password</FormLabel>
               <FormControl>
-                <Input placeholder="supersecret" type="password" {...field} />
+                <Input
+                  placeholder="Confirm your new password"
+                  type="password"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button className="w-full" type="submit">
-          Reset Password
+        {form.formState.errors.root && (
+          <div className="text-sm text-red-500">
+            {form.formState.errors.root.message}
+          </div>
+        )}
+
+        <Button className="w-full" type="submit" disabled={isLoading}>
+          {isLoading ? "Resetting..." : "Reset Password"}
         </Button>
       </form>
     </Form>

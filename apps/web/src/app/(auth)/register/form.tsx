@@ -1,6 +1,6 @@
 "use client";
 
-import { register } from "@/actions/auth";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -13,62 +13,78 @@ import {
   Input,
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const formSchema = z.object({
-  name: z.string().min(3).max(32),
-  phone: z.string().min(5).max(20),
-  email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  name: z.string().min(3, "Name must be at least 3 characters").max(32),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(12, "Password must be at least 12 characters"),
+  confirmPassword: z
+    .string()
+    .min(12, "Password must be at least 12 characters"),
 });
+
+type FormData = z.infer<typeof formSchema>;
 
 const RegisterForm = () => {
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      phone: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
+  const onSubmit = async (data: FormData) => {
     try {
-      const { confirmPassword, ...rest } = data;
+      setIsLoading(true);
 
-      if (rest.password !== confirmPassword) {
+      if (data.password !== data.confirmPassword) {
         form.setError("confirmPassword", {
           type: "manual",
-          message: "Passwords do not match.",
+          message: "Passwords do not match",
         });
-
         return;
       }
 
-      const hasRegisteredSuccessfully = await register(rest);
+      const result = await authClient.signUp.email({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+      });
 
-      if (!hasRegisteredSuccessfully) {
-        throw new Error("SOMETHING_WENT_WRONG");
+      if (result.error) {
+        form.setError("root", {
+          type: "manual",
+          message: result.error.message || "Failed to register",
+        });
+        return;
       }
 
-      console.log("Registered successfully, check your email.");
-
-      router.push("/login");
-    } catch (e) {
-      console.error("Failed to register. Please try again later.");
-
-      console.error(e);
+      // Redirect to dashboard on success
+      router.push("/dashboard");
+      router.refresh(); // Refresh to ensure middleware runs
+    } catch (error) {
+      console.error("Registration error:", error);
+      form.setError("root", {
+        type: "manual",
+        message: "An error occurred during registration. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -76,21 +92,7 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone Number</FormLabel>
-              <FormControl>
-                <Input placeholder="+1 (555) 555-5555" type="tel" {...field} />
+                <Input placeholder="John Doe" disabled={isLoading} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,8 +107,9 @@ const RegisterForm = () => {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="email@address.com"
+                  placeholder="you@example.com"
                   type="email"
+                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -122,7 +125,12 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="supersecret" type="password" {...field} />
+                <Input
+                  placeholder="Enter your password"
+                  type="password"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -136,15 +144,26 @@ const RegisterForm = () => {
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input placeholder="supersecret" type="password" {...field} />
+                <Input
+                  placeholder="Confirm your password"
+                  type="password"
+                  disabled={isLoading}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button className="w-full" type="submit">
-          Register
+        {form.formState.errors.root && (
+          <div className="text-sm text-red-500">
+            {form.formState.errors.root.message}
+          </div>
+        )}
+
+        <Button className="w-full" type="submit" disabled={isLoading}>
+          {isLoading ? "Creating account..." : "Register"}
         </Button>
       </form>
     </Form>

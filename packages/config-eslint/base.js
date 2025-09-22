@@ -11,6 +11,9 @@ export const config = [
       "node_modules/**",
       "coverage/**",
       "build/**",
+      "next-env.d.ts",
+      "**/.eslintrc.js",
+      "storybook-static/**",
     ],
   },
 ];

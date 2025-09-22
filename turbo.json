@@ -4,19 +4,15 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "NODE_ENV",
-
-    "NEXTAUTH_SECRET",
+    "DATABASE_URL",
     "API_URL",
-
     "PORT",
-    "SECRET",
-    "HTTP_HOST",
-    "HTTP_PORT",
-    "REDIS_URL",
-    "CORS_ORIGIN_URL",
-    "RESEND_API_KEY",
-
-    "DATABASE_URL"
+    "HOST",
+    "CORS_ORIGINS",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "TRUSTED_ORIGINS",
+    "RESEND_API_KEY"
   ],
   "tasks": {
     "build": {
