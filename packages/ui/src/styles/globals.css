@@ -1,3 +1,12 @@
-@import "tailwindcss";
+@import "tailwindcss" prefix(ui);
 @import "tw-animate-css";
 @import "@repo/tailwind-config";
+
+@layer base {
+  * {
+    @apply ui:border-border ui:outline-ring/50;
+  }
+  body {
+    @apply ui:bg-background ui:text-foreground;
+  }
+}

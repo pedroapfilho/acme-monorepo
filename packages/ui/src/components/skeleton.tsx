@@ -22,15 +22,15 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
     ref,
   ) => {
     const variantClasses = {
-      text: "rounded-md",
-      circular: "rounded-full",
-      rectangular: "rounded-none",
-      rounded: "rounded-lg",
+      text: "ui:rounded-md",
+      circular: "ui:rounded-full",
+      rectangular: "ui:rounded-none",
+      rounded: "ui:rounded-lg",
     };
 
     const animationClasses = {
-      pulse: "animate-pulse",
-      wave: "animate-shimmer",
+      pulse: "ui:animate-pulse",
+      wave: "ui:animate-shimmer",
       none: "",
     };
 
@@ -38,7 +38,7 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       <div
         ref={ref}
         className={cn(
-          "bg-muted",
+          "ui:bg-muted",
           variantClasses[variant],
           animationClasses[animation],
           className,
@@ -68,9 +68,9 @@ const SkeletonContainer = React.forwardRef<
   SkeletonContainerProps
 >(({ children, className, count = 1, spacing = "md", ...props }, ref) => {
   const spacingClasses = {
-    sm: "space-y-2",
-    md: "space-y-3",
-    lg: "space-y-4",
+    sm: "ui:space-y-2",
+    md: "ui:space-y-3",
+    lg: "ui:space-y-4",
   };
 
   if (count > 1 && !children) {
@@ -108,10 +108,10 @@ const SkeletonCard = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("space-y-3 rounded-lg border p-4", className)}
+      className={cn("ui:space-y-3 ui:rounded-lg ui:border ui:p-4", className)}
       {...props}
     >
-      <Skeleton variant="rectangular" height={200} className="mb-4" />
+      <Skeleton variant="rectangular" height={200} className="ui:mb-4" />
       <Skeleton variant="text" width="60%" />
       <Skeleton variant="text" width="80%" />
       <Skeleton variant="text" width="40%" />
