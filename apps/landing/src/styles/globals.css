@@ -1,2 +1,5 @@
-@import "tailwindcss";
 @import "@repo/ui/styles.css";
+
+@import "tailwindcss";
+@import "@repo/tailwind-config";
+@import "tw-animate-css";
