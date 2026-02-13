@@ -43,3 +43,6 @@ dist/
 
 # storybook
 storybook-static
+
+# prisma generated client
+packages/db/src/generated

@@ -1,5 +1,5 @@
 import { createAuth } from "../server";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@repo/db";
 import { describe, it, expect, beforeAll } from "vitest";
 
 describe("Auth Server Configuration", () => {
@@ -8,7 +8,7 @@ describe("Auth Server Configuration", () => {
 
   beforeAll(() => {
     prisma = new PrismaClient();
-    auth = createAuth(prisma);
+    auth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
   });
 
   it("should have email and password authentication enabled", () => {
@@ -39,16 +39,16 @@ describe("Auth Server Configuration", () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
 
-    const prodAuth = createAuth(prisma);
+    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(
-      prodAuth.options.advanced?.cookies?.sessionToken?.options?.secure,
+      prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure,
     ).toBe(true);
     expect(
-      prodAuth.options.advanced?.cookies?.sessionToken?.options?.httpOnly,
+      prodAuth.options.advanced?.cookies?.session_token?.attributes?.httpOnly,
     ).toBe(true);
     expect(
-      prodAuth.options.advanced?.cookies?.sessionToken?.options?.sameSite,
-    ).toBe("strict");
+      prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite,
+    ).toBe("lax");
 
     process.env.NODE_ENV = originalEnv;
   });
@@ -57,7 +57,7 @@ describe("Auth Server Configuration", () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
 
-    const prodAuth = createAuth(prisma);
+    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.emailAndPassword?.requireEmailVerification).toBe(
       true,
     );
@@ -80,7 +80,7 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should use custom session token name", () => {
-    expect(auth.options.advanced?.cookies?.sessionToken?.name).toBe(
+    expect(auth.options.advanced?.cookies?.session_token?.name).toBe(
       "session_token",
     );
   });

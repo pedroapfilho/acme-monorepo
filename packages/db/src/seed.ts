@@ -5,27 +5,23 @@ const DEFAULT_USERS = [
     id: "1",
     name: "John Doe",
     email: "john@doe.com",
-    phone: "1234567890",
-    password: "supersecret",
-    salt: "salt",
+    emailVerified: false,
   },
   {
     id: "2",
     name: "Jane Doe",
     email: "jane@doe.com",
-    phone: "1234567890",
-    password: "secret",
-    salt: "sugar",
+    emailVerified: false,
   },
 ];
 
 (async () => {
   try {
-    await Promise.all(
+    const results = await Promise.allSettled(
       DEFAULT_USERS.map((user) =>
         prisma.user.upsert({
           where: {
-            id: user.id!,
+            id: user.id,
           },
           update: {
             ...user,
@@ -36,6 +32,11 @@ const DEFAULT_USERS = [
         }),
       ),
     );
+
+    const failures = results.filter((r) => r.status === "rejected");
+    if (failures.length > 0) {
+      console.error("Some seed operations failed:", failures);
+    }
   } catch (error) {
     console.error(error);
 

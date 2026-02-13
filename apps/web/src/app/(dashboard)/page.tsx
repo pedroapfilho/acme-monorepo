@@ -1,29 +1,10 @@
-import { authClient } from "@/lib/auth-client";
+import { SignOutButton } from "@/components/sign-out-button";
 import { getSession } from "@/lib/auth-helpers";
-import { Button } from "@repo/ui";
 import { redirect } from "next/navigation";
 
-async function SignOutButton() {
-  async function handleSignOut() {
-    "use server";
-
-    await authClient.signOut();
-    redirect("/login");
-  }
-
-  return (
-    <form action={handleSignOut}>
-      <Button type="submit" variant="outline">
-        Sign Out
-      </Button>
-    </form>
-  );
-}
-
-export default async function Dashboard() {
+const Dashboard = async () => {
   const session = await getSession();
 
-  // This shouldn't happen due to middleware, but as a safety check
   if (!session) {
     redirect("/login");
   }
@@ -48,4 +29,6 @@ export default async function Dashboard() {
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

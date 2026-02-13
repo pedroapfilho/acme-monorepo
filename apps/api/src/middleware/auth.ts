@@ -1,5 +1,4 @@
-import { createAuth } from "@repo/auth/server";
-import { prisma } from "@repo/db";
+import { auth } from "../lib/auth";
 import type { Context, Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
@@ -12,8 +11,6 @@ type AuthVariables = {
     displayName?: string;
   };
 };
-
-const auth = createAuth(prisma);
 
 export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
   async (c: Context, next: Next) => {

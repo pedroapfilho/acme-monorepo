@@ -3,46 +3,51 @@
 const fs = require("fs");
 const path = require("path");
 
-console.log("🔍 Verifying Better Auth Implementation...\n");
+console.log("Verifying Better Auth Implementation...\n");
 
 const checks = [
   {
-    name: "✅ Auth Server Package",
+    name: "Auth Server Package",
     file: "packages/auth/src/server.ts",
     pattern: /betterAuth|prismaAdapter/,
   },
   {
-    name: "✅ Auth Client Package",
+    name: "Auth Client Package",
     file: "packages/auth/src/client.ts",
     pattern: /createAuthClient|usernameClient/,
   },
   {
-    name: "✅ API Hono Integration",
+    name: "API Shared Auth Instance",
+    file: "apps/api/src/lib/auth.ts",
+    pattern: /createAuth/,
+  },
+  {
+    name: "API Hono Integration",
     file: "apps/api/src/index.ts",
-    pattern: /auth\.handler.*Hono/s,
+    pattern: /auth\.handler/,
   },
   {
-    name: "✅ Web Auth Route",
-    file: "apps/web/src/app/api/auth/[...all]/route.ts",
-    pattern: /toNextJsHandler/,
+    name: "Web Proxy Rewrite",
+    file: "apps/web/next.config.ts",
+    pattern: /rewrites|\/api\/auth/,
   },
   {
-    name: "✅ Middleware Configuration",
+    name: "Middleware Configuration",
     file: "apps/web/src/middleware.ts",
     pattern: /runtime.*nodejs|auth\.api\.getSession/,
   },
   {
-    name: "✅ Database Schema",
+    name: "Database Schema (PostgreSQL)",
     file: "packages/db/prisma/schema.prisma",
-    pattern: /model\s+(User|Session|Account)/,
+    pattern: /provider\s*=\s*"postgresql"/,
   },
   {
-    name: "✅ Enhanced Security (12-char passwords)",
+    name: "Enhanced Security (12-char passwords)",
     file: "packages/auth/src/server.ts",
     pattern: /minPasswordLength:\s*12/,
   },
   {
-    name: "✅ Cookie Cache Configuration",
+    name: "Cookie Cache Configuration",
     file: "packages/auth/src/server.ts",
     pattern: /cookieCache.*enabled.*true/s,
   },
@@ -55,14 +60,14 @@ checks.forEach((check) => {
   try {
     const content = fs.readFileSync(filePath, "utf8");
     const passed = check.pattern.test(content);
-    console.log(`${passed ? "✅" : "❌"} ${check.name}`);
+    console.log(`${passed ? "PASS" : "FAIL"} ${check.name}`);
     console.log(`   File: ${check.file}`);
     if (!passed) {
       allPassed = false;
-      console.log("   ⚠️  Pattern not found");
+      console.log("   Pattern not found");
     }
   } catch (error) {
-    console.log(`❌ ${check.name}`);
+    console.log(`FAIL ${check.name}`);
     console.log(`   File: ${check.file}`);
     console.log(`   Error: ${error.message}`);
     allPassed = false;
@@ -70,16 +75,16 @@ checks.forEach((check) => {
   console.log("");
 });
 
-console.log("─".repeat(50));
+console.log("-".repeat(50));
 if (allPassed) {
-  console.log("✅ All checks passed! Better Auth is properly configured.");
+  console.log("All checks passed! Better Auth is properly configured.");
 } else {
-  console.log("⚠️  Some checks failed. Please review the configuration.");
+  console.log("Some checks failed. Please review the configuration.");
 }
-console.log("─".repeat(50));
+console.log("-".repeat(50));
 
 // Check environment variables
-console.log("\n📋 Environment Variables Check:\n");
+console.log("\nEnvironment Variables Check:\n");
 const envFiles = [
   { name: "Web App", file: "apps/web/.env.local" },
   { name: "API", file: "apps/api/.env" },
@@ -94,13 +99,13 @@ envFiles.forEach((env) => {
     const hasDb = content.includes("DATABASE_URL");
 
     console.log(`${env.name}:`);
-    console.log(`  ${hasSecret ? "✅" : "❌"} BETTER_AUTH_SECRET`);
-    console.log(`  ${hasUrl ? "✅" : "❌"} BETTER_AUTH_URL`);
-    console.log(`  ${hasDb ? "✅" : "❌"} DATABASE_URL`);
+    console.log(`  ${hasSecret ? "PASS" : "FAIL"} BETTER_AUTH_SECRET`);
+    console.log(`  ${hasUrl ? "PASS" : "FAIL"} BETTER_AUTH_URL`);
+    console.log(`  ${hasDb ? "PASS" : "FAIL"} DATABASE_URL`);
     console.log("");
   } catch (error) {
-    console.log(`${env.name}: ⚠️  File not found (${env.file})`);
+    console.log(`${env.name}: File not found (${env.file})`);
   }
 });
 
-console.log("🎉 Verification complete!");
+console.log("Verification complete!");

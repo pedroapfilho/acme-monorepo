@@ -4,7 +4,8 @@ const userSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string().email(),
-  phone: z.string(),
+  username: z.string().optional(),
+  displayName: z.string().optional(),
 });
 
 export { userSchema };

@@ -25,7 +25,7 @@ const Page = async () => {
     <div className="flex flex-col gap-4 sm:mx-auto sm:w-full sm:max-w-[480px]">
       <Card>
         <CardHeader>
-          <CardTitle> Log In to Hasteo</CardTitle>
+          <CardTitle>Log In to Acme</CardTitle>
           <CardDescription>Please enter your details to login</CardDescription>
         </CardHeader>
 

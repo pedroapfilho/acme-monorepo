@@ -10,7 +10,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 const metadata: Metadata = {
-  title: "Recover your account - Hasteo",
+  title: "Recover your account - Acme",
 };
 
 const Page = () => {

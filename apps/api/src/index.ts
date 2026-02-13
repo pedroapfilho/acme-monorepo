@@ -9,9 +9,9 @@ import {
   requestSizeLimit,
   requestId,
 } from "./middleware/security";
+import { auth } from "./lib/auth";
 import { v1UserRoutes } from "./routes/v1/users";
 import { serve } from "@hono/node-server";
-import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 import "dotenv/config";
 import { Hono } from "hono";
@@ -19,9 +19,6 @@ import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 
 const app = new Hono();
-
-// Initialize Better Auth
-const auth = createAuth(prisma);
 
 // Global middleware
 app.use("*", requestId);
@@ -100,7 +97,7 @@ app.get("/readyz", async (c) => {
 });
 
 // Better Auth routes
-app.all("/auth/*", async (c) => {
+app.on(["POST", "GET"], "/auth/*", (c) => {
   return auth.handler(c.req.raw);
 });
 
@@ -118,7 +115,7 @@ app.notFound(notFound);
 app.onError(errorHandler);
 
 // Start server
-const port = Number(env.PORT) || 3001;
+const port = Number(env.PORT) || 4000;
 const hostname = env.HOST || "0.0.0.0";
 
 logger.info(

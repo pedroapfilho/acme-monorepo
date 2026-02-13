@@ -2,8 +2,25 @@ import type { PrismaClient } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer, username } from "better-auth/plugins";
+import type { BetterAuthPlugin } from "better-auth/types";
 
-export const createAuth = (prisma: PrismaClient) => {
+type AuthConfig = {
+  prisma: PrismaClient;
+  secret: string;
+  resendApiKey?: string;
+  fromEmail?: string;
+  extraPlugins?: BetterAuthPlugin[];
+};
+
+export const createAuth = (config: AuthConfig) => {
+  const {
+    prisma,
+    secret,
+    resendApiKey,
+    fromEmail = "noreply@acme.com",
+    extraPlugins = [],
+  } = config;
+
   return betterAuth({
     database: prismaAdapter(prisma, {
       provider: "postgresql",
@@ -14,11 +31,49 @@ export const createAuth = (prisma: PrismaClient) => {
       requireEmailVerification: process.env.NODE_ENV === "production",
       minPasswordLength: 12,
       maxPasswordLength: 128,
+      sendResetPassword: resendApiKey
+        ? async ({ user, url }) => {
+            const { Resend } = await import("resend");
+            const resend = new Resend(resendApiKey);
+            // Non-blocking to prevent timing attacks, but log failures
+            resend.emails
+              .send({
+                from: fromEmail,
+                to: user.email,
+                subject: "Reset your password",
+                html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+              })
+              .catch((error) => {
+                console.error("Failed to send password reset email:", error);
+              });
+          }
+        : undefined,
+    },
+
+    emailVerification: {
+      sendVerificationEmail: resendApiKey
+        ? async ({ user, url }) => {
+            const { Resend } = await import("resend");
+            const resend = new Resend(resendApiKey);
+            // Non-blocking to prevent timing attacks, but log failures
+            resend.emails
+              .send({
+                from: fromEmail,
+                to: user.email,
+                subject: "Verify your email address",
+                html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
+              })
+              .catch((error) => {
+                console.error("Failed to send verification email:", error);
+              });
+          }
+        : undefined,
     },
 
     plugins: [
-      username(), // Enables username login
-      bearer(), // Enables bearer token auth
+      username(),
+      bearer(),
+      ...extraPlugins,
     ],
 
     session: {
@@ -33,10 +88,10 @@ export const createAuth = (prisma: PrismaClient) => {
     advanced: {
       cookiePrefix: "acme",
       cookies: {
-        sessionToken: {
+        session_token: {
           name: "session_token",
-          options: {
-            sameSite: "strict" as const,
+          attributes: {
+            sameSite: "lax" as const,
             secure: process.env.NODE_ENV === "production",
             httpOnly: true,
           },
@@ -51,7 +106,6 @@ export const createAuth = (prisma: PrismaClient) => {
       },
     },
 
-    // Custom user fields
     user: {
       additionalFields: {
         displayName: {
@@ -68,13 +122,15 @@ export const createAuth = (prisma: PrismaClient) => {
       max: 10, // 10 requests per minute
     },
 
-    secret: process.env.BETTER_AUTH_SECRET!,
-    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3001",
+    secret,
+    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
     trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || [
       "http://localhost:3000", // Web app
-      "http://localhost:3001", // API
+      "http://localhost:3001", // Landing
+      "http://localhost:4000", // API
     ],
   });
 };
 
 export type Auth = ReturnType<typeof createAuth>;
+export type { AuthConfig };

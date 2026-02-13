@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "turbo run start",
-    "dev": "turbo run dev --concurrency 16",
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "build": "turbo run build",
@@ -16,11 +16,11 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@playwright/test": "^1.58.0",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "prettier": "^3.6.2",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "turbo": "^2.5.6"
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "turbo": "^2.8.7"
   },
   "packageManager": "pnpm@10.7.0"
 }

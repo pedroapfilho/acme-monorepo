@@ -3,7 +3,7 @@ import * as z from "zod";
 // Password strength validation
 const passwordSchema = z
   .string()
-  .min(8, "Password must be at least 8 characters")
+  .min(12, "Password must be at least 12 characters")
   .max(128, "Password must be less than 128 characters")
   .regex(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
@@ -105,8 +105,8 @@ export const getPasswordStrength = (
   const feedback: string[] = [];
   let score = 0;
 
-  if (password.length >= 8) score += 1;
-  else feedback.push("Use at least 8 characters");
+  if (password.length >= 12) score += 1;
+  else feedback.push("Use at least 12 characters");
 
   if (/[a-z]/.test(password)) score += 1;
   else feedback.push("Add lowercase letters");

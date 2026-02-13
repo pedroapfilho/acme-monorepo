@@ -11,7 +11,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 const metadata: Metadata = {
-  title: "Create an account - Hasteo",
+  title: "Create an account - Acme",
 };
 
 const Page = async () => {

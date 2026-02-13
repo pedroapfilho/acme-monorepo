@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 const metadata: Metadata = {
-  title: "Reset your password - Hasteo",
+  title: "Reset your password - Acme",
 };
 
 const Page = () => {

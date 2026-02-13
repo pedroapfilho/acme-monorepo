@@ -2,30 +2,16 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": [
-    "NODE_ENV",
-    "DATABASE_URL",
-    "API_URL",
-    "PORT",
-    "HOST",
-    "CORS_ORIGINS",
-    "BETTER_AUTH_SECRET",
-    "BETTER_AUTH_URL",
-    "TRUSTED_ORIGINS",
-    "RESEND_API_KEY"
-  ],
+  "globalEnv": ["NODE_ENV"],
   "tasks": {
     "build": {
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**",
-        "storybook-static/**"
-      ],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"],
+      "env": ["API_URL", "BETTER_AUTH_URL", "NEXT_PUBLIC_API_URL"]
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": []
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -40,13 +26,16 @@
       "cache": false
     },
     "db:generate": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "db:push": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "db:seed": {
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     }
   }
 }
