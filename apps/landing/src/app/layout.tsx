@@ -8,7 +8,7 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 
-let SITE_NAME = "Acme";
+const SITE_NAME = "Acme";
 
 const SHORT_DESCRIPTION = "The one template to rule them all";
 
