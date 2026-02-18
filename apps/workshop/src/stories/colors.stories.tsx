@@ -24,12 +24,8 @@ const ColorSwatch = ({ name, variable, description }: ColorSwatchProps) => (
     />
     <div className="flex-1">
       <h3 className="text-foreground font-medium">{name}</h3>
-      <code className="text-muted-foreground font-mono text-sm">
-        {variable}
-      </code>
-      {description && (
-        <p className="text-muted-foreground mt-1 text-sm">{description}</p>
-      )}
+      <code className="text-muted-foreground font-mono text-sm">{variable}</code>
+      {description && <p className="text-muted-foreground mt-1 text-sm">{description}</p>}
     </div>
   </div>
 );
@@ -45,9 +41,7 @@ type ColorSectionProps = {
 
 const ColorSection = ({ title, colors }: ColorSectionProps) => (
   <div className="space-y-4">
-    <h2 className="text-foreground border-border border-b pb-2 text-xl font-semibold">
-      {title}
-    </h2>
+    <h2 className="text-foreground border-border border-b pb-2 text-xl font-semibold">{title}</h2>
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {colors.map((color) => (
         <ColorSwatch
@@ -67,8 +61,7 @@ export const AllColors: Story = {
       <div className="space-y-2 text-center">
         <h1 className="text-foreground text-3xl font-bold">Color System</h1>
         <p className="text-muted-foreground">
-          Complete overview of all colors in the design system with their CSS
-          variables
+          Complete overview of all colors in the design system with their CSS variables
         </p>
       </div>
 

@@ -1,23 +1,16 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { auth } from "@/lib/auth";
+
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
-const authRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/recover",
-  "/reset-password",
-];
+const authRoutes = ["/login", "/register", "/forgot-password", "/recover", "/reset-password"];
 
 export const middleware = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
@@ -50,7 +43,5 @@ export const middleware = async (request: NextRequest) => {
 
 export const config = {
   runtime: "nodejs",
-  matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)",
-  ],
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
 };

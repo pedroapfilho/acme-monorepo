@@ -1,6 +1,7 @@
-import { env } from "./env";
 import pino from "pino";
 import { pinoHttp } from "pino-http";
+
+import { env } from "./env";
 
 const logLevel = env.NODE_ENV === "production" ? "info" : "debug";
 

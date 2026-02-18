@@ -304,9 +304,7 @@ export const UserManagement: Story = {
             </TableCell>
             <TableCell>{user.department}</TableCell>
             <TableCell>
-              <Badge
-                variant={user.status === "Active" ? "default" : "secondary"}
-              >
+              <Badge variant={user.status === "Active" ? "default" : "secondary"}>
                 {user.status}
               </Badge>
             </TableCell>

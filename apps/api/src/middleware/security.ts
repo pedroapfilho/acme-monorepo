@@ -36,10 +36,7 @@ export const standardRateLimit = rateLimiter({
   standardHeaders: "draft-6",
   keyGenerator: (c: Context) => {
     return (
-      c.req.header("x-forwarded-for") ||
-      c.req.header("x-real-ip") ||
-      c.env?.remoteAddr ||
-      "unknown"
+      c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || c.env?.remoteAddr || "unknown"
     );
   },
   handler: (c: Context) => {

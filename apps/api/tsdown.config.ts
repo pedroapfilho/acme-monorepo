@@ -1,5 +1,6 @@
-import alias from "@rollup/plugin-alias";
 import path from "path";
+
+import alias from "@rollup/plugin-alias";
 import { defineConfig } from "tsdown";
 
 export default defineConfig({

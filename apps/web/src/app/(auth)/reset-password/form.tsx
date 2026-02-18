@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -17,11 +16,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import { authClient } from "@/lib/auth-client";
+
 const formSchema = z.object({
   password: z.string().min(12, "Password must be at least 12 characters"),
-  confirmPassword: z
-    .string()
-    .min(12, "Password must be at least 12 characters"),
+  confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -127,9 +126,7 @@ const ResetPasswordForm = () => {
         />
 
         {form.formState.errors.root && (
-          <div className="text-sm text-red-500">
-            {form.formState.errors.root.message}
-          </div>
+          <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
         )}
 
         <Button className="w-full" type="submit" disabled={isLoading}>

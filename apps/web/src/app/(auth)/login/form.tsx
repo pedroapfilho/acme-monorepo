@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -16,6 +15,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+
+import { authClient } from "@/lib/auth-client";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -81,12 +82,7 @@ const LoginForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="you@example.com"
-                  type="email"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <Input placeholder="you@example.com" type="email" disabled={isLoading} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,9 +109,7 @@ const LoginForm = () => {
         />
 
         {form.formState.errors.root && (
-          <div className="text-sm text-red-500">
-            {form.formState.errors.root.message}
-          </div>
+          <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
         )}
 
         <Button className="w-full" type="submit" disabled={isLoading}>

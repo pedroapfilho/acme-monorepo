@@ -1,7 +1,8 @@
-import { logger } from "@/lib/logger";
-import { AppError } from "@/middleware/error-handler";
 import { prisma } from "@repo/db";
 import type { Prisma } from "@repo/db";
+
+import { logger } from "@/lib/logger";
+import { AppError } from "@/middleware/error-handler";
 
 export class UserService {
   async findById(id: string) {
@@ -29,12 +30,7 @@ export class UserService {
       if (error instanceof AppError) throw error;
 
       logger.error({ error, userId: id }, "Failed to find user by ID");
-      throw new AppError(
-        "Failed to fetch user",
-        500,
-        false,
-        "USER_FETCH_ERROR",
-      );
+      throw new AppError("Failed to fetch user", 500, false, "USER_FETCH_ERROR");
     }
   }
 
@@ -56,12 +52,7 @@ export class UserService {
       return user;
     } catch (error) {
       logger.error({ error, email }, "Failed to find user by email");
-      throw new AppError(
-        "Failed to fetch user",
-        500,
-        false,
-        "USER_FETCH_ERROR",
-      );
+      throw new AppError("Failed to fetch user", 500, false, "USER_FETCH_ERROR");
     }
   }
 
@@ -77,12 +68,7 @@ export class UserService {
         });
 
         if (existing) {
-          throw new AppError(
-            "Username already taken",
-            400,
-            true,
-            "USERNAME_TAKEN",
-          );
+          throw new AppError("Username already taken", 400, true, "USERNAME_TAKEN");
         }
       }
 
@@ -101,10 +87,7 @@ export class UserService {
         },
       });
 
-      logger.info(
-        { userId: id, fields: Object.keys(data) },
-        "User updated successfully",
-      );
+      logger.info({ userId: id, fields: Object.keys(data) }, "User updated successfully");
 
       return updatedUser;
     } catch (error) {
@@ -115,12 +98,7 @@ export class UserService {
       }
 
       logger.error({ error, userId: id }, "Failed to update user");
-      throw new AppError(
-        "Failed to update user",
-        500,
-        false,
-        "USER_UPDATE_ERROR",
-      );
+      throw new AppError("Failed to update user", 500, false, "USER_UPDATE_ERROR");
     }
   }
 
@@ -139,12 +117,7 @@ export class UserService {
       }
 
       logger.error({ error, userId: id }, "Failed to delete user");
-      throw new AppError(
-        "Failed to delete user",
-        500,
-        false,
-        "USER_DELETE_ERROR",
-      );
+      throw new AppError("Failed to delete user", 500, false, "USER_DELETE_ERROR");
     }
   }
 
@@ -181,12 +154,7 @@ export class UserService {
       };
     } catch (error) {
       logger.error({ error, options }, "Failed to list users");
-      throw new AppError(
-        "Failed to fetch users",
-        500,
-        false,
-        "USER_LIST_ERROR",
-      );
+      throw new AppError("Failed to fetch users", 500, false, "USER_LIST_ERROR");
     }
   }
 }

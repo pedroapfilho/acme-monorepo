@@ -1,8 +1,9 @@
-import { authMiddleware } from "@/middleware/auth";
-import { userService } from "@/services/user.service";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
+
+import { authMiddleware } from "@/middleware/auth";
+import { userService } from "@/services/user.service";
 
 type AuthVariables = {
   user: {
@@ -36,18 +37,13 @@ const updateUserSchema = z.object({
     .optional(),
 });
 
-v1UserRoutes.patch(
-  "/me",
-  authMiddleware,
-  zValidator("json", updateUserSchema),
-  async (c) => {
-    const user = c.get("user");
-    const data = c.req.valid("json");
+v1UserRoutes.patch("/me", authMiddleware, zValidator("json", updateUserSchema), async (c) => {
+  const user = c.get("user");
+  const data = c.req.valid("json");
 
-    const updatedUser = await userService.update(user.id, data);
-    return c.json({ data: updatedUser });
-  },
-);
+  const updatedUser = await userService.update(user.id, data);
+  return c.json({ data: updatedUser });
+});
 
 // Delete user account
 v1UserRoutes.delete("/me", authMiddleware, async (c) => {
@@ -64,28 +60,23 @@ const listUsersSchema = z.object({
   order: z.enum(["asc", "desc"]).default("desc"),
 });
 
-v1UserRoutes.get(
-  "/",
-  authMiddleware,
-  zValidator("query", listUsersSchema),
-  async (c) => {
-    const { page, limit, orderBy, order } = c.req.valid("query");
+v1UserRoutes.get("/", authMiddleware, zValidator("query", listUsersSchema), async (c) => {
+  const { page, limit, orderBy, order } = c.req.valid("query");
 
-    const result = await userService.list({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { [orderBy]: order },
-    });
+  const result = await userService.list({
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: { [orderBy]: order },
+  });
 
-    return c.json({
-      data: result.data,
-      meta: {
-        ...result.meta,
-        page,
-        totalPages: Math.ceil(result.meta.total / limit),
-      },
-    });
-  },
-);
+  return c.json({
+    data: result.data,
+    meta: {
+      ...result.meta,
+      page,
+      totalPages: Math.ceil(result.meta.total / limit),
+    },
+  });
+});
 
 export { v1UserRoutes };

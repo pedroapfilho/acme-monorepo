@@ -1,9 +1,10 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+import { authClient } from "@/lib/auth-client";
 
 const SignOutButton = () => {
   const router = useRouter();
@@ -24,11 +25,7 @@ const SignOutButton = () => {
 
   return (
     <div>
-      <Button
-        variant="outline"
-        onClick={handleSignOut}
-        disabled={isLoading}
-      >
+      <Button variant="outline" onClick={handleSignOut} disabled={isLoading}>
         {isLoading ? "Signing out" : "Sign Out"}
       </Button>
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}

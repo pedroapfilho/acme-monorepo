@@ -1,15 +1,13 @@
 "use client";
 
-import { cn } from "../lib/utils";
-import { Button, buttonVariants } from "./button";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "lucide-react";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import * as React from "react";
 import { ComponentProps } from "react";
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker";
+
+import { cn } from "../lib/utils";
+
+import { Button, buttonVariants } from "./button";
 
 function Calendar({
   className,
@@ -29,15 +27,14 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "ui:bg-background ui:group/calendar ui:p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:ui:bg-transparent [[data-slot=popover-content]_&]:ui:bg-transparent",
+        "ui:bg-background ui:group/calendar ui:p-3 [[data-slot=card-content]_&]:ui:bg-transparent [[data-slot=popover-content]_&]:ui:bg-transparent [--cell-size:--spacing(8)]",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className,
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+        formatMonthDropdown: (date) => date.toLocaleString("default", { month: "short" }),
         ...formatters,
       }}
       classNames={{
@@ -103,10 +100,7 @@ function Calendar({
           "ui:group/day ui:relative ui:aspect-square ui:h-full ui:w-full ui:p-0 ui:text-center ui:select-none ui:[&:first-child[data-selected=true]_button]:rounded-l-md ui:[&:last-child[data-selected=true]_button]:rounded-r-md",
           defaultClassNames.day,
         ),
-        range_start: cn(
-          "ui:bg-accent ui:rounded-l-md",
-          defaultClassNames.range_start,
-        ),
+        range_start: cn("ui:bg-accent ui:rounded-l-md", defaultClassNames.range_start),
         range_middle: cn("ui:rounded-none", defaultClassNames.range_middle),
         range_end: cn("ui:bg-accent ui:rounded-r-md", defaultClassNames.range_end),
         today: cn(
@@ -117,43 +111,24 @@ function Calendar({
           "ui:text-muted-foreground ui:aria-selected:text-muted-foreground",
           defaultClassNames.outside,
         ),
-        disabled: cn(
-          "ui:text-muted-foreground ui:opacity-50",
-          defaultClassNames.disabled,
-        ),
+        disabled: cn("ui:text-muted-foreground ui:opacity-50", defaultClassNames.disabled),
         hidden: cn("ui:invisible", defaultClassNames.hidden),
         ...classNames,
       }}
       components={{
         Root: ({ className, rootRef, ...props }) => {
-          return (
-            <div
-              data-slot="calendar"
-              ref={rootRef}
-              className={cn(className)}
-              {...props}
-            />
-          );
+          return <div data-slot="calendar" ref={rootRef} className={cn(className)} {...props} />;
         },
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
-            return (
-              <ChevronLeftIcon className={cn("ui:size-4", className)} {...props} />
-            );
+            return <ChevronLeftIcon className={cn("ui:size-4", className)} {...props} />;
           }
 
           if (orientation === "right") {
-            return (
-              <ChevronRightIcon
-                className={cn("ui:size-4", className)}
-                {...props}
-              />
-            );
+            return <ChevronRightIcon className={cn("ui:size-4", className)} {...props} />;
           }
 
-          return (
-            <ChevronDownIcon className={cn("ui:size-4", className)} {...props} />
-          );
+          return <ChevronDownIcon className={cn("ui:size-4", className)} {...props} />;
         },
         DayButton: CalendarDayButton,
         WeekNumber: ({ children, ...props }) => {

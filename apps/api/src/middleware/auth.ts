@@ -1,7 +1,8 @@
-import { auth } from "../lib/auth";
 import type { Context, Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+
+import { auth } from "../lib/auth";
 
 type AuthVariables = {
   user: {

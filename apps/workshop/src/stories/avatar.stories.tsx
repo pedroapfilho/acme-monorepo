@@ -51,17 +51,11 @@ export const WithImage: Story = {
   render: () => (
     <div className="flex gap-4">
       <Avatar>
-        <AvatarImage
-          src="https://github.com/thenamespace.png"
-          alt="@thenamespace"
-        />
+        <AvatarImage src="https://github.com/thenamespace.png" alt="@thenamespace" />
         <AvatarFallback>TNS</AvatarFallback>
       </Avatar>
       <Avatar>
-        <AvatarImage
-          src="https://avatars.githubusercontent.com/u/124599?v=4"
-          alt="@octocat"
-        />
+        <AvatarImage src="https://avatars.githubusercontent.com/u/124599?v=4" alt="@octocat" />
         <AvatarFallback>OC</AvatarFallback>
       </Avatar>
       <Avatar>
@@ -102,24 +96,16 @@ export const CustomFallbacks: Story = {
   render: () => (
     <div className="flex gap-4">
       <Avatar className="bg-gradient-to-r from-purple-400 to-pink-400">
-        <AvatarFallback className="bg-transparent font-bold text-white">
-          JD
-        </AvatarFallback>
+        <AvatarFallback className="bg-transparent font-bold text-white">JD</AvatarFallback>
       </Avatar>
       <Avatar className="bg-gradient-to-r from-blue-400 to-cyan-400">
-        <AvatarFallback className="bg-transparent font-bold text-white">
-          SM
-        </AvatarFallback>
+        <AvatarFallback className="bg-transparent font-bold text-white">SM</AvatarFallback>
       </Avatar>
       <Avatar className="bg-gradient-to-r from-green-400 to-blue-500">
-        <AvatarFallback className="bg-transparent font-bold text-white">
-          AB
-        </AvatarFallback>
+        <AvatarFallback className="bg-transparent font-bold text-white">AB</AvatarFallback>
       </Avatar>
       <Avatar className="bg-gradient-to-r from-yellow-400 to-orange-500">
-        <AvatarFallback className="bg-transparent font-bold text-white">
-          MK
-        </AvatarFallback>
+        <AvatarFallback className="bg-transparent font-bold text-white">MK</AvatarFallback>
       </Avatar>
     </div>
   ),
@@ -210,9 +196,7 @@ export const InContext: Story = {
               <p className="text-sm font-medium">Mike Johnson</p>
               <p className="text-muted-foreground text-xs">2 hours ago</p>
             </div>
-            <p className="mt-1 text-sm">
-              This looks great! Really love the new design.
-            </p>
+            <p className="mt-1 text-sm">This looks great! Really love the new design.</p>
           </div>
         </div>
       </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -16,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+
+import { authClient } from "@/lib/auth-client";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -46,8 +47,7 @@ const RecoverForm = () => {
       if (result.error) {
         form.setError("root", {
           type: "manual",
-          message:
-            result.error.message || "Failed to send password reset email",
+          message: result.error.message || "Failed to send password reset email",
         });
         return;
       }
@@ -87,9 +87,7 @@ const RecoverForm = () => {
         />
 
         {form.formState.errors.root && (
-          <div className="text-sm text-red-500">
-            {form.formState.errors.root.message}
-          </div>
+          <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
         )}
 
         <Button className="w-full" type="submit" disabled={isLoading}>

@@ -1,12 +1,14 @@
+import "@/styles/globals.css";
+
+import { Metadata } from "next";
+import { Inter } from "next/font/google";
+
 import { AnalyticsWrapper } from "@/components/analytics";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
-import "@/styles/globals.css";
-import { Metadata } from "next";
-import { Inter } from "next/font/google";
 
-const SITE_NAME = "Acme";
+let SITE_NAME = "Acme";
 
 const SHORT_DESCRIPTION = "The one template to rule them all";
 
@@ -58,12 +60,7 @@ const inter = Inter({
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en-US" className="scroll-smooth" data-mode="dark">
-      <body
-        className={cn(
-          "relative min-h-screen font-sans antialiased",
-          inter.variable,
-        )}
-      >
+      <body className={cn("relative min-h-screen font-sans antialiased", inter.variable)}>
         <>
           <Header />
 

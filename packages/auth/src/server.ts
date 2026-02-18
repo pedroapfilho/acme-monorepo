@@ -70,11 +70,7 @@ export const createAuth = (config: AuthConfig) => {
         : undefined,
     },
 
-    plugins: [
-      username(),
-      bearer(),
-      ...extraPlugins,
-    ],
+    plugins: [username(), bearer(), ...extraPlugins],
 
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days

@@ -1,8 +1,9 @@
-import { env } from "@/lib/env";
-import { logger } from "@/lib/logger";
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
+
+import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 
 export class AppError extends Error {
   public readonly statusCode: number;
@@ -100,10 +101,7 @@ export const errorHandler = async (err: Error, c: Context) => {
   }
 
   // Generic error response
-  const message =
-    env.NODE_ENV === "production"
-      ? "An unexpected error occurred"
-      : err.message;
+  const message = env.NODE_ENV === "production" ? "An unexpected error occurred" : err.message;
 
   return c.json(
     {

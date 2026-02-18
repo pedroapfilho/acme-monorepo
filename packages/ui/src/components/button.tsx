@@ -1,23 +1,22 @@
-import { cn } from "../lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
+
+import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
   "ui:focus-visible:border-ring ui:focus-visible:ring-ring/50 ui:aria-invalid:ring-destructive/20 ui:dark:aria-invalid:ring-destructive/40 ui:aria-invalid:border-destructive ui:inline-flex ui:shrink-0 ui:items-center ui:justify-center ui:gap-2 ui:rounded-md ui:text-sm ui:font-medium ui:whitespace-nowrap ui:transition-all ui:outline-none ui:focus-visible:ring-[3px] ui:disabled:pointer-events-none ui:disabled:opacity-50 ui:[&_svg]:pointer-events-none ui:[&_svg]:shrink-0 ui:[&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default:
-          "ui:bg-primary ui:text-primary-foreground ui:hover:bg-primary/90 ui:shadow-xs",
+        default: "ui:bg-primary ui:text-primary-foreground ui:hover:bg-primary/90 ui:shadow-xs",
         destructive:
           "ui:bg-destructive ui:hover:bg-destructive/90 ui:focus-visible:ring-destructive/20 ui:dark:focus-visible:ring-destructive/40 ui:dark:bg-destructive/60 ui:text-white ui:shadow-xs",
         outline:
           "ui:bg-background ui:hover:bg-accent ui:hover:text-accent-foreground ui:dark:bg-input/30 ui:dark:border-input ui:dark:hover:bg-input/50 ui:border ui:shadow-xs",
         secondary:
           "ui:bg-secondary ui:text-secondary-foreground ui:hover:bg-secondary/80 ui:shadow-xs",
-        ghost:
-          "ui:hover:bg-accent ui:hover:text-accent-foreground ui:dark:hover:bg-accent/50",
+        ghost: "ui:hover:bg-accent ui:hover:text-accent-foreground ui:dark:hover:bg-accent/50",
         link: "ui:text-primary ui:underline-offset-4 ui:hover:underline",
       },
       size: {

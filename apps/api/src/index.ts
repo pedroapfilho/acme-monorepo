@@ -1,3 +1,12 @@
+import "dotenv/config";
+
+import { serve } from "@hono/node-server";
+import { prisma } from "@repo/db";
+import { Hono } from "hono";
+import { compress } from "hono/compress";
+import { cors } from "hono/cors";
+
+import { auth } from "./lib/auth";
 import { env } from "./lib/env";
 import { logger } from "./lib/logger";
 import { errorHandler, notFound } from "./middleware/error-handler";
@@ -9,14 +18,7 @@ import {
   requestSizeLimit,
   requestId,
 } from "./middleware/security";
-import { auth } from "./lib/auth";
 import { v1UserRoutes } from "./routes/v1/users";
-import { serve } from "@hono/node-server";
-import { prisma } from "@repo/db";
-import "dotenv/config";
-import { Hono } from "hono";
-import { compress } from "hono/compress";
-import { cors } from "hono/cors";
 
 const app = new Hono();
 
