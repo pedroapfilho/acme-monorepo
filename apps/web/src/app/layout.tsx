@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
@@ -16,14 +17,7 @@ export const metadata: Metadata = {
   },
   description:
     "A modern, secure authentication platform built with Better Auth and Next.js. Fast, reliable, and developer-friendly.",
-  keywords: [
-    "authentication",
-    "security",
-    "next.js",
-    "better-auth",
-    "login",
-    "registration",
-  ],
+  keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
   authors: [{ name: "Acme Team" }],
   creator: "Acme",
   publisher: "Acme",
@@ -35,8 +29,7 @@ export const metadata: Metadata = {
     url: "https://acme.example.com",
     siteName: "Acme",
     title: "Acme - Secure Authentication Platform",
-    description:
-      "A modern, secure authentication platform built with Better Auth and Next.js.",
+    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
     images: [
       {
         url: "/og-image.png",
@@ -51,8 +44,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Acme - Secure Authentication Platform",
-    description:
-      "A modern, secure authentication platform built with Better Auth and Next.js.",
+    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
     images: ["/twitter-image.png"],
   },
 
@@ -98,17 +90,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en" className={inter.variable}>
       <head>
-        {/* Preconnect to external domains */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-
-        {/* DNS prefetch for better performance */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-
         {/* Additional meta tags */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-TileColor" content="#000000" />

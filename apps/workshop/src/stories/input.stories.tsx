@@ -1,16 +1,6 @@
 import { Button, Input, Label } from "@repo/ui";
 import { Meta, StoryObj } from "@storybook/react-vite";
-import {
-  Search,
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  User,
-  Phone,
-  CreditCard,
-  Calendar,
-} from "lucide-react";
+import { Search, Eye, EyeOff, Mail, Lock, User, Phone, CreditCard, Calendar } from "lucide-react";
 import { useState } from "react";
 
 const meta: Meta<typeof Input> = {
@@ -135,32 +125,34 @@ export const WithIcons: Story = {
   ),
 };
 
-export const PasswordInput: Story = {
-  render: () => {
-    const [showPassword, setShowPassword] = useState(false);
+const PasswordInputRender = () => {
+  const [showPassword, setShowPassword] = useState(false);
 
-    return (
-      <div className="w-80 space-y-4">
-        <div className="space-y-2">
-          <Label>Password with Toggle</Label>
-          <Input
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter password"
-            startIcon={<Lock />}
-            endIcon={
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOff /> : <Eye />}
-              </button>
-            }
-          />
-        </div>
+  return (
+    <div className="w-80 space-y-4">
+      <div className="space-y-2">
+        <Label>Password with Toggle</Label>
+        <Input
+          type={showPassword ? "text" : "password"}
+          placeholder="Enter password"
+          startIcon={<Lock />}
+          endIcon={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+            </button>
+          }
+        />
       </div>
-    );
-  },
+    </div>
+  );
+};
+
+export const PasswordInput: Story = {
+  render: () => <PasswordInputRender />,
 };
 
 export const Sizes: Story = {
@@ -216,11 +208,7 @@ export const InputGroups: Story = {
       <div className="space-y-2">
         <Label>Email Subscription</Label>
         <div className="flex">
-          <Input
-            type="email"
-            placeholder="Enter email"
-            className="rounded-r-none"
-          />
+          <Input type="email" placeholder="Enter email" className="rounded-r-none" />
           <Button type="submit" className="rounded-l-none">
             Subscribe
           </Button>
@@ -243,12 +231,7 @@ export const InputGroups: Story = {
           <div className="text-muted-foreground bg-muted border-input inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
             $
           </div>
-          <Input
-            type="number"
-            placeholder="0.00"
-            className="rounded-l-none"
-            step="0.01"
-          />
+          <Input type="number" placeholder="0.00" className="rounded-l-none" step="0.01" />
         </div>
       </div>
 
@@ -270,9 +253,7 @@ export const FormExample: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Contact Information</h3>
-        <p className="text-muted-foreground text-sm">
-          Please provide your contact details.
-        </p>
+        <p className="text-muted-foreground text-sm">Please provide your contact details.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -288,22 +269,12 @@ export const FormExample: Story = {
 
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="john@example.com"
-          startIcon={<Mail />}
-        />
+        <Input id="email" type="email" placeholder="john@example.com" startIcon={<Mail />} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="phone">Phone Number</Label>
-        <Input
-          id="phone"
-          type="tel"
-          placeholder="+1 (555) 123-4567"
-          startIcon={<Phone />}
-        />
+        <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" startIcon={<Phone />} />
       </div>
 
       <div className="space-y-2">
@@ -343,9 +314,7 @@ export const ValidationStates: Story = {
           placeholder="Warning input"
           className="border-yellow-500 focus-visible:ring-yellow-500"
         />
-        <p className="text-sm text-yellow-600">
-          ⚠ Please double-check this field
-        </p>
+        <p className="text-sm text-yellow-600">⚠ Please double-check this field</p>
       </div>
     </div>
   ),
@@ -356,11 +325,7 @@ export const SpecialInputs: Story = {
     <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Credit Card</Label>
-        <Input
-          placeholder="1234 5678 9012 3456"
-          startIcon={<CreditCard />}
-          maxLength={19}
-        />
+        <Input placeholder="1234 5678 9012 3456" startIcon={<CreditCard />} maxLength={19} />
       </div>
 
       <div className="space-y-2">
@@ -454,20 +419,12 @@ export const FormWithIcons: Story = {
 
       <div className="space-y-2">
         <Label>Email</Label>
-        <Input
-          type="email"
-          placeholder="john@example.com"
-          startIcon={<Mail />}
-        />
+        <Input type="email" placeholder="john@example.com" startIcon={<Mail />} />
       </div>
 
       <div className="space-y-2">
         <Label>Phone</Label>
-        <Input
-          type="tel"
-          placeholder="+1 (555) 123-4567"
-          startIcon={<Phone />}
-        />
+        <Input type="tel" placeholder="+1 (555) 123-4567" startIcon={<Phone />} />
       </div>
 
       <div className="space-y-2">
@@ -486,11 +443,7 @@ export const FormWithIcons: Story = {
 
       <div className="space-y-2">
         <Label>Credit Card</Label>
-        <Input
-          placeholder="1234 5678 9012 3456"
-          startIcon={<CreditCard />}
-          maxLength={19}
-        />
+        <Input placeholder="1234 5678 9012 3456" startIcon={<CreditCard />} maxLength={19} />
       </div>
 
       <Button className="w-full">Submit</Button>

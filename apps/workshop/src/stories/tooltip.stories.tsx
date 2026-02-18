@@ -1,10 +1,4 @@
-import {
-  Button,
-  Input,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui";
+import { Button, Input, Tooltip, TooltipContent, TooltipTrigger } from "@repo/ui";
 import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Plus,
@@ -199,9 +193,7 @@ export const RichContent: Story = {
               <span className="font-medium">John Doe</span>
             </div>
             <p className="text-sm">Senior Developer</p>
-            <p className="text-muted-foreground text-xs">
-              Last active 2 hours ago
-            </p>
+            <p className="text-muted-foreground text-xs">Last active 2 hours ago</p>
           </div>
         </TooltipContent>
       </Tooltip>
@@ -247,14 +239,12 @@ export const InteractiveElements: Story = {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="cursor-help underline decoration-dotted">
-            What is this?
-          </span>
+          <span className="cursor-help underline decoration-dotted">What is this?</span>
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
           <p>
-            This is a helpful tooltip that explains what this feature does and
-            how to use it effectively.
+            This is a helpful tooltip that explains what this feature does and how to use it
+            effectively.
           </p>
         </TooltipContent>
       </Tooltip>
@@ -274,64 +264,50 @@ export const InteractiveElements: Story = {
   ),
 };
 
+const ActionTooltipsRender = () => {
+  const [liked, setLiked] = useState(false);
+  const [starred, setStarred] = useState(false);
+
+  return (
+    <div className="flex gap-4">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={() => setLiked(!liked)}>
+            <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{liked ? "Remove from favorites" : "Add to favorites"}</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon" onClick={() => setStarred(!starred)}>
+            <Star className={`h-4 w-4 ${starred ? "fill-yellow-500 text-yellow-500" : ""}`} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{starred ? "Unstar" : "Star this item"}</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <Copy className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Copy to clipboard</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  );
+};
+
 export const ActionTooltips: Story = {
-  render: () => {
-    const [liked, setLiked] = useState(false);
-    const [starred, setStarred] = useState(false);
-
-    return (
-      <div className="flex gap-4">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLiked(!liked)}
-            >
-              <Heart
-                className={`h-4 w-4 ${
-                  liked ? "fill-red-500 text-red-500" : ""
-                }`}
-              />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{liked ? "Remove from favorites" : "Add to favorites"}</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setStarred(!starred)}
-            >
-              <Star
-                className={`h-4 w-4 ${
-                  starred ? "fill-yellow-500 text-yellow-500" : ""
-                }`}
-              />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{starred ? "Unstar" : "Star this item"}</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Copy className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Copy to clipboard</p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-    );
-  },
+  render: () => <ActionTooltipsRender />,
 };
 
 export const DelayedTooltip: Story = {
@@ -427,25 +403,25 @@ export const FormTooltips: Story = {
     <div className="max-w-md space-y-4">
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Password</label>
+          <label htmlFor="form-tooltip-password" className="text-sm font-medium">Password</label>
           <Tooltip>
             <TooltipTrigger asChild>
               <Info className="text-muted-foreground h-3 w-3 cursor-help" />
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
               <p>
-                Password must be at least 8 characters long and contain at least
-                one number and one special character.
+                Password must be at least 8 characters long and contain at least one number and one
+                special character.
               </p>
             </TooltipContent>
           </Tooltip>
         </div>
-        <Input type="password" placeholder="Enter password" />
+        <Input id="form-tooltip-password" type="password" placeholder="Enter password" />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">API Key</label>
+          <label htmlFor="form-tooltip-api-key" className="text-sm font-medium">API Key</label>
           <Tooltip>
             <TooltipTrigger asChild>
               <HelpCircle className="text-muted-foreground h-3 w-3 cursor-help" />
@@ -455,12 +431,12 @@ export const FormTooltips: Story = {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Input placeholder="Enter API key" />
+        <Input id="form-tooltip-api-key" placeholder="Enter API key" />
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Webhook URL</label>
+          <label htmlFor="form-tooltip-webhook" className="text-sm font-medium">Webhook URL</label>
           <Tooltip>
             <TooltipTrigger asChild>
               <Info className="text-muted-foreground h-3 w-3 cursor-help" />
@@ -477,7 +453,7 @@ export const FormTooltips: Story = {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Input placeholder="https://example.com/webhook" />
+        <Input id="form-tooltip-webhook" placeholder="https://example.com/webhook" />
       </div>
     </div>
   ),

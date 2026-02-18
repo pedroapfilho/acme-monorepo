@@ -1,12 +1,4 @@
-import {
-  Button,
-  Input,
-  Checkbox,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Label,
-} from "@repo/ui";
+import { Button, Input, Checkbox, Popover, PopoverContent, PopoverTrigger, Label } from "@repo/ui";
 import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Settings2,
@@ -55,42 +47,24 @@ export const Default: Story = {
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="leading-none font-medium">Dimensions</h4>
-            <p className="text-muted-foreground text-sm">
-              Set the dimensions for the layer.
-            </p>
+            <p className="text-muted-foreground text-sm">Set the dimensions for the layer.</p>
           </div>
           <div className="grid gap-2">
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="width">Width</Label>
-              <Input
-                id="width"
-                defaultValue="100%"
-                className="col-span-2 h-8"
-              />
+              <Input id="width" defaultValue="100%" className="col-span-2 h-8" />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="maxWidth">Max. width</Label>
-              <Input
-                id="maxWidth"
-                defaultValue="300px"
-                className="col-span-2 h-8"
-              />
+              <Input id="maxWidth" defaultValue="300px" className="col-span-2 h-8" />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="height">Height</Label>
-              <Input
-                id="height"
-                defaultValue="25px"
-                className="col-span-2 h-8"
-              />
+              <Input id="height" defaultValue="25px" className="col-span-2 h-8" />
             </div>
             <div className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor="maxHeight">Max. height</Label>
-              <Input
-                id="maxHeight"
-                defaultValue="none"
-                className="col-span-2 h-8"
-              />
+              <Input id="maxHeight" defaultValue="none" className="col-span-2 h-8" />
             </div>
           </div>
         </div>
@@ -166,10 +140,7 @@ export const UserProfilePopover: Story = {
             </Button>
           </div>
           <div className="border-t pt-2">
-            <Button
-              variant="ghost"
-              className="text-destructive w-full justify-start"
-            >
+            <Button variant="ghost" className="text-destructive w-full justify-start">
               Sign Out
             </Button>
           </div>
@@ -210,10 +181,7 @@ export const ActionsMenu: Story = {
             Open in new tab
           </Button>
           <div className="my-1 border-t" />
-          <Button
-            variant="ghost"
-            className="text-destructive w-full justify-start"
-          >
+          <Button variant="ghost" className="text-destructive w-full justify-start">
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Button>
@@ -288,9 +256,7 @@ export const FilterPopover: Story = {
           <div className="space-y-4">
             <div className="space-y-2">
               <h4 className="font-medium">Filter Tasks</h4>
-              <p className="text-muted-foreground text-sm">
-                Narrow down your task list.
-              </p>
+              <p className="text-muted-foreground text-sm">Narrow down your task list.</p>
             </div>
 
             <div className="space-y-3">
@@ -378,24 +344,15 @@ export const SearchPopover: Story = {
           <div className="space-y-2">
             <Label className="text-sm font-medium">Recent Searches</Label>
             <div className="space-y-1">
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start text-sm"
-              >
+              <Button variant="ghost" className="h-8 w-full justify-start text-sm">
                 <Clock className="mr-2 h-3 w-3" />
                 user interface design
               </Button>
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start text-sm"
-              >
+              <Button variant="ghost" className="h-8 w-full justify-start text-sm">
                 <Clock className="mr-2 h-3 w-3" />
                 project management
               </Button>
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start text-sm"
-              >
+              <Button variant="ghost" className="h-8 w-full justify-start text-sm">
                 <Clock className="mr-2 h-3 w-3" />
                 team collaboration
               </Button>
@@ -405,17 +362,11 @@ export const SearchPopover: Story = {
           <div className="space-y-2">
             <Label className="text-sm font-medium">Quick Actions</Label>
             <div className="space-y-1">
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start text-sm"
-              >
+              <Button variant="ghost" className="h-8 w-full justify-start text-sm">
                 <Plus className="mr-2 h-3 w-3" />
                 Create new project
               </Button>
-              <Button
-                variant="ghost"
-                className="h-8 w-full justify-start text-sm"
-              >
+              <Button variant="ghost" className="h-8 w-full justify-start text-sm">
                 <User className="mr-2 h-3 w-3" />
                 Add team member
               </Button>
@@ -474,9 +425,7 @@ export const NotificationPopover: Story = {
               <div className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-gray-300" />
               <div className="space-y-1">
                 <p className="text-sm font-medium">Meeting reminder</p>
-                <p className="text-muted-foreground text-xs">
-                  Team standup in 30 minutes
-                </p>
+                <p className="text-muted-foreground text-xs">Team standup in 30 minutes</p>
                 <p className="text-muted-foreground text-xs">3 hours ago</p>
               </div>
             </div>
@@ -493,42 +442,43 @@ export const NotificationPopover: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
+const ControlledRender = () => {
+  const [open, setOpen] = useState(false);
 
-    return (
-      <div className="space-y-4">
-        <div className="flex gap-2">
-          <Button onClick={() => setOpen(true)}>Open Popover</Button>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Close Popover
-          </Button>
-        </div>
-        <p className="text-muted-foreground text-sm">
-          Popover is currently {open ? "open" : "closed"}
-        </p>
-
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline">Controlled Popover</Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80">
-            <div className="space-y-3">
-              <h4 className="font-medium">Controlled Popover</h4>
-              <p className="text-muted-foreground text-sm">
-                This popover&apos;s open state is controlled by the parent
-                component.
-              </p>
-              <Button size="sm" onClick={() => setOpen(false)}>
-                Close from inside
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <Button onClick={() => setOpen(true)}>Open Popover</Button>
+        <Button variant="outline" onClick={() => setOpen(false)}>
+          Close Popover
+        </Button>
       </div>
-    );
-  },
+      <p className="text-muted-foreground text-sm">
+        Popover is currently {open ? "open" : "closed"}
+      </p>
+
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Controlled Popover</Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="space-y-3">
+            <h4 className="font-medium">Controlled Popover</h4>
+            <p className="text-muted-foreground text-sm">
+              This popover&apos;s open state is controlled by the parent component.
+            </p>
+            <Button size="sm" onClick={() => setOpen(false)}>
+              Close from inside
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
+
+export const Controlled: Story = {
+  render: () => <ControlledRender />,
 };
 
 export const Playground: Story = {

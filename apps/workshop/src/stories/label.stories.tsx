@@ -35,11 +35,7 @@ export const BasicUsage: Story = {
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-        />
+        <Input id="password" type="password" placeholder="Enter your password" />
       </div>
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
@@ -71,11 +67,7 @@ export const WithIcons: Story = {
           <Lock className="h-4 w-4" />
           Password
         </Label>
-        <Input
-          id="password-icon"
-          type="password"
-          placeholder="Enter password"
-        />
+        <Input id="password-icon" type="password" placeholder="Enter password" />
       </div>
     </div>
   ),
@@ -122,11 +114,7 @@ export const Required: Story = {
         <Label htmlFor="required-email">
           Email Address <span className="text-destructive">*</span>
         </Label>
-        <Input
-          id="required-email"
-          type="email"
-          placeholder="Enter your email"
-        />
+        <Input id="required-email" type="email" placeholder="Enter your email" />
       </div>
       <div className="space-y-2">
         <Label htmlFor="optional-phone">Phone Number</Label>
@@ -149,9 +137,7 @@ export const ErrorStates: Story = {
           placeholder="Enter your email"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-destructive text-sm">
-          Please enter a valid email address
-        </p>
+        <p className="text-destructive text-sm">Please enter a valid email address</p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="error-password" className="text-destructive">
@@ -163,9 +149,7 @@ export const ErrorStates: Story = {
           placeholder="Enter password"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-destructive text-sm">
-          Password must be at least 8 characters
-        </p>
+        <p className="text-destructive text-sm">Password must be at least 8 characters</p>
       </div>
     </div>
   ),
@@ -178,7 +162,7 @@ export const WithCheckboxes: Story = {
         <Checkbox id="terms" />
         <Label htmlFor="terms">
           I agree to the{" "}
-          <a href="#" className="underline">
+          <a href="/terms" className="underline">
             terms and conditions
           </a>
         </Label>
@@ -189,9 +173,7 @@ export const WithCheckboxes: Story = {
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="newsletter" />
-        <Label htmlFor="newsletter">
-          Subscribe to our newsletter for updates
-        </Label>
+        <Label htmlFor="newsletter">Subscribe to our newsletter for updates</Label>
       </div>
     </div>
   ),
@@ -214,11 +196,7 @@ export const Sizes: Story = {
         <Label htmlFor="large" className="text-lg">
           Large Label
         </Label>
-        <Input
-          id="large"
-          className="h-12 text-base"
-          placeholder="Large input"
-        />
+        <Input id="large" className="h-12 text-base" placeholder="Large input" />
       </div>
     </div>
   ),
@@ -266,9 +244,7 @@ export const FormExample: Story = {
           Phone Number
         </Label>
         <Input id="form-phone" type="tel" placeholder="+1 (555) 123-4567" />
-        <p className="text-muted-foreground text-sm">
-          Optional: For account recovery
-        </p>
+        <p className="text-muted-foreground text-sm">Optional: For account recovery</p>
       </div>
 
       <div className="space-y-2">
@@ -287,11 +263,11 @@ export const FormExample: Story = {
           <Checkbox id="form-terms" />
           <Label htmlFor="form-terms" className="text-sm">
             I agree to the{" "}
-            <a href="#" className="underline">
+            <a href="/terms-of-service" className="underline">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a href="#" className="underline">
+            <a href="/privacy-policy" className="underline">
               Privacy Policy
             </a>
           </Label>
@@ -357,9 +333,7 @@ export const SpecialCases: Story = {
           className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           placeholder="Tell us about yourself..."
         />
-        <p className="text-muted-foreground text-sm">
-          Brief description for your profile
-        </p>
+        <p className="text-muted-foreground text-sm">Brief description for your profile</p>
       </div>
     </div>
   ),

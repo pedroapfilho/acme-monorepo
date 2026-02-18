@@ -285,9 +285,7 @@ export const FormExample: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Project Settings</h3>
-        <p className="text-muted-foreground text-sm">
-          Configure your project preferences
-        </p>
+        <p className="text-muted-foreground text-sm">Configure your project preferences</p>
       </div>
 
       <div className="grid gap-4">
@@ -413,40 +411,40 @@ export const FormExample: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    const [value, setValue] = useState("");
+const ControlledSelectRender = () => {
+  const [value, setValue] = useState("");
 
-    return (
-      <div className="w-80 space-y-4">
-        <div className="space-y-2">
-          <Label>Controlled Select</Label>
-          <Select value={value} onValueChange={setValue}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select an option" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="option1">Option 1</SelectItem>
-              <SelectItem value="option2">Option 2</SelectItem>
-              <SelectItem value="option3">Option 3</SelectItem>
-              <SelectItem value="option4">Option 4</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="text-muted-foreground text-sm">
-          Selected value: {value || "None"}
-        </div>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={() => setValue("option2")}>
-            Set to Option 2
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setValue("")}>
-            Clear
-          </Button>
-        </div>
+  return (
+    <div className="w-80 space-y-4">
+      <div className="space-y-2">
+        <Label>Controlled Select</Label>
+        <Select value={value} onValueChange={setValue}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select an option" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="option1">Option 1</SelectItem>
+            <SelectItem value="option2">Option 2</SelectItem>
+            <SelectItem value="option3">Option 3</SelectItem>
+            <SelectItem value="option4">Option 4</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-    );
-  },
+      <div className="text-muted-foreground text-sm">Selected value: {value || "None"}</div>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={() => setValue("option2")}>
+          Set to Option 2
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setValue("")}>
+          Clear
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export const Controlled: Story = {
+  render: () => <ControlledSelectRender />,
 };
 
 export const SearchableSelect: Story = {

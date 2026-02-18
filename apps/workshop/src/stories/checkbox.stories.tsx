@@ -75,88 +75,84 @@ export const WithLabel: Story = {
   ),
 };
 
-export const Interactive: Story = {
-  render: () => {
-    const [checked, setChecked] = useState(false);
+const InteractiveCheckboxRender = () => {
+  const [checked, setChecked] = useState(false);
 
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="interactive"
-            checked={checked}
-            onCheckedChange={(checked) => {
-              if (checked === "indeterminate") return;
-              setChecked(checked);
-            }}
-          />
-          <Label htmlFor="interactive">
-            Interactive checkbox (currently {checked ? "checked" : "unchecked"})
-          </Label>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setChecked(!checked)}
-        >
-          Toggle
-        </Button>
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="interactive"
+          checked={checked}
+          onCheckedChange={(checked) => {
+            if (checked === "indeterminate") return;
+            setChecked(checked);
+          }}
+        />
+        <Label htmlFor="interactive">
+          Interactive checkbox (currently {checked ? "checked" : "unchecked"})
+        </Label>
       </div>
-    );
-  },
+      <Button variant="outline" size="sm" onClick={() => setChecked(!checked)}>
+        Toggle
+      </Button>
+    </div>
+  );
+};
+
+export const Interactive: Story = {
+  render: () => <InteractiveCheckboxRender />,
+};
+
+const CheckboxGroupRender = () => {
+  const [items, setItems] = useState([
+    { id: "item1", label: "Item 1", checked: false },
+    { id: "item2", label: "Item 2", checked: true },
+    { id: "item3", label: "Item 3", checked: false },
+    { id: "item4", label: "Item 4", checked: true },
+  ]);
+
+  const handleItemChange = (id: string, checked: boolean) => {
+    setItems(items.map((item) => (item.id === id ? { ...item, checked } : item)));
+  };
+
+  const allChecked = items.every((item) => item.checked);
+  const someChecked = items.some((item) => item.checked);
+
+  const handleSelectAll = (checked: boolean) => {
+    setItems(items.map((item) => ({ ...item, checked })));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="select-all"
+          checked={allChecked ? true : someChecked ? "indeterminate" : false}
+          onCheckedChange={handleSelectAll}
+        />
+        <Label htmlFor="select-all" className="font-medium">
+          Select All
+        </Label>
+      </div>
+      <div className="space-y-3 border-t pt-4">
+        {items.map((item) => (
+          <div key={item.id} className="ml-4 flex items-center space-x-2">
+            <Checkbox
+              id={item.id}
+              checked={item.checked}
+              onCheckedChange={(checked) => handleItemChange(item.id, checked as boolean)}
+            />
+            <Label htmlFor={item.id}>{item.label}</Label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export const CheckboxGroup: Story = {
-  render: () => {
-    const [items, setItems] = useState([
-      { id: "item1", label: "Item 1", checked: false },
-      { id: "item2", label: "Item 2", checked: true },
-      { id: "item3", label: "Item 3", checked: false },
-      { id: "item4", label: "Item 4", checked: true },
-    ]);
-
-    const handleItemChange = (id: string, checked: boolean) => {
-      setItems(
-        items.map((item) => (item.id === id ? { ...item, checked } : item)),
-      );
-    };
-
-    const allChecked = items.every((item) => item.checked);
-    const someChecked = items.some((item) => item.checked);
-
-    const handleSelectAll = (checked: boolean) => {
-      setItems(items.map((item) => ({ ...item, checked })));
-    };
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="select-all"
-            checked={allChecked ? true : someChecked ? "indeterminate" : false}
-            onCheckedChange={handleSelectAll}
-          />
-          <Label htmlFor="select-all" className="font-medium">
-            Select All
-          </Label>
-        </div>
-        <div className="space-y-3 border-t pt-4">
-          {items.map((item) => (
-            <div key={item.id} className="ml-4 flex items-center space-x-2">
-              <Checkbox
-                id={item.id}
-                checked={item.checked}
-                onCheckedChange={(checked) =>
-                  handleItemChange(item.id, checked as boolean)
-                }
-              />
-              <Label htmlFor={item.id}>{item.label}</Label>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  },
+  render: () => <CheckboxGroupRender />,
 };
 
 export const FormExample: Story = {
@@ -164,9 +160,7 @@ export const FormExample: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Account Preferences</h3>
-        <p className="text-muted-foreground text-sm">
-          Choose your notification preferences
-        </p>
+        <p className="text-muted-foreground text-sm">Choose your notification preferences</p>
       </div>
 
       <div className="space-y-4">
@@ -216,57 +210,55 @@ export const FormExample: Story = {
   ),
 };
 
-export const TaskList: Story = {
-  render: () => {
-    const [tasks, setTasks] = useState([
-      { id: 1, text: "Review project proposal", completed: true },
-      { id: 2, text: "Update team on progress", completed: true },
-      { id: 3, text: "Prepare presentation slides", completed: false },
-      { id: 4, text: "Schedule client meeting", completed: false },
-      { id: 5, text: "Submit final report", completed: false },
-    ]);
+const TaskListRender = () => {
+  const [tasks, setTasks] = useState([
+    { id: 1, text: "Review project proposal", completed: true },
+    { id: 2, text: "Update team on progress", completed: true },
+    { id: 3, text: "Prepare presentation slides", completed: false },
+    { id: 4, text: "Schedule client meeting", completed: false },
+    { id: 5, text: "Submit final report", completed: false },
+  ]);
 
-    const toggleTask = (id: number) => {
-      setTasks(
-        tasks.map((task) =>
-          task.id === id ? { ...task, completed: !task.completed } : task,
-        ),
-      );
-    };
-
-    const completedCount = tasks.filter((task) => task.completed).length;
-
-    return (
-      <div className="max-w-md space-y-4">
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Today&apos;s Tasks</h3>
-          <p className="text-muted-foreground text-sm">
-            {completedCount} of {tasks.length} completed
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {tasks.map((task) => (
-            <div key={task.id} className="flex items-center space-x-2">
-              <Checkbox
-                id={`task-${task.id}`}
-                checked={task.completed}
-                onCheckedChange={() => toggleTask(task.id)}
-              />
-              <Label
-                htmlFor={`task-${task.id}`}
-                className={`flex-1 ${
-                  task.completed ? "text-muted-foreground line-through" : ""
-                }`}
-              >
-                {task.text}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
+  const toggleTask = (id: number) => {
+    setTasks(
+      tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)),
     );
-  },
+  };
+
+  const completedCount = tasks.filter((task) => task.completed).length;
+
+  return (
+    <div className="max-w-md space-y-4">
+      <div className="space-y-2">
+        <h3 className="text-lg font-semibold">Today&apos;s Tasks</h3>
+        <p className="text-muted-foreground text-sm">
+          {completedCount} of {tasks.length} completed
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {tasks.map((task) => (
+          <div key={task.id} className="flex items-center space-x-2">
+            <Checkbox
+              id={`task-${task.id}`}
+              checked={task.completed}
+              onCheckedChange={() => toggleTask(task.id)}
+            />
+            <Label
+              htmlFor={`task-${task.id}`}
+              className={`flex-1 ${task.completed ? "text-muted-foreground line-through" : ""}`}
+            >
+              {task.text}
+            </Label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const TaskList: Story = {
+  render: () => <TaskListRender />,
 };
 
 export const Sizes: Story = {
@@ -296,10 +288,7 @@ export const CustomStyling: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Checkbox
-          id="custom1"
-          className="border-green-500 data-[state=checked]:bg-green-500"
-        />
+        <Checkbox id="custom1" className="border-green-500 data-[state=checked]:bg-green-500" />
         <Label htmlFor="custom1">Green checkbox</Label>
       </div>
       <div className="flex items-center space-x-2">

@@ -56,21 +56,13 @@ export const Default: Story = {
             <Label htmlFor="name" className="text-right">
               Name
             </Label>
-            <Input
-              id="name"
-              defaultValue="Pedro Duarte"
-              className="col-span-3"
-            />
+            <Input id="name" defaultValue="Pedro Duarte" className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="text-right">
               Username
             </Label>
-            <Input
-              id="username"
-              defaultValue="@peduarte"
-              className="col-span-3"
-            />
+            <Input id="username" defaultValue="@peduarte" className="col-span-3" />
           </div>
         </div>
         <DialogFooter>
@@ -97,8 +89,8 @@ export const Confirmation: Story = {
             Delete Account
           </DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            This action cannot be undone. This will permanently delete your account and remove your
+            data from our servers.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -188,11 +180,7 @@ export const ContactForm: Story = {
             <Label htmlFor="contact-name">Full Name</Label>
             <div className="relative">
               <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-              <Input
-                id="contact-name"
-                placeholder="John Doe"
-                className="pl-10"
-              />
+              <Input id="contact-name" placeholder="John Doe" className="pl-10" />
             </div>
           </div>
           <div className="space-y-2">
@@ -241,9 +229,7 @@ export const Settings: Story = {
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Account Settings</DialogTitle>
-          <DialogDescription>
-            Manage your account settings and preferences.
-          </DialogDescription>
+          <DialogDescription>Manage your account settings and preferences.</DialogDescription>
         </DialogHeader>
         <div className="space-y-6 py-4">
           <div className="space-y-4">
@@ -303,55 +289,51 @@ export const LargeContent: Story = {
       <DialogContent className="max-h-[600px] sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
-          <DialogDescription>
-            Please read and accept our terms of service.
-          </DialogDescription>
+          <DialogDescription>Please read and accept our terms of service.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[400px] overflow-y-auto py-4">
           <div className="space-y-4 text-sm">
             <section>
               <h3 className="mb-2 font-semibold">1. Acceptance of Terms</h3>
               <p className="text-muted-foreground">
-                By accessing and using this service, you accept and agree to be
-                bound by the terms and provision of this agreement. If you do
-                not agree to abide by the above, please do not use this service.
+                By accessing and using this service, you accept and agree to be bound by the terms
+                and provision of this agreement. If you do not agree to abide by the above, please
+                do not use this service.
               </p>
             </section>
 
             <section>
               <h3 className="mb-2 font-semibold">2. Use License</h3>
               <p className="text-muted-foreground">
-                Permission is granted to temporarily download one copy of the
-                materials on our website for personal, non-commercial transitory
-                viewing only. This is the grant of a license, not a transfer of
-                title.
+                Permission is granted to temporarily download one copy of the materials on our
+                website for personal, non-commercial transitory viewing only. This is the grant of a
+                license, not a transfer of title.
               </p>
             </section>
 
             <section>
               <h3 className="mb-2 font-semibold">3. Disclaimer</h3>
               <p className="text-muted-foreground">
-                The materials on our website are provided on an &apos;as
-                is&apos; basis. We make no warranties, expressed or implied, and
-                hereby disclaim and negate all other warranties including
-                without limitation.
+                The materials on our website are provided on an &apos;as is&apos; basis. We make no
+                warranties, expressed or implied, and hereby disclaim and negate all other
+                warranties including without limitation.
               </p>
             </section>
 
             <section>
               <h3 className="mb-2 font-semibold">4. Limitations</h3>
               <p className="text-muted-foreground">
-                In no event shall our company or its suppliers be liable for any
-                damages (including, without limitation, damages for loss of data
-                or profit, or due to business interruption).
+                In no event shall our company or its suppliers be liable for any damages (including,
+                without limitation, damages for loss of data or profit, or due to business
+                interruption).
               </p>
             </section>
 
             <section>
               <h3 className="mb-2 font-semibold">5. Privacy Policy</h3>
               <p className="text-muted-foreground">
-                Your personal information is kept private and is not shared with
-                third parties except as described in our privacy policy.
+                Your personal information is kept private and is not shared with third parties
+                except as described in our privacy policy.
               </p>
             </section>
           </div>
@@ -365,53 +347,54 @@ export const LargeContent: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
-    const [name, setName] = useState("John Doe");
+const ControlledDialogRender = () => {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("John Doe");
 
-    return (
-      <div className="space-y-4">
-        <div className="flex gap-2">
-          <Button onClick={() => setOpen(true)}>Open Dialog</Button>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Close Dialog
-          </Button>
-        </div>
-        <p className="text-muted-foreground text-sm">
-          Dialog is currently {open ? "open" : "closed"}
-        </p>
-
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Controlled Dialog</DialogTitle>
-              <DialogDescription>
-                This dialog&apos;s open state is controlled by the parent
-                component.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="controlled-name">Name</Label>
-                <Input
-                  id="controlled-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setOpen(false)}>Save</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <Button onClick={() => setOpen(true)}>Open Dialog</Button>
+        <Button variant="outline" onClick={() => setOpen(false)}>
+          Close Dialog
+        </Button>
       </div>
-    );
-  },
+      <p className="text-muted-foreground text-sm">
+        Dialog is currently {open ? "open" : "closed"}
+      </p>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Controlled Dialog</DialogTitle>
+            <DialogDescription>
+              This dialog&apos;s open state is controlled by the parent component.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="controlled-name">Name</Label>
+              <Input
+                id="controlled-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setOpen(false)}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export const Controlled: Story = {
+  render: () => <ControlledDialogRender />,
 };
 
 export const NoHeader: Story = {
@@ -422,9 +405,7 @@ export const NoHeader: Story = {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <div className="py-6">
-          <p className="mb-4 text-center text-lg font-medium">
-            Are you sure you want to continue?
-          </p>
+          <p className="mb-4 text-center text-lg font-medium">Are you sure you want to continue?</p>
           <p className="text-muted-foreground text-center text-sm">
             This action will save your changes and close the dialog.
           </p>
@@ -447,9 +428,7 @@ export const Playground: Story = {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Playground Dialog</DialogTitle>
-          <DialogDescription>
-            This is a playground dialog for testing purposes.
-          </DialogDescription>
+          <DialogDescription>This is a playground dialog for testing purposes.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">

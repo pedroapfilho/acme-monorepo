@@ -26,14 +26,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: { type: "select" },
-      options: [
-        "default",
-        "destructive",
-        "outline",
-        "secondary",
-        "ghost",
-        "link",
-      ],
+      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
     },
     size: {
       control: { type: "select" },
@@ -174,12 +167,12 @@ export const AsChild: Story = {
   render: () => (
     <div className="flex gap-4">
       <Button asChild>
-        <a href="#" className="cursor-pointer">
+        <a href="/example" className="cursor-pointer">
           Link Button
         </a>
       </Button>
       <Button variant="outline" asChild>
-        <a href="#" className="cursor-pointer">
+        <a href="/downloads" className="cursor-pointer">
           <Download className="mr-2 h-4 w-4" />
           Download Link
         </a>
@@ -204,11 +197,7 @@ export const ButtonGroups: Story = {
       </div>
 
       <div className="flex">
-        <Button
-          size="sm"
-          variant="outline"
-          className="rounded-r-none border-r-0"
-        >
+        <Button size="sm" variant="outline" className="rounded-r-none border-r-0">
           <Save className="mr-2 h-4 w-4" />
           Save
         </Button>
@@ -230,11 +219,7 @@ export const DropdownButtons: Story = {
     <div className="flex flex-wrap gap-4">
       <div className="flex">
         <Button>Actions</Button>
-        <Button
-          variant="default"
-          size="icon"
-          className="ml-px rounded-l-none px-2"
-        >
+        <Button variant="default" size="icon" className="ml-px rounded-l-none px-2">
           <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
@@ -244,11 +229,7 @@ export const DropdownButtons: Story = {
           <Download className="mr-2 h-4 w-4" />
           Export
         </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="ml-px rounded-l-none px-2"
-        >
+        <Button variant="outline" size="icon" className="ml-px rounded-l-none px-2">
           <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
@@ -342,8 +323,9 @@ export const InContext: Story = {
       {/* Form with buttons */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Email Address</label>
+          <label htmlFor="context-email" className="text-sm font-medium">Email Address</label>
           <input
+            id="context-email"
             type="email"
             placeholder="Enter your email"
             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
@@ -360,8 +342,7 @@ export const InContext: Story = {
         <div className="space-y-1">
           <h4 className="text-destructive font-medium">Delete Project</h4>
           <p className="text-muted-foreground text-sm">
-            This action cannot be undone. This will permanently delete your
-            project.
+            This action cannot be undone. This will permanently delete your project.
           </p>
         </div>
         <div className="flex gap-3">

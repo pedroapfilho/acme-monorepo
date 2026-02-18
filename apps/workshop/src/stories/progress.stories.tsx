@@ -65,54 +65,58 @@ export const ProgressStates: Story = {
   ),
 };
 
-export const AnimatedProgress: Story = {
-  render: () => {
-    const [progress, setProgress] = useState(0);
+const AnimatedProgressRender = () => {
+  const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-      const timer = setTimeout(() => setProgress(66), 500);
-      return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
-    return (
-      <div className="w-80 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span>Loading...</span>
-          <span>{progress}%</span>
-        </div>
-        <Progress value={progress} />
+  return (
+    <div className="w-80 space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Loading...</span>
+        <span>{progress}%</span>
       </div>
-    );
-  },
+      <Progress value={progress} />
+    </div>
+  );
+};
+
+export const AnimatedProgress: Story = {
+  render: () => <AnimatedProgressRender />,
+};
+
+const LoadingSimulationRender = () => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          return 0; // Reset to create a loop
+        }
+        return prev + 10;
+      });
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="w-80 space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Downloading...</span>
+        <span>{progress}%</span>
+      </div>
+      <Progress value={progress} />
+    </div>
+  );
 };
 
 export const LoadingSimulation: Story = {
-  render: () => {
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            return 0; // Reset to create a loop
-          }
-          return prev + 10;
-        });
-      }, 300);
-
-      return () => clearInterval(interval);
-    }, []);
-
-    return (
-      <div className="w-80 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span>Downloading...</span>
-          <span>{progress}%</span>
-        </div>
-        <Progress value={progress} />
-      </div>
-    );
-  },
+  render: () => <LoadingSimulationRender />,
 };
 
 export const DifferentSizes: Story = {
@@ -146,24 +150,20 @@ export const WithLabels: Story = {
     <div className="w-80 space-y-6">
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Upload Progress</label>
+          <label htmlFor="upload-progress" className="text-sm font-medium">Upload Progress</label>
           <span className="text-muted-foreground text-sm">45%</span>
         </div>
-        <Progress value={45} />
-        <p className="text-muted-foreground text-xs">
-          Uploading file... 2.3 MB of 5.1 MB
-        </p>
+        <Progress id="upload-progress" value={45} />
+        <p className="text-muted-foreground text-xs">Uploading file... 2.3 MB of 5.1 MB</p>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Installation</label>
+          <label htmlFor="installation-progress" className="text-sm font-medium">Installation</label>
           <span className="text-muted-foreground text-sm">78%</span>
         </div>
-        <Progress value={78} />
-        <p className="text-muted-foreground text-xs">
-          Installing dependencies...
-        </p>
+        <Progress id="installation-progress" value={78} />
+        <p className="text-muted-foreground text-xs">Installing dependencies...</p>
       </div>
     </div>
   ),
@@ -175,9 +175,7 @@ export const InCard: Story = {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold">Project Setup</h3>
-          <p className="text-muted-foreground text-sm">
-            Setting up your new project
-          </p>
+          <p className="text-muted-foreground text-sm">Setting up your new project</p>
         </div>
 
         <div className="space-y-4">

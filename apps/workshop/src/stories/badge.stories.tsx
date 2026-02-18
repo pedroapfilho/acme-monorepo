@@ -64,28 +64,13 @@ export const WithIcons: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Badge variant="default">
-        <svg
-          className="h-3 w-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
         Success
       </Badge>
       <Badge variant="destructive">
-        <svg
-          className="h-3 w-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -96,12 +81,7 @@ export const WithIcons: Story = {
         Error
       </Badge>
       <Badge variant="outline">
-        <svg
-          className="h-3 w-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -141,12 +121,12 @@ export const AsLink: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Badge asChild variant="default">
-        <a href="#" className="cursor-pointer">
+        <a href="/badges/clickable" className="cursor-pointer">
           Clickable Badge
         </a>
       </Badge>
       <Badge asChild variant="outline">
-        <a href="#" className="cursor-pointer">
+        <a href="/badges/link" className="cursor-pointer">
           Link Badge
         </a>
       </Badge>
