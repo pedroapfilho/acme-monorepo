@@ -6,12 +6,12 @@ import { Suspense } from "react";
 import LoginForm from "@/app/(auth)/login/form";
 
 const metadata: Metadata = {
-  title: "Sign In",
   description: "Sign in to your Acme account to access your dashboard and manage your profile.",
   robots: {
-    index: false, // Don't index auth pages
     follow: false,
+    index: false, // Don't index auth pages
   },
+  title: "Sign In",
 };
 
 const Page = async () => {
@@ -30,7 +30,7 @@ const Page = async () => {
 
           <p className="text-sm">
             Not a member yet?{" "}
-            <Link href="/register" className="font-semibold hover:text-neutral-600">
+            <Link className="font-semibold hover:text-neutral-600" href="/register">
               Create an account
             </Link>
           </p>
@@ -40,7 +40,7 @@ const Page = async () => {
       <div>
         <p className="text-center text-sm">
           Lost your account?{" "}
-          <Link href="/recover" className="font-semibold hover:text-neutral-600">
+          <Link className="font-semibold hover:text-neutral-600" href="/recover">
             Let&apos;s try to recover it
           </Link>
         </p>

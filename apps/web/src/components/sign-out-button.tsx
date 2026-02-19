@@ -25,7 +25,7 @@ const SignOutButton = () => {
 
   return (
     <div>
-      <Button variant="outline" onClick={handleSignOut} disabled={isLoading}>
+      <Button disabled={isLoading} onClick={handleSignOut} variant="outline">
         {isLoading ? "Signing out" : "Sign Out"}
       </Button>
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}

@@ -14,14 +14,14 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useForm } from "react-hook-form";
 import { useState } from "storybook/internal/preview-api";
-import * as z from "zod";
+import { z } from "zod";
 
 const meta: Meta = {
-  title: "ui/Form",
   parameters: {
     layout: "padded",
   },
   tags: ["autodocs"],
+  title: "ui/Form",
 };
 
 export default meta;
@@ -36,20 +36,20 @@ const loginSchema = z.object({
   remember: z.boolean().optional(),
 });
 
+const handleLoginSubmit = (values: z.infer<typeof loginSchema>) => {
+  console.log(values);
+  alert("Form submitted! Check the console for values.");
+};
+
 const LoginFormRender = () => {
   const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
       remember: false,
     },
+    resolver: zodResolver(loginSchema),
   });
-
-  const handleSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log(values);
-    alert("Form submitted! Check the console for values.");
-  };
 
   return (
     <div className="mx-auto max-w-md space-y-6">
@@ -59,7 +59,7 @@ const LoginFormRender = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form className="space-y-4" onSubmit={form.handleSubmit(handleLoginSubmit)}>
           <FormField
             control={form.control}
             name="email"
@@ -81,7 +81,7 @@ const LoginFormRender = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="********" {...field} />
+                  <Input placeholder="********" type="password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -104,7 +104,7 @@ const LoginFormRender = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button className="w-full" type="submit">
             Sign In
           </Button>
         </form>
@@ -118,33 +118,33 @@ export const LoginForm: Story = {
 };
 
 const profileSchema = z.object({
+  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
+  email: z.string().email("Please enter a valid email address"),
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
-  website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
-  notifications: z.boolean(),
   marketing: z.boolean(),
+  notifications: z.boolean(),
+  website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
+
+const handleProfileSubmit = (values: z.infer<typeof profileSchema>) => {
+  console.log(values);
+  alert("Profile updated! Check the console for values.");
+};
 
 const ProfileFormRender = () => {
   const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
     defaultValues: {
+      bio: "",
+      email: "john@example.com",
       firstName: "John",
       lastName: "Doe",
-      email: "john@example.com",
-      bio: "",
-      website: "",
-      notifications: true,
       marketing: false,
+      notifications: true,
+      website: "",
     },
+    resolver: zodResolver(profileSchema),
   });
-
-  const handleSubmit = (values: z.infer<typeof profileSchema>) => {
-    console.log(values);
-    alert("Profile updated! Check the console for values.");
-  };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -154,7 +154,7 @@ const ProfileFormRender = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form className="space-y-6" onSubmit={form.handleSubmit(handleProfileSubmit)}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -194,9 +194,7 @@ const ProfileFormRender = () => {
                 <FormControl>
                   <Input placeholder="john@example.com" {...field} />
                 </FormControl>
-                <FormDescription>
-                  This email will be used for account notifications
-                </FormDescription>
+                <FormDescription>This email will be used for account notifications</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -225,7 +223,7 @@ const ProfileFormRender = () => {
                 <FormLabel>Bio</FormLabel>
                 <FormControl>
                   <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[100px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                     placeholder="Tell us about yourself..."
                     {...field}
                   />
@@ -280,7 +278,7 @@ const ProfileFormRender = () => {
 
           <div className="flex gap-4">
             <Button type="submit">Save Changes</Button>
-            <Button type="button" variant="outline" onClick={() => form.reset()}>
+            <Button onClick={() => form.reset()} type="button" variant="outline">
               Cancel
             </Button>
           </div>
@@ -295,43 +293,41 @@ export const ProfileForm: Story = {
 };
 
 const contactSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
-  subject: z.string().min(5, "Subject must be at least 5 characters"),
   message: z.string().min(10, "Message must be at least 10 characters"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
   priority: z.enum(["low", "medium", "high"]),
+  subject: z.string().min(5, "Subject must be at least 5 characters"),
   subscribe: z.boolean().optional(),
 });
 
+const handleContactSubmit = (values: z.infer<typeof contactSchema>) => {
+  console.log(values);
+  alert("Message sent! Check the console for values.");
+};
+
 const ContactFormRender = () => {
   const form = useForm<z.infer<typeof contactSchema>>({
-    resolver: zodResolver(contactSchema),
     defaultValues: {
-      name: "",
       email: "",
-      subject: "",
       message: "",
+      name: "",
       priority: "medium",
+      subject: "",
       subscribe: false,
     },
+    resolver: zodResolver(contactSchema),
   });
-
-  const handleSubmit = (values: z.infer<typeof contactSchema>) => {
-    console.log(values);
-    alert("Message sent! Check the console for values.");
-  };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="space-y-2 text-center">
         <h2 className="text-2xl font-bold">Contact Us</h2>
-        <p className="text-muted-foreground">
-          We&apos;d love to hear from you. Send us a message!
-        </p>
+        <p className="text-muted-foreground">We&apos;d love to hear from you. Send us a message!</p>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <form className="space-y-6" onSubmit={form.handleSubmit(handleContactSubmit)}>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -387,7 +383,7 @@ const ContactFormRender = () => {
                   <FormLabel>Priority</FormLabel>
                   <FormControl>
                     <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                       {...field}
                     >
                       <option value="low">Low</option>
@@ -409,7 +405,7 @@ const ContactFormRender = () => {
                 <FormLabel>Message</FormLabel>
                 <FormControl>
                   <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring min-h-[120px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                     placeholder="Tell us more about your inquiry..."
                     {...field}
                   />
@@ -436,7 +432,7 @@ const ContactFormRender = () => {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button className="w-full" type="submit">
             Send Message
           </Button>
         </form>
@@ -452,10 +448,10 @@ export const ContactForm: Story = {
 const FormValidationRender = () => {
   const form = useForm({
     defaultValues: {
-      username: "",
-      email: "",
       age: "",
+      email: "",
       terms: false,
+      username: "",
     },
   });
 
@@ -471,23 +467,14 @@ const FormValidationRender = () => {
     <div className="mx-auto max-w-md space-y-6">
       <div className="space-y-2 text-center">
         <h2 className="text-2xl font-bold">Validation Examples</h2>
-        <p className="text-muted-foreground">
-          Try submitting with invalid data to see validation
-        </p>
+        <p className="text-muted-foreground">Try submitting with invalid data to see validation</p>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
           <FormField
             control={form.control}
             name="username"
-            rules={{
-              required: "Username is required",
-              minLength: {
-                value: 3,
-                message: "Username must be at least 3 characters",
-              },
-            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
@@ -498,18 +485,18 @@ const FormValidationRender = () => {
                 <FormMessage />
               </FormItem>
             )}
+            rules={{
+              minLength: {
+                message: "Username must be at least 3 characters",
+                value: 3,
+              },
+              required: "Username is required",
+            }}
           />
 
           <FormField
             control={form.control}
             name="email"
-            rules={{
-              required: "Email is required",
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: "Invalid email address",
-              },
-            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -519,29 +506,25 @@ const FormValidationRender = () => {
                 <FormMessage />
               </FormItem>
             )}
+            rules={{
+              pattern: {
+                message: "Invalid email address",
+                value: /^\S+@\S+$/i,
+              },
+              required: "Email is required",
+            }}
           />
 
           <FormField
             control={form.control}
             name="age"
-            rules={{
-              required: "Age is required",
-              min: {
-                value: 18,
-                message: "You must be at least 18 years old",
-              },
-              max: {
-                value: 120,
-                message: "Age must be less than 120",
-              },
-            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Age</FormLabel>
                 <FormControl>
                   <Input
-                    type="number"
                     placeholder="Enter age"
+                    type="number"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
@@ -550,14 +533,22 @@ const FormValidationRender = () => {
                 <FormMessage />
               </FormItem>
             )}
+            rules={{
+              max: {
+                message: "Age must be less than 120",
+                value: 120,
+              },
+              min: {
+                message: "You must be at least 18 years old",
+                value: 18,
+              },
+              required: "Age is required",
+            }}
           />
 
           <FormField
             control={form.control}
             name="terms"
-            rules={{
-              required: "You must accept the terms",
-            }}
             render={({ field }) => (
               <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                 <FormControl>
@@ -570,9 +561,12 @@ const FormValidationRender = () => {
                 </div>
               </FormItem>
             )}
+            rules={{
+              required: "You must accept the terms",
+            }}
           />
 
-          <Button type="submit" className="w-full" disabled={submitted}>
+          <Button className="w-full" disabled={submitted} type="submit">
             {submitted ? "Submitted!" : "Submit"}
           </Button>
         </form>
@@ -588,9 +582,9 @@ export const FormValidation: Story = {
 const FormStatesRender = () => {
   const form = useForm({
     defaultValues: {
-      normal: "",
-      error: "invalid-email",
       disabled: "Disabled field",
+      error: "invalid-email",
+      normal: "",
       readonly: "Read-only field",
     },
   });
@@ -621,12 +615,6 @@ const FormStatesRender = () => {
           <FormField
             control={form.control}
             name="error"
-            rules={{
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: "Please enter a valid email address",
-              },
-            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Field with Error</FormLabel>
@@ -637,6 +625,12 @@ const FormStatesRender = () => {
                 <FormMessage />
               </FormItem>
             )}
+            rules={{
+              pattern: {
+                message: "Please enter a valid email address",
+                value: /^\S+@\S+$/i,
+              },
+            }}
           />
 
           <FormField

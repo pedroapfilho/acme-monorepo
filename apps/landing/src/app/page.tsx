@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Home",
   description: "Welcome to Acme — the one template to rule them all.",
+  title: "Home",
 };
 
 const Page = () => {

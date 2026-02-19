@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -29,10 +29,10 @@ const RecoverForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
     },
+    resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: FormData) => {
@@ -46,18 +46,17 @@ const RecoverForm = () => {
 
       if (result.error) {
         form.setError("root", {
-          type: "manual",
           message: result.error.message || "Failed to send password reset email",
+          type: "manual",
         });
         return;
       }
 
       router.push("/login?message=password-reset-sent");
-    } catch (error) {
-      console.error("Password reset request error:", error);
+    } catch {
       form.setError("root", {
-        type: "manual",
         message: "An error occurred. Please try again.",
+        type: "manual",
       });
     } finally {
       setIsLoading(false);
@@ -75,9 +74,9 @@ const RecoverForm = () => {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
+                  disabled={isLoading}
                   placeholder="email@address.com"
                   type="email"
-                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -90,7 +89,7 @@ const RecoverForm = () => {
           <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
         )}
 
-        <Button className="w-full" type="submit" disabled={isLoading}>
+        <Button className="w-full" disabled={isLoading} type="submit">
           {isLoading ? "Sending..." : "Submit Request"}
         </Button>
       </form>

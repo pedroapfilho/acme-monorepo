@@ -4,12 +4,6 @@ import { Wifi, Bluetooth, Bell, BellOff, Moon, Shield } from "lucide-react";
 import { useState } from "react";
 
 const meta: Meta<typeof Switch> = {
-  title: "ui/Switch",
-  component: Switch,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
   argTypes: {
     checked: {
       control: { type: "boolean" },
@@ -18,6 +12,12 @@ const meta: Meta<typeof Switch> = {
       control: { type: "boolean" },
     },
   },
+  component: Switch,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  title: "ui/Switch",
 };
 export default meta;
 
@@ -43,15 +43,15 @@ export const States: Story = {
         <Label htmlFor="unchecked">Unchecked</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="checked" checked />
+        <Switch checked id="checked" />
         <Label htmlFor="checked">Checked</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="disabled" disabled />
+        <Switch disabled id="disabled" />
         <Label htmlFor="disabled">Disabled (unchecked)</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="disabled-checked" disabled checked />
+        <Switch checked disabled id="disabled-checked" />
         <Label htmlFor="disabled-checked">Disabled (checked)</Label>
       </div>
     </div>
@@ -63,28 +63,28 @@ export const WithIcons: Story = {
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <Switch id="wifi" />
-        <Label htmlFor="wifi" className="flex items-center gap-2">
+        <Label className="flex items-center gap-2" htmlFor="wifi">
           <Wifi className="h-4 w-4" />
           WiFi
         </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Switch id="bluetooth" />
-        <Label htmlFor="bluetooth" className="flex items-center gap-2">
+        <Label className="flex items-center gap-2" htmlFor="bluetooth">
           <Bluetooth className="h-4 w-4" />
           Bluetooth
         </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Switch id="notifications" />
-        <Label htmlFor="notifications" className="flex items-center gap-2">
+        <Label className="flex items-center gap-2" htmlFor="notifications">
           <Bell className="h-4 w-4" />
           Notifications
         </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Switch id="dark-mode" />
-        <Label htmlFor="dark-mode" className="flex items-center gap-2">
+        <Label className="flex items-center gap-2" htmlFor="dark-mode">
           <Moon className="h-4 w-4" />
           Dark Mode
         </Label>
@@ -99,10 +99,10 @@ const InteractiveRender = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Switch id="interactive" checked={isEnabled} onCheckedChange={setIsEnabled} />
+        <Switch checked={isEnabled} id="interactive" onCheckedChange={setIsEnabled} />
         <Label htmlFor="interactive">Feature is {isEnabled ? "enabled" : "disabled"}</Label>
       </div>
-      <Button variant="outline" size="sm" onClick={() => setIsEnabled(!isEnabled)}>
+      <Button onClick={() => setIsEnabled(!isEnabled)} size="sm" variant="outline">
         Toggle Programmatically
       </Button>
     </div>
@@ -115,12 +115,12 @@ export const Interactive: Story = {
 
 const SettingsPanelRender = () => {
   const [settings, setSettings] = useState({
-    notifications: true,
-    emailAlerts: false,
+    analytics: false,
     autoSave: true,
     darkMode: false,
+    emailAlerts: false,
+    notifications: true,
     sounds: true,
-    analytics: false,
   });
 
   const updateSetting = (key: string, value: boolean) => {
@@ -131,7 +131,7 @@ const SettingsPanelRender = () => {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Account Settings</h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Manage your account preferences and notifications
         </p>
       </div>
@@ -142,31 +142,29 @@ const SettingsPanelRender = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="push-notifications" className="text-sm font-normal">
+                <Label className="text-sm font-normal" htmlFor="push-notifications">
                   Push notifications
                 </Label>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   Receive push notifications on your devices
                 </p>
               </div>
               <Switch
-                id="push-notifications"
                 checked={settings.notifications}
+                id="push-notifications"
                 onCheckedChange={(checked) => updateSetting("notifications", checked)}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="email-alerts" className="text-sm font-normal">
+                <Label className="text-sm font-normal" htmlFor="email-alerts">
                   Email alerts
                 </Label>
-                <p className="text-muted-foreground text-xs">
-                  Receive important updates via email
-                </p>
+                <p className="text-xs text-muted-foreground">Receive important updates via email</p>
               </div>
               <Switch
-                id="email-alerts"
                 checked={settings.emailAlerts}
+                id="email-alerts"
                 onCheckedChange={(checked) => updateSetting("emailAlerts", checked)}
               />
             </div>
@@ -178,40 +176,40 @@ const SettingsPanelRender = () => {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="auto-save" className="text-sm font-normal">
+                <Label className="text-sm font-normal" htmlFor="auto-save">
                   Auto-save
                 </Label>
-                <p className="text-muted-foreground text-xs">Automatically save your work</p>
+                <p className="text-xs text-muted-foreground">Automatically save your work</p>
               </div>
               <Switch
-                id="auto-save"
                 checked={settings.autoSave}
+                id="auto-save"
                 onCheckedChange={(checked) => updateSetting("autoSave", checked)}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="dark-theme" className="text-sm font-normal">
+                <Label className="text-sm font-normal" htmlFor="dark-theme">
                   Dark theme
                 </Label>
-                <p className="text-muted-foreground text-xs">Use dark mode interface</p>
+                <p className="text-xs text-muted-foreground">Use dark mode interface</p>
               </div>
               <Switch
-                id="dark-theme"
                 checked={settings.darkMode}
+                id="dark-theme"
                 onCheckedChange={(checked) => updateSetting("darkMode", checked)}
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="sound-effects" className="text-sm font-normal">
+                <Label className="text-sm font-normal" htmlFor="sound-effects">
                   Sound effects
                 </Label>
-                <p className="text-muted-foreground text-xs">Play sounds for interactions</p>
+                <p className="text-xs text-muted-foreground">Play sounds for interactions</p>
               </div>
               <Switch
-                id="sound-effects"
                 checked={settings.sounds}
+                id="sound-effects"
                 onCheckedChange={(checked) => updateSetting("sounds", checked)}
               />
             </div>
@@ -222,16 +220,16 @@ const SettingsPanelRender = () => {
           <h4 className="text-sm font-medium">Privacy</h4>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="analytics" className="text-sm font-normal">
+              <Label className="text-sm font-normal" htmlFor="analytics">
                 Analytics
               </Label>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 Help improve our service with usage data
               </p>
             </div>
             <Switch
-              id="analytics"
               checked={settings.analytics}
+              id="analytics"
               onCheckedChange={(checked) => updateSetting("analytics", checked)}
             />
           </div>
@@ -249,11 +247,11 @@ export const SettingsPanel: Story = {
 
 const SystemControlsRender = () => {
   const [controls, setControls] = useState({
-    wifi: true,
-    bluetooth: false,
-    location: true,
     airplaneMode: false,
+    bluetooth: false,
     doNotDisturb: false,
+    location: true,
+    wifi: true,
   });
 
   const updateControl = (key: string, value: boolean) => {
@@ -264,7 +262,7 @@ const SystemControlsRender = () => {
     <div className="max-w-sm space-y-4">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">System Controls</h3>
-        <p className="text-muted-foreground text-sm">Quick access to system settings</p>
+        <p className="text-sm text-muted-foreground">Quick access to system settings</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -280,7 +278,7 @@ const SystemControlsRender = () => {
           </div>
           <div>
             <p className="text-sm font-medium">WiFi</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               {controls.wifi ? "Connected" : "Disconnected"}
             </p>
           </div>
@@ -300,7 +298,7 @@ const SystemControlsRender = () => {
           </div>
           <div>
             <p className="text-sm font-medium">Bluetooth</p>
-            <p className="text-muted-foreground text-xs">{controls.bluetooth ? "On" : "Off"}</p>
+            <p className="text-xs text-muted-foreground">{controls.bluetooth ? "On" : "Off"}</p>
           </div>
         </div>
 
@@ -309,7 +307,7 @@ const SystemControlsRender = () => {
             {controls.doNotDisturb ? (
               <BellOff className="h-5 w-5 text-orange-500" />
             ) : (
-              <Bell className="text-muted-foreground h-5 w-5" />
+              <Bell className="h-5 w-5 text-muted-foreground" />
             )}
             <Switch
               checked={controls.doNotDisturb}
@@ -318,7 +316,7 @@ const SystemControlsRender = () => {
           </div>
           <div>
             <p className="text-sm font-medium">Do Not Disturb</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               {controls.doNotDisturb ? "Enabled" : "Disabled"}
             </p>
           </div>
@@ -338,7 +336,7 @@ const SystemControlsRender = () => {
           </div>
           <div>
             <p className="text-sm font-medium">Location</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               {controls.location ? "Enabled" : "Disabled"}
             </p>
           </div>
@@ -357,50 +355,50 @@ export const FormIntegration: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Project Preferences</h3>
-        <p className="text-muted-foreground text-sm">Configure your project settings</p>
+        <p className="text-sm text-muted-foreground">Configure your project settings</p>
       </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="public-project" className="text-sm">
+            <Label className="text-sm" htmlFor="public-project">
               Make project public
             </Label>
-            <p className="text-muted-foreground text-xs">Allow others to view this project</p>
+            <p className="text-xs text-muted-foreground">Allow others to view this project</p>
           </div>
           <Switch id="public-project" />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="allow-comments" className="text-sm">
+            <Label className="text-sm" htmlFor="allow-comments">
               Allow comments
             </Label>
-            <p className="text-muted-foreground text-xs">Let viewers leave feedback</p>
+            <p className="text-xs text-muted-foreground">Let viewers leave feedback</p>
           </div>
           <Switch id="allow-comments" />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="email-updates" className="text-sm">
+            <Label className="text-sm" htmlFor="email-updates">
               Email updates
             </Label>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               Receive notifications about project activity
             </p>
           </div>
-          <Switch id="email-updates" defaultChecked />
+          <Switch defaultChecked id="email-updates" />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="auto-backup" className="text-sm">
+            <Label className="text-sm" htmlFor="auto-backup">
               Automatic backups
             </Label>
-            <p className="text-muted-foreground text-xs">Backup project data daily</p>
+            <p className="text-xs text-muted-foreground">Backup project data daily</p>
           </div>
-          <Switch id="auto-backup" defaultChecked />
+          <Switch defaultChecked id="auto-backup" />
         </div>
       </div>
 
@@ -416,8 +414,8 @@ export const Sizes: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Switch id="small" className="scale-75" />
-        <Label htmlFor="small" className="text-sm">
+        <Switch className="scale-75" id="small" />
+        <Label className="text-sm" htmlFor="small">
           Small switch
         </Label>
       </div>
@@ -426,8 +424,8 @@ export const Sizes: Story = {
         <Label htmlFor="default-size">Default switch</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="large" className="scale-125" />
-        <Label htmlFor="large" className="text-lg">
+        <Switch className="scale-125" id="large" />
+        <Label className="text-lg" htmlFor="large">
           Large switch
         </Label>
       </div>
@@ -439,15 +437,15 @@ export const CustomStyling: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Switch id="custom1" className="data-[state=checked]:bg-green-500" />
+        <Switch className="data-[state=checked]:bg-green-500" id="custom1" />
         <Label htmlFor="custom1">Green switch</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="custom2" className="data-[state=checked]:bg-purple-500" />
+        <Switch className="data-[state=checked]:bg-purple-500" id="custom2" />
         <Label htmlFor="custom2">Purple switch</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Switch id="custom3" className="data-[state=checked]:bg-orange-500" />
+        <Switch className="data-[state=checked]:bg-orange-500" id="custom3" />
         <Label htmlFor="custom3">Orange switch</Label>
       </div>
     </div>
@@ -456,9 +454,9 @@ export const CustomStyling: Story = {
 
 export const Playground: Story = {
   args: {
-    id: "playground",
     checked: false,
     disabled: false,
+    id: "playground",
   },
   render: (args) => (
     <div className="flex items-center space-x-2">

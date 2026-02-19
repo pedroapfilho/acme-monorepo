@@ -14,13 +14,13 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 
 const formSchema = z.object({
-  password: z.string().min(12, "Password must be at least 12 characters"),
   confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
+  password: z.string().min(12, "Password must be at least 12 characters"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -33,11 +33,11 @@ const ResetPasswordForm = () => {
   const token = searchParams.get("token");
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
-      password: "",
       confirmPassword: "",
+      password: "",
     },
+    resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: FormData) => {
@@ -46,16 +46,16 @@ const ResetPasswordForm = () => {
 
       if (data.password !== data.confirmPassword) {
         form.setError("confirmPassword", {
-          type: "manual",
           message: "Passwords do not match",
+          type: "manual",
         });
         return;
       }
 
       if (!token) {
         form.setError("root", {
-          type: "manual",
           message: "Invalid reset token. Please request a new password reset.",
+          type: "manual",
         });
         return;
       }
@@ -67,18 +67,17 @@ const ResetPasswordForm = () => {
 
       if (result.error) {
         form.setError("root", {
-          type: "manual",
           message: result.error.message || "Failed to reset password",
+          type: "manual",
         });
         return;
       }
 
       router.push("/login?message=password-reset-success");
-    } catch (error) {
-      console.error("Password reset error:", error);
+    } catch {
       form.setError("root", {
-        type: "manual",
         message: "An error occurred. Please try again.",
+        type: "manual",
       });
     } finally {
       setIsLoading(false);
@@ -96,9 +95,9 @@ const ResetPasswordForm = () => {
               <FormLabel>New Password</FormLabel>
               <FormControl>
                 <Input
+                  disabled={isLoading}
                   placeholder="Enter your new password"
                   type="password"
-                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -114,9 +113,9 @@ const ResetPasswordForm = () => {
               <FormLabel>Confirm New Password</FormLabel>
               <FormControl>
                 <Input
+                  disabled={isLoading}
                   placeholder="Confirm your new password"
                   type="password"
-                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -129,7 +128,7 @@ const ResetPasswordForm = () => {
           <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
         )}
 
-        <Button className="w-full" type="submit" disabled={isLoading}>
+        <Button className="w-full" disabled={isLoading} type="submit">
           {isLoading ? "Resetting..." : "Reset Password"}
         </Button>
       </form>

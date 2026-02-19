@@ -30,10 +30,10 @@ app.use("*", securityHeaders);
 app.use(
   "*",
   cors({
-    origin: env.CORS_ORIGINS?.split(",") || ["http://localhost:3000"],
-    credentials: true,
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowHeaders: ["Content-Type", "Authorization", "X-Request-Id"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    credentials: true,
+    origin: env.CORS_ORIGINS?.split(",") || ["http://localhost:3000"],
   }),
 );
 
@@ -48,10 +48,10 @@ app.use("*", async (c, next) => {
   const ms = Date.now() - start;
 
   logger.info({
-    method: c.req.method,
-    url: c.req.url,
-    status: c.res.status,
     duration: ms,
+    method: c.req.method,
+    status: c.res.status,
+    url: c.req.url,
   });
 });
 
@@ -63,9 +63,9 @@ app.use("/auth/sign-in/*", authRateLimit);
 // Health check endpoint
 app.get("/healthz", (c) => {
   return c.json({
+    service: "api",
     status: "healthy",
     timestamp: new Date().toISOString(),
-    service: "api",
     version: "1.0.0",
   });
 });
@@ -77,21 +77,21 @@ app.get("/readyz", async (c) => {
     await prisma.$queryRaw`SELECT 1`;
 
     return c.json({
-      status: "ready",
-      timestamp: new Date().toISOString(),
       checks: {
         database: "healthy",
       },
+      status: "ready",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     logger.error({ error }, "Readiness check failed");
     return c.json(
       {
-        status: "not ready",
-        timestamp: new Date().toISOString(),
         checks: {
           database: "unhealthy",
         },
+        status: "not ready",
+        timestamp: new Date().toISOString(),
       },
       503,
     );
@@ -122,18 +122,18 @@ const hostname = env.HOST || "0.0.0.0";
 
 logger.info(
   {
-    port,
-    hostname,
-    env: env.NODE_ENV,
     cors: env.CORS_ORIGINS,
+    env: env.NODE_ENV,
+    hostname,
+    port,
   },
   "🚀 Starting server...",
 );
 
 serve({
   fetch: app.fetch,
-  port,
   hostname,
+  port,
 });
 
 // Graceful shutdown

@@ -23,8 +23,8 @@ export const middleware = async (request: NextRequest) => {
     session = await auth.api.getSession({
       headers: request.headers,
     });
-  } catch (error) {
-    console.warn("Session check failed, treating as unauthenticated:", error);
+  } catch {
+    // Session check failed — treat as unauthenticated
   }
 
   if (isProtectedRoute && !session) {
@@ -42,6 +42,6 @@ export const middleware = async (request: NextRequest) => {
 };
 
 export const config = {
-  runtime: "nodejs",
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
+  runtime: "nodejs",
 };

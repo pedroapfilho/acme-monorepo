@@ -1,54 +1,54 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 console.log("Verifying Better Auth Implementation...\n");
 
 const checks = [
   {
-    name: "Auth Server Package",
     file: "packages/auth/src/server.ts",
+    name: "Auth Server Package",
     pattern: /betterAuth|prismaAdapter/,
   },
   {
-    name: "Auth Client Package",
     file: "packages/auth/src/client.ts",
+    name: "Auth Client Package",
     pattern: /createAuthClient|usernameClient/,
   },
   {
-    name: "API Shared Auth Instance",
     file: "apps/api/src/lib/auth.ts",
+    name: "API Shared Auth Instance",
     pattern: /createAuth/,
   },
   {
-    name: "API Hono Integration",
     file: "apps/api/src/index.ts",
+    name: "API Hono Integration",
     pattern: /auth\.handler/,
   },
   {
-    name: "Web Proxy Rewrite",
     file: "apps/web/next.config.ts",
+    name: "Web Proxy Rewrite",
     pattern: /rewrites|\/api\/auth/,
   },
   {
-    name: "Middleware Configuration",
     file: "apps/web/src/middleware.ts",
+    name: "Middleware Configuration",
     pattern: /runtime.*nodejs|auth\.api\.getSession/,
   },
   {
-    name: "Database Schema (PostgreSQL)",
     file: "packages/db/prisma/schema.prisma",
+    name: "Database Schema (PostgreSQL)",
     pattern: /provider\s*=\s*"postgresql"/,
   },
   {
-    name: "Enhanced Security (12-char passwords)",
     file: "packages/auth/src/server.ts",
+    name: "Enhanced Security (12-char passwords)",
     pattern: /minPasswordLength:\s*12/,
   },
   {
-    name: "Cookie Cache Configuration",
     file: "packages/auth/src/server.ts",
+    name: "Cookie Cache Configuration",
     pattern: /cookieCache.*enabled.*true/s,
   },
 ];
@@ -86,8 +86,8 @@ console.log("-".repeat(50));
 // Check environment variables
 console.log("\nEnvironment Variables Check:\n");
 const envFiles = [
-  { name: "Web App", file: "apps/web/.env.local" },
-  { name: "API", file: "apps/api/.env" },
+  { file: "apps/web/.env.local", name: "Web App" },
+  { file: "apps/api/.env", name: "API" },
 ];
 
 envFiles.forEach((env) => {
@@ -103,7 +103,7 @@ envFiles.forEach((env) => {
     console.log(`  ${hasUrl ? "PASS" : "FAIL"} BETTER_AUTH_URL`);
     console.log(`  ${hasDb ? "PASS" : "FAIL"} DATABASE_URL`);
     console.log("");
-  } catch (error) {
+  } catch {
     console.log(`${env.name}: File not found (${env.file})`);
   }
 });

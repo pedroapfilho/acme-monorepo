@@ -26,13 +26,13 @@ import {
 import { useState } from "react";
 
 const meta: Meta<typeof Dialog> = {
-  title: "ui/Dialog",
+  argTypes: {},
   component: Dialog,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {},
+  title: "ui/Dialog",
 };
 export default meta;
 
@@ -53,16 +53,16 @@ export const Default: Story = {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+            <Label className="text-right" htmlFor="name">
               Name
             </Label>
-            <Input id="name" defaultValue="Pedro Duarte" className="col-span-3" />
+            <Input className="col-span-3" defaultValue="Pedro Duarte" id="name" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
+            <Label className="text-right" htmlFor="username">
               Username
             </Label>
-            <Input id="username" defaultValue="@peduarte" className="col-span-3" />
+            <Input className="col-span-3" defaultValue="@peduarte" id="username" />
           </div>
         </div>
         <DialogFooter>
@@ -85,7 +85,7 @@ export const Confirmation: Story = {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="text-destructive h-5 w-5" />
+            <AlertTriangle className="h-5 w-5 text-destructive" />
             Delete Account
           </DialogTitle>
           <DialogDescription>
@@ -96,7 +96,7 @@ export const Confirmation: Story = {
         <div className="py-4">
           <div className="flex items-center space-x-2">
             <Checkbox id="confirm" />
-            <Label htmlFor="confirm" className="text-sm">
+            <Label className="text-sm" htmlFor="confirm">
               I understand that this action is irreversible
             </Label>
           </div>
@@ -135,7 +135,7 @@ export const Information: Story = {
               <CheckCircle className="mt-0.5 h-4 w-4 text-green-500" />
               <div>
                 <p className="text-sm font-medium">Feature Enabled</p>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                   This feature is now active on your account.
                 </p>
               </div>
@@ -144,7 +144,7 @@ export const Information: Story = {
               <AlertTriangle className="mt-0.5 h-4 w-4 text-yellow-500" />
               <div>
                 <p className="text-sm font-medium">Limited Access</p>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                   Some features may be restricted during the trial period.
                 </p>
               </div>
@@ -179,31 +179,31 @@ export const ContactForm: Story = {
           <div className="space-y-2">
             <Label htmlFor="contact-name">Full Name</Label>
             <div className="relative">
-              <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-              <Input id="contact-name" placeholder="John Doe" className="pl-10" />
+              <User className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+              <Input className="pl-10" id="contact-name" placeholder="John Doe" />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact-email">Email</Label>
             <div className="relative">
-              <Mail className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+              <Mail className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
-                id="contact-email"
-                type="email"
-                placeholder="john@example.com"
                 className="pl-10"
+                id="contact-email"
+                placeholder="john@example.com"
+                type="email"
               />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="contact-phone">Phone</Label>
             <div className="relative">
-              <Phone className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+              <Phone className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
-                id="contact-phone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
                 className="pl-10"
+                id="contact-phone"
+                placeholder="+1 (555) 123-4567"
+                type="tel"
               />
             </div>
           </div>
@@ -238,7 +238,7 @@ export const Settings: Story = {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-sm">Email notifications</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Receive email about your account activity
                   </p>
                 </div>
@@ -247,7 +247,7 @@ export const Settings: Story = {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-sm">Push notifications</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Receive push notifications on your devices
                   </p>
                 </div>
@@ -262,7 +262,7 @@ export const Settings: Story = {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-sm">Profile visibility</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Make your profile visible to other users
                   </p>
                 </div>
@@ -355,15 +355,15 @@ const ControlledDialogRender = () => {
     <div className="space-y-4">
       <div className="flex gap-2">
         <Button onClick={() => setOpen(true)}>Open Dialog</Button>
-        <Button variant="outline" onClick={() => setOpen(false)}>
+        <Button onClick={() => setOpen(false)} variant="outline">
           Close Dialog
         </Button>
       </div>
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Dialog is currently {open ? "open" : "closed"}
       </p>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog onOpenChange={setOpen} open={open}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Controlled Dialog</DialogTitle>
@@ -374,15 +374,11 @@ const ControlledDialogRender = () => {
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="controlled-name">Name</Label>
-              <Input
-                id="controlled-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <Input id="controlled-name" onChange={(e) => setName(e.target.value)} value={name} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button onClick={() => setOpen(false)} variant="outline">
               Cancel
             </Button>
             <Button onClick={() => setOpen(false)}>Save</Button>
@@ -406,7 +402,7 @@ export const NoHeader: Story = {
       <DialogContent className="sm:max-w-[425px]">
         <div className="py-6">
           <p className="mb-4 text-center text-lg font-medium">Are you sure you want to continue?</p>
-          <p className="text-muted-foreground text-center text-sm">
+          <p className="text-center text-sm text-muted-foreground">
             This action will save your changes and close the dialog.
           </p>
         </div>

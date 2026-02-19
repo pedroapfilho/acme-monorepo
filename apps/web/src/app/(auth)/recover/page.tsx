@@ -25,7 +25,7 @@ const Page = () => {
       <div>
         <p className="text-center text-sm">
           Remembered your password?{" "}
-          <Link href="/login" className="font-semibold hover:text-neutral-600">
+          <Link className="font-semibold hover:text-neutral-600" href="/login">
             Log in into your account
           </Link>
         </p>

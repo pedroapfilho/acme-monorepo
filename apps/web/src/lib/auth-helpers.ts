@@ -13,8 +13,7 @@ export const getSession = cache(async () => {
     });
 
     return session;
-  } catch (error) {
-    console.error("Failed to get session:", error);
+  } catch {
     return null;
   }
 });

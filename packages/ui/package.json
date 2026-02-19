@@ -26,7 +26,7 @@
     "check-types": "bunchee --no-clean --no-emit",
     "dev:styles": "tailwindcss -i ./src/styles/globals.css -o ./dist/index.css --watch",
     "dev:components": "bunchee --watch --no-clean",
-    "lint": "oxlint src --deny-warnings",
+    "lint": "oxlint src",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {

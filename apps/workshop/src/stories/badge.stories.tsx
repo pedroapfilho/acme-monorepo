@@ -2,21 +2,21 @@ import { Badge } from "@repo/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof Badge> = {
-  title: "ui/Badge",
+  argTypes: {
+    asChild: {
+      control: { type: "boolean" },
+    },
+    variant: {
+      control: { type: "select" },
+      options: ["default", "secondary", "destructive", "outline"],
+    },
+  },
   component: Badge,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    variant: {
-      control: { type: "select" },
-      options: ["default", "secondary", "destructive", "outline"],
-    },
-    asChild: {
-      control: { type: "boolean" },
-    },
-  },
+  title: "ui/Badge",
 };
 
 export default meta;
@@ -65,17 +65,17 @@ export const WithIcons: Story = {
     <div className="flex flex-wrap gap-4">
       <Badge variant="default">
         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
         </svg>
         Success
       </Badge>
       <Badge variant="destructive">
         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
+            d="M6 18L18 6M6 6l12 12"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
           />
         </svg>
         Error
@@ -83,10 +83,10 @@ export const WithIcons: Story = {
       <Badge variant="outline">
         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
         Info
@@ -121,12 +121,12 @@ export const AsLink: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Badge asChild variant="default">
-        <a href="/badges/clickable" className="cursor-pointer">
+        <a className="cursor-pointer" href="/badges/clickable">
           Clickable Badge
         </a>
       </Badge>
       <Badge asChild variant="outline">
-        <a href="/badges/link" className="cursor-pointer">
+        <a className="cursor-pointer" href="/badges/link">
           Link Badge
         </a>
       </Badge>

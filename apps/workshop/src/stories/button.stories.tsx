@@ -17,28 +17,28 @@ import {
 } from "lucide-react";
 
 const meta: Meta<typeof Button> = {
-  title: "ui/Button",
-  component: Button,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
   argTypes: {
-    variant: {
-      control: { type: "select" },
-      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+    asChild: {
+      control: { type: "boolean" },
+    },
+    disabled: {
+      control: { type: "boolean" },
     },
     size: {
       control: { type: "select" },
       options: ["default", "sm", "lg", "icon"],
     },
-    disabled: {
-      control: { type: "boolean" },
-    },
-    asChild: {
-      control: { type: "boolean" },
+    variant: {
+      control: { type: "select" },
+      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
     },
   },
+  component: Button,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  title: "ui/Button",
 };
 export default meta;
 
@@ -128,11 +128,11 @@ export const Loading: Story = {
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         Loading...
       </Button>
-      <Button variant="outline" disabled>
+      <Button disabled variant="outline">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         Saving...
       </Button>
-      <Button variant="secondary" disabled>
+      <Button disabled variant="secondary">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
         Processing...
       </Button>
@@ -149,13 +149,13 @@ export const States: Story = {
       </div>
       <div className="flex gap-4">
         <Button variant="outline">Normal</Button>
-        <Button variant="outline" disabled>
+        <Button disabled variant="outline">
           Disabled
         </Button>
       </div>
       <div className="flex gap-4">
         <Button variant="secondary">Normal</Button>
-        <Button variant="secondary" disabled>
+        <Button disabled variant="secondary">
           Disabled
         </Button>
       </div>
@@ -167,12 +167,12 @@ export const AsChild: Story = {
   render: () => (
     <div className="flex gap-4">
       <Button asChild>
-        <a href="/example" className="cursor-pointer">
+        <a className="cursor-pointer" href="/example">
           Link Button
         </a>
       </Button>
-      <Button variant="outline" asChild>
-        <a href="/downloads" className="cursor-pointer">
+      <Button asChild variant="outline">
+        <a className="cursor-pointer" href="/downloads">
           <Download className="mr-2 h-4 w-4" />
           Download Link
         </a>
@@ -185,27 +185,27 @@ export const ButtonGroups: Story = {
   render: () => (
     <div className="space-y-6">
       <div className="flex">
-        <Button variant="outline" className="rounded-r-none border-r-0">
+        <Button className="rounded-r-none border-r-0" variant="outline">
           Left
         </Button>
-        <Button variant="outline" className="rounded-none border-r-0">
+        <Button className="rounded-none border-r-0" variant="outline">
           Center
         </Button>
-        <Button variant="outline" className="rounded-l-none">
+        <Button className="rounded-l-none" variant="outline">
           Right
         </Button>
       </div>
 
       <div className="flex">
-        <Button size="sm" variant="outline" className="rounded-r-none border-r-0">
+        <Button className="rounded-r-none border-r-0" size="sm" variant="outline">
           <Save className="mr-2 h-4 w-4" />
           Save
         </Button>
-        <Button size="sm" variant="outline" className="rounded-none border-r-0">
+        <Button className="rounded-none border-r-0" size="sm" variant="outline">
           <Edit className="mr-2 h-4 w-4" />
           Edit
         </Button>
-        <Button size="sm" variant="outline" className="rounded-l-none">
+        <Button className="rounded-l-none" size="sm" variant="outline">
           <Share className="mr-2 h-4 w-4" />
           Share
         </Button>
@@ -219,7 +219,7 @@ export const DropdownButtons: Story = {
     <div className="flex flex-wrap gap-4">
       <div className="flex">
         <Button>Actions</Button>
-        <Button variant="default" size="icon" className="ml-px rounded-l-none px-2">
+        <Button className="ml-px rounded-l-none px-2" size="icon" variant="default">
           <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
@@ -229,7 +229,7 @@ export const DropdownButtons: Story = {
           <Download className="mr-2 h-4 w-4" />
           Export
         </Button>
-        <Button variant="outline" size="icon" className="ml-px rounded-l-none px-2">
+        <Button className="ml-px rounded-l-none px-2" size="icon" variant="outline">
           <ChevronDown className="h-4 w-4" />
         </Button>
       </div>
@@ -283,11 +283,11 @@ export const FullWidth: Story = {
   render: () => (
     <div className="max-w-md space-y-4">
       <Button className="w-full">Sign In</Button>
-      <Button variant="outline" className="w-full">
+      <Button className="w-full" variant="outline">
         <Mail className="mr-2 h-4 w-4" />
         Sign in with Email
       </Button>
-      <Button variant="secondary" className="w-full">
+      <Button className="w-full" variant="secondary">
         Create Account
       </Button>
     </div>
@@ -298,10 +298,10 @@ export const InContext: Story = {
   render: () => (
     <div className="max-w-2xl space-y-8">
       {/* Card with buttons */}
-      <div className="border-border space-y-4 rounded-lg border p-6">
+      <div className="space-y-4 rounded-lg border border-border p-6">
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Project Settings</h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Manage your project configuration and preferences.
           </p>
         </div>
@@ -314,7 +314,7 @@ export const InContext: Story = {
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button size="icon" variant="ghost">
             <Settings className="h-4 w-4" />
           </Button>
         </div>
@@ -323,12 +323,14 @@ export const InContext: Story = {
       {/* Form with buttons */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor="context-email" className="text-sm font-medium">Email Address</label>
+          <label className="text-sm font-medium" htmlFor="context-email">
+            Email Address
+          </label>
           <input
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             id="context-email"
-            type="email"
             placeholder="Enter your email"
-            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+            type="email"
           />
         </div>
         <div className="flex gap-3">
@@ -338,18 +340,18 @@ export const InContext: Story = {
       </div>
 
       {/* Alert with buttons */}
-      <div className="border-destructive/20 bg-destructive/10 space-y-3 rounded-lg border p-4">
+      <div className="space-y-3 rounded-lg border border-destructive/20 bg-destructive/10 p-4">
         <div className="space-y-1">
-          <h4 className="text-destructive font-medium">Delete Project</h4>
-          <p className="text-muted-foreground text-sm">
+          <h4 className="font-medium text-destructive">Delete Project</h4>
+          <p className="text-sm text-muted-foreground">
             This action cannot be undone. This will permanently delete your project.
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="destructive" size="sm">
+          <Button size="sm" variant="destructive">
             Yes, Delete Project
           </Button>
-          <Button variant="outline" size="sm">
+          <Button size="sm" variant="outline">
             Cancel
           </Button>
         </div>
@@ -361,8 +363,8 @@ export const InContext: Story = {
 export const Playground: Story = {
   args: {
     children: "Playground Button",
-    variant: "default",
-    size: "default",
     disabled: false,
+    size: "default",
+    variant: "default",
   },
 };

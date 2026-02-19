@@ -28,9 +28,9 @@ export const errorHandler = async (err: Error, c: Context) => {
   // Log the error
   logger.error({
     err,
+    ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
     method: c.req.method,
     url: c.req.url,
-    ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
     userAgent: c.req.header("user-agent"),
   });
 
@@ -39,8 +39,8 @@ export const errorHandler = async (err: Error, c: Context) => {
     return c.json(
       {
         error: {
-          message: err.message,
           code: "HTTP_EXCEPTION",
+          message: err.message,
         },
       },
       err.status,
@@ -51,12 +51,12 @@ export const errorHandler = async (err: Error, c: Context) => {
     return c.json(
       {
         error: {
-          message: "Validation failed",
           code: "VALIDATION_ERROR",
           details: err.issues.map((issue) => ({
             field: issue.path.join("."),
             message: issue.message,
           })),
+          message: "Validation failed",
         },
       },
       400 as const,
@@ -67,8 +67,8 @@ export const errorHandler = async (err: Error, c: Context) => {
     return c.json(
       {
         error: {
-          message: err.message,
           code: err.code || "APP_ERROR",
+          message: err.message,
         },
       },
       err.statusCode as 400 | 401 | 403 | 404 | 409 | 422 | 500,
@@ -80,8 +80,8 @@ export const errorHandler = async (err: Error, c: Context) => {
     return c.json(
       {
         error: {
-          message: "A record with this value already exists",
           code: "DUPLICATE_ENTRY",
+          message: "A record with this value already exists",
         },
       },
       409 as const,
@@ -92,8 +92,8 @@ export const errorHandler = async (err: Error, c: Context) => {
     return c.json(
       {
         error: {
-          message: "Record not found",
           code: "NOT_FOUND",
+          message: "Record not found",
         },
       },
       404 as const,
@@ -106,8 +106,8 @@ export const errorHandler = async (err: Error, c: Context) => {
   return c.json(
     {
       error: {
-        message,
         code: "INTERNAL_SERVER_ERROR",
+        message,
         ...(env.NODE_ENV !== "production" && { stack: err.stack }),
       },
     },
@@ -119,8 +119,8 @@ export const notFound = (c: Context) => {
   return c.json(
     {
       error: {
-        message: "Resource not found",
         code: "NOT_FOUND",
+        message: "Resource not found",
       },
     },
     404 as const,

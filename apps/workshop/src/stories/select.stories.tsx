@@ -15,17 +15,17 @@ import { User, Calendar, Clock, Star, Flag, Users } from "lucide-react";
 import { useState } from "react";
 
 const meta: Meta<typeof Select> = {
-  title: "ui/Select",
-  component: Select,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
   argTypes: {
     disabled: {
       control: { type: "boolean" },
     },
   },
+  component: Select,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  title: "ui/Select",
 };
 export default meta;
 
@@ -68,7 +68,7 @@ export const WithGroups: Story = {
           <SelectLabel>Vegetables</SelectLabel>
           <SelectItem value="aubergine">Aubergine</SelectItem>
           <SelectItem value="broccoli">Broccoli</SelectItem>
-          <SelectItem value="carrot" disabled>
+          <SelectItem disabled value="carrot">
             Carrot (Out of stock)
           </SelectItem>
           <SelectItem value="courgette">Courgette</SelectItem>
@@ -285,7 +285,7 @@ export const FormExample: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Project Settings</h3>
-        <p className="text-muted-foreground text-sm">Configure your project preferences</p>
+        <p className="text-sm text-muted-foreground">Configure your project preferences</p>
       </div>
 
       <div className="grid gap-4">
@@ -418,7 +418,7 @@ const ControlledSelectRender = () => {
     <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Controlled Select</Label>
-        <Select value={value} onValueChange={setValue}>
+        <Select onValueChange={setValue} value={value}>
           <SelectTrigger>
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>
@@ -430,12 +430,12 @@ const ControlledSelectRender = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="text-muted-foreground text-sm">Selected value: {value || "None"}</div>
+      <div className="text-sm text-muted-foreground">Selected value: {value || "None"}</div>
       <div className="flex gap-2">
-        <Button size="sm" onClick={() => setValue("option2")}>
+        <Button onClick={() => setValue("option2")} size="sm">
           Set to Option 2
         </Button>
-        <Button size="sm" variant="outline" onClick={() => setValue("")}>
+        <Button onClick={() => setValue("")} size="sm" variant="outline">
           Clear
         </Button>
       </div>
@@ -570,7 +570,7 @@ export const Playground: Story = {
         <SelectItem value="item1">Item 1</SelectItem>
         <SelectItem value="item2">Item 2</SelectItem>
         <SelectItem value="item3">Item 3</SelectItem>
-        <SelectItem value="item4" disabled>
+        <SelectItem disabled value="item4">
           Item 4 (Disabled)
         </SelectItem>
       </SelectContent>

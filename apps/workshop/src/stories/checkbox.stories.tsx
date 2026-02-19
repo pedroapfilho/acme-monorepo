@@ -3,12 +3,6 @@ import { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "storybook/internal/preview-api";
 
 const meta: Meta<typeof Checkbox> = {
-  title: "ui/Checkbox",
-  component: Checkbox,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
   argTypes: {
     checked: {
       control: { type: "boolean" },
@@ -17,6 +11,12 @@ const meta: Meta<typeof Checkbox> = {
       control: { type: "boolean" },
     },
   },
+  component: Checkbox,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  title: "ui/Checkbox",
 };
 export default meta;
 
@@ -42,19 +42,19 @@ export const States: Story = {
         <Label htmlFor="unchecked">Unchecked</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Checkbox id="checked" checked />
+        <Checkbox checked id="checked" />
         <Label htmlFor="checked">Checked</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Checkbox id="indeterminate" checked="indeterminate" />
+        <Checkbox checked="indeterminate" id="indeterminate" />
         <Label htmlFor="indeterminate">Indeterminate</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Checkbox id="disabled" disabled />
+        <Checkbox disabled id="disabled" />
         <Label htmlFor="disabled">Disabled</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Checkbox id="disabled-checked" disabled checked />
+        <Checkbox checked disabled id="disabled-checked" />
         <Label htmlFor="disabled-checked">Disabled & Checked</Label>
       </div>
     </div>
@@ -67,7 +67,7 @@ export const WithLabel: Story = {
       <Checkbox id="terms1" />
       <div className="grid gap-1.5 leading-none">
         <Label htmlFor="terms1">Accept terms and conditions</Label>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           You agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
@@ -82,10 +82,12 @@ const InteractiveCheckboxRender = () => {
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <Checkbox
-          id="interactive"
           checked={checked}
+          id="interactive"
           onCheckedChange={(checked) => {
-            if (checked === "indeterminate") return;
+            if (checked === "indeterminate") {
+              return;
+            }
             setChecked(checked);
           }}
         />
@@ -93,7 +95,7 @@ const InteractiveCheckboxRender = () => {
           Interactive checkbox (currently {checked ? "checked" : "unchecked"})
         </Label>
       </div>
-      <Button variant="outline" size="sm" onClick={() => setChecked(!checked)}>
+      <Button onClick={() => setChecked(!checked)} size="sm" variant="outline">
         Toggle
       </Button>
     </div>
@@ -106,10 +108,10 @@ export const Interactive: Story = {
 
 const CheckboxGroupRender = () => {
   const [items, setItems] = useState([
-    { id: "item1", label: "Item 1", checked: false },
-    { id: "item2", label: "Item 2", checked: true },
-    { id: "item3", label: "Item 3", checked: false },
-    { id: "item4", label: "Item 4", checked: true },
+    { checked: false, id: "item1", label: "Item 1" },
+    { checked: true, id: "item2", label: "Item 2" },
+    { checked: false, id: "item3", label: "Item 3" },
+    { checked: true, id: "item4", label: "Item 4" },
   ]);
 
   const handleItemChange = (id: string, checked: boolean) => {
@@ -127,20 +129,20 @@ const CheckboxGroupRender = () => {
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <Checkbox
-          id="select-all"
           checked={allChecked ? true : someChecked ? "indeterminate" : false}
+          id="select-all"
           onCheckedChange={handleSelectAll}
         />
-        <Label htmlFor="select-all" className="font-medium">
+        <Label className="font-medium" htmlFor="select-all">
           Select All
         </Label>
       </div>
       <div className="space-y-3 border-t pt-4">
         {items.map((item) => (
-          <div key={item.id} className="ml-4 flex items-center space-x-2">
+          <div className="ml-4 flex items-center space-x-2" key={item.id}>
             <Checkbox
-              id={item.id}
               checked={item.checked}
+              id={item.id}
               onCheckedChange={(checked) => handleItemChange(item.id, checked as boolean)}
             />
             <Label htmlFor={item.id}>{item.label}</Label>
@@ -160,7 +162,7 @@ export const FormExample: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Account Preferences</h3>
-        <p className="text-muted-foreground text-sm">Choose your notification preferences</p>
+        <p className="text-sm text-muted-foreground">Choose your notification preferences</p>
       </div>
 
       <div className="space-y-4">
@@ -168,7 +170,7 @@ export const FormExample: Story = {
           <Checkbox id="email-notifications" />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="email-notifications">Email notifications</Label>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Receive email about your account activity
             </p>
           </div>
@@ -178,27 +180,27 @@ export const FormExample: Story = {
           <Checkbox id="marketing-emails" />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="marketing-emails">Marketing emails</Label>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Receive emails about new products and features
             </p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox id="security-emails" checked />
+          <Checkbox checked id="security-emails" />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="security-emails">Security emails</Label>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Receive emails about your account security
             </p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox id="sms-notifications" disabled />
+          <Checkbox disabled id="sms-notifications" />
           <div className="grid gap-1.5 leading-none">
             <Label htmlFor="sms-notifications">SMS notifications</Label>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Receive SMS about urgent account activity (coming soon)
             </p>
           </div>
@@ -212,11 +214,11 @@ export const FormExample: Story = {
 
 const TaskListRender = () => {
   const [tasks, setTasks] = useState([
-    { id: 1, text: "Review project proposal", completed: true },
-    { id: 2, text: "Update team on progress", completed: true },
-    { id: 3, text: "Prepare presentation slides", completed: false },
-    { id: 4, text: "Schedule client meeting", completed: false },
-    { id: 5, text: "Submit final report", completed: false },
+    { completed: true, id: 1, text: "Review project proposal" },
+    { completed: true, id: 2, text: "Update team on progress" },
+    { completed: false, id: 3, text: "Prepare presentation slides" },
+    { completed: false, id: 4, text: "Schedule client meeting" },
+    { completed: false, id: 5, text: "Submit final report" },
   ]);
 
   const toggleTask = (id: number) => {
@@ -231,22 +233,22 @@ const TaskListRender = () => {
     <div className="max-w-md space-y-4">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Today&apos;s Tasks</h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           {completedCount} of {tasks.length} completed
         </p>
       </div>
 
       <div className="space-y-3">
         {tasks.map((task) => (
-          <div key={task.id} className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2" key={task.id}>
             <Checkbox
-              id={`task-${task.id}`}
               checked={task.completed}
+              id={`task-${task.id}`}
               onCheckedChange={() => toggleTask(task.id)}
             />
             <Label
-              htmlFor={`task-${task.id}`}
               className={`flex-1 ${task.completed ? "text-muted-foreground line-through" : ""}`}
+              htmlFor={`task-${task.id}`}
             >
               {task.text}
             </Label>
@@ -265,8 +267,8 @@ export const Sizes: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Checkbox id="small" className="h-3 w-3" />
-        <Label htmlFor="small" className="text-sm">
+        <Checkbox className="h-3 w-3" id="small" />
+        <Label className="text-sm" htmlFor="small">
           Small checkbox
         </Label>
       </div>
@@ -275,8 +277,8 @@ export const Sizes: Story = {
         <Label htmlFor="default-size">Default checkbox</Label>
       </div>
       <div className="flex items-center space-x-2">
-        <Checkbox id="large" className="h-5 w-5" />
-        <Label htmlFor="large" className="text-lg">
+        <Checkbox className="h-5 w-5" id="large" />
+        <Label className="text-lg" htmlFor="large">
           Large checkbox
         </Label>
       </div>
@@ -288,20 +290,20 @@ export const CustomStyling: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Checkbox id="custom1" className="border-green-500 data-[state=checked]:bg-green-500" />
+        <Checkbox className="border-green-500 data-[state=checked]:bg-green-500" id="custom1" />
         <Label htmlFor="custom1">Green checkbox</Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox
-          id="custom2"
           className="rounded-full border-purple-500 data-[state=checked]:bg-purple-500"
+          id="custom2"
         />
         <Label htmlFor="custom2">Purple rounded checkbox</Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox
-          id="custom3"
           className="h-5 w-5 border-orange-500 data-[state=checked]:bg-orange-500"
+          id="custom3"
         />
         <Label htmlFor="custom3">Orange large checkbox</Label>
       </div>
@@ -311,9 +313,9 @@ export const CustomStyling: Story = {
 
 export const Playground: Story = {
   args: {
-    id: "playground",
     checked: false,
     disabled: false,
+    id: "playground",
   },
   render: (args) => (
     <div className="flex items-center space-x-2">

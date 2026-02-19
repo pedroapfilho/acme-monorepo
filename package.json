@@ -1,6 +1,7 @@
 {
   "name": "acme",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "turbo run start",
     "dev": "turbo run dev",
@@ -20,6 +21,7 @@
     "@playwright/test": "^1.58.0",
     "oxfmt": "^0.32.0",
     "oxlint": "^1.47.0",
+    "oxlint-config-awesomeness": "^1.0.0",
     "turbo": "^2.8.7"
   },
   "packageManager": "pnpm@10.7.0"

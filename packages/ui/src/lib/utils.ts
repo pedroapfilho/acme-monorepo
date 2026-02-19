@@ -16,7 +16,7 @@ const twMerge = createTailwindMerge(() => {
   };
 });
 
-const cn = (...inputs: ClassValue[]) => {
+const cn = (...inputs: Array<ClassValue>) => {
   return twMerge(clsx(inputs));
 };
 

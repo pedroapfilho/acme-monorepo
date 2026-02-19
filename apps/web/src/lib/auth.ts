@@ -11,7 +11,7 @@ if (!secret) {
 }
 
 export const auth = createAuth({
+  extraPlugins: [nextCookies()],
   prisma,
   secret,
-  extraPlugins: [nextCookies()],
 });

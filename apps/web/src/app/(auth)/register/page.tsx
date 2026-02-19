@@ -25,7 +25,7 @@ const Page = async () => {
           </Suspense>
           <p className="text-sm">
             Already a member?{" "}
-            <Link href="/login" className="font-semibold hover:text-neutral-600">
+            <Link className="font-semibold hover:text-neutral-600" href="/login">
               Log in into your account
             </Link>
           </p>

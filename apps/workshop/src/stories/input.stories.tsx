@@ -4,13 +4,13 @@ import { Search, Eye, EyeOff, Mail, Lock, User, Phone, CreditCard, Calendar } fr
 import { useState } from "react";
 
 const meta: Meta<typeof Input> = {
-  title: "ui/Input",
-  component: Input,
-  parameters: {
-    layout: "centered",
-  },
-  tags: ["autodocs"],
   argTypes: {
+    disabled: {
+      control: { type: "boolean" },
+    },
+    readOnly: {
+      control: { type: "boolean" },
+    },
     type: {
       control: { type: "select" },
       options: [
@@ -26,13 +26,13 @@ const meta: Meta<typeof Input> = {
         "datetime-local",
       ],
     },
-    disabled: {
-      control: { type: "boolean" },
-    },
-    readOnly: {
-      control: { type: "boolean" },
-    },
   },
+  component: Input,
+  parameters: {
+    layout: "centered",
+  },
+  tags: ["autodocs"],
+  title: "ui/Input",
 };
 export default meta;
 
@@ -49,27 +49,27 @@ export const Types: Story = {
     <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Text Input</Label>
-        <Input type="text" placeholder="Enter text" />
+        <Input placeholder="Enter text" type="text" />
       </div>
       <div className="space-y-2">
         <Label>Email Input</Label>
-        <Input type="email" placeholder="Enter email" />
+        <Input placeholder="Enter email" type="email" />
       </div>
       <div className="space-y-2">
         <Label>Password Input</Label>
-        <Input type="password" placeholder="Enter password" />
+        <Input placeholder="Enter password" type="password" />
       </div>
       <div className="space-y-2">
         <Label>Number Input</Label>
-        <Input type="number" placeholder="Enter number" />
+        <Input placeholder="Enter number" type="number" />
       </div>
       <div className="space-y-2">
         <Label>Phone Input</Label>
-        <Input type="tel" placeholder="Enter phone number" />
+        <Input placeholder="Enter phone number" type="tel" />
       </div>
       <div className="space-y-2">
         <Label>URL Input</Label>
-        <Input type="url" placeholder="https://example.com" />
+        <Input placeholder="https://example.com" type="url" />
       </div>
     </div>
   ),
@@ -84,19 +84,19 @@ export const States: Story = {
       </div>
       <div className="space-y-2">
         <Label>Disabled</Label>
-        <Input placeholder="Disabled input" disabled />
+        <Input disabled placeholder="Disabled input" />
       </div>
       <div className="space-y-2">
         <Label>Read-only</Label>
-        <Input value="Read-only value" readOnly />
+        <Input readOnly value="Read-only value" />
       </div>
       <div className="space-y-2">
         <Label>With Error</Label>
         <Input
-          placeholder="Invalid input"
           className="border-destructive focus-visible:ring-destructive"
+          placeholder="Invalid input"
         />
-        <p className="text-destructive text-sm">This field is required</p>
+        <p className="text-sm text-destructive">This field is required</p>
       </div>
     </div>
   ),
@@ -111,7 +111,7 @@ export const WithIcons: Story = {
       </div>
       <div className="space-y-2">
         <Label>Email</Label>
-        <Input type="email" placeholder="Email address" startIcon={<Mail />} />
+        <Input placeholder="Email address" startIcon={<Mail />} type="email" />
       </div>
       <div className="space-y-2">
         <Label>Username</Label>
@@ -119,7 +119,7 @@ export const WithIcons: Story = {
       </div>
       <div className="space-y-2">
         <Label>Phone</Label>
-        <Input type="tel" placeholder="Phone number" startIcon={<Phone />} />
+        <Input placeholder="Phone number" startIcon={<Phone />} type="tel" />
       </div>
     </div>
   ),
@@ -133,18 +133,18 @@ const PasswordInputRender = () => {
       <div className="space-y-2">
         <Label>Password with Toggle</Label>
         <Input
-          type={showPassword ? "text" : "password"}
-          placeholder="Enter password"
-          startIcon={<Lock />}
           endIcon={
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
               className="text-muted-foreground hover:text-foreground"
+              onClick={() => setShowPassword(!showPassword)}
+              type="button"
             >
               {showPassword ? <EyeOff /> : <Eye />}
             </button>
           }
+          placeholder="Enter password"
+          startIcon={<Lock />}
+          type={showPassword ? "text" : "password"}
         />
       </div>
     </div>
@@ -160,7 +160,7 @@ export const Sizes: Story = {
     <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Small</Label>
-        <Input placeholder="Small input" className="h-8 text-sm" />
+        <Input className="h-8 text-sm" placeholder="Small input" />
       </div>
       <div className="space-y-2">
         <Label>Default</Label>
@@ -168,7 +168,7 @@ export const Sizes: Story = {
       </div>
       <div className="space-y-2">
         <Label>Large</Label>
-        <Input placeholder="Large input" className="h-12 text-base" />
+        <Input className="h-12 text-base" placeholder="Large input" />
       </div>
     </div>
   ),
@@ -179,22 +179,22 @@ export const WithLabelsAndHelp: Story = {
     <div className="w-80 space-y-6">
       <div className="space-y-2">
         <Label htmlFor="email">Email Address</Label>
-        <Input id="email" type="email" placeholder="john@example.com" />
-        <p className="text-muted-foreground text-sm">
+        <Input id="email" placeholder="john@example.com" type="email" />
+        <p className="text-sm text-muted-foreground">
           We&apos;ll never share your email with anyone else.
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="username">Username</Label>
         <Input id="username" placeholder="Choose a username" />
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           This will be your unique identifier on the platform.
         </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="website">Website</Label>
-        <Input id="website" type="url" placeholder="https://yoursite.com" />
-        <p className="text-muted-foreground text-sm">
+        <Input id="website" placeholder="https://yoursite.com" type="url" />
+        <p className="text-sm text-muted-foreground">
           Optional: Link to your personal or professional website.
         </p>
       </div>
@@ -208,8 +208,8 @@ export const InputGroups: Story = {
       <div className="space-y-2">
         <Label>Email Subscription</Label>
         <div className="flex">
-          <Input type="email" placeholder="Enter email" className="rounded-r-none" />
-          <Button type="submit" className="rounded-l-none">
+          <Input className="rounded-r-none" placeholder="Enter email" type="email" />
+          <Button className="rounded-l-none" type="submit">
             Subscribe
           </Button>
         </div>
@@ -218,8 +218,8 @@ export const InputGroups: Story = {
       <div className="space-y-2">
         <Label>Search</Label>
         <div className="flex">
-          <Input placeholder="Search products..." className="rounded-r-none" />
-          <Button type="submit" variant="outline" className="rounded-l-none">
+          <Input className="rounded-r-none" placeholder="Search products..." />
+          <Button className="rounded-l-none" type="submit" variant="outline">
             <Search className="h-4 w-4" />
           </Button>
         </div>
@@ -228,20 +228,20 @@ export const InputGroups: Story = {
       <div className="space-y-2">
         <Label>Amount</Label>
         <div className="flex">
-          <div className="text-muted-foreground bg-muted border-input inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
+          <div className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
             $
           </div>
-          <Input type="number" placeholder="0.00" className="rounded-l-none" step="0.01" />
+          <Input className="rounded-l-none" placeholder="0.00" step="0.01" type="number" />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label>Website URL</Label>
         <div className="flex">
-          <div className="text-muted-foreground bg-muted border-input inline-flex items-center rounded-l-md border border-r-0 px-3 text-sm">
+          <div className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
             https://
           </div>
-          <Input placeholder="example.com" className="rounded-l-none" />
+          <Input className="rounded-l-none" placeholder="example.com" />
         </div>
       </div>
     </div>
@@ -253,7 +253,7 @@ export const FormExample: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Contact Information</h3>
-        <p className="text-muted-foreground text-sm">Please provide your contact details.</p>
+        <p className="text-sm text-muted-foreground">Please provide your contact details.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -269,12 +269,12 @@ export const FormExample: Story = {
 
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" placeholder="john@example.com" startIcon={<Mail />} />
+        <Input id="email" placeholder="john@example.com" startIcon={<Mail />} type="email" />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="phone">Phone Number</Label>
-        <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" startIcon={<Phone />} />
+        <Input id="phone" placeholder="+1 (555) 123-4567" startIcon={<Phone />} type="tel" />
       </div>
 
       <div className="space-y-2">
@@ -293,8 +293,8 @@ export const ValidationStates: Story = {
       <div className="space-y-2">
         <Label>Valid Input</Label>
         <Input
-          placeholder="Valid input"
           className="border-green-500 focus-visible:ring-green-500"
+          placeholder="Valid input"
         />
         <p className="text-sm text-green-600">✓ This field is valid</p>
       </div>
@@ -302,17 +302,17 @@ export const ValidationStates: Story = {
       <div className="space-y-2">
         <Label>Invalid Input</Label>
         <Input
-          placeholder="Invalid input"
           className="border-destructive focus-visible:ring-destructive"
+          placeholder="Invalid input"
         />
-        <p className="text-destructive text-sm">✗ This field is required</p>
+        <p className="text-sm text-destructive">✗ This field is required</p>
       </div>
 
       <div className="space-y-2">
         <Label>Warning Input</Label>
         <Input
-          placeholder="Warning input"
           className="border-yellow-500 focus-visible:ring-yellow-500"
+          placeholder="Warning input"
         />
         <p className="text-sm text-yellow-600">⚠ Please double-check this field</p>
       </div>
@@ -325,12 +325,12 @@ export const SpecialInputs: Story = {
     <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Credit Card</Label>
-        <Input placeholder="1234 5678 9012 3456" startIcon={<CreditCard />} maxLength={19} />
+        <Input maxLength={19} placeholder="1234 5678 9012 3456" startIcon={<CreditCard />} />
       </div>
 
       <div className="space-y-2">
         <Label>Date</Label>
-        <Input type="date" startIcon={<Calendar />} />
+        <Input startIcon={<Calendar />} type="date" />
       </div>
 
       <div className="space-y-2">
@@ -341,8 +341,8 @@ export const SpecialInputs: Story = {
       <div className="space-y-2">
         <Label>File Upload</Label>
         <Input
+          className="file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
           type="file"
-          className="file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 file:mr-4 file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-medium"
         />
       </div>
     </div>
@@ -359,37 +359,37 @@ export const IconExamples: Story = {
       <div className="space-y-2">
         <Label>End Icon Only</Label>
         <Input
-          placeholder="Copy to clipboard"
           endIcon={
             <button className="text-muted-foreground hover:text-foreground">
               <Search />
             </button>
           }
+          placeholder="Copy to clipboard"
         />
       </div>
       <div className="space-y-2">
         <Label>Both Icons</Label>
         <Input
-          placeholder="Search and clear"
-          startIcon={<Search />}
           endIcon={
             <button className="text-muted-foreground hover:text-foreground">
               <Eye />
             </button>
           }
+          placeholder="Search and clear"
+          startIcon={<Search />}
         />
       </div>
       <div className="space-y-2">
         <Label>Interactive End Icon</Label>
         <Input
-          type="password"
-          placeholder="Password with visibility toggle"
-          startIcon={<Lock />}
           endIcon={
             <button className="text-muted-foreground hover:text-foreground">
               <EyeOff />
             </button>
           }
+          placeholder="Password with visibility toggle"
+          startIcon={<Lock />}
+          type="password"
         />
       </div>
     </div>
@@ -401,7 +401,7 @@ export const FormWithIcons: Story = {
     <div className="max-w-md space-y-6">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Enhanced Form</h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           All inputs with relevant icons for better UX.
         </p>
       </div>
@@ -419,31 +419,31 @@ export const FormWithIcons: Story = {
 
       <div className="space-y-2">
         <Label>Email</Label>
-        <Input type="email" placeholder="john@example.com" startIcon={<Mail />} />
+        <Input placeholder="john@example.com" startIcon={<Mail />} type="email" />
       </div>
 
       <div className="space-y-2">
         <Label>Phone</Label>
-        <Input type="tel" placeholder="+1 (555) 123-4567" startIcon={<Phone />} />
+        <Input placeholder="+1 (555) 123-4567" startIcon={<Phone />} type="tel" />
       </div>
 
       <div className="space-y-2">
         <Label>Password</Label>
         <Input
-          type="password"
-          placeholder="Enter password"
-          startIcon={<Lock />}
           endIcon={
             <button className="text-muted-foreground hover:text-foreground">
               <Eye />
             </button>
           }
+          placeholder="Enter password"
+          startIcon={<Lock />}
+          type="password"
         />
       </div>
 
       <div className="space-y-2">
         <Label>Credit Card</Label>
-        <Input placeholder="1234 5678 9012 3456" startIcon={<CreditCard />} maxLength={19} />
+        <Input maxLength={19} placeholder="1234 5678 9012 3456" startIcon={<CreditCard />} />
       </div>
 
       <Button className="w-full">Submit</Button>
@@ -453,8 +453,8 @@ export const FormWithIcons: Story = {
 
 export const Playground: Story = {
   args: {
+    disabled: false,
     placeholder: "Playground input",
     type: "text",
-    disabled: false,
   },
 };

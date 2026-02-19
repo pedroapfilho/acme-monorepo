@@ -7,10 +7,10 @@ import { userService } from "@/services/user.service";
 
 type AuthVariables = {
   user: {
-    id: string;
-    email: string;
-    username?: string;
     displayName?: string;
+    email: string;
+    id: string;
+    username?: string;
   };
 };
 
@@ -54,19 +54,19 @@ v1UserRoutes.delete("/me", authMiddleware, async (c) => {
 
 // List users (admin only - for future use)
 const listUsersSchema = z.object({
-  page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
-  orderBy: z.enum(["createdAt", "updatedAt", "email"]).default("createdAt"),
   order: z.enum(["asc", "desc"]).default("desc"),
+  orderBy: z.enum(["createdAt", "updatedAt", "email"]).default("createdAt"),
+  page: z.coerce.number().min(1).default(1),
 });
 
 v1UserRoutes.get("/", authMiddleware, zValidator("query", listUsersSchema), async (c) => {
-  const { page, limit, orderBy, order } = c.req.valid("query");
+  const { limit, order, orderBy, page } = c.req.valid("query");
 
   const result = await userService.list({
+    orderBy: { [orderBy]: order },
     skip: (page - 1) * limit,
     take: limit,
-    orderBy: { [orderBy]: order },
   });
 
   return c.json({

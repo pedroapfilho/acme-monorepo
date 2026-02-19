@@ -6,10 +6,10 @@ import { env } from "./env";
 const logLevel = env.NODE_ENV === "production" ? "info" : "debug";
 
 export const logger = pino({
-  level: logLevel,
   base: {
     env: env.NODE_ENV,
   },
+  level: logLevel,
   redact: {
     paths: ["req.headers.authorization", "req.headers.cookie", "res.headers"],
     remove: true,
@@ -17,9 +17,11 @@ export const logger = pino({
 });
 
 export const httpLogger = pinoHttp({
-  logger,
   autoLogging: {
     ignore: (req) => req.url === "/healthz",
+  },
+  customErrorMessage: (req, res, err) => {
+    return `${req.method} ${req.url} - ${err.message}`;
   },
   customLogLevel: (req, res, err) => {
     if (res.statusCode >= 400 && res.statusCode < 500) {
@@ -37,17 +39,15 @@ export const httpLogger = pinoHttp({
     }
     return `${req.method} ${req.url}`;
   },
-  customErrorMessage: (req, res, err) => {
-    return `${req.method} ${req.url} - ${err.message}`;
-  },
+  logger,
   serializers: {
     req: (req) => ({
       method: req.method,
-      url: req.url,
-      query: req.query,
       params: req.params,
+      query: req.query,
       remoteAddress: req.remoteAddress,
       remotePort: req.remotePort,
+      url: req.url,
     }),
     res: (res) => ({
       statusCode: res.statusCode,

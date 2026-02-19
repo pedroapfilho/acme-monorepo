@@ -8,17 +8,17 @@ export class UserService {
   async findById(id: string) {
     try {
       const user = await prisma.user.findUnique({
-        where: { id },
         select: {
-          id: true,
-          email: true,
-          name: true,
-          username: true,
-          displayName: true,
-          emailVerified: true,
           createdAt: true,
+          displayName: true,
+          email: true,
+          emailVerified: true,
+          id: true,
+          name: true,
           updatedAt: true,
+          username: true,
         },
+        where: { id },
       });
 
       if (!user) {
@@ -27,7 +27,9 @@ export class UserService {
 
       return user;
     } catch (error) {
-      if (error instanceof AppError) throw error;
+      if (error instanceof AppError) {
+        throw error;
+      }
 
       logger.error({ error, userId: id }, "Failed to find user by ID");
       throw new AppError("Failed to fetch user", 500, false, "USER_FETCH_ERROR");
@@ -37,21 +39,21 @@ export class UserService {
   async findByEmail(email: string) {
     try {
       const user = await prisma.user.findUnique({
-        where: { email },
         select: {
-          id: true,
+          createdAt: true,
+          displayName: true,
           email: true,
+          emailVerified: true,
+          id: true,
           name: true,
           username: true,
-          displayName: true,
-          emailVerified: true,
-          createdAt: true,
         },
+        where: { email },
       });
 
       return user;
     } catch (error) {
-      logger.error({ error, email }, "Failed to find user by email");
+      logger.error({ email, error }, "Failed to find user by email");
       throw new AppError("Failed to fetch user", 500, false, "USER_FETCH_ERROR");
     }
   }
@@ -62,8 +64,8 @@ export class UserService {
       if (data.username) {
         const existing = await prisma.user.findFirst({
           where: {
-            username: data.username as string,
             NOT: { id },
+            username: data.username as string,
           },
         });
 
@@ -73,25 +75,27 @@ export class UserService {
       }
 
       const updatedUser = await prisma.user.update({
-        where: { id },
         data,
         select: {
-          id: true,
-          email: true,
-          name: true,
-          username: true,
-          displayName: true,
-          emailVerified: true,
           createdAt: true,
+          displayName: true,
+          email: true,
+          emailVerified: true,
+          id: true,
+          name: true,
           updatedAt: true,
+          username: true,
         },
+        where: { id },
       });
 
-      logger.info({ userId: id, fields: Object.keys(data) }, "User updated successfully");
+      logger.info({ fields: Object.keys(data), userId: id }, "User updated successfully");
 
       return updatedUser;
     } catch (error) {
-      if (error instanceof AppError) throw error;
+      if (error instanceof AppError) {
+        throw error;
+      }
 
       if (error instanceof Error && error.message.includes("P2025")) {
         throw new AppError("User not found", 404, true, "USER_NOT_FOUND");
@@ -122,9 +126,9 @@ export class UserService {
   }
 
   async list(options: {
+    orderBy?: Prisma.UserOrderByWithRelationInput;
     skip?: number;
     take?: number;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
     where?: Prisma.UserWhereInput;
   }) {
     try {
@@ -132,13 +136,13 @@ export class UserService {
         prisma.user.findMany({
           ...options,
           select: {
-            id: true,
+            createdAt: true,
+            displayName: true,
             email: true,
+            emailVerified: true,
+            id: true,
             name: true,
             username: true,
-            displayName: true,
-            emailVerified: true,
-            createdAt: true,
           },
         }),
         prisma.user.count({ where: options.where }),
@@ -147,9 +151,9 @@ export class UserService {
       return {
         data: users,
         meta: {
-          total,
           skip: options.skip || 0,
           take: options.take || users.length,
+          total,
         },
       };
     } catch (error) {
