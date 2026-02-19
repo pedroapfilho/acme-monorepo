@@ -1,6 +1,7 @@
-import { auth } from "./auth";
 import { headers } from "next/headers";
 import { cache } from "react";
+
+import { auth } from "./auth";
 
 // Server-side function to get the current session
 export const getSession = cache(async () => {
@@ -12,20 +13,7 @@ export const getSession = cache(async () => {
     });
 
     return session;
-  } catch (error) {
-    console.error("Failed to get session:", error);
+  } catch {
     return null;
   }
-});
-
-// Server-side function to get the current user
-export const getCurrentUser = cache(async () => {
-  const session = await getSession();
-  return session?.user || null;
-});
-
-// Check if user is authenticated
-export const isAuthenticated = cache(async () => {
-  const session = await getSession();
-  return !!session;
 });

@@ -3,17 +3,17 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState, useEffect } from "react";
 
 const meta: Meta<typeof Progress> = {
-  title: "ui/Progress",
+  argTypes: {
+    value: {
+      control: { max: 100, min: 0, step: 1, type: "range" },
+    },
+  },
   component: Progress,
   parameters: {
     layout: "centered",
   },
   tags: ["autodocs"],
-  argTypes: {
-    value: {
-      control: { type: "range", min: 0, max: 100, step: 1 },
-    },
-  },
+  title: "ui/Progress",
 };
 
 export default meta;
@@ -65,54 +65,58 @@ export const ProgressStates: Story = {
   ),
 };
 
-export const AnimatedProgress: Story = {
-  render: () => {
-    const [progress, setProgress] = useState(0);
+const AnimatedProgressRender = () => {
+  const [progress, setProgress] = useState(0);
 
-    useEffect(() => {
-      const timer = setTimeout(() => setProgress(66), 500);
-      return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
-    return (
-      <div className="w-80 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span>Loading...</span>
-          <span>{progress}%</span>
-        </div>
-        <Progress value={progress} />
+  return (
+    <div className="w-80 space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Loading...</span>
+        <span>{progress}%</span>
       </div>
-    );
-  },
+      <Progress value={progress} />
+    </div>
+  );
+};
+
+export const AnimatedProgress: Story = {
+  render: () => <AnimatedProgressRender />,
+};
+
+const LoadingSimulationRender = () => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          return 0; // Reset to create a loop
+        }
+        return prev + 10;
+      });
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="w-80 space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Downloading...</span>
+        <span>{progress}%</span>
+      </div>
+      <Progress value={progress} />
+    </div>
+  );
 };
 
 export const LoadingSimulation: Story = {
-  render: () => {
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            return 0; // Reset to create a loop
-          }
-          return prev + 10;
-        });
-      }, 300);
-
-      return () => clearInterval(interval);
-    }, []);
-
-    return (
-      <div className="w-80 space-y-2">
-        <div className="flex justify-between text-sm">
-          <span>Downloading...</span>
-          <span>{progress}%</span>
-        </div>
-        <Progress value={progress} />
-      </div>
-    );
-  },
+  render: () => <LoadingSimulationRender />,
 };
 
 export const DifferentSizes: Story = {
@@ -120,7 +124,7 @@ export const DifferentSizes: Story = {
     <div className="w-80 space-y-6">
       <div className="space-y-2">
         <span className="text-sm">Small (h-1)</span>
-        <Progress value={65} className="h-1" />
+        <Progress className="h-1" value={65} />
       </div>
 
       <div className="space-y-2">
@@ -130,12 +134,12 @@ export const DifferentSizes: Story = {
 
       <div className="space-y-2">
         <span className="text-sm">Medium (h-3)</span>
-        <Progress value={65} className="h-3" />
+        <Progress className="h-3" value={65} />
       </div>
 
       <div className="space-y-2">
         <span className="text-sm">Large (h-4)</span>
-        <Progress value={65} className="h-4" />
+        <Progress className="h-4" value={65} />
       </div>
     </div>
   ),
@@ -146,24 +150,24 @@ export const WithLabels: Story = {
     <div className="w-80 space-y-6">
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Upload Progress</label>
-          <span className="text-muted-foreground text-sm">45%</span>
+          <label className="text-sm font-medium" htmlFor="upload-progress">
+            Upload Progress
+          </label>
+          <span className="text-sm text-muted-foreground">45%</span>
         </div>
-        <Progress value={45} />
-        <p className="text-muted-foreground text-xs">
-          Uploading file... 2.3 MB of 5.1 MB
-        </p>
+        <Progress id="upload-progress" value={45} />
+        <p className="text-xs text-muted-foreground">Uploading file... 2.3 MB of 5.1 MB</p>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Installation</label>
-          <span className="text-muted-foreground text-sm">78%</span>
+          <label className="text-sm font-medium" htmlFor="installation-progress">
+            Installation
+          </label>
+          <span className="text-sm text-muted-foreground">78%</span>
         </div>
-        <Progress value={78} />
-        <p className="text-muted-foreground text-xs">
-          Installing dependencies...
-        </p>
+        <Progress id="installation-progress" value={78} />
+        <p className="text-xs text-muted-foreground">Installing dependencies...</p>
       </div>
     </div>
   ),
@@ -171,13 +175,11 @@ export const WithLabels: Story = {
 
 export const InCard: Story = {
   render: () => (
-    <div className="border-border bg-card w-80 rounded-lg border p-6">
+    <div className="w-80 rounded-lg border border-border bg-card p-6">
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold">Project Setup</h3>
-          <p className="text-muted-foreground text-sm">
-            Setting up your new project
-          </p>
+          <p className="text-sm text-muted-foreground">Setting up your new project</p>
         </div>
 
         <div className="space-y-4">

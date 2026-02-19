@@ -1,15 +1,16 @@
-import { authMiddleware } from "@/middleware/auth";
-import { userService } from "@/services/user.service";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
+import { authMiddleware } from "@/middleware/auth";
+import { userService } from "@/services/user.service";
+
 type AuthVariables = {
   user: {
-    id: string;
-    email: string;
-    username?: string;
     displayName?: string;
+    email: string;
+    id: string;
+    username?: string;
   };
 };
 
@@ -36,18 +37,13 @@ const updateUserSchema = z.object({
     .optional(),
 });
 
-v1UserRoutes.patch(
-  "/me",
-  authMiddleware,
-  zValidator("json", updateUserSchema),
-  async (c) => {
-    const user = c.get("user");
-    const data = c.req.valid("json");
+v1UserRoutes.patch("/me", authMiddleware, zValidator("json", updateUserSchema), async (c) => {
+  const user = c.get("user");
+  const data = c.req.valid("json");
 
-    const updatedUser = await userService.update(user.id, data);
-    return c.json({ data: updatedUser });
-  },
-);
+  const updatedUser = await userService.update(user.id, data);
+  return c.json({ data: updatedUser });
+});
 
 // Delete user account
 v1UserRoutes.delete("/me", authMiddleware, async (c) => {
@@ -58,34 +54,29 @@ v1UserRoutes.delete("/me", authMiddleware, async (c) => {
 
 // List users (admin only - for future use)
 const listUsersSchema = z.object({
-  page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
-  orderBy: z.enum(["createdAt", "updatedAt", "email"]).default("createdAt"),
   order: z.enum(["asc", "desc"]).default("desc"),
+  orderBy: z.enum(["createdAt", "updatedAt", "email"]).default("createdAt"),
+  page: z.coerce.number().min(1).default(1),
 });
 
-v1UserRoutes.get(
-  "/",
-  authMiddleware,
-  zValidator("query", listUsersSchema),
-  async (c) => {
-    const { page, limit, orderBy, order } = c.req.valid("query");
+v1UserRoutes.get("/", authMiddleware, zValidator("query", listUsersSchema), async (c) => {
+  const { limit, order, orderBy, page } = c.req.valid("query");
 
-    const result = await userService.list({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { [orderBy]: order },
-    });
+  const result = await userService.list({
+    orderBy: { [orderBy]: order },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
 
-    return c.json({
-      data: result.data,
-      meta: {
-        ...result.meta,
-        page,
-        totalPages: Math.ceil(result.meta.total / limit),
-      },
-    });
-  },
-);
+  return c.json({
+    data: result.data,
+    meta: {
+      ...result.meta,
+      page,
+      totalPages: Math.ceil(result.meta.total / limit),
+    },
+  });
+});
 
 export { v1UserRoutes };

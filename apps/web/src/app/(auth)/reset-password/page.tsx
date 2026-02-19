@@ -1,6 +1,7 @@
-import ResetPasswordForm from "@/app/(auth)/reset-password/form";
 import { Metadata } from "next";
 import { Suspense } from "react";
+
+import ResetPasswordForm from "@/app/(auth)/reset-password/form";
 
 const metadata: Metadata = {
   title: "Reset your password - Acme",
@@ -14,9 +15,7 @@ const Page = () => {
           <div>
             <h2 className="text-lg font-semibold">Reset your password</h2>
 
-            <p className="text-sm text-neutral-500">
-              Please enter your new credentials
-            </p>
+            <p className="text-sm text-neutral-500">Please enter your new credentials</p>
           </div>
         </div>
 

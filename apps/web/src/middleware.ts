@@ -1,23 +1,16 @@
-import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { auth } from "@/lib/auth";
+
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
-const authRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/recover",
-  "/reset-password",
-];
+const authRoutes = ["/login", "/register", "/forgot-password", "/recover", "/reset-password"];
 
 export const middleware = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
@@ -30,8 +23,8 @@ export const middleware = async (request: NextRequest) => {
     session = await auth.api.getSession({
       headers: request.headers,
     });
-  } catch (error) {
-    console.warn("Session check failed, treating as unauthenticated:", error);
+  } catch {
+    // Session check failed — treat as unauthenticated
   }
 
   if (isProtectedRoute && !session) {
@@ -49,8 +42,6 @@ export const middleware = async (request: NextRequest) => {
 };
 
 export const config = {
+  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
   runtime: "nodejs",
-  matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)",
-  ],
 };

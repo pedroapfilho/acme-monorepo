@@ -1,6 +1,7 @@
-import { createAuth } from "../server";
 import { PrismaClient } from "@repo/db";
 import { describe, it, expect, beforeAll } from "vitest";
+
+import { createAuth } from "../server";
 
 describe("Auth Server Configuration", () => {
   let auth: ReturnType<typeof createAuth>;
@@ -40,15 +41,9 @@ describe("Auth Server Configuration", () => {
     process.env.NODE_ENV = "production";
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(
-      prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure,
-    ).toBe(true);
-    expect(
-      prodAuth.options.advanced?.cookies?.session_token?.attributes?.httpOnly,
-    ).toBe(true);
-    expect(
-      prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite,
-    ).toBe("lax");
+    expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(true);
+    expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.httpOnly).toBe(true);
+    expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite).toBe("lax");
 
     process.env.NODE_ENV = originalEnv;
   });
@@ -58,18 +53,14 @@ describe("Auth Server Configuration", () => {
     process.env.NODE_ENV = "production";
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(prodAuth.options.emailAndPassword?.requireEmailVerification).toBe(
-      true,
-    );
+    expect(prodAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
 
     process.env.NODE_ENV = originalEnv;
   });
 
   it("should have bearer token plugin enabled", () => {
     const plugins = auth.options.plugins || [];
-    const hasBearerToken = plugins.some(
-      (plugin) => plugin.id === "bearer-token",
-    );
+    const hasBearerToken = plugins.some((plugin) => plugin.id === "bearer-token");
     expect(hasBearerToken).toBe(true);
   });
 
@@ -80,9 +71,7 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should use custom session token name", () => {
-    expect(auth.options.advanced?.cookies?.session_token?.name).toBe(
-      "session_token",
-    );
+    expect(auth.options.advanced?.cookies?.session_token?.name).toBe("session_token");
   });
 
   it("should have account linking enabled", () => {

@@ -1,14 +1,15 @@
-import { auth } from "../lib/auth";
 import type { Context, Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
+import { auth } from "../lib/auth";
+
 type AuthVariables = {
   user: {
-    id: string;
-    email: string;
-    username?: string;
     displayName?: string;
+    email: string;
+    id: string;
+    username?: string;
   };
 };
 
@@ -38,10 +39,10 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
 
     // Set user in Hono context
     c.set("user", {
-      id: session.user.id,
-      email: session.user.email,
-      username: session.user.username,
       displayName: session.user.displayName,
+      email: session.user.email,
+      id: session.user.id,
+      username: session.user.username,
     });
 
     await next();
@@ -71,15 +72,14 @@ export const optionalAuthMiddleware = createMiddleware<{
     if (session && session.user) {
       // Set user in Hono context
       c.set("user", {
-        id: session.user.id,
-        email: session.user.email,
-        username: session.user.username,
         displayName: session.user.displayName,
+        email: session.user.email,
+        id: session.user.id,
+        username: session.user.username,
       });
     }
-  } catch (error) {
+  } catch {
     // Ignore errors for optional auth
-    console.error("Optional auth error:", error);
   }
 
   await next();

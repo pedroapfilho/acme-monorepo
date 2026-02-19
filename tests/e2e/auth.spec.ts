@@ -67,9 +67,7 @@ test.describe("Authentication Flow", () => {
     expect(page.url()).toContain("from=%2Fdashboard");
   });
 
-  test("should redirect to dashboard if already logged in", async ({
-    page,
-  }) => {
+  test("should redirect to dashboard if already logged in", async ({ page }) => {
     // First login
     await page.goto("/login");
     await page.fill('input[name="email"]', testEmail);
@@ -132,9 +130,7 @@ test.describe("Authentication Flow", () => {
     expect(data.user.email).toBe(testEmail);
   });
 
-  test("should reject protected API route without session", async ({
-    page,
-  }) => {
+  test("should reject protected API route without session", async ({ page }) => {
     // Clear cookies to ensure we're logged out
     await page.context().clearCookies();
 

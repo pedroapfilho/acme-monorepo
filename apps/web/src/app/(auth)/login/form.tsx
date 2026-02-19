@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -15,7 +14,9 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { z } from "zod";
+
+import { authClient } from "@/lib/auth-client";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -33,11 +34,11 @@ const LoginForm = () => {
   const from = searchParams?.get("from") || "/dashboard";
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
+    resolver: zodResolver(formSchema),
   });
 
   const handleSubmit = async (data: FormData) => {
@@ -51,8 +52,8 @@ const LoginForm = () => {
 
       if (result.error) {
         form.setError("root", {
-          type: "manual",
           message: result.error.message || "Invalid credentials",
+          type: "manual",
         });
         return;
       }
@@ -60,11 +61,10 @@ const LoginForm = () => {
       // Redirect to the intended page or dashboard
       router.push(from);
       router.refresh(); // Refresh to ensure middleware runs
-    } catch (error) {
-      console.error("Login error:", error);
+    } catch {
       form.setError("root", {
-        type: "manual",
         message: "An error occurred during login. Please try again.",
+        type: "manual",
       });
     } finally {
       setIsLoading(false);
@@ -81,12 +81,7 @@ const LoginForm = () => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="you@example.com"
-                  type="email"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <Input disabled={isLoading} placeholder="you@example.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -101,9 +96,9 @@ const LoginForm = () => {
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input
+                  disabled={isLoading}
                   placeholder="Enter your password"
                   type="password"
-                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -113,12 +108,10 @@ const LoginForm = () => {
         />
 
         {form.formState.errors.root && (
-          <div className="text-sm text-red-500">
-            {form.formState.errors.root.message}
-          </div>
+          <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
         )}
 
-        <Button className="w-full" type="submit" disabled={isLoading}>
+        <Button className="w-full" disabled={isLoading} type="submit">
           {isLoading ? "Logging in..." : "Log In"}
         </Button>
       </form>

@@ -1,10 +1,10 @@
 export default {
-  external: ["react", "react-dom"],
+  dts: true,
   entries: {
     "./index": "./src/index.ts",
   },
-  dts: true,
-  target: "es2020",
+  external: ["react", "react-dom"],
   format: "esm",
   sourcemap: false,
+  target: "es2020",
 };

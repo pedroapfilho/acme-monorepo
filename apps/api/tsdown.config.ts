@@ -1,19 +1,20 @@
+import path from "node:path";
+
 import alias from "@rollup/plugin-alias";
-import path from "path";
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
-  platform: "node",
-  target: "node22",
-  sourcemap: true,
   clean: true,
+  entry: ["src/index.ts"],
+  external: ["@repo/db", "@repo/auth"],
   format: ["esm"],
-  tsconfig: "tsconfig.json",
+  platform: "node",
   plugins: [
     alias({
       entries: [{ find: "@", replacement: path.resolve(process.cwd(), "src") }],
     }),
   ],
-  external: ["@repo/db", "@repo/auth"],
+  sourcemap: true,
+  target: "node22",
+  tsconfig: "tsconfig.json",
 });

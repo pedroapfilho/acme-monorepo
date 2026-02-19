@@ -5,45 +5,69 @@ import { bearer, username } from "better-auth/plugins";
 import type { BetterAuthPlugin } from "better-auth/types";
 
 type AuthConfig = {
-  prisma: PrismaClient;
-  secret: string;
-  resendApiKey?: string;
+  extraPlugins?: Array<BetterAuthPlugin>;
   fromEmail?: string;
-  extraPlugins?: BetterAuthPlugin[];
+  prisma: PrismaClient;
+  resendApiKey?: string;
+  secret: string;
 };
 
 export const createAuth = (config: AuthConfig) => {
   const {
-    prisma,
-    secret,
-    resendApiKey,
-    fromEmail = "noreply@acme.com",
     extraPlugins = [],
+    fromEmail = "noreply@acme.com",
+    prisma,
+    resendApiKey,
+    secret,
   } = config;
 
   return betterAuth({
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["email"],
+      },
+    },
+
+    advanced: {
+      cookiePrefix: "acme",
+      cookies: {
+        session_token: {
+          attributes: {
+            httpOnly: true,
+            sameSite: "lax" as const,
+            secure: process.env.NODE_ENV === "production",
+          },
+          name: "session_token",
+        },
+      },
+    },
+
+    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
+
     database: prismaAdapter(prisma, {
       provider: "postgresql",
     }),
 
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: process.env.NODE_ENV === "production",
-      minPasswordLength: 12,
       maxPasswordLength: 128,
+      minPasswordLength: 12,
+      requireEmailVerification: process.env.NODE_ENV === "production",
       sendResetPassword: resendApiKey
-        ? async ({ user, url }) => {
+        ? async ({ url, user }) => {
             const { Resend } = await import("resend");
             const resend = new Resend(resendApiKey);
             // Non-blocking to prevent timing attacks, but log failures
             resend.emails
               .send({
                 from: fromEmail,
-                to: user.email,
-                subject: "Reset your password",
                 html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+                subject: "Reset your password",
+                to: user.email,
               })
               .catch((error) => {
+                // eslint-disable-next-line no-console -- server-side email failure logging
                 console.error("Failed to send password reset email:", error);
               });
           }
@@ -52,83 +76,57 @@ export const createAuth = (config: AuthConfig) => {
 
     emailVerification: {
       sendVerificationEmail: resendApiKey
-        ? async ({ user, url }) => {
+        ? async ({ url, user }) => {
             const { Resend } = await import("resend");
             const resend = new Resend(resendApiKey);
             // Non-blocking to prevent timing attacks, but log failures
             resend.emails
               .send({
                 from: fromEmail,
-                to: user.email,
-                subject: "Verify your email address",
                 html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
+                subject: "Verify your email address",
+                to: user.email,
               })
               .catch((error) => {
+                // eslint-disable-next-line no-console -- server-side email failure logging
                 console.error("Failed to send verification email:", error);
               });
           }
         : undefined,
     },
 
-    plugins: [
-      username(),
-      bearer(),
-      ...extraPlugins,
-    ],
+    plugins: [username(), bearer(), ...extraPlugins],
+
+    rateLimit: {
+      enabled: true,
+      max: 10, // 10 requests per minute
+      window: 60, // 1 minute
+    },
+
+    secret,
 
     session: {
-      expiresIn: 60 * 60 * 24 * 7, // 7 days
-      updateAge: 60 * 60 * 24, // Update if older than 1 day
       cookieCache: {
         enabled: true,
         maxAge: 5 * 60, // 5 minutes
       },
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // Update if older than 1 day
     },
-
-    advanced: {
-      cookiePrefix: "acme",
-      cookies: {
-        session_token: {
-          name: "session_token",
-          attributes: {
-            sameSite: "lax" as const,
-            secure: process.env.NODE_ENV === "production",
-            httpOnly: true,
-          },
-        },
-      },
-    },
-
-    account: {
-      accountLinking: {
-        enabled: true,
-        trustedProviders: ["email"],
-      },
-    },
-
-    user: {
-      additionalFields: {
-        displayName: {
-          type: "string",
-          required: false,
-          defaultValue: null,
-        },
-      },
-    },
-
-    rateLimit: {
-      enabled: true,
-      window: 60, // 1 minute
-      max: 10, // 10 requests per minute
-    },
-
-    secret,
-    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
     trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || [
       "http://localhost:3000", // Web app
       "http://localhost:3001", // Landing
       "http://localhost:4000", // API
     ],
+    user: {
+      additionalFields: {
+        displayName: {
+          defaultValue: null,
+          required: false,
+          type: "string",
+        },
+      },
+    },
   });
 };
 

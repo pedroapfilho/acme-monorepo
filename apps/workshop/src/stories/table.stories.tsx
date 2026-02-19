@@ -14,12 +14,12 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof Table> = {
-  title: "ui/Table",
   component: Table,
   parameters: {
     layout: "padded",
   },
   tags: ["autodocs"],
+  title: "ui/Table",
 };
 
 export default meta;
@@ -28,45 +28,45 @@ type Story = StoryObj<typeof meta>;
 const invoices = [
   {
     invoice: "INV001",
+    paymentMethod: "Credit Card",
     paymentStatus: "Paid",
     totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
   },
   {
     invoice: "INV002",
+    paymentMethod: "PayPal",
     paymentStatus: "Pending",
     totalAmount: "$150.00",
-    paymentMethod: "PayPal",
   },
   {
     invoice: "INV003",
+    paymentMethod: "Bank Transfer",
     paymentStatus: "Unpaid",
     totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
   },
   {
     invoice: "INV004",
+    paymentMethod: "Credit Card",
     paymentStatus: "Paid",
     totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
   },
   {
     invoice: "INV005",
+    paymentMethod: "PayPal",
     paymentStatus: "Paid",
     totalAmount: "$550.00",
-    paymentMethod: "PayPal",
   },
   {
     invoice: "INV006",
+    paymentMethod: "Bank Transfer",
     paymentStatus: "Pending",
     totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
   },
   {
     invoice: "INV007",
+    paymentMethod: "Credit Card",
     paymentStatus: "Unpaid",
     totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
   },
 ];
 
@@ -198,10 +198,10 @@ export const WithActions: Story = {
             <TableCell>{invoice.totalAmount}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm">
+                <Button size="sm" variant="outline">
                   View
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button size="sm" variant="outline">
                   Edit
                 </Button>
               </div>
@@ -247,35 +247,35 @@ export const WithCheckboxes: Story = {
 
 const users = [
   {
+    department: "Engineering",
+    email: "john@example.com",
     id: "1",
     name: "John Doe",
-    email: "john@example.com",
     role: "Admin",
-    department: "Engineering",
     status: "Active",
   },
   {
+    department: "Marketing",
+    email: "jane@example.com",
     id: "2",
     name: "Jane Smith",
-    email: "jane@example.com",
     role: "User",
-    department: "Marketing",
     status: "Active",
   },
   {
+    department: "Sales",
+    email: "bob@example.com",
     id: "3",
     name: "Bob Johnson",
-    email: "bob@example.com",
     role: "User",
-    department: "Sales",
     status: "Inactive",
   },
   {
+    department: "Support",
+    email: "alice@example.com",
     id: "4",
     name: "Alice Brown",
-    email: "alice@example.com",
     role: "Moderator",
-    department: "Support",
     status: "Active",
   },
 ];
@@ -304,18 +304,16 @@ export const UserManagement: Story = {
             </TableCell>
             <TableCell>{user.department}</TableCell>
             <TableCell>
-              <Badge
-                variant={user.status === "Active" ? "default" : "secondary"}
-              >
+              <Badge variant={user.status === "Active" ? "default" : "secondary"}>
                 {user.status}
               </Badge>
             </TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm">
+                <Button size="sm" variant="outline">
                   Edit
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button size="sm" variant="outline">
                   Delete
                 </Button>
               </div>
@@ -371,7 +369,7 @@ export const EmptyTable: Story = {
       </TableHeader>
       <TableBody>
         <TableRow>
-          <TableCell colSpan={3} className="h-24 text-center">
+          <TableCell className="h-24 text-center" colSpan={3}>
             No results.
           </TableCell>
         </TableRow>
