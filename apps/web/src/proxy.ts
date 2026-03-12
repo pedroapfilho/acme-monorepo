@@ -7,7 +7,7 @@ const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
 const authRoutes = ["/login", "/register", "/forgot-password", "/recover", "/reset-password"];
 
-export const middleware = async (request: NextRequest) => {
+export const proxy = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
@@ -18,14 +18,14 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  let session = null;
-  try {
-    session = await auth.api.getSession({
-      headers: request.headers,
-    });
-  } catch {
-    // Session check failed — treat as unauthenticated
-  }
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  }).catch((error) => {
+    // Auth service failure (DB down, misconfiguration, etc.) — log so outages
+    // are observable, then treat as unauthenticated to keep the pipeline moving.
+    console.error("[proxy] getSession failed — treating as unauthenticated", { error, pathname });
+    return null;
+  });
 
   if (isProtectedRoute && !session) {
     const url = new URL("/login", request.url);
@@ -43,5 +43,4 @@ export const middleware = async (request: NextRequest) => {
 
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
-  runtime: "nodejs",
 };

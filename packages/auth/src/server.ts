@@ -1,7 +1,8 @@
 import type { PrismaClient } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { bearer, username } from "better-auth/plugins";
+import { bearer } from "better-auth/plugins/bearer";
+import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
 type AuthConfig = {
@@ -35,7 +36,7 @@ export const createAuth = (config: AuthConfig) => {
         session_token: {
           attributes: {
             httpOnly: true,
-            sameSite: "lax" as const,
+            sameSite: "lax",
             secure: process.env.NODE_ENV === "production",
           },
           name: "session_token",
@@ -58,18 +59,15 @@ export const createAuth = (config: AuthConfig) => {
         ? async ({ url, user }) => {
             const { Resend } = await import("resend");
             const resend = new Resend(resendApiKey);
-            // Non-blocking to prevent timing attacks, but log failures
-            resend.emails
-              .send({
-                from: fromEmail,
-                html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
-                subject: "Reset your password",
-                to: user.email,
-              })
-              .catch((error) => {
-                // eslint-disable-next-line no-console -- server-side email failure logging
-                console.error("Failed to send password reset email:", error);
-              });
+            const { error } = await resend.emails.send({
+              from: fromEmail,
+              html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+              subject: "Reset your password",
+              to: user.email,
+            });
+            if (error) {
+              throw new Error(`Failed to send password reset email: ${error.message}`);
+            }
           }
         : undefined,
     },
@@ -79,18 +77,15 @@ export const createAuth = (config: AuthConfig) => {
         ? async ({ url, user }) => {
             const { Resend } = await import("resend");
             const resend = new Resend(resendApiKey);
-            // Non-blocking to prevent timing attacks, but log failures
-            resend.emails
-              .send({
-                from: fromEmail,
-                html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
-                subject: "Verify your email address",
-                to: user.email,
-              })
-              .catch((error) => {
-                // eslint-disable-next-line no-console -- server-side email failure logging
-                console.error("Failed to send verification email:", error);
-              });
+            const { error } = await resend.emails.send({
+              from: fromEmail,
+              html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
+              subject: "Verify your email address",
+              to: user.email,
+            });
+            if (error) {
+              throw new Error(`Failed to send verification email: ${error.message}`);
+            }
           }
         : undefined,
     },
@@ -100,6 +95,7 @@ export const createAuth = (config: AuthConfig) => {
     rateLimit: {
       enabled: true,
       max: 10, // 10 requests per minute
+      storage: "database",
       window: 60, // 1 minute
     },
 

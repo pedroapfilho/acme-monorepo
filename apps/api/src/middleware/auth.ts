@@ -3,6 +3,7 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
 import { auth } from "../lib/auth";
+import { logger } from "../lib/logger";
 
 type AuthVariables = {
   user: {
@@ -17,7 +18,6 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
   async (c: Context, next: Next) => {
     const headers = new Headers();
 
-    // Extract auth headers
     const authHeader = c.req.header("Authorization");
     if (authHeader) {
       headers.set("Authorization", authHeader);
@@ -28,8 +28,16 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
       headers.set("Cookie", cookie);
     }
 
-    // Use Better Auth's session handling
-    const session = await auth.api.getSession({ headers });
+    let session;
+    try {
+      session = await auth.api.getSession({ headers });
+    } catch (error) {
+      logger.error(
+        { error, method: c.req.method, url: c.req.url },
+        "authMiddleware: getSession threw — auth service unavailable",
+      );
+      throw new HTTPException(503, { message: "Authentication service unavailable" });
+    }
 
     if (!session || !session.user) {
       throw new HTTPException(401, {
@@ -37,7 +45,6 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
       });
     }
 
-    // Set user in Hono context
     c.set("user", {
       displayName: session.user.displayName,
       email: session.user.email,
@@ -54,7 +61,6 @@ export const optionalAuthMiddleware = createMiddleware<{
 }>(async (c: Context, next: Next) => {
   const headers = new Headers();
 
-  // Extract auth headers
   const authHeader = c.req.header("Authorization");
   if (authHeader) {
     headers.set("Authorization", authHeader);
@@ -66,11 +72,9 @@ export const optionalAuthMiddleware = createMiddleware<{
   }
 
   try {
-    // Use Better Auth's session handling
     const session = await auth.api.getSession({ headers });
 
     if (session && session.user) {
-      // Set user in Hono context
       c.set("user", {
         displayName: session.user.displayName,
         email: session.user.email,
@@ -78,8 +82,14 @@ export const optionalAuthMiddleware = createMiddleware<{
         username: session.user.username,
       });
     }
-  } catch {
-    // Ignore errors for optional auth
+  } catch (error) {
+    // Unexpected failures (DB down, malformed token, rate limit exception) must
+    // not be silently discarded — a missing user context is otherwise
+    // indistinguishable from an infrastructure outage.
+    logger.error(
+      { error, method: c.req.method, url: c.req.url },
+      "optionalAuthMiddleware: getSession threw unexpectedly",
+    );
   }
 
   await next();

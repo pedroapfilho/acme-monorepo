@@ -3,7 +3,6 @@ import { cache } from "react";
 
 import { auth } from "./auth";
 
-// Server-side function to get the current session
 export const getSession = cache(async () => {
   const headersList = await headers();
 
@@ -13,7 +12,10 @@ export const getSession = cache(async () => {
     });
 
     return session;
-  } catch {
+  } catch (error) {
+    // Auth failures (DB down, misconfiguration) must not be silent — they
+    // look identical to "logged out" without a log entry to diagnose.
+    console.error("[auth-helpers] getSession failed", { error });
     return null;
   }
 });

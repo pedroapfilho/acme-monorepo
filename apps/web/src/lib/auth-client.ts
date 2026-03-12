@@ -1,7 +1,9 @@
 import { createBetterAuthClient } from "@repo/auth/client";
 
-// Client-side: relative URL goes through Next.js proxy rewrite
-// Server-side (prerendering): needs absolute URL as fallback
+// During CSR the relative URL is rewritten by Next.js (next.config.ts:
+// /api/auth/* → API /auth/*) so the browser never calls the API directly.
+// During SSR/prerendering window is undefined, so an absolute URL is required
+// because the rewrite layer does not apply server-side.
 const baseURL =
   typeof window !== "undefined"
     ? "/api/auth"

@@ -1,15 +1,20 @@
-import { PrismaClient } from "@repo/db";
-import { describe, it, expect, beforeAll } from "vitest";
+import { prisma } from "@repo/db";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { createAuth } from "../server";
+import type { AuthConfig } from "../server";
+
+type Plugin = NonNullable<AuthConfig["extraPlugins"]>[number];
 
 describe("Auth Server Configuration", () => {
   let auth: ReturnType<typeof createAuth>;
-  let prisma: PrismaClient;
 
   beforeAll(() => {
-    prisma = new PrismaClient();
     auth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("should have email and password authentication enabled", () => {
@@ -37,25 +42,19 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should have secure cookie settings in production", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(true);
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.httpOnly).toBe(true);
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite).toBe("lax");
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   it("should require email verification in production", () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    vi.stubEnv("NODE_ENV", "production");
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   it("should have bearer token plugin enabled", () => {
@@ -80,5 +79,57 @@ describe("Auth Server Configuration", () => {
 
   it("should trust host by default", () => {
     expect(auth.options.trustedOrigins).toContain("http://localhost:3000");
+  });
+
+  it("should use database storage for rate limiting", () => {
+    expect(auth.options.rateLimit?.storage).toBe("database");
+  });
+
+  it("should have rate limiting enabled with correct window and max", () => {
+    expect(auth.options.rateLimit?.enabled).toBe(true);
+    expect(auth.options.rateLimit?.window).toBe(60);
+    expect(auth.options.rateLimit?.max).toBe(10);
+  });
+
+  it("should parse TRUSTED_ORIGINS env var as comma-separated list", () => {
+    vi.stubEnv("TRUSTED_ORIGINS", "https://app.acme.com,https://api.acme.com");
+
+    const envAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(envAuth.options.trustedOrigins).toEqual([
+      "https://app.acme.com",
+      "https://api.acme.com",
+    ]);
+  });
+
+  it("should not configure reset password email when resendApiKey is absent", () => {
+    expect(auth.options.emailAndPassword?.sendResetPassword).toBeUndefined();
+  });
+
+  it("should configure reset password email when resendApiKey is provided", () => {
+    const emailAuth = createAuth({
+      prisma,
+      resendApiKey: "re_test_key",
+      secret: "test-secret-minimum-32-characters-long",
+    });
+    expect(emailAuth.options.emailAndPassword?.sendResetPassword).toBeDefined();
+  });
+
+  it("should expire sessions after 7 days", () => {
+    expect(auth.options.session?.expiresIn).toBe(60 * 60 * 24 * 7);
+  });
+
+  it("should refresh sessions that are older than 1 day", () => {
+    expect(auth.options.session?.updateAge).toBe(60 * 60 * 24);
+  });
+
+  it("should include extra plugins in the resolved plugin list", () => {
+    const mockPlugin = { id: "test-plugin", init: () => ({}) } as unknown as Plugin;
+    const extendedAuth = createAuth({
+      extraPlugins: [mockPlugin],
+      prisma,
+      secret: "test-secret-minimum-32-characters-long",
+    });
+    const plugins = extendedAuth.options.plugins ?? [];
+    expect(plugins.some((p) => p.id === "test-plugin")).toBe(true);
   });
 });

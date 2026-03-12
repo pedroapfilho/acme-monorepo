@@ -6,11 +6,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["@repo/ui", "lucide-react"],
   },
-  modularizeImports: {
-    "lucide-react": {
-      transform: "lucide-react/dist/esm/icons/{{member}}",
-    },
-  },
   reactStrictMode: true,
 
   async rewrites() {
