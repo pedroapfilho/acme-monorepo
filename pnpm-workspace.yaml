@@ -1,6 +1,9 @@
 packages:
   - apps/*
   - packages/*
+
+nodeLinker: hoisted
+
 onlyBuiltDependencies:
   - "@parcel/watcher"
   - "@prisma/client"
