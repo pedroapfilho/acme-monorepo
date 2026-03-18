@@ -31,7 +31,7 @@
     "@types/node": "^25.3.0",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.1",
-    "tsdown": "^0.20.3",
+    "tsdown": "^0.21.4",
     "typescript": "^5.9.3"
   }
 }

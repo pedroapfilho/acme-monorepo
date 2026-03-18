@@ -6,6 +6,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   clean: true,
   entry: ["src/index.ts"],
+  inlineOnly: false,
   external: ["@repo/db", "@repo/auth"],
   format: ["esm"],
   platform: "node",

@@ -4,13 +4,12 @@
     "dist/**"
   ],
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "scripts": {
-    "build": "bunchee",
+    "build": "tsdown",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "bunchee --watch",
+    "dev": "tsdown --watch",
     "lint": "tsc --noEmit && oxlint src",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -24,9 +23,9 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.3.0",
-    "bunchee": "^6.6.0",
     "dotenv": "^17.3.1",
     "prisma": "^7.4.1",
+    "tsdown": "^0.21.4",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3"
   }
