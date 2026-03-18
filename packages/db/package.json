@@ -1,11 +1,13 @@
 {
   "name": "@repo/db",
   "files": [
-    "dist/**"
+    "dist/**",
+    "src/**"
   ],
   "type": "module",
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
