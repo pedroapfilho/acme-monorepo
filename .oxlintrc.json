@@ -19,12 +19,7 @@
   ],
   "overrides": [
     {
-      "files": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
-      ],
+      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "rules": {
         "constructor-super": "off",
         "getter-return": "off",
@@ -52,40 +47,28 @@
         "browser": false,
         "node": true
       },
-      "files": [
-        "apps/api/**/*.ts"
-      ]
+      "files": ["apps/api/**/*.ts"]
     },
     {
-      "files": [
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/__tests__/**"
-      ],
+      "files": ["**/*.test.ts", "**/*.spec.ts", "**/__tests__/**"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off"
       }
     },
     {
-      "files": [
-        "apps/workshop/**/*.stories.tsx"
-      ],
+      "files": ["apps/workshop/**/*.stories.tsx"],
       "rules": {
         "no-console": "off"
       }
     },
     {
-      "files": [
-        "**/seed.ts"
-      ],
+      "files": ["**/seed.ts"],
       "rules": {
         "no-console": "off"
       }
     },
     {
-      "files": [
-        "packages/ui/src/**"
-      ],
+      "files": ["packages/ui/src/**"],
       "rules": {
         "import/no-namespace": "off",
         "perfectionist/sort-jsx-props": "off",
@@ -93,12 +76,7 @@
       }
     }
   ],
-  "plugins": [
-    "typescript",
-    "import",
-    "react",
-    "unicorn"
-  ],
+  "plugins": ["typescript", "import", "react", "unicorn"],
   "rules": {
     "@typescript-eslint/array-type": [
       "error",
@@ -186,9 +164,7 @@
     "no-warning-comments": [
       "error",
       {
-        "terms": [
-          "@nocommit"
-        ]
+        "terms": ["@nocommit"]
       }
     ],
     "no-with": "error",
