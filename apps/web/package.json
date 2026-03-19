@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "oxlint src",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf .next"
   },
   "dependencies": {

@@ -7,7 +7,8 @@
     "build": "tsdown",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "tsdown --watch --on-success \"node dist/index.js\"",
-    "lint": "tsc --noEmit && oxlint src",
+    "lint": "oxlint src",
+    "typecheck": "tsc --noEmit",
     "start": "node dist/index.js"
   },
   "dependencies": {

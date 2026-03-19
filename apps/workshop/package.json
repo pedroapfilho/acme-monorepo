@@ -9,7 +9,8 @@
     "build": "storybook build --docs -o storybook-static",
     "preview-storybook": "serve storybook-static",
     "clean": "rm -rf .turbo node_modules",
-    "lint": "oxlint src"
+    "lint": "oxlint src",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

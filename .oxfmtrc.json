@@ -7,10 +7,10 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "bracketSpacing": true,
-  "experimentalSortImports": {
+  "sortImports": {
     "groups": [
-      ["side_effect"],
-      ["builtin"],
+      "side_effect",
+      "builtin",
       ["external", "type-external"],
       ["internal", "type-internal"],
       ["parent", "type-parent"],
@@ -18,8 +18,8 @@
       ["index", "type-index"]
     ]
   },
-  "experimentalSortPackageJson": true,
-  "experimentalTailwindcss": {
+  "sortPackageJson": true,
+  "sortTailwindcss": {
     "stylesheet": "./packages/config-tailwind/shared-styles.css",
     "attributes": ["class", "className"],
     "functions": ["cn", "cva"],
@@ -31,8 +31,8 @@
     ".next/**",
     "node_modules/**",
     "build/**",
-    "storybook-static/**",
     "coverage/**",
+    "storybook-static/**",
     "pnpm-lock.yaml"
   ]
 }
