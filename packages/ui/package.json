@@ -19,7 +19,7 @@
     "build": "mkdir -p dist && pnpm run build:styles && pnpm run build:components",
     "build:styles": "tailwindcss -i ./src/styles/globals.css -o ./dist/index.css",
     "build:components": "tsdown",
-    "check-types": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "dev:styles": "tailwindcss -i ./src/styles/globals.css -o ./dist/index.css --watch",
     "dev:components": "tsdown --watch",
     "lint": "oxlint src",
