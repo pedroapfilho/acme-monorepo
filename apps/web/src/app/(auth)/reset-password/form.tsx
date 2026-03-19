@@ -11,7 +11,7 @@ import {
   FormMessage,
   Input,
 } from "@repo/ui";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,12 +25,13 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const ResetPasswordForm = () => {
-  const searchParams = useSearchParams();
+type Props = {
+  token: string | null;
+};
+
+const ResetPasswordForm = ({ token }: Props) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-
-  const token = searchParams.get("token");
 
   const form = useForm<FormData>({
     defaultValues: {

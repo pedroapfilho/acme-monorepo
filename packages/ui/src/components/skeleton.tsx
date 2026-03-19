@@ -10,6 +10,10 @@ type SkeletonProps = HTMLAttributes<HTMLDivElement> & {
   width?: string | number;
 };
 
+type SkeletonAvatarProps = SkeletonProps & {
+  size?: number;
+};
+
 const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
   ({ animation = "pulse", className, height, style, variant = "text", width, ...props }, ref) => {
     const variantClasses = {
@@ -102,7 +106,7 @@ const SkeletonCard = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 
 SkeletonCard.displayName = "SkeletonCard";
 
-const SkeletonAvatar = forwardRef<HTMLDivElement, SkeletonProps>(
+const SkeletonAvatar = forwardRef<HTMLDivElement, SkeletonAvatarProps>(
   ({ className, size = 40, ...props }, ref) => {
     return (
       <Skeleton

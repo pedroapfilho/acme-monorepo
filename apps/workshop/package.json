@@ -26,6 +26,7 @@
     "@storybook/addon-themes": "^10.2.11",
     "@storybook/react": "^10.2.11",
     "@storybook/react-vite": "^10.2.11",
+    "@total-typescript/ts-reset": "^0.6.1",
     "@vitejs/plugin-react": "^5.0.2",
     "serve": "^14.2.1",
     "storybook": "^10.2.11",

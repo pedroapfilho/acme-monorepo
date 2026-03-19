@@ -11,7 +11,7 @@ import {
   FormMessage,
   Input,
 } from "@repo/ui";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,13 +25,13 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-const LoginForm = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(false);
+type Props = {
+  from: string;
+};
 
-  // Get redirect URL from search params
-  const from = searchParams?.get("from") || "/dashboard";
+const LoginForm = ({ from }: Props) => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<FormData>({
     defaultValues: {

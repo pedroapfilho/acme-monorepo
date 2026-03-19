@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 
 import LoginForm from "@/app/(auth)/login/form";
 
@@ -14,7 +13,13 @@ const metadata: Metadata = {
   title: "Sign In",
 };
 
-const Page = async () => {
+type Props = {
+  searchParams: Promise<{ from?: string }>;
+};
+
+const Page = async ({ searchParams }: Props) => {
+  const { from = "/dashboard" } = await searchParams;
+
   return (
     <div className="flex flex-col gap-4 sm:mx-auto sm:w-full sm:max-w-[480px]">
       <Card>
@@ -24,9 +29,7 @@ const Page = async () => {
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
-          <Suspense>
-            <LoginForm />
-          </Suspense>
+          <LoginForm from={from} />
 
           <p className="text-sm">
             Not a member yet?{" "}
