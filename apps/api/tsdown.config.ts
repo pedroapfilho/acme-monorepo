@@ -5,12 +5,12 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig({
   clean: true,
-  entry: ["src/index.ts"],
   deps: {
     // Workspace packages export .ts source — Node can't import those at runtime,
     // so tsdown must bundle them into the output instead of leaving them as external imports.
     alwaysBundle: ["@repo/auth", "@repo/db"],
   },
+  entry: ["src/index.ts"],
   format: ["esm"],
   platform: "node",
   plugins: [
