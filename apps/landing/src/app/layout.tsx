@@ -60,6 +60,20 @@ const inter = Inter({
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html className="scroll-smooth" data-mode="dark" lang="en-US">
+      {process.env.NODE_ENV === "development" && (
+        <>
+          <script
+            async
+            crossOrigin="anonymous"
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+          />
+          <script
+            async
+            crossOrigin="anonymous"
+            src="https://unpkg.com/react-grab/dist/index.global.js"
+          />
+        </>
+      )}
       <body className={cn("relative min-h-screen font-sans antialiased", inter.variable)}>
         <>
           <Header />

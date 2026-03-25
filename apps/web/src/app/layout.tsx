@@ -89,6 +89,20 @@ export const viewport: Viewport = {
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html className={inter.variable} lang="en">
+      {process.env.NODE_ENV === "development" && (
+        <>
+          <script
+            async
+            crossOrigin="anonymous"
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+          />
+          <script
+            async
+            crossOrigin="anonymous"
+            src="https://unpkg.com/react-grab/dist/index.global.js"
+          />
+        </>
+      )}
       <head>
         {/* Additional meta tags */}
         <meta content="telephone=no" name="format-detection" />
