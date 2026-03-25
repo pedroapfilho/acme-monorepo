@@ -1,18 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Button,
-  Input,
-  Checkbox,
-} from "@repo/ui";
+import { Field, FieldDescription, FieldError, FieldLabel, Button, Input, Checkbox } from "@repo/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useForm } from "react-hook-form";
+import { useForm } from "@tanstack/react-form";
 import { useState } from "storybook/internal/preview-api";
 import { z } from "zod";
 
@@ -36,19 +24,21 @@ const loginSchema = z.object({
   remember: z.boolean().optional(),
 });
 
-const handleLoginSubmit = (values: z.infer<typeof loginSchema>) => {
-  console.log(values);
-  alert("Form submitted! Check the console for values.");
-};
-
 const LoginFormRender = () => {
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const form = useForm({
     defaultValues: {
       email: "",
       password: "",
       remember: false,
     },
-    resolver: zodResolver(loginSchema),
+    onSubmit: async ({ value }) => {
+      console.log(value);
+      alert("Form submitted! Check the console for values.");
+    },
+    validators: {
+      onBlur: loginSchema,
+      onChange: loginSchema,
+    },
   });
 
   return (
@@ -58,57 +48,76 @@ const LoginFormRender = () => {
         <p className="text-muted-foreground">Enter your credentials to access your account</p>
       </div>
 
-      <Form {...form}>
-        <form className="space-y-4" onSubmit={form.handleSubmit(handleLoginSubmit)}>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="john@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <form
+        className="space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="email"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="john@example.com"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input placeholder="********" type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <form.Field name="password">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="password"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="********"
+                  type="password"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="remember"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Remember me</FormLabel>
-                  <FormDescription>Keep me signed in for 30 days</FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
+        <form.Field name="remember">
+          {(field) => (
+            <Field className="flex flex-row items-start gap-3">
+              <Checkbox
+                checked={field.state.value}
+                onCheckedChange={(checked) => field.handleChange(checked === true)}
+              />
+              <div className="space-y-1 leading-none">
+                <FieldLabel>Remember me</FieldLabel>
+                <FieldDescription>Keep me signed in for 30 days</FieldDescription>
+              </div>
+            </Field>
+          )}
+        </form.Field>
 
-          <Button className="w-full" type="submit">
-            Sign In
-          </Button>
-        </form>
-      </Form>
+        <Button className="w-full" type="submit">
+          Sign In
+        </Button>
+      </form>
     </div>
   );
 };
@@ -127,13 +136,8 @@ const profileSchema = z.object({
   website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
 
-const handleProfileSubmit = (values: z.infer<typeof profileSchema>) => {
-  console.log(values);
-  alert("Profile updated! Check the console for values.");
-};
-
 const ProfileFormRender = () => {
-  const form = useForm<z.infer<typeof profileSchema>>({
+  const form = useForm({
     defaultValues: {
       bio: "",
       email: "john@example.com",
@@ -143,7 +147,14 @@ const ProfileFormRender = () => {
       notifications: true,
       website: "",
     },
-    resolver: zodResolver(profileSchema),
+    onSubmit: async ({ value }) => {
+      console.log(value);
+      alert("Profile updated! Check the console for values.");
+    },
+    validators: {
+      onBlur: profileSchema,
+      onChange: profileSchema,
+    },
   });
 
   return (
@@ -153,137 +164,174 @@ const ProfileFormRender = () => {
         <p className="text-muted-foreground">Manage your account settings and preferences</p>
       </div>
 
-      <Form {...form}>
-        <form className="space-y-6" onSubmit={form.handleSubmit(handleProfileSubmit)}>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="john@example.com" {...field} />
-                </FormControl>
-                <FormDescription>This email will be used for account notifications</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="website"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://example.com" {...field} />
-                </FormControl>
-                <FormDescription>Optional: Your personal or professional website</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="bio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Bio</FormLabel>
-                <FormControl>
-                  <textarea
-                    className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Tell us about yourself..."
-                    {...field}
+      <form
+        className="space-y-6"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field name="firstName">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="firstName">First Name</FieldLabel>
+                  <Input
+                    aria-invalid={isInvalid}
+                    id="firstName"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="John"
+                    value={field.state.value}
                   />
-                </FormControl>
-                <FormDescription>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+
+          <form.Field name="lastName">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+                  <Input
+                    aria-invalid={isInvalid}
+                    id="lastName"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="Doe"
+                    value={field.state.value}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+        </div>
+
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="profile-email">Email</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="profile-email"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="john@example.com"
+                  value={field.state.value}
+                />
+                <FieldDescription>
+                  This email will be used for account notifications
+                </FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="website">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="website">Website</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="website"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="https://example.com"
+                  value={field.state.value}
+                />
+                <FieldDescription>Optional: Your personal or professional website</FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="bio">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="bio">Bio</FieldLabel>
+                <textarea
+                  aria-invalid={isInvalid}
+                  className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  id="bio"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Tell us about yourself..."
+                  value={field.state.value}
+                />
+                <FieldDescription>
                   A brief description about yourself (max 500 characters)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
+                </FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Preferences</h3>
+
+          <form.Field name="notifications">
+            {(field) => (
+              <Field className="flex flex-row items-start gap-3">
+                <Checkbox
+                  checked={field.state.value}
+                  onCheckedChange={(checked) => field.handleChange(checked === true)}
+                />
+                <div className="space-y-1 leading-none">
+                  <FieldLabel>Email Notifications</FieldLabel>
+                  <FieldDescription>
+                    Receive email notifications about your account activity
+                  </FieldDescription>
+                </div>
+              </Field>
             )}
-          />
+          </form.Field>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Preferences</h3>
+          <form.Field name="marketing">
+            {(field) => (
+              <Field className="flex flex-row items-start gap-3">
+                <Checkbox
+                  checked={field.state.value}
+                  onCheckedChange={(checked) => field.handleChange(checked === true)}
+                />
+                <div className="space-y-1 leading-none">
+                  <FieldLabel>Marketing Emails</FieldLabel>
+                  <FieldDescription>
+                    Receive emails about new features and promotions
+                  </FieldDescription>
+                </div>
+              </Field>
+            )}
+          </form.Field>
+        </div>
 
-            <FormField
-              control={form.control}
-              name="notifications"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Email Notifications</FormLabel>
-                    <FormDescription>
-                      Receive email notifications about your account activity
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="marketing"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Marketing Emails</FormLabel>
-                    <FormDescription>
-                      Receive emails about new features and promotions
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <Button type="submit">Save Changes</Button>
-            <Button onClick={() => form.reset()} type="button" variant="outline">
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Form>
+        <div className="flex gap-4">
+          <Button type="submit">Save Changes</Button>
+          <Button onClick={() => form.reset()} type="button" variant="outline">
+            Cancel
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
@@ -301,22 +349,24 @@ const contactSchema = z.object({
   subscribe: z.boolean().optional(),
 });
 
-const handleContactSubmit = (values: z.infer<typeof contactSchema>) => {
-  console.log(values);
-  alert("Message sent! Check the console for values.");
-};
-
 const ContactFormRender = () => {
-  const form = useForm<z.infer<typeof contactSchema>>({
+  const form = useForm({
     defaultValues: {
       email: "",
       message: "",
       name: "",
-      priority: "medium",
+      priority: "medium" as const,
       subject: "",
       subscribe: false,
     },
-    resolver: zodResolver(contactSchema),
+    onSubmit: async ({ value }) => {
+      console.log(value);
+      alert("Message sent! Check the console for values.");
+    },
+    validators: {
+      onBlur: contactSchema,
+      onChange: contactSchema,
+    },
   });
 
   return (
@@ -326,117 +376,145 @@ const ContactFormRender = () => {
         <p className="text-muted-foreground">We&apos;d love to hear from you. Send us a message!</p>
       </div>
 
-      <Form {...form}>
-        <form className="space-y-6" onSubmit={form.handleSubmit(handleContactSubmit)}>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Your name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="your@email.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="md:col-span-2">
-              <FormField
-                control={form.control}
-                name="subject"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Subject</FormLabel>
-                    <FormControl>
-                      <Input placeholder="What is this about?" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="priority"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Priority</FormLabel>
-                  <FormControl>
-                    <select
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                      {...field}
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Message</FormLabel>
-                <FormControl>
-                  <textarea
-                    className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                    placeholder="Tell us more about your inquiry..."
-                    {...field}
+      <form
+        className="space-y-6"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <form.Field name="name">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="contact-name">Name</FieldLabel>
+                  <Input
+                    aria-invalid={isInvalid}
+                    id="contact-name"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="Your name"
+                    value={field.state.value}
                   />
-                </FormControl>
-                <FormDescription>Please provide as much detail as possible</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
 
-          <FormField
-            control={form.control}
-            name="subscribe"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Subscribe to Newsletter</FormLabel>
-                  <FormDescription>Get notified about updates and new features</FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
+          <form.Field name="email">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="contact-email">Email</FieldLabel>
+                  <Input
+                    aria-invalid={isInvalid}
+                    id="contact-email"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="your@email.com"
+                    value={field.state.value}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+        </div>
 
-          <Button className="w-full" type="submit">
-            Send Message
-          </Button>
-        </form>
-      </Form>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <form.Field name="subject">
+              {(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid || undefined}>
+                    <FieldLabel htmlFor="subject">Subject</FieldLabel>
+                    <Input
+                      aria-invalid={isInvalid}
+                      id="subject"
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="What is this about?"
+                      value={field.state.value}
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                );
+              }}
+            </form.Field>
+          </div>
+
+          <form.Field name="priority">
+            {(field) => (
+              <Field>
+                <FieldLabel htmlFor="priority">Priority</FieldLabel>
+                <select
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                  id="priority"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value as "low" | "medium" | "high")}
+                  value={field.state.value}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </Field>
+            )}
+          </form.Field>
+        </div>
+
+        <form.Field name="message">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="message">Message</FieldLabel>
+                <textarea
+                  aria-invalid={isInvalid}
+                  className="min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                  id="message"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Tell us more about your inquiry..."
+                  value={field.state.value}
+                />
+                <FieldDescription>Please provide as much detail as possible</FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="subscribe">
+          {(field) => (
+            <Field className="flex flex-row items-start gap-3">
+              <Checkbox
+                checked={field.state.value}
+                onCheckedChange={(checked) => field.handleChange(checked === true)}
+              />
+              <div className="space-y-1 leading-none">
+                <FieldLabel>Subscribe to Newsletter</FieldLabel>
+                <FieldDescription>Get notified about updates and new features</FieldDescription>
+              </div>
+            </Field>
+          )}
+        </form.Field>
+
+        <Button className="w-full" type="submit">
+          Send Message
+        </Button>
+      </form>
     </div>
   );
 };
@@ -445,23 +523,36 @@ export const ContactForm: Story = {
   render: () => <ContactFormRender />,
 };
 
+const validationSchema = z.object({
+  age: z
+    .number()
+    .min(18, "You must be at least 18 years old")
+    .max(120, "Age must be less than 120"),
+  email: z.string().email("Invalid email address"),
+  terms: z.boolean(),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+});
+
 const FormValidationRender = () => {
+  const [submitted, setSubmitted] = useState(false);
+
   const form = useForm({
     defaultValues: {
-      age: "",
+      age: 0,
       email: "",
       terms: false,
       username: "",
     },
+    onSubmit: async ({ value }) => {
+      setSubmitted(true);
+      console.log(value);
+      setTimeout(() => setSubmitted(false), 2000);
+    },
+    validators: {
+      onBlur: validationSchema,
+      onChange: validationSchema,
+    },
   });
-
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (values: unknown) => {
-    setSubmitted(true);
-    console.log(values);
-    setTimeout(() => setSubmitted(false), 2000);
-  };
 
   return (
     <div className="mx-auto max-w-md space-y-6">
@@ -470,107 +561,99 @@ const FormValidationRender = () => {
         <p className="text-muted-foreground">Try submitting with invalid data to see validation</p>
       </div>
 
-      <Form {...form}>
-        <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter username" {...field} />
-                </FormControl>
-                <FormDescription>Must be at least 3 characters long</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-            rules={{
-              minLength: {
-                message: "Username must be at least 3 characters",
-                value: 3,
-              },
-              required: "Username is required",
-            }}
-          />
+      <form
+        className="space-y-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <form.Field name="username">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="username"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Enter username"
+                  value={field.state.value}
+                />
+                <FieldDescription>Must be at least 3 characters long</FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-            rules={{
-              pattern: {
-                message: "Invalid email address",
-                value: /^\S+@\S+$/i,
-              },
-              required: "Email is required",
-            }}
-          />
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="validation-email">Email</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="validation-email"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Enter email"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="age"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Age</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter age"
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-                <FormDescription>Must be between 18 and 120</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-            rules={{
-              max: {
-                message: "Age must be less than 120",
-                value: 120,
-              },
-              min: {
-                message: "You must be at least 18 years old",
-                value: 18,
-              },
-              required: "Age is required",
-            }}
-          />
+        <form.Field name="age">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="age">Age</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  id="age"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+                  placeholder="Enter age"
+                  type="number"
+                  value={field.state.value}
+                />
+                <FieldDescription>Must be between 18 and 120</FieldDescription>
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="terms"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                <FormControl>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Accept Terms</FormLabel>
-                  <FormDescription>I agree to the terms and conditions</FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-            rules={{
-              required: "You must accept the terms",
-            }}
-          />
+        <form.Field name="terms">
+          {(field) => (
+            <Field className="flex flex-row items-start gap-3">
+              <Checkbox
+                checked={field.state.value}
+                onCheckedChange={(checked) => field.handleChange(checked === true)}
+              />
+              <div className="space-y-1 leading-none">
+                <FieldLabel>Accept Terms</FieldLabel>
+                <FieldDescription>I agree to the terms and conditions</FieldDescription>
+              </div>
+            </Field>
+          )}
+        </form.Field>
 
-          <Button className="w-full" disabled={submitted} type="submit">
-            {submitted ? "Submitted!" : "Submit"}
-          </Button>
-        </form>
-      </Form>
+        <Button className="w-full" disabled={submitted} type="submit">
+          {submitted ? "Submitted!" : "Submit"}
+        </Button>
+      </form>
     </div>
   );
 };
@@ -583,7 +666,7 @@ const FormStatesRender = () => {
   const form = useForm({
     defaultValues: {
       disabled: "Disabled field",
-      error: "invalid-email",
+      error: "",
       normal: "",
       readonly: "Read-only field",
     },
@@ -596,72 +679,61 @@ const FormStatesRender = () => {
         <p className="text-muted-foreground">Different states of form fields</p>
       </div>
 
-      <Form {...form}>
-        <form className="space-y-4">
-          <FormField
-            control={form.control}
-            name="normal"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Normal Field</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter text" {...field} />
-                </FormControl>
-                <FormDescription>This is a normal input field</FormDescription>
-              </FormItem>
-            )}
-          />
+      <form className="space-y-4">
+        <form.Field name="normal">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="normal">Normal Field</FieldLabel>
+              <Input
+                id="normal"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Enter text"
+                value={field.state.value}
+              />
+              <FieldDescription>This is a normal input field</FieldDescription>
+            </Field>
+          )}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="error"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Field with Error</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter email" {...field} />
-                </FormControl>
-                <FormDescription>This field has validation errors</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-            rules={{
-              pattern: {
-                message: "Please enter a valid email address",
-                value: /^\S+@\S+$/i,
-              },
-            }}
-          />
+        <form.Field name="error">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="error">Field with Error</FieldLabel>
+              <Input
+                id="error"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Enter email"
+                value={field.state.value}
+              />
+              <FieldDescription>This field has validation errors</FieldDescription>
+            </Field>
+          )}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="disabled"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Disabled Field</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled />
-                </FormControl>
-                <FormDescription>This field is disabled</FormDescription>
-              </FormItem>
-            )}
-          />
+        <form.Field name="disabled">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="disabled">Disabled Field</FieldLabel>
+              <Input disabled id="disabled" name={field.name} value={field.state.value} />
+              <FieldDescription>This field is disabled</FieldDescription>
+            </Field>
+          )}
+        </form.Field>
 
-          <FormField
-            control={form.control}
-            name="readonly"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Read-only Field</FormLabel>
-                <FormControl>
-                  <Input {...field} readOnly />
-                </FormControl>
-                <FormDescription>This field is read-only</FormDescription>
-              </FormItem>
-            )}
-          />
-        </form>
-      </Form>
+        <form.Field name="readonly">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor="readonly">Read-only Field</FieldLabel>
+              <Input id="readonly" name={field.name} readOnly value={field.state.value} />
+              <FieldDescription>This field is read-only</FieldDescription>
+            </Field>
+          )}
+        </form.Field>
+      </form>
     </div>
   );
 };
