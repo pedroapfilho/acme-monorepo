@@ -1,22 +1,22 @@
-import { ClassValue, clsx } from "clsx";
-import { createTailwindMerge, getDefaultConfig } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx";
+import { extendTailwindMerge } from "tailwind-merge";
 
-const PREFIX = "ui";
+const twMerge = extendTailwindMerge({
+  experimentalParseClassName({ className, parseClassName }) {
+    const parsed = parseClassName(className);
 
-const twMerge = createTailwindMerge(() => {
-  const config = getDefaultConfig();
+    if (parsed.baseClassName.startsWith("ui:")) {
+      return {
+        ...parsed,
+        baseClassName: parsed.baseClassName.slice(3),
+      };
+    }
 
-  return {
-    ...config,
-    classGroups: Object.fromEntries(
-      Object.entries(config.classGroups).map(([key, value]) => {
-        return [key, [...value, { [PREFIX]: value }]];
-      }),
-    ),
-  };
+    return parsed;
+  },
 });
 
-const cn = (...inputs: Array<ClassValue>) => {
+const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
