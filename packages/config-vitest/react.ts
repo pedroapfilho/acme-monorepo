@@ -4,12 +4,12 @@ import { defineConfig } from "vitest/config";
 const reactConfig = defineConfig({
   plugins: [react()],
   test: {
+    css: false,
     environment: "jsdom",
     globals: true,
-    setupFiles: ["@repo/config-vitest/setup-react"],
-    css: false,
     include: ["src/**/*.test.{ts,tsx}"],
     passWithNoTests: true,
+    setupFiles: ["@repo/config-vitest/setup-react"],
   },
 });
 
