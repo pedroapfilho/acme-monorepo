@@ -1,0 +1,23 @@
+{
+  "name": "@repo/config-vitest",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./react": "./react.ts",
+    "./node": "./node.ts",
+    "./setup-react": "./setup-react.ts"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react": "^4.5.2",
+    "@vitest/coverage-v8": "^4.1.0",
+    "jsdom": "^26.1.0",
+    "vitest": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0"
+  }
+}

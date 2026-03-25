@@ -59,7 +59,7 @@ describe("Auth Server Configuration", () => {
 
   it("should have bearer token plugin enabled", () => {
     const plugins = auth.options.plugins || [];
-    const hasBearerToken = plugins.some((plugin) => plugin.id === "bearer-token");
+    const hasBearerToken = plugins.some((plugin) => plugin.id === "bearer");
     expect(hasBearerToken).toBe(true);
   });
 

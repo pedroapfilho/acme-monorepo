@@ -13,6 +13,9 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "tsdown --watch",
     "lint": "oxlint src",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -24,12 +27,14 @@
     "@prisma/client": "^7.5.0"
   },
   "devDependencies": {
+    "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.3.0",
     "dotenv": "^17.3.1",
     "prisma": "^7.5.0",
     "tsdown": "^0.21.4",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }

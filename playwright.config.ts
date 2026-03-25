@@ -1,8 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export default defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
@@ -11,13 +8,23 @@ export default defineConfig({
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
     },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
   ],
-  reporter: "html",
+  reporter: process.env.CI ? [["dot"], ["html"]] : [["list"], ["html"]],
   retries: process.env.CI ? 2 : 0,
   testDir: "./tests/e2e",
   use: {
     baseURL: "http://localhost:3000",
+    screenshot: "only-on-failure",
     trace: "on-first-retry",
+    video: "retain-on-failure",
   },
 
   webServer: [
