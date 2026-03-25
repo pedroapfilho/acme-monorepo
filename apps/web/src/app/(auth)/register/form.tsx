@@ -1,19 +1,9 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Input,
-} from "@repo/ui";
+import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
+import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
@@ -25,139 +15,159 @@ const formSchema = z.object({
   password: z.string().min(12, "Password must be at least 12 characters"),
 });
 
-type FormData = z.infer<typeof formSchema>;
-
 const RegisterForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [rootError, setRootError] = useState<string | null>(null);
 
-  const form = useForm<FormData>({
+  const form = useForm({
     defaultValues: {
       confirmPassword: "",
       email: "",
       name: "",
       password: "",
     },
-    resolver: zodResolver(formSchema),
+    onSubmit: async ({ value }) => {
+      try {
+        setIsLoading(true);
+        setRootError(null);
+
+        if (value.password !== value.confirmPassword) {
+          setRootError("Passwords do not match");
+          return;
+        }
+
+        const result = await authClient.signUp.email({
+          email: value.email,
+          name: value.name,
+          password: value.password,
+        });
+
+        if (result.error) {
+          setRootError(result.error.message || "Failed to register");
+          return;
+        }
+
+        router.push("/dashboard");
+        router.refresh();
+      } catch {
+        setRootError("An error occurred during registration. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    validators: {
+      onBlur: formSchema,
+      onChange: formSchema,
+    },
   });
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      setIsLoading(true);
-
-      if (data.password !== data.confirmPassword) {
-        form.setError("confirmPassword", {
-          message: "Passwords do not match",
-          type: "manual",
-        });
-        return;
-      }
-
-      const result = await authClient.signUp.email({
-        email: data.email,
-        name: data.name,
-        password: data.password,
-      });
-
-      if (result.error) {
-        form.setError("root", {
-          message: result.error.message || "Failed to register",
-          type: "manual",
-        });
-        return;
-      }
-
-      // Redirect to dashboard on success
-      router.push("/dashboard");
-      router.refresh(); // Refresh to ensure middleware runs
-    } catch {
-      form.setError("root", {
-        message: "An error occurred during registration. Please try again.",
-        type: "manual",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <Form {...form}>
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input disabled={isLoading} placeholder="John Doe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <form
+      className="space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
+      }}
+    >
+      <form.Field name="name">
+        {(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid || undefined}>
+              <FieldLabel htmlFor="name">Name</FieldLabel>
+              <Input
+                aria-invalid={isInvalid}
+                disabled={isLoading}
+                id="name"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="John Doe"
+                value={field.state.value}
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      </form.Field>
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input disabled={isLoading} placeholder="you@example.com" type="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form.Field name="email">
+        {(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid || undefined}>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                aria-invalid={isInvalid}
+                disabled={isLoading}
+                id="email"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="you@example.com"
+                type="email"
+                value={field.state.value}
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      </form.Field>
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  disabled={isLoading}
-                  placeholder="Enter your password"
-                  type="password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form.Field name="password">
+        {(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid || undefined}>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input
+                aria-invalid={isInvalid}
+                disabled={isLoading}
+                id="password"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Enter your password"
+                type="password"
+                value={field.state.value}
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      </form.Field>
 
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
-              <FormControl>
-                <Input
-                  disabled={isLoading}
-                  placeholder="Confirm your password"
-                  type="password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form.Field name="confirmPassword">
+        {(field) => {
+          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid || undefined}>
+              <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+              <Input
+                aria-invalid={isInvalid}
+                disabled={isLoading}
+                id="confirmPassword"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Confirm your password"
+                type="password"
+                value={field.state.value}
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      </form.Field>
 
-        {form.formState.errors.root && (
-          <div className="text-sm text-red-500">{form.formState.errors.root.message}</div>
-        )}
+      {rootError && <div className="text-sm text-red-500">{rootError}</div>}
 
-        <Button className="w-full" disabled={isLoading} type="submit">
-          {isLoading ? "Creating account..." : "Register"}
-        </Button>
-      </form>
-    </Form>
+      <Button className="w-full" disabled={isLoading} type="submit">
+        {isLoading ? "Creating account..." : "Register"}
+      </Button>
+    </form>
   );
 };
 
