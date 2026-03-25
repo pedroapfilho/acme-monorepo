@@ -29,6 +29,9 @@
     "turbo": "^2.8.20"
   },
   "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "oxlint"
+    ],
     "*.{ts,tsx,js,jsx,json,md}": [
       "oxfmt"
     ]
