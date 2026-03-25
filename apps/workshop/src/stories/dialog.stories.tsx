@@ -41,9 +41,7 @@ type Story = StoryObj<typeof Dialog>;
 export const Default: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button variant="outline" />}>Edit Profile</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
@@ -76,11 +74,9 @@ export const Default: Story = {
 export const Confirmation: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="destructive">
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete Account
-        </Button>
+      <DialogTrigger render={<Button variant="destructive" />}>
+        <Trash2 className="mr-2 h-4 w-4" />
+        Delete Account
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -113,11 +109,9 @@ export const Confirmation: Story = {
 export const Information: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Info className="mr-2 h-4 w-4" />
-          Show Info
-        </Button>
+      <DialogTrigger render={<Button variant="outline" />}>
+        <Info className="mr-2 h-4 w-4" />
+        Show Info
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -162,11 +156,9 @@ export const Information: Story = {
 export const ContactForm: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Contact
-        </Button>
+      <DialogTrigger render={<Button />}>
+        <Plus className="mr-2 h-4 w-4" />
+        Add Contact
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -220,11 +212,9 @@ export const ContactForm: Story = {
 export const Settings: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <SettingsIcon className="mr-2 h-4 w-4" />
-          Settings
-        </Button>
+      <DialogTrigger render={<Button variant="outline" />}>
+        <SettingsIcon className="mr-2 h-4 w-4" />
+        Settings
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
@@ -283,9 +273,7 @@ export const Settings: Story = {
 export const LargeContent: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">View Terms</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button variant="outline" />}>View Terms</DialogTrigger>
       <DialogContent className="max-h-[600px] sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
@@ -396,9 +384,7 @@ export const Controlled: Story = {
 export const NoHeader: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Simple Dialog</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button variant="outline" />}>Simple Dialog</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <div className="py-6">
           <p className="mb-4 text-center text-lg font-medium">Are you sure you want to continue?</p>
@@ -418,9 +404,7 @@ export const NoHeader: Story = {
 export const Playground: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Open Playground</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button variant="outline" />}>Open Playground</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Playground Dialog</DialogTitle>

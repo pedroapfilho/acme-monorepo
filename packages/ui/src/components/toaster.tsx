@@ -14,15 +14,15 @@ export const Toaster = () => {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ action, description, id, title, ...props }) {
+      {toasts.map(function ({ action, description, id, onOpenChange, title, ...props }) {
         return (
-          <Toast key={id} {...props}>
+          <Toast key={id} onOpenChange={onOpenChange} {...props}>
             <div className="ui:grid ui:gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
-            <ToastClose />
+            <ToastClose onClick={() => onOpenChange?.(false)} />
           </Toast>
         );
       })}

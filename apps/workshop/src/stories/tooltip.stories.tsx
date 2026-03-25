@@ -36,11 +36,9 @@ type Story = StoryObj<typeof Tooltip>;
 export const Default: Story = {
   render: () => (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button className="w-10 rounded-full p-0" variant="outline">
-          <Plus className="h-4 w-4" />
-          <span className="sr-only">Add</span>
-        </Button>
+      <TooltipTrigger render={<Button className="w-10 rounded-full p-0" variant="outline" />}>
+        <Plus className="h-4 w-4" />
+        <span className="sr-only">Add</span>
       </TooltipTrigger>
       <TooltipContent>
         <p>Add to library</p>
@@ -53,10 +51,8 @@ export const BasicTooltips: Story = {
   render: () => (
     <div className="flex gap-4">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="outline">
-            <Edit className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="outline" />}>
+          <Edit className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>
           <p>Edit</p>
@@ -64,10 +60,8 @@ export const BasicTooltips: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="outline">
-            <Share className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="outline" />}>
+          <Share className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>
           <p>Share</p>
@@ -75,10 +69,8 @@ export const BasicTooltips: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="outline">
-            <Download className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="outline" />}>
+          <Download className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>
           <p>Download</p>
@@ -86,10 +78,8 @@ export const BasicTooltips: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="destructive">
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="destructive" />}>
+          <Trash2 className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>
           <p>Delete permanently</p>
@@ -103,36 +93,28 @@ export const Positions: Story = {
   render: () => (
     <div className="grid grid-cols-3 gap-8 p-8">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Top Left</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Top Left</TooltipTrigger>
         <TooltipContent align="start" side="top">
           <p>Tooltip on top left</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Top</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Top</TooltipTrigger>
         <TooltipContent side="top">
           <p>Tooltip on top</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Top Right</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Top Right</TooltipTrigger>
         <TooltipContent align="end" side="top">
           <p>Tooltip on top right</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Left</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Left</TooltipTrigger>
         <TooltipContent side="left">
           <p>Tooltip on left</p>
         </TooltipContent>
@@ -141,36 +123,28 @@ export const Positions: Story = {
       <div />
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Right</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Right</TooltipTrigger>
         <TooltipContent side="right">
           <p>Tooltip on right</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Bottom Left</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Bottom Left</TooltipTrigger>
         <TooltipContent align="start" side="bottom">
           <p>Tooltip on bottom left</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Bottom</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Bottom</TooltipTrigger>
         <TooltipContent side="bottom">
           <p>Tooltip on bottom</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Bottom Right</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Bottom Right</TooltipTrigger>
         <TooltipContent align="end" side="bottom">
           <p>Tooltip on bottom right</p>
         </TooltipContent>
@@ -183,9 +157,7 @@ export const RichContent: Story = {
   render: () => (
     <div className="flex gap-4">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">User Info</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>User Info</TooltipTrigger>
         <TooltipContent className="max-w-xs">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -199,9 +171,7 @@ export const RichContent: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Status</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Status</TooltipTrigger>
         <TooltipContent>
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-500" />
@@ -211,9 +181,7 @@ export const RichContent: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Warning</Button>
-        </TooltipTrigger>
+        <TooltipTrigger render={<Button variant="outline" />}>Warning</TooltipTrigger>
         <TooltipContent>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
@@ -229,17 +197,15 @@ export const InteractiveElements: Story = {
   render: () => (
     <div className="flex gap-4">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Input className="w-40" placeholder="Hover for help" />
-        </TooltipTrigger>
+        <TooltipTrigger render={<Input className="w-40" placeholder="Hover for help" />} />
         <TooltipContent>
           <p>Enter your email address</p>
         </TooltipContent>
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="cursor-help underline decoration-dotted">What is this?</span>
+        <TooltipTrigger render={<span className="cursor-help underline decoration-dotted" />}>
+          What is this?
         </TooltipTrigger>
         <TooltipContent className="max-w-xs">
           <p>
@@ -250,11 +216,9 @@ export const InteractiveElements: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="flex cursor-help items-center gap-1">
-            <span>Advanced Settings</span>
-            <HelpCircle className="h-3 w-3 text-muted-foreground" />
-          </div>
+        <TooltipTrigger render={<div className="flex cursor-help items-center gap-1" />}>
+          <span>Advanced Settings</span>
+          <HelpCircle className="h-3 w-3 text-muted-foreground" />
         </TooltipTrigger>
         <TooltipContent>
           <p>Configure advanced options for power users</p>
@@ -271,10 +235,10 @@ const ActionTooltipsRender = () => {
   return (
     <div className="flex gap-4">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={() => setLiked(!liked)} size="icon" variant="ghost">
-            <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
-          </Button>
+        <TooltipTrigger
+          render={<Button onClick={() => setLiked(!liked)} size="icon" variant="ghost" />}
+        >
+          <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : ""}`} />
         </TooltipTrigger>
         <TooltipContent>
           <p>{liked ? "Remove from favorites" : "Add to favorites"}</p>
@@ -282,10 +246,10 @@ const ActionTooltipsRender = () => {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button onClick={() => setStarred(!starred)} size="icon" variant="ghost">
-            <Star className={`h-4 w-4 ${starred ? "fill-yellow-500 text-yellow-500" : ""}`} />
-          </Button>
+        <TooltipTrigger
+          render={<Button onClick={() => setStarred(!starred)} size="icon" variant="ghost" />}
+        >
+          <Star className={`h-4 w-4 ${starred ? "fill-yellow-500 text-yellow-500" : ""}`} />
         </TooltipTrigger>
         <TooltipContent>
           <p>{starred ? "Unstar" : "Star this item"}</p>
@@ -293,10 +257,8 @@ const ActionTooltipsRender = () => {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <Copy className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="ghost" />}>
+          <Copy className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent>
           <p>Copy to clipboard</p>
@@ -313,27 +275,27 @@ export const ActionTooltips: Story = {
 export const DelayedTooltip: Story = {
   render: () => (
     <div className="space-y-4">
-      <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Instant (0ms)</Button>
+      <Tooltip>
+        <TooltipTrigger delay={0} render={<Button variant="outline" />}>
+          Instant (0ms)
         </TooltipTrigger>
         <TooltipContent>
           <p>Shows immediately</p>
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip delayDuration={500}>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Normal (500ms)</Button>
+      <Tooltip>
+        <TooltipTrigger delay={500} render={<Button variant="outline" />}>
+          Normal (500ms)
         </TooltipTrigger>
         <TooltipContent>
           <p>Shows after 500ms</p>
         </TooltipContent>
       </Tooltip>
 
-      <Tooltip delayDuration={1000}>
-        <TooltipTrigger asChild>
-          <Button variant="outline">Delayed (1000ms)</Button>
+      <Tooltip>
+        <TooltipTrigger delay={1000} render={<Button variant="outline" />}>
+          Delayed (1000ms)
         </TooltipTrigger>
         <TooltipContent>
           <p>Shows after 1 second</p>
@@ -347,10 +309,8 @@ export const NavigationTooltips: Story = {
   render: () => (
     <div className="flex gap-2 rounded-lg bg-muted p-4">
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <Search className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="ghost" />}>
+          <Search className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent side="bottom">
           <div className="flex items-center gap-2">
@@ -363,10 +323,8 @@ export const NavigationTooltips: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <Bell className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="ghost" />}>
+          <Bell className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent side="bottom">
           <p>Notifications</p>
@@ -374,10 +332,8 @@ export const NavigationTooltips: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <Settings className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="ghost" />}>
+          <Settings className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent side="bottom">
           <p>Settings</p>
@@ -385,10 +341,8 @@ export const NavigationTooltips: Story = {
       </Tooltip>
 
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="icon" variant="ghost">
-            <User className="h-4 w-4" />
-          </Button>
+        <TooltipTrigger render={<Button size="icon" variant="ghost" />}>
+          <User className="h-4 w-4" />
         </TooltipTrigger>
         <TooltipContent side="bottom">
           <p>Profile</p>
@@ -407,9 +361,9 @@ export const FormTooltips: Story = {
             Password
           </label>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="h-3 w-3 cursor-help text-muted-foreground" />
-            </TooltipTrigger>
+            <TooltipTrigger
+              render={<Info className="h-3 w-3 cursor-help text-muted-foreground" />}
+            />
             <TooltipContent className="max-w-xs">
               <p>
                 Password must be at least 8 characters long and contain at least one number and one
@@ -427,9 +381,9 @@ export const FormTooltips: Story = {
             API Key
           </label>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircle className="h-3 w-3 cursor-help text-muted-foreground" />
-            </TooltipTrigger>
+            <TooltipTrigger
+              render={<HelpCircle className="h-3 w-3 cursor-help text-muted-foreground" />}
+            />
             <TooltipContent>
               <p>You can find your API key in the dashboard settings</p>
             </TooltipContent>
@@ -444,9 +398,9 @@ export const FormTooltips: Story = {
             Webhook URL
           </label>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Info className="h-3 w-3 cursor-help text-muted-foreground" />
-            </TooltipTrigger>
+            <TooltipTrigger
+              render={<Info className="h-3 w-3 cursor-help text-muted-foreground" />}
+            />
             <TooltipContent className="max-w-xs">
               <div className="space-y-1">
                 <p className="font-medium">Webhook Requirements:</p>
@@ -471,11 +425,9 @@ export const StatusTooltips: Story = {
       <div className="flex items-center gap-2">
         <span className="text-sm">Server Status:</span>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex cursor-help items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              <span className="text-sm text-green-600">Online</span>
-            </div>
+          <TooltipTrigger render={<div className="flex cursor-help items-center gap-2" />}>
+            <div className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="text-sm text-green-600">Online</span>
           </TooltipTrigger>
           <TooltipContent>
             <div className="space-y-1">
@@ -490,11 +442,9 @@ export const StatusTooltips: Story = {
       <div className="flex items-center gap-2">
         <span className="text-sm">Database:</span>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex cursor-help items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-yellow-500" />
-              <span className="text-sm text-yellow-600">Warning</span>
-            </div>
+          <TooltipTrigger render={<div className="flex cursor-help items-center gap-2" />}>
+            <div className="h-2 w-2 rounded-full bg-yellow-500" />
+            <span className="text-sm text-yellow-600">Warning</span>
           </TooltipTrigger>
           <TooltipContent>
             <div className="space-y-1">
@@ -509,11 +459,9 @@ export const StatusTooltips: Story = {
       <div className="flex items-center gap-2">
         <span className="text-sm">API:</span>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="flex cursor-help items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-red-500" />
-              <span className="text-sm text-red-600">Error</span>
-            </div>
+          <TooltipTrigger render={<div className="flex cursor-help items-center gap-2" />}>
+            <div className="h-2 w-2 rounded-full bg-red-500" />
+            <span className="text-sm text-red-600">Error</span>
           </TooltipTrigger>
           <TooltipContent>
             <div className="space-y-1">
@@ -531,9 +479,7 @@ export const StatusTooltips: Story = {
 export const Playground: Story = {
   render: () => (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline">Playground Tooltip</Button>
-      </TooltipTrigger>
+      <TooltipTrigger render={<Button variant="outline" />}>Playground Tooltip</TooltipTrigger>
       <TooltipContent>
         <p>This is a playground tooltip</p>
       </TooltipContent>

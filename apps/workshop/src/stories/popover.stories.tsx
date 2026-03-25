@@ -37,11 +37,9 @@ type Story = StoryObj<typeof Popover>;
 export const Default: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button className="w-10 rounded-full p-0" variant="outline">
-          <Settings2 className="h-4 w-4" />
-          <span className="sr-only">Open popover</span>
-        </Button>
+      <PopoverTrigger render={<Button className="w-10 rounded-full p-0" variant="outline" />}>
+        <Settings2 className="h-4 w-4" />
+        <span className="sr-only">Open popover</span>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="grid gap-4">
@@ -76,10 +74,8 @@ export const Default: Story = {
 export const HelpPopover: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button size="icon" variant="ghost">
-          <HelpCircle className="h-4 w-4" />
-        </Button>
+      <PopoverTrigger render={<Button size="icon" variant="ghost" />}>
+        <HelpCircle className="h-4 w-4" />
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-3">
@@ -109,10 +105,8 @@ export const HelpPopover: Story = {
 export const UserProfilePopover: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button size="icon" variant="ghost">
-          <User className="h-4 w-4" />
-        </Button>
+      <PopoverTrigger render={<Button size="icon" variant="ghost" />}>
+        <User className="h-4 w-4" />
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
@@ -153,10 +147,8 @@ export const UserProfilePopover: Story = {
 export const ActionsMenu: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button size="icon" variant="ghost">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
+      <PopoverTrigger render={<Button size="icon" variant="ghost" />}>
+        <MoreHorizontal className="h-4 w-4" />
       </PopoverTrigger>
       <PopoverContent className="w-56">
         <div className="space-y-1">
@@ -194,11 +186,9 @@ export const ActionsMenu: Story = {
 export const DateTimePicker: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline">
-          <Calendar className="mr-2 h-4 w-4" />
-          Select Date & Time
-        </Button>
+      <PopoverTrigger render={<Button variant="outline" />}>
+        <Calendar className="mr-2 h-4 w-4" />
+        Select Date & Time
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
@@ -246,11 +236,9 @@ export const FilterPopover: Story = {
   render: () => {
     return (
       <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            Filters
-          </Button>
+        <PopoverTrigger render={<Button variant="outline" />}>
+          <Filter className="mr-2 h-4 w-4" />
+          Filters
         </PopoverTrigger>
         <PopoverContent className="w-80">
           <div className="space-y-4">
@@ -325,11 +313,9 @@ export const FilterPopover: Story = {
 export const SearchPopover: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline">
-          <Search className="mr-2 h-4 w-4" />
-          Search
-        </Button>
+      <PopoverTrigger render={<Button variant="outline" />}>
+        <Search className="mr-2 h-4 w-4" />
+        Search
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
@@ -381,13 +367,11 @@ export const SearchPopover: Story = {
 export const NotificationPopover: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button className="relative" size="icon" variant="ghost">
-          <Bell className="h-4 w-4" />
-          <div className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-destructive">
-            <span className="text-xs text-white">3</span>
-          </div>
-        </Button>
+      <PopoverTrigger render={<Button className="relative" size="icon" variant="ghost" />}>
+        <Bell className="h-4 w-4" />
+        <div className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-destructive">
+          <span className="text-xs text-white">3</span>
+        </div>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
@@ -458,9 +442,7 @@ const ControlledRender = () => {
       </p>
 
       <Popover onOpenChange={setOpen} open={open}>
-        <PopoverTrigger asChild>
-          <Button variant="outline">Controlled Popover</Button>
-        </PopoverTrigger>
+        <PopoverTrigger render={<Button variant="outline" />}>Controlled Popover</PopoverTrigger>
         <PopoverContent className="w-80">
           <div className="space-y-3">
             <h4 className="font-medium">Controlled Popover</h4>
@@ -484,9 +466,7 @@ export const Controlled: Story = {
 export const Playground: Story = {
   render: () => (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline">Playground Popover</Button>
-      </PopoverTrigger>
+      <PopoverTrigger render={<Button variant="outline" />}>Playground Popover</PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-3">
           <h4 className="font-medium">Playground</h4>
