@@ -27,6 +27,7 @@
     "preserveWhitespace": false
   },
   "ignorePatterns": [
+    ".context/**",
     "dist/**",
     ".next/**",
     "node_modules/**",

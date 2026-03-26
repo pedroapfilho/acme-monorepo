@@ -89,7 +89,7 @@ export const viewport: Viewport = {
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html className={inter.variable} lang="en">
-      {process.env.NODE_ENV === "development" && (
+      {process.env.NODE_ENV === "development" && !process.env.CI && (
         <>
           <script
             async

@@ -60,7 +60,7 @@ const inter = Inter({
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html className="scroll-smooth" data-mode="dark" lang="en-US">
-      {process.env.NODE_ENV === "development" && (
+      {process.env.NODE_ENV === "development" && !process.env.CI && (
         <>
           <script
             async

@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   oxlint:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:

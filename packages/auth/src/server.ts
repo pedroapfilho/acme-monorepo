@@ -1,9 +1,36 @@
+import { execSync } from "node:child_process";
+
 import type { PrismaClient } from "@repo/db";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
+
+const getPortlessUrl = (name: string) => {
+  if (process.env.CI) {
+    return undefined;
+  }
+  try {
+    return execSync(`portless get ${name}`).toString().trim();
+  } catch {
+    return undefined;
+  }
+};
+
+const defaultTrustedOrigins = () => {
+  const origins = ["http://localhost:3000", "http://localhost:3001", "http://localhost:4000"];
+
+  const portlessNames = ["acme.web", "acme.landing", "acme.api"];
+  for (const name of portlessNames) {
+    const url = getPortlessUrl(name);
+    if (url) {
+      origins.push(url);
+    }
+  }
+
+  return origins;
+};
 
 type AuthConfig = {
   extraPlugins?: Array<BetterAuthPlugin>;
@@ -109,11 +136,7 @@ export const createAuth = (config: AuthConfig) => {
       expiresIn: 60 * 60 * 24 * 7, // 7 days
       updateAge: 60 * 60 * 24, // Update if older than 1 day
     },
-    trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || [
-      "http://localhost:3000", // Web app
-      "http://localhost:3001", // Landing
-      "http://localhost:4000", // API
-    ],
+    trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || defaultTrustedOrigins(),
     user: {
       additionalFields: {
         displayName: {
