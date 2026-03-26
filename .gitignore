@@ -50,3 +50,6 @@ storybook-static
 
 # prisma generated client
 packages/db/src/generated
+
+# counselors agent output
+agents/
