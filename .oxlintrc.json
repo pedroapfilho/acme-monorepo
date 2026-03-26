@@ -56,7 +56,7 @@
       }
     },
     {
-      "files": ["tests/e2e/fixtures/**"],
+      "files": ["tests/e2e/**/fixtures/**"],
       "rules": {
         "react-hooks/rules-of-hooks": "off"
       }
