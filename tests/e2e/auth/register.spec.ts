@@ -25,7 +25,7 @@ test.describe("Register", () => {
       "SecurePassword1!",
     );
 
-    await expect(registerPage.rootError).toBeVisible();
+    await registerPage.expectErrorVisible();
     expect(page.url()).toContain("/register");
   });
 
@@ -50,7 +50,7 @@ test.describe("Register", () => {
       "DifferentPassword!",
     );
 
-    await expect(registerPage.rootError).toContainText("Passwords do not match");
+    await registerPage.expectErrorText("Passwords do not match");
     expect(page.url()).toContain("/register");
   });
 

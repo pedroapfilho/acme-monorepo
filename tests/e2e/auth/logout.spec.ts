@@ -3,7 +3,7 @@ import { test, expect } from "../fixtures/auth.fixture";
 test.describe("Logout", () => {
   test("signs out and redirects to login", async ({ dashboardPage, page }) => {
     await dashboardPage.goto();
-    await expect(dashboardPage.heading).toBeVisible();
+    await dashboardPage.expectHeadingVisible();
 
     await dashboardPage.signOut();
 

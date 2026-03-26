@@ -1,27 +1,24 @@
 name: Format
 
 on:
-  pull_request:
   push:
     branches: [main]
+  pull_request:
 
 permissions:
   contents: read
 
 jobs:
   oxfmt:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
       - run: pnpm run format:check

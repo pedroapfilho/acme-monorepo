@@ -22,7 +22,7 @@ test.describe("Protected Routes", () => {
   test("allows authenticated access to dashboard", async ({ dashboardPage }) => {
     await dashboardPage.goto();
 
-    await expect(dashboardPage.heading).toBeVisible();
-    await expect(dashboardPage.userEmail).toBeVisible();
+    await dashboardPage.expectHeadingVisible();
+    await dashboardPage.expectUserEmailVisible();
   });
 });

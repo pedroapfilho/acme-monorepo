@@ -18,7 +18,7 @@ test.describe("Login", () => {
     await loginPage.goto();
     await loginPage.login(TEST_USER.email, "WrongPassword!!");
 
-    await expect(loginPage.rootError).toBeVisible();
+    await loginPage.expectErrorVisible();
     expect(page.url()).toContain("/login");
   });
 
@@ -26,7 +26,7 @@ test.describe("Login", () => {
     await loginPage.goto();
     await loginPage.login("not-an-email", TEST_USER.password);
 
-    await expect(loginPage.rootError).toBeVisible();
+    await loginPage.expectErrorVisible();
   });
 
   test("redirects to dashboard if already authenticated", async ({ page }) => {
