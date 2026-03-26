@@ -50,7 +50,9 @@ export default defineConfig({
     },
   ],
 
-  reporter: process.env.CI ? "blob" : [["list"], ["html"]],
+  reporter: process.env.CI
+    ? [["html", { outputFolder: "playwright-report" }]]
+    : [["list"], ["html"]],
   retries: process.env.CI ? 2 : 0,
   testDir: "./tests/e2e",
 
@@ -64,7 +66,7 @@ export default defineConfig({
   webServer: [
     {
       command: process.env.CI
-        ? "pnpm --filter=web exec next dev -p 3000"
+        ? "pnpm --filter=web exec next start -p 3000"
         : "pnpm run dev --filter=web",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
@@ -78,7 +80,7 @@ export default defineConfig({
     },
     {
       command: process.env.CI
-        ? "pnpm --filter=landing exec next dev -p 3001"
+        ? "pnpm --filter=landing exec next start -p 3001"
         : "pnpm run dev --filter=landing",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

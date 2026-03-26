@@ -7,7 +7,13 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"],
-      "env": ["API_URL", "BETTER_AUTH_URL", "NEXT_PUBLIC_API_URL"]
+      "env": [
+        "API_URL",
+        "BETTER_AUTH_URL",
+        "BETTER_AUTH_SECRET",
+        "DATABASE_URL",
+        "NEXT_PUBLIC_API_URL"
+      ]
     },
     "lint": {
       "dependsOn": ["^build"],

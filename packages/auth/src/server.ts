@@ -120,10 +120,10 @@ export const createAuth = (config: AuthConfig) => {
     plugins: [username(), bearer(), ...extraPlugins],
 
     rateLimit: {
-      enabled: true,
-      max: 10, // 10 requests per minute
+      enabled: process.env.CI !== "true",
+      max: 10,
       storage: "database",
-      window: 60, // 1 minute
+      window: 60,
     },
 
     secret,
