@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "portless landing next dev",
+    "dev": "portless run --name acme.landing next dev",
     "build": "next build",
     "start": "next start",
     "lint": "oxlint src",

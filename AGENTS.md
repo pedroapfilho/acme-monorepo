@@ -34,12 +34,12 @@ pnpm db:seed                      # seed database
 
 ### Apps
 
-| App        | Framework                | Dev URL                         | Purpose                   |
-| ---------- | ------------------------ | ------------------------------- | ------------------------- |
-| `web`      | Next.js 16 (App Router)  | `http://web.localhost:1355`     | Main application          |
-| `landing`  | Next.js 16 (App Router)  | `http://landing.localhost:1355` | Marketing site            |
-| `api`      | Hono on Node.js (tsdown) | `http://api.localhost:1355`     | Backend API + auth server |
-| `workshop` | Storybook 10 (Vite)      | `:6006`                         | Component documentation   |
+| App        | Framework                | Dev URL                              | Purpose                   |
+| ---------- | ------------------------ | ------------------------------------ | ------------------------- |
+| `web`      | Next.js 16 (App Router)  | `http://acme.web.localhost:1355`     | Main application          |
+| `landing`  | Next.js 16 (App Router)  | `http://acme.landing.localhost:1355` | Marketing site            |
+| `api`      | Hono on Node.js (tsdown) | `http://acme.api.localhost:1355`     | Backend API + auth server |
+| `workshop` | Storybook 10 (Vite)      | `:6006`                              | Component documentation   |
 
 ### Packages
 
@@ -61,7 +61,7 @@ pnpm db:seed                      # seed database
 
 ## Portless (Dev URLs)
 
-All dev scripts use `portless <name>` prefix. Dev URLs follow the pattern `http://<name>.localhost:1355`. Portless must be installed globally: `npm install -g portless`. No hardcoded port numbers in dev scripts.
+Dev scripts use `portless run --name <project>.<app>`. URLs follow `http://<project>.<app>.localhost:1355`. In git worktrees, the branch is auto-prepended: `http://<branch>.<project>.<app>.localhost:1355`. Install globally: `npm install -g portless`.
 
 ## Dev Tools (Development Only)
 
