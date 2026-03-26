@@ -12,15 +12,19 @@ const formSchema = z.object({
   email: z.string().email(),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
+const defaultValues: FormValues = {
+  email: "",
+};
+
 const RecoverForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [rootError, setRootError] = useState<string | null>(null);
 
   const form = useForm({
-    defaultValues: {
-      email: "",
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       try {
         setIsLoading(true);
@@ -52,6 +56,7 @@ const RecoverForm = () => {
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

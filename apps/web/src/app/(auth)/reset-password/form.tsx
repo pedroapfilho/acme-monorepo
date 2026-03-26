@@ -13,6 +13,13 @@ const formSchema = z.object({
   password: z.string().min(12, "Password must be at least 12 characters"),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
+const defaultValues: FormValues = {
+  confirmPassword: "",
+  password: "",
+};
+
 type Props = {
   token: string | null;
 };
@@ -23,10 +30,7 @@ const ResetPasswordForm = ({ token }: Props) => {
   const [rootError, setRootError] = useState<string | null>(null);
 
   const form = useForm({
-    defaultValues: {
-      confirmPassword: "",
-      password: "",
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       try {
         setIsLoading(true);
@@ -68,6 +72,7 @@ const ResetPasswordForm = ({ token }: Props) => {
   return (
     <form
       className="space-y-4"
+      noValidate
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

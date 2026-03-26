@@ -24,13 +24,17 @@ const loginSchema = z.object({
   remember: z.boolean().optional(),
 });
 
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+const loginDefaultValues: LoginFormValues = {
+  email: "",
+  password: "",
+  remember: false,
+};
+
 const LoginFormRender = () => {
   const form = useForm({
-    defaultValues: {
-      email: "",
-      password: "",
-      remember: false,
-    },
+    defaultValues: loginDefaultValues,
     onSubmit: async ({ value }) => {
       console.log(value);
       alert("Form submitted! Check the console for values.");
@@ -50,6 +54,7 @@ const LoginFormRender = () => {
 
       <form
         className="space-y-4"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -136,17 +141,21 @@ const profileSchema = z.object({
   website: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
 
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
+const profileDefaultValues: ProfileFormValues = {
+  bio: "",
+  email: "john@example.com",
+  firstName: "John",
+  lastName: "Doe",
+  marketing: false,
+  notifications: true,
+  website: "",
+};
+
 const ProfileFormRender = () => {
   const form = useForm({
-    defaultValues: {
-      bio: "",
-      email: "john@example.com",
-      firstName: "John",
-      lastName: "Doe",
-      marketing: false,
-      notifications: true,
-      website: "",
-    },
+    defaultValues: profileDefaultValues,
     onSubmit: async ({ value }) => {
       console.log(value);
       alert("Profile updated! Check the console for values.");
@@ -166,6 +175,7 @@ const ProfileFormRender = () => {
 
       <form
         className="space-y-6"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -349,16 +359,20 @@ const contactSchema = z.object({
   subscribe: z.boolean().optional(),
 });
 
+type ContactFormValues = z.infer<typeof contactSchema>;
+
+const contactDefaultValues: ContactFormValues = {
+  email: "",
+  message: "",
+  name: "",
+  priority: "medium",
+  subject: "",
+  subscribe: false,
+};
+
 const ContactFormRender = () => {
   const form = useForm({
-    defaultValues: {
-      email: "",
-      message: "",
-      name: "",
-      priority: "medium" as const,
-      subject: "",
-      subscribe: false,
-    },
+    defaultValues: contactDefaultValues,
     onSubmit: async ({ value }) => {
       console.log(value);
       alert("Message sent! Check the console for values.");
@@ -378,6 +392,7 @@ const ContactFormRender = () => {
 
       <form
         className="space-y-6"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -533,16 +548,20 @@ const validationSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
 });
 
+type ValidationFormValues = z.infer<typeof validationSchema>;
+
+const validationDefaultValues: ValidationFormValues = {
+  age: 0,
+  email: "",
+  terms: false,
+  username: "",
+};
+
 const FormValidationRender = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const form = useForm({
-    defaultValues: {
-      age: 0,
-      email: "",
-      terms: false,
-      username: "",
-    },
+    defaultValues: validationDefaultValues,
     onSubmit: async ({ value }) => {
       setSubmitted(true);
       console.log(value);
@@ -563,6 +582,7 @@ const FormValidationRender = () => {
 
       <form
         className="space-y-4"
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -662,14 +682,23 @@ export const FormValidation: Story = {
   render: () => <FormValidationRender />,
 };
 
+type FormStatesValues = {
+  disabled: string;
+  error: string;
+  normal: string;
+  readonly: string;
+};
+
+const formStatesDefaultValues: FormStatesValues = {
+  disabled: "Disabled field",
+  error: "",
+  normal: "",
+  readonly: "Read-only field",
+};
+
 const FormStatesRender = () => {
   const form = useForm({
-    defaultValues: {
-      disabled: "Disabled field",
-      error: "",
-      normal: "",
-      readonly: "Read-only field",
-    },
+    defaultValues: formStatesDefaultValues,
   });
 
   return (
