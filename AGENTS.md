@@ -6,7 +6,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ```bash
 # Development (runs all apps concurrently via Turborepo)
-pnpm dev                          # all apps: web(:3000), landing(:3001), api(:4000), workshop(:6006)
+pnpm dev                          # all apps via portless
 pnpm dev --filter=web             # single app
 pnpm dev --filter=api
 
@@ -34,36 +34,67 @@ pnpm db:seed                      # seed database
 
 ### Apps
 
-| App        | Framework                | Port | Purpose                   |
-| ---------- | ------------------------ | ---- | ------------------------- |
-| `web`      | Next.js 16 (App Router)  | 3000 | Main application          |
-| `landing`  | Next.js 16 (App Router)  | 3001 | Marketing site            |
-| `api`      | Hono on Node.js (tsdown) | 4000 | Backend API + auth server |
-| `workshop` | Storybook 10 (Vite)      | 6006 | Component documentation   |
+| App        | Framework                | Dev URL                         | Purpose                   |
+| ---------- | ------------------------ | ------------------------------- | ------------------------- |
+| `web`      | Next.js 16 (App Router)  | `http://web.localhost:1355`     | Main application          |
+| `landing`  | Next.js 16 (App Router)  | `http://landing.localhost:1355` | Marketing site            |
+| `api`      | Hono on Node.js (tsdown) | `http://api.localhost:1355`     | Backend API + auth server |
+| `workshop` | Storybook 10 (Vite)      | `:6006`                         | Component documentation   |
 
 ### Packages
 
-| Package                   | Purpose                                                                                 |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `@repo/ui`                | Shared React components (Radix UI + Tailwind). Uses `cn()` utility for class merging.   |
-| `@repo/auth`              | Better Auth config. Exports `./server` (for api) and `./client` (for web/landing).      |
-| `@repo/db`                | Prisma client singleton + schema. Models: User, Session, Account, Verification.         |
-| `@repo/typescript-config` | Shared tsconfig bases: `nextjs.json`, `server.json`, `react-library.json`, `vite.json`. |
-| `@repo/tailwind-config`   | Shared Tailwind CSS config, PostCSS config, and design tokens (`shared-styles.css`).    |
+| Package                   | Purpose                                                                                                                                                                                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@repo/ui`                | Shared React components (Tailwind + CVA). Uses `ui:` prefix for Tailwind classes. Includes TanStack Form field components (`Field`, `FieldGroup`, `FieldLabel`, `FieldError`). `cn()` uses `extendTailwindMerge` with `experimentalParseClassName` to handle `ui:` prefix. |
+| `@repo/config-vitest`     | Shared Vitest config. Exports `react.ts` and `node.ts` configs.                                                                                                                                                                                                            |
+| `@repo/auth`              | Better Auth config. Exports `./server` (for api) and `./client` (for web/landing).                                                                                                                                                                                         |
+| `@repo/db`                | Prisma client singleton + schema. Models: User, Session, Account, Verification.                                                                                                                                                                                            |
+| `@repo/typescript-config` | Shared tsconfig bases: `nextjs.json`, `server.json`, `react-library.json`, `vite.json`.                                                                                                                                                                                    |
+| `@repo/tailwind-config`   | Shared Tailwind CSS config, PostCSS config, and design tokens (`shared-styles.css`).                                                                                                                                                                                       |
 
 ### Key Relationships
 
 - **Auth flow**: `web`/`landing` use `@repo/auth/client` → calls `api` at `/auth/*` → `api` uses `@repo/auth/server` with Prisma adapter from `@repo/db`.
 - **API structure**: Hono app with versioned routes (`/api/v1/*`), Better Auth at `/auth/*`, health at `/healthz` and `/readyz`.
-- **UI consumption**: `web`, `landing`, and `workshop` all import from `@repo/ui`. Components are Radix-based with Tailwind styling.
+- **UI consumption**: `web`, `landing`, and `workshop` all import from `@repo/ui`. Components use Tailwind with `ui:` prefix inside the package, unprefixed in consumer apps.
 - **Build order**: Turborepo handles `^build` dependencies — packages build before apps that depend on them.
 
-## Tooling (Non-Standard)
+## Portless (Dev URLs)
 
-- **Linter**: Oxlint (not ESLint). Config in `.oxlintrc.json`. Run via `pnpm lint`.
-- **Formatter**: Oxfmt (not Prettier). Config in `.oxfmtrc.json`. Sorts Tailwind classes and imports automatically.
-- **Bundler (api)**: tsdown (not tsc). Outputs to `dist/`.
-- **Pre-commit**: Husky + lint-staged runs `oxfmt` on staged files.
+All dev scripts use `portless <name>` prefix. Dev URLs follow the pattern `http://<name>.localhost:1355`. Portless must be installed globally: `npm install -g portless`. No hardcoded port numbers in dev scripts.
+
+## Dev Tools (Development Only)
+
+- **React Scan** — highlights unnecessary re-renders, loaded via `<script>` in root layout when `NODE_ENV=development`
+- **React Grab** — inspect React component tree, loaded via `<script>` in root layout when `NODE_ENV=development`
+- Neither tool runs in production builds
+
+## Tooling
+
+- **Linter**: oxlint (NOT ESLint). Config in `.oxlintrc.json`. Uses `oxlint-config-awesomeness`.
+- **Formatter**: oxfmt (NOT Prettier). Config in `.oxfmtrc.json`. Sorts Tailwind classes and imports.
+- **Pre-commit**: Husky + lint-staged runs `oxlint` (on `.ts,.tsx,.js,.jsx` files) and `oxfmt` (on `.ts,.tsx,.js,.jsx,.json,.md` files).
+- **Testing**: Vitest for unit tests, Playwright for e2e (chromium, firefox, webkit). `@repo/config-vitest` exports `react.ts` and `node.ts` configs.
+- **Bundler (api)**: tsdown (not tsc). Outputs to `dist/`. Turbopack for Next.js dev.
+
+## Forms
+
+- **@tanstack/react-form** (NOT react-hook-form)
+- Validation: `onBlur` + `onChange` validators with Zod schemas
+- Display errors with `field.state.meta.isTouched && !field.state.meta.isValid`
+- Field components from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`
+- NEVER use `field.handleChange` inside `useEffect` or `useCallback` with `field` in deps — use `field.form.setFieldValue(field.name, value)` with stable refs
+
+## CI (GitHub Actions)
+
+- `test.yml` — `pnpm test`
+- `lint.yml` — `pnpm oxlint --format=github .`
+- `format.yml` — `pnpm run format:check`
+- All use `permissions: { contents: read }` and `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true`
+
+## Prisma
+
+`prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
 
 ## Environment
 
