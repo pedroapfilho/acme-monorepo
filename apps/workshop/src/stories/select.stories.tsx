@@ -418,7 +418,7 @@ const ControlledSelectRender = () => {
     <div className="w-80 space-y-4">
       <div className="space-y-2">
         <Label>Controlled Select</Label>
-        <Select onValueChange={setValue} value={value}>
+        <Select onValueChange={(v) => setValue(String(v))} value={value}>
           <SelectTrigger>
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>

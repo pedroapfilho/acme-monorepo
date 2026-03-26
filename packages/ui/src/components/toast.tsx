@@ -1,42 +1,31 @@
-import {
-  Action as ToastPrimitiveAction,
-  Close as ToastPrimitiveClose,
-  Description as ToastPrimitiveDescription,
-  Provider as ToastPrimitiveProvider,
-  Root as ToastPrimitiveRoot,
-  Title as ToastPrimitiveTitle,
-  Viewport as ToastPrimitiveViewport,
-} from "@radix-ui/react-toast";
+"use client";
+
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
-import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
-  type ReactElement,
-  forwardRef,
-} from "react";
+import { type ComponentProps, type ReactElement } from "react";
 
 import { cn } from "../lib/utils";
 
-const ToastProvider = ToastPrimitiveProvider;
+const ToastProvider = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
 
-const ToastViewport = forwardRef<
-  ElementRef<typeof ToastPrimitiveViewport>,
-  ComponentPropsWithoutRef<typeof ToastPrimitiveViewport>
->(({ className, ...props }, ref) => (
-  <ToastPrimitiveViewport
-    className={cn(
-      "ui:fixed ui:top-0 ui:z-[100] ui:flex ui:max-h-screen ui:w-full ui:flex-col-reverse ui:p-4 ui:sm:top-auto ui:sm:right-0 ui:sm:bottom-0 ui:sm:flex-col ui:md:max-w-[420px]",
-      className,
-    )}
-    ref={ref}
-    {...props}
-  />
-));
-ToastViewport.displayName = ToastPrimitiveViewport.displayName;
+function ToastViewport({ className, ...props }: ComponentProps<"ol">) {
+  return (
+    <ol
+      className={cn(
+        "ui:fixed ui:top-0 ui:z-[100] ui:flex ui:max-h-screen ui:w-full ui:flex-col-reverse ui:p-4 ui:sm:top-auto ui:sm:right-0 ui:sm:bottom-0 ui:sm:flex-col ui:md:max-w-[420px]",
+        className,
+      )}
+      tabIndex={-1}
+      {...props}
+    />
+  );
+}
+ToastViewport.displayName = "ToastViewport";
 
 const toastVariants = cva(
-  "ui:group ui:data-[state=open]:animate-in ui:data-[state=closed]:animate-out ui:data-[swipe=end]:animate-out ui:data-[state=closed]:fade-out-80 ui:data-[state=closed]:slide-out-to-right-full ui:data-[state=open]:slide-in-from-top-full ui:data-[state=open]:sm:slide-in-from-bottom-full ui:pointer-events-auto ui:relative ui:flex ui:w-full ui:items-center ui:justify-between ui:space-x-4 ui:overflow-hidden ui:rounded-md ui:border ui:p-6 ui:pr-8 ui:shadow-lg ui:transition-all ui:data-[swipe=cancel]:translate-x-0 ui:data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] ui:data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] ui:data-[swipe=move]:transition-none",
+  "ui:group ui:data-[state=open]:animate-in ui:data-[state=closed]:animate-out ui:data-[swipe=end]:animate-out ui:data-[state=closed]:fade-out-80 ui:data-[state=closed]:slide-out-to-right-full ui:data-[state=open]:slide-in-from-top-full ui:data-[state=open]:sm:slide-in-from-bottom-full ui:pointer-events-auto ui:relative ui:flex ui:w-full ui:items-center ui:justify-between ui:space-x-4 ui:overflow-hidden ui:rounded-md ui:border ui:p-6 ui:pr-8 ui:shadow-lg ui:transition-all ui:data-[swipe=cancel]:translate-x-0 ui:data-[swipe=move]:transition-none",
   {
     defaultVariants: {
       variant: "default",
@@ -55,78 +44,75 @@ const toastVariants = cva(
   },
 );
 
-const Toast = forwardRef<
-  ElementRef<typeof ToastPrimitiveRoot>,
-  ComponentPropsWithoutRef<typeof ToastPrimitiveRoot> & VariantProps<typeof toastVariants>
->(({ className, variant, ...props }, ref) => {
+const Toast = ({
+  className,
+  open,
+  onOpenChange,
+  variant,
+  ...props
+}: ComponentProps<"li"> &
+  VariantProps<typeof toastVariants> & {
+    onOpenChange?: (open: boolean) => void;
+    open?: boolean;
+  }) => {
   return (
-    <ToastPrimitiveRoot
+    <li
       className={cn(toastVariants({ variant }), className)}
-      ref={ref}
+      data-state={open ? "open" : "closed"}
+      role="status"
       {...props}
     />
   );
-});
-Toast.displayName = ToastPrimitiveRoot.displayName;
+};
+Toast.displayName = "Toast";
 
-const ToastAction = forwardRef<
-  ElementRef<typeof ToastPrimitiveAction>,
-  ComponentPropsWithoutRef<typeof ToastPrimitiveAction>
->(({ className, ...props }, ref) => (
-  <ToastPrimitiveAction
-    className={cn(
-      "ui:ring-offset-background ui:hover:bg-secondary ui:focus:ring-ring ui:group-[.destructive]:border-muted/40 ui:group-[.destructive]:hover:border-destructive/30 ui:group-[.destructive]:hover:bg-destructive ui:group-[.destructive]:hover:text-destructive-foreground ui:group-[.destructive]:focus:ring-destructive ui:inline-flex ui:h-8 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-md ui:border ui:bg-transparent ui:px-3 ui:text-sm ui:font-medium ui:transition-colors ui:focus:ring-2 ui:focus:ring-offset-2 ui:focus:outline-none ui:disabled:pointer-events-none ui:disabled:opacity-50",
-      className,
-    )}
-    ref={ref}
-    {...props}
-  />
-));
-ToastAction.displayName = ToastPrimitiveAction.displayName;
+const ToastAction = ({
+  className,
+  altText,
+  ...props
+}: ComponentProps<"button"> & { altText: string }) => {
+  return (
+    <button
+      aria-label={altText}
+      className={cn(
+        "ui:ring-offset-background ui:hover:bg-secondary ui:focus:ring-ring ui:group-[.destructive]:border-muted/40 ui:group-[.destructive]:hover:border-destructive/30 ui:group-[.destructive]:hover:bg-destructive ui:group-[.destructive]:hover:text-destructive-foreground ui:group-[.destructive]:focus:ring-destructive ui:inline-flex ui:h-8 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-md ui:border ui:bg-transparent ui:px-3 ui:text-sm ui:font-medium ui:transition-colors ui:focus:ring-2 ui:focus:ring-offset-2 ui:focus:outline-none ui:disabled:pointer-events-none ui:disabled:opacity-50",
+        className,
+      )}
+      type="button"
+      {...props}
+    />
+  );
+};
+ToastAction.displayName = "ToastAction";
 
-const ToastClose = forwardRef<
-  ElementRef<typeof ToastPrimitiveClose>,
-  ComponentPropsWithoutRef<typeof ToastPrimitiveClose>
->(({ className, ...props }, ref) => (
-  <ToastPrimitiveClose
-    className={cn(
-      "ui:text-foreground/50 ui:hover:text-foreground ui:absolute ui:top-2 ui:right-2 ui:rounded-md ui:p-1 ui:opacity-0 ui:transition-opacity ui:group-hover:opacity-100 ui:group-[.destructive]:text-red-300 ui:group-[.destructive]:hover:text-red-50 ui:focus:opacity-100 ui:focus:ring-2 ui:focus:outline-none ui:group-[.destructive]:focus:ring-red-400 ui:group-[.destructive]:focus:ring-offset-red-600",
-      className,
-    )}
-    ref={ref}
-    toast-close=""
-    {...props}
-  >
-    <X className="ui:h-4 ui:w-4" />
-  </ToastPrimitiveClose>
-));
-ToastClose.displayName = ToastPrimitiveClose.displayName;
+const ToastClose = ({ className, ...props }: ComponentProps<"button">) => {
+  return (
+    <button
+      className={cn(
+        "ui:text-foreground/50 ui:hover:text-foreground ui:absolute ui:top-2 ui:right-2 ui:rounded-md ui:p-1 ui:opacity-0 ui:transition-opacity ui:group-hover:opacity-100 ui:group-[.destructive]:text-red-300 ui:group-[.destructive]:hover:text-red-50 ui:focus:opacity-100 ui:focus:ring-2 ui:focus:outline-none ui:group-[.destructive]:focus:ring-red-400 ui:group-[.destructive]:focus:ring-offset-red-600",
+        className,
+      )}
+      data-toast-close=""
+      type="button"
+      {...props}
+    >
+      <X className="ui:h-4 ui:w-4" />
+    </button>
+  );
+};
+ToastClose.displayName = "ToastClose";
 
-const ToastTitle = forwardRef<
-  ElementRef<typeof ToastPrimitiveTitle>,
-  ComponentPropsWithoutRef<typeof ToastPrimitiveTitle>
->(({ className, ...props }, ref) => (
-  <ToastPrimitiveTitle
-    className={cn("ui:text-sm ui:font-semibold", className)}
-    ref={ref}
-    {...props}
-  />
-));
-ToastTitle.displayName = ToastPrimitiveTitle.displayName;
+const ToastTitle = ({ className, ...props }: ComponentProps<"div">) => {
+  return <div className={cn("ui:text-sm ui:font-semibold", className)} {...props} />;
+};
+ToastTitle.displayName = "ToastTitle";
 
-const ToastDescription = forwardRef<
-  ElementRef<typeof ToastPrimitiveDescription>,
-  ComponentPropsWithoutRef<typeof ToastPrimitiveDescription>
->(({ className, ...props }, ref) => (
-  <ToastPrimitiveDescription
-    className={cn("ui:text-sm ui:opacity-90", className)}
-    ref={ref}
-    {...props}
-  />
-));
-ToastDescription.displayName = ToastPrimitiveDescription.displayName;
+const ToastDescription = ({ className, ...props }: ComponentProps<"div">) => {
+  return <div className={cn("ui:text-sm ui:opacity-90", className)} {...props} />;
+};
+ToastDescription.displayName = "ToastDescription";
 
-type ToastProps = ComponentPropsWithoutRef<typeof Toast>;
+type ToastProps = ComponentProps<typeof Toast>;
 type ToastActionElement = ReactElement<typeof ToastAction>;
 
 export {

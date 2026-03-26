@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui";
+import { Button, buttonVariants } from "@repo/ui";
 import { Meta, StoryObj } from "@storybook/react-vite";
 import {
   Loader2,
@@ -18,9 +18,6 @@ import {
 
 const meta: Meta<typeof Button> = {
   argTypes: {
-    asChild: {
-      control: { type: "boolean" },
-    },
     disabled: {
       control: { type: "boolean" },
     },
@@ -163,20 +160,16 @@ export const States: Story = {
   ),
 };
 
-export const AsChild: Story = {
+export const AsLink: Story = {
   render: () => (
     <div className="flex gap-4">
-      <Button asChild>
-        <a className="cursor-pointer" href="/example">
-          Link Button
-        </a>
-      </Button>
-      <Button asChild variant="outline">
-        <a className="cursor-pointer" href="/downloads">
-          <Download className="mr-2 h-4 w-4" />
-          Download Link
-        </a>
-      </Button>
+      <a className={buttonVariants({ variant: "default" })} href="/example">
+        Link Button
+      </a>
+      <a className={buttonVariants({ variant: "outline" })} href="/downloads">
+        <Download className="mr-2 h-4 w-4" />
+        Download Link
+      </a>
     </div>
   ),
 };

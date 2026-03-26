@@ -1,11 +1,8 @@
-import { Badge } from "@repo/ui";
+import { Badge, badgeVariants } from "@repo/ui";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof Badge> = {
   argTypes: {
-    asChild: {
-      control: { type: "boolean" },
-    },
     variant: {
       control: { type: "select" },
       options: ["default", "secondary", "destructive", "outline"],
@@ -120,16 +117,12 @@ export const Status: Story = {
 export const AsLink: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge asChild variant="default">
-        <a className="cursor-pointer" href="/badges/clickable">
-          Clickable Badge
-        </a>
-      </Badge>
-      <Badge asChild variant="outline">
-        <a className="cursor-pointer" href="/badges/link">
-          Link Badge
-        </a>
-      </Badge>
+      <a className={badgeVariants({ variant: "default" })} href="/badges/clickable">
+        Clickable Badge
+      </a>
+      <a className={badgeVariants({ variant: "outline" })} href="/badges/link">
+        Link Badge
+      </a>
     </div>
   ),
 };
