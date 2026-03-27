@@ -1,13 +1,13 @@
 import { headers } from "next/headers";
 import { cache } from "react";
 
-import { auth } from "./auth";
+import { getAuth } from "./auth";
 
 export const getSession = cache(async () => {
   const headersList = await headers();
 
   try {
-    const session = await auth.api.getSession({
+    const session = await getAuth().api.getSession({
       headers: headersList,
     });
 

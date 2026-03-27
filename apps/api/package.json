@@ -9,7 +9,7 @@
     "dev": "portless run --name acme.api tsdown --watch --on-success \"node dist/index.js\"",
     "lint": "oxlint src",
     "typecheck": "tsc --noEmit",
-    "start": "node dist/index.js",
+    "start": "node dist/index.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

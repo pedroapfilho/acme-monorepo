@@ -56,6 +56,12 @@
       }
     },
     {
+      "files": ["tests/e2e/**/fixtures/**"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    },
+    {
       "files": ["apps/workshop/**/*.stories.tsx"],
       "rules": {
         "no-console": "off"
