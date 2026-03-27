@@ -12,7 +12,7 @@ type Fixtures = {
   registerPage: RegisterPage;
 };
 
-export const test = base.extend<Fixtures>({
+const test = base.extend<Fixtures>({
   dashboardPage: async ({ page }, use) => {
     await use(new DashboardPage(page));
   },
@@ -27,4 +27,5 @@ export const test = base.extend<Fixtures>({
   },
 });
 
+export { test };
 export { expect } from "@playwright/test";
