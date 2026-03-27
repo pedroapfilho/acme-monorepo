@@ -1,8 +1,8 @@
 import { prisma } from "@repo/db";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { createAuth } from "../server";
-import type { AuthConfig } from "../server";
+import { createAuth } from "./server";
+import type { AuthConfig } from "./server";
 
 type Plugin = NonNullable<AuthConfig["extraPlugins"]>[number];
 
@@ -131,5 +131,34 @@ describe("Auth Server Configuration", () => {
     });
     const plugins = extendedAuth.options.plugins ?? [];
     expect(plugins.some((p) => p.id === "test-plugin")).toBe(true);
+  });
+
+  it("should not configure verification email when resendApiKey is absent", () => {
+    expect(auth.options.emailVerification?.sendVerificationEmail).toBeUndefined();
+  });
+
+  it("should configure verification email when resendApiKey is provided", () => {
+    const emailAuth = createAuth({
+      prisma,
+      resendApiKey: "re_test_key",
+      secret: "test-secret-minimum-32-characters-long",
+    });
+    expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
+  });
+
+  it("should disable rate limiting when CI is true", () => {
+    vi.stubEnv("CI", "true");
+
+    const ciAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(ciAuth.options.rateLimit?.enabled).toBe(false);
+  });
+
+  it("should have displayName as optional additional user field", () => {
+    const displayName = auth.options.user?.additionalFields?.displayName;
+    expect(displayName).toEqual({
+      defaultValue: null,
+      required: false,
+      type: "string",
+    });
   });
 });
