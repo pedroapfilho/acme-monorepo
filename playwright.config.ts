@@ -50,9 +50,7 @@ export default defineConfig({
     },
   ],
 
-  reporter: process.env.CI
-    ? [["html", { outputFolder: "playwright-report" }]]
-    : [["list"], ["html"]],
+  reporter: process.env.CI ? [["html", { open: "never" }]] : [["list"], ["html"]],
   retries: process.env.CI ? 2 : 0,
   testDir: "./tests/e2e",
 
