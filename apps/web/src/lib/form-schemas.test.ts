@@ -1,31 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
 
-/**
- * Mirror the form schemas from the auth forms to test validation logic
- * in isolation without rendering React components.
- */
-
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
-
-const registerSchema = z.object({
-  confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-  email: z.string().email("Invalid email address"),
-  name: z.string().min(3, "Name must be at least 3 characters").max(32),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
-
-const recoverSchema = z.object({
-  email: z.string().email(),
-});
-
-const resetPasswordSchema = z.object({
-  confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
+import { loginSchema, recoverSchema, registerSchema, resetPasswordSchema } from "./form-schemas";
 
 describe("loginSchema", () => {
   it("should accept valid credentials", () => {
