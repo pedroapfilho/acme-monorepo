@@ -10,12 +10,14 @@
     "pino-pretty",
     "react-scan",
     "@repo/tailwind-config",
+    "@repo/typescript-config",
     "tailwindcss",
     "@prisma/client",
     "clsx",
     "tailwind-merge",
     "jsdom",
-    "@vitest/coverage-v8"
+    "@vitest/coverage-v8",
+    "@testing-library/user-event"
   ],
   "ignore": [
     "verify-auth.js",
