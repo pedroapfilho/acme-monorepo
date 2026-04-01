@@ -5,7 +5,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost"],
   experimental: {
-    optimizePackageImports: ["@repo/ui", "lucide-react"],
+    optimizePackageImports: ["@repo/ui"],
   },
   reactStrictMode: true,
 
