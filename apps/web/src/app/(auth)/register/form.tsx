@@ -4,18 +4,11 @@ import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { registerSchema } from "@/lib/form-schemas";
 
-const formSchema = z.object({
-  confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-  email: z.string().email("Invalid email address"),
-  name: z.string().min(3, "Name must be at least 3 characters").max(32),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof registerSchema>;
 
 const defaultValues: FormValues = {
   confirmPassword: "",
@@ -61,8 +54,8 @@ const RegisterForm = () => {
       }
     },
     validators: {
-      onBlur: formSchema,
-      onChange: formSchema,
+      onBlur: registerSchema,
+      onChange: registerSchema,
     },
   });
 
