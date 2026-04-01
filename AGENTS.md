@@ -90,6 +90,7 @@ Dev scripts use `portless run --name <project>.<app>`. URLs follow `http://<proj
 - `test.yml` — `pnpm test`
 - `lint.yml` — `pnpm oxlint --format=github .`
 - `format.yml` — `pnpm run format:check`
+- `knip.yml` — `pnpm knip` (unused dependency detection)
 - All use `permissions: { contents: read }` and `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true`
 
 ## Prisma

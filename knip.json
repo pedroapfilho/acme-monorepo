@@ -1,0 +1,26 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "ignoreBinaries": ["portless"],
+  "ignoreDependencies": [
+    "eslint-plugin-*",
+    "@tailwindcss/postcss",
+    "oxlint-config-awesomeness",
+    "tw-animate-css",
+    "postcss",
+    "pino-pretty",
+    "react-scan",
+    "@repo/tailwind-config",
+    "tailwindcss",
+    "@prisma/client",
+    "clsx",
+    "tailwind-merge",
+    "jsdom",
+    "@vitest/coverage-v8"
+  ],
+  "ignore": [
+    "verify-auth.js",
+    "packages/ui/src/styles/globals.css",
+    "tests/e2e/setup/auth.setup.ts"
+  ],
+  "exclude": ["unresolved"]
+}

@@ -16,17 +16,13 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.12",
-    "@hono/zod-openapi": "^1.2.4",
     "@hono/zod-validator": "^0.7.6",
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
-    "better-auth": "^1.5.6",
     "dotenv": "^17.3.1",
     "hono": "^4.12.9",
     "hono-rate-limiter": "^0.5.3",
     "pino-http": "^11.0.0",
-    "resend": "^6.10.0",
-    "undici": "^7.24.6",
     "zod": "^4.3.6"
   },
   "devDependencies": {

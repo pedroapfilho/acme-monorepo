@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "better-auth": "^1.5.6"
+    "better-auth": "^1.5.6",
+    "resend": "^6.10.0"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
