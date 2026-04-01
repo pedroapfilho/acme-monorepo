@@ -46,7 +46,7 @@ jobs:
       - run: pnpm build --filter=web --filter=api --filter=landing
       - name: Get Playwright version
         id: pw
-        run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> $GITHUB_OUTPUT
+        run: echo "version=$(pnpm exec playwright --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4
         id: pw-cache
         with:
