@@ -51,8 +51,7 @@ const LoginForm = ({ from }: Props) => {
       }
     },
     validators: {
-      onBlur: loginSchema,
-      onChange: loginSchema,
+      onSubmit: loginSchema,
     },
   });
 

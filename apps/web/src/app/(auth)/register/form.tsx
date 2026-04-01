@@ -4,6 +4,7 @@ import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
@@ -54,8 +55,7 @@ const RegisterForm = () => {
       }
     },
     validators: {
-      onBlur: registerSchema,
-      onChange: registerSchema,
+      onSubmit: registerSchema,
     },
   });
 
