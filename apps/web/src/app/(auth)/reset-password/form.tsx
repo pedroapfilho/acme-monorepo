@@ -4,16 +4,11 @@ import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { resetPasswordSchema } from "@/lib/form-schemas";
 
-const formSchema = z.object({
-  confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof resetPasswordSchema>;
 
 const defaultValues: FormValues = {
   confirmPassword: "",
@@ -64,8 +59,8 @@ const ResetPasswordForm = ({ token }: Props) => {
       }
     },
     validators: {
-      onBlur: formSchema,
-      onChange: formSchema,
+      onBlur: resetPasswordSchema,
+      onChange: resetPasswordSchema,
     },
   });
 

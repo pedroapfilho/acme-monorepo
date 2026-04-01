@@ -4,15 +4,11 @@ import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { recoverSchema } from "@/lib/form-schemas";
 
-const formSchema = z.object({
-  email: z.string().email(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof recoverSchema>;
 
 const defaultValues: FormValues = {
   email: "",
@@ -48,8 +44,8 @@ const RecoverForm = () => {
       }
     },
     validators: {
-      onBlur: formSchema,
-      onChange: formSchema,
+      onBlur: recoverSchema,
+      onChange: recoverSchema,
     },
   });
 

@@ -7,13 +7,9 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
+import { loginSchema } from "@/lib/form-schemas";
 
-const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof loginSchema>;
 
 const defaultValues: FormValues = {
   email: "",
@@ -55,8 +51,8 @@ const LoginForm = ({ from }: Props) => {
       }
     },
     validators: {
-      onBlur: formSchema,
-      onChange: formSchema,
+      onBlur: loginSchema,
+      onChange: loginSchema,
     },
   });
 
