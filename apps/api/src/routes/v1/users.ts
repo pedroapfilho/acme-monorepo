@@ -52,7 +52,9 @@ v1UserRoutes.delete("/me", authMiddleware, async (c) => {
   return c.json({ message: "Account deleted successfully" });
 });
 
-// List users (admin only - for future use)
+// List users (admin only)
+// TODO: Add a proper role/permission system (e.g. user.role === "admin").
+// Until then, this endpoint is restricted to returning only the requesting user's own data.
 const listUsersSchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(10),
   order: z.enum(["asc", "desc"]).default("desc"),
@@ -61,20 +63,15 @@ const listUsersSchema = z.object({
 });
 
 v1UserRoutes.get("/", authMiddleware, zValidator("query", listUsersSchema), async (c) => {
-  const { limit, order, orderBy, page } = c.req.valid("query");
-
-  const result = await userService.list({
-    orderBy: { [orderBy]: order },
-    skip: (page - 1) * limit,
-    take: limit,
-  });
+  const user = c.get("user");
+  const fullUser = await userService.findById(user.id);
 
   return c.json({
-    data: result.data,
+    data: fullUser ? [fullUser] : [],
     meta: {
-      ...result.meta,
-      page,
-      totalPages: Math.ceil(result.meta.total / limit),
+      page: 1,
+      total: fullUser ? 1 : 0,
+      totalPages: 1,
     },
   });
 });

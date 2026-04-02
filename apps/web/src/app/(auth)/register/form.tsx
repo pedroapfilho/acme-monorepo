@@ -27,13 +27,13 @@ const RegisterForm = () => {
     defaultValues,
     onSubmit: async ({ value }) => {
       try {
-        setIsLoading(true);
-        setRootError(null);
-
         if (value.password !== value.confirmPassword) {
           setRootError("Passwords do not match");
           return;
         }
+
+        setIsLoading(true);
+        setRootError(null);
 
         const result = await authClient.signUp.email({
           email: value.email,

@@ -29,18 +29,18 @@ const ResetPasswordForm = ({ token }: Props) => {
     defaultValues,
     onSubmit: async ({ value }) => {
       try {
-        setIsLoading(true);
-        setRootError(null);
+        if (!token) {
+          setRootError("Invalid reset token. Please request a new password reset.");
+          return;
+        }
 
         if (value.password !== value.confirmPassword) {
           setRootError("Passwords do not match");
           return;
         }
 
-        if (!token) {
-          setRootError("Invalid reset token. Please request a new password reset.");
-          return;
-        }
+        setIsLoading(true);
+        setRootError(null);
 
         const result = await authClient.resetPassword({
           newPassword: value.password,

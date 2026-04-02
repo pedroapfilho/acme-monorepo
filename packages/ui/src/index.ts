@@ -1,5 +1,3 @@
-"use client";
-
 // Components
 export * from "./components/aspect-ratio";
 export * from "./components/avatar";
