@@ -19,8 +19,8 @@
     "@hono/zod-validator": "^0.7.6",
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
-    "dotenv": "^17.3.1",
-    "hono": "^4.12.9",
+    "dotenv": "^17.4.0",
+    "hono": "^4.12.10",
     "hono-rate-limiter": "^0.5.3",
     "pino-http": "^11.0.0",
     "zod": "^4.3.6"

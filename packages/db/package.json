@@ -30,7 +30,7 @@
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.5.0",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.0",
     "prisma": "^7.6.0",
     "tsdown": "^0.21.7",
     "tsx": "^4.21.0",
