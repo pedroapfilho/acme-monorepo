@@ -1,3 +1,5 @@
+name: acme
+
 services:
   postgres:
     image: postgres:18-alpine
