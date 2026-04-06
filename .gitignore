@@ -53,3 +53,5 @@ packages/db/src/generated
 
 # counselors agent output
 agents/
+# typescript build info
+*.tsbuildinfo
