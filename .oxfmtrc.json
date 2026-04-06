@@ -33,7 +33,6 @@
     "node_modules/**",
     "build/**",
     "coverage/**",
-    "storybook-static/**",
     "pnpm-lock.yaml"
   ]
 }
