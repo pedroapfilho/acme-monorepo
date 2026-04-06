@@ -1,7 +1,0 @@
-{
-  "extends": "@repo/typescript-config/vite.json",
-  "compilerOptions": {
-    "skipLibCheck": true
-  },
-  "include": ["."]
-}

@@ -62,12 +62,6 @@
       }
     },
     {
-      "files": ["apps/workshop/**/*.stories.tsx"],
-      "rules": {
-        "no-console": "off"
-      }
-    },
-    {
       "files": ["**/seed.ts"],
       "rules": {
         "no-console": "off"
@@ -266,7 +260,6 @@
     "dist/**",
     "next-env.d.ts",
     "node_modules/**",
-    "storybook-static/**",
     "verify-auth.js"
   ],
   "$schema": "./node_modules/oxlint/configuration_schema.json"
