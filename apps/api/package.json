@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "portless run --name acme.api tsdown --watch --on-success \"node dist/index.mjs\"",
+    "dev": "portless run --force --name acme.api tsdown --watch --on-success \"node dist/index.mjs\"",
     "lint": "oxlint src",
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.mjs",
