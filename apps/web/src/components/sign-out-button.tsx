@@ -4,6 +4,7 @@ import { Button } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { BoneyardSkeleton } from "@/components/boneyard-skeleton";
 import { authClient } from "@/lib/auth-client";
 
 const SignOutButton = () => {
@@ -24,12 +25,18 @@ const SignOutButton = () => {
   };
 
   return (
-    <div>
-      <Button disabled={isLoading} onClick={handleSignOut} variant="outline">
-        {isLoading ? "Signing out" : "Sign Out"}
-      </Button>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-    </div>
+    <BoneyardSkeleton
+      fixture={<div className="h-10 w-24 rounded bg-neutral-200" />}
+      loading={isLoading}
+      name="sign-out-button"
+    >
+      <div>
+        <Button disabled={isLoading} onClick={handleSignOut} variant="outline">
+          {isLoading ? "Signing out" : "Sign Out"}
+        </Button>
+        {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      </div>
+    </BoneyardSkeleton>
   );
 };
 

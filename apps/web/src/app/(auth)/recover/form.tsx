@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
 
+import { BoneyardSkeleton } from "@/components/boneyard-skeleton";
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 
@@ -50,44 +51,55 @@ const RecoverForm = () => {
   });
 
   return (
-    <form
-      className="space-y-4"
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
+    <BoneyardSkeleton
+      fixture={
+        <div className="space-y-4">
+          <div className="h-10 w-full rounded bg-neutral-200" />
+          <div className="h-10 w-full rounded bg-neutral-200" />
+        </div>
+      }
+      loading={isLoading}
+      name="recover-form"
     >
-      <form.Field name="email">
-        {(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid || undefined}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                aria-invalid={isInvalid}
-                disabled={isLoading}
-                id="email"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="email@address.com"
-                type="email"
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
+      <form
+        className="space-y-4"
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
         }}
-      </form.Field>
+      >
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  disabled={isLoading}
+                  id="email"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="email@address.com"
+                  type="email"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-      {rootError && <div className="text-sm text-red-500">{rootError}</div>}
+        {rootError && <div className="text-sm text-red-500">{rootError}</div>}
 
-      <Button className="w-full" disabled={isLoading} type="submit">
-        {isLoading ? "Sending..." : "Submit Request"}
-      </Button>
-    </form>
+        <Button className="w-full" disabled={isLoading} type="submit">
+          {isLoading ? "Sending..." : "Submit Request"}
+        </Button>
+      </form>
+    </BoneyardSkeleton>
   );
 };
 
