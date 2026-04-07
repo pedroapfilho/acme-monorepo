@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost"],
   experimental: {
     optimizePackageImports: ["@repo/ui"],
-    viewTransition: true,
   },
   reactStrictMode: true,
 
