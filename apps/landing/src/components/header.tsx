@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="flex flex-col border-b" style={{ viewTransitionName: "site-header" }}>
+    <header className="flex flex-col border-b">
       <Link href="/about">About</Link>
     </header>
   );

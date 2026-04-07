@@ -1,7 +1,16 @@
 "use client";
 
-import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
+import {
+  Button,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+} from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -51,7 +60,6 @@ const RecoverForm = () => {
 
   return (
     <form
-      className="space-y-4"
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
@@ -59,34 +67,41 @@ const RecoverForm = () => {
         void form.handleSubmit();
       }}
     >
-      <form.Field name="email">
-        {(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid || undefined}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                aria-invalid={isInvalid}
-                disabled={isLoading}
-                id="email"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="email@address.com"
-                type="email"
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      </form.Field>
+      <FieldGroup>
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  disabled={isLoading}
+                  id="email"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="m@example.com"
+                  type="email"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-      {rootError && <div className="text-sm text-red-500">{rootError}</div>}
+        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
-      <Button className="w-full" disabled={isLoading} type="submit">
-        {isLoading ? "Sending..." : "Submit Request"}
-      </Button>
+        <Field>
+          <Button disabled={isLoading} type="submit">
+            {isLoading ? "Sending..." : "Send reset link"}
+          </Button>
+          <FieldDescription className="text-center">
+            Remembered your password? <Link href="/login">Sign in</Link>
+          </FieldDescription>
+        </Field>
+      </FieldGroup>
     </form>
   );
 };

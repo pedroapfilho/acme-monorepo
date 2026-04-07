@@ -1,7 +1,16 @@
 "use client";
 
-import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
+import {
+  Button,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+} from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -57,7 +66,6 @@ const LoginForm = ({ from }: Props) => {
 
   return (
     <form
-      className="space-y-4"
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
@@ -65,57 +73,71 @@ const LoginForm = ({ from }: Props) => {
         void form.handleSubmit();
       }}
     >
-      <form.Field name="email">
-        {(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid || undefined}>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <Input
-                aria-invalid={isInvalid}
-                disabled={isLoading}
-                id="email"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="you@example.com"
-                type="email"
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      </form.Field>
+      <FieldGroup>
+        <form.Field name="email">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  aria-invalid={isInvalid}
+                  disabled={isLoading}
+                  id="email"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="m@example.com"
+                  type="email"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-      <form.Field name="password">
-        {(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid || undefined}>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input
-                aria-invalid={isInvalid}
-                disabled={isLoading}
-                id="password"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Enter your password"
-                type="password"
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      </form.Field>
+        <form.Field name="password">
+          {(field) => {
+            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid || undefined}>
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <Link
+                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                    href="/recover"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
+                <Input
+                  aria-invalid={isInvalid}
+                  disabled={isLoading}
+                  id="password"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  type="password"
+                  value={field.state.value}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
 
-      {rootError && <div className="text-sm text-red-500">{rootError}</div>}
+        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
-      <Button className="w-full" disabled={isLoading} type="submit">
-        {isLoading ? "Logging in..." : "Log In"}
-      </Button>
+        <Field>
+          <Button disabled={isLoading} type="submit">
+            {isLoading ? "Signing in..." : "Sign in"}
+          </Button>
+          <FieldDescription className="text-center">
+            Don&apos;t have an account? <Link href="/register">Sign up</Link>
+          </FieldDescription>
+        </Field>
+      </FieldGroup>
     </form>
   );
 };

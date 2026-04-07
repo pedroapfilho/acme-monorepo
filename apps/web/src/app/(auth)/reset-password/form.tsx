@@ -1,7 +1,16 @@
 "use client";
 
-import { Button, Field, FieldError, FieldLabel, Input } from "@repo/ui";
+import {
+  Button,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+} from "@repo/ui";
 import { useForm } from "@tanstack/react-form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -66,7 +75,6 @@ const ResetPasswordForm = ({ token }: Props) => {
 
   return (
     <form
-      className="space-y-4"
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
@@ -74,57 +82,64 @@ const ResetPasswordForm = ({ token }: Props) => {
         void form.handleSubmit();
       }}
     >
-      <form.Field name="password">
-        {(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid || undefined}>
-              <FieldLabel htmlFor="password">New Password</FieldLabel>
-              <Input
-                aria-invalid={isInvalid}
-                disabled={isLoading}
-                id="password"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Enter your new password"
-                type="password"
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      </form.Field>
+      <FieldGroup>
+        <div className="grid grid-cols-2 gap-4">
+          <form.Field name="password">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="password">New password</FieldLabel>
+                  <Input
+                    aria-invalid={isInvalid}
+                    disabled={isLoading}
+                    id="password"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    type="password"
+                    value={field.state.value}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
 
-      <form.Field name="confirmPassword">
-        {(field) => {
-          const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-          return (
-            <Field data-invalid={isInvalid || undefined}>
-              <FieldLabel htmlFor="confirmPassword">Confirm New Password</FieldLabel>
-              <Input
-                aria-invalid={isInvalid}
-                disabled={isLoading}
-                id="confirmPassword"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Confirm your new password"
-                type="password"
-                value={field.state.value}
-              />
-              {isInvalid && <FieldError errors={field.state.meta.errors} />}
-            </Field>
-          );
-        }}
-      </form.Field>
+          <form.Field name="confirmPassword">
+            {(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid || undefined}>
+                  <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
+                  <Input
+                    aria-invalid={isInvalid}
+                    disabled={isLoading}
+                    id="confirmPassword"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    type="password"
+                    value={field.state.value}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+        </div>
 
-      {rootError && <div className="text-sm text-red-500">{rootError}</div>}
+        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
-      <Button className="w-full" disabled={isLoading} type="submit">
-        {isLoading ? "Resetting..." : "Reset Password"}
-      </Button>
+        <Field>
+          <Button disabled={isLoading} type="submit">
+            {isLoading ? "Resetting..." : "Reset password"}
+          </Button>
+          <FieldDescription className="text-center">
+            Back to <Link href="/login">sign in</Link>
+          </FieldDescription>
+        </Field>
+      </FieldGroup>
     </form>
   );
 };
