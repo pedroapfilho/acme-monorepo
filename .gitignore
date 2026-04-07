@@ -48,6 +48,10 @@ dist/
 # prisma generated client
 packages/db/src/generated
 
+# boneyard generated bones (keep registry.ts, ignore generated data)
+**/bones/*
+!**/bones/registry.ts
+
 # counselors agent output
 agents/
 # typescript build info

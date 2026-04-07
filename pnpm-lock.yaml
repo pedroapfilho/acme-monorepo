@@ -101,7 +101,10 @@ importers:
         version: link:../../packages/ui
       '@vercel/analytics':
         specifier: ^2.0.1
-        version: 2.0.1(next@16.2.2(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+        version: 2.0.1(next@16.2.2(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+      boneyard-js:
+        specifier: ^1.6.7
+        version: 1.6.7(react@19.2.4)
       next:
         specifier: ^16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -175,6 +178,9 @@ importers:
       better-auth:
         specifier: ^1.5.6
         version: 1.5.6(839a3eeaf36bb661c4475cecf0f0fc19)
+      boneyard-js:
+        specifier: ^1.6.7
+        version: 1.6.7(react@19.2.4)
       next:
         specifier: ^16.2.2
         version: 16.2.2(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -611,6 +617,9 @@ packages:
   '@bramus/specificity@2.4.2':
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
+
+  '@chenglou/pretext@0.0.3':
+    resolution: {integrity: sha512-RQmqMqUAPRCyv4R3LlRi/ao6KbNWYclqLA+V1HS7sWgyUUbjn3JmmlfXZSY/BjM4rbmIaMSyIVisYocYGYftiQ==}
 
   '@clack/core@0.5.0':
     resolution: {integrity: sha512-p3y0FIOwaYRUPRcMO7+dlmLh8PSRcrjuTndsiA0WAFbWES0mLZlrjVoBRZ9DzkPFJZG6KGkJmoEAY0ZcVWTkow==}
@@ -2873,6 +2882,27 @@ packages:
   birpc@4.0.0:
     resolution: {integrity: sha512-LShSxJP0KTmd101b6DRyGBj57LZxSDYWKitQNW/mi8GRMvZb078Uf9+pveax1DrVL89vm7mWe+TovdI/UDOuPw==}
 
+  boneyard-js@1.6.7:
+    resolution: {integrity: sha512-ClzI7uF4cAaSBQOtwChjNQhIzOUIWofYBBN8Q0bY/b7+i3Ik6o/ykd0SZp4XaRMt7z9BDwE7Ir/U6IxDV9cGqw==}
+    hasBin: true
+    peerDependencies:
+      '@angular/core': '>=14'
+      react: '>=18'
+      react-native: '>=0.71'
+      svelte: '>=5.29'
+      vue: '>=3'
+    peerDependenciesMeta:
+      '@angular/core':
+        optional: true
+      react:
+        optional: true
+      react-native:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+
   brace-expansion@1.1.13:
     resolution: {integrity: sha512-9ZLprWS6EENmhEOpjCYW2c8VkmOvckIJZfkr7rBW6dObmfgJ/L1GpSYW5Hpo9lDz4D1+n0Ckz8rU7FwHDQiG/w==}
 
@@ -4947,6 +4977,9 @@ snapshots:
     dependencies:
       css-tree: 3.2.1
 
+  '@chenglou/pretext@0.0.3':
+    optional: true
+
   '@clack/core@0.5.0':
     dependencies:
       picocolors: 1.1.1
@@ -6328,7 +6361,7 @@ snapshots:
       '@typescript-eslint/types': 8.58.0
       eslint-visitor-keys: 5.0.1
 
-  '@vercel/analytics@2.0.1(next@16.2.2(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
+  '@vercel/analytics@2.0.1(next@16.2.2(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     optionalDependencies:
       next: 16.2.2(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
@@ -6522,6 +6555,13 @@ snapshots:
       - '@types/react'
 
   birpc@4.0.0: {}
+
+  boneyard-js@1.6.7(react@19.2.4):
+    dependencies:
+      playwright: 1.59.1
+    optionalDependencies:
+      '@chenglou/pretext': 0.0.3
+      react: 19.2.4
 
   brace-expansion@1.1.13:
     dependencies:

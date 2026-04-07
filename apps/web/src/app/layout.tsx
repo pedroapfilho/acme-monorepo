@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import "../bones/registry";
 
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
