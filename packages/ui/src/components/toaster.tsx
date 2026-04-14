@@ -19,7 +19,7 @@ export const Toaster = () => {
       {toasts.map(function ({ action, description, id, onOpenChange, title, ...props }) {
         return (
           <Toast key={id} onOpenChange={onOpenChange} {...props}>
-            <div className="ui:grid ui:gap-1">
+            <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && <ToastDescription>{description}</ToastDescription>}
             </div>

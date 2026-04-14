@@ -33,18 +33,18 @@ function TooltipContent({
         alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
-        className="ui:isolate ui:z-50"
+        className="isolate z-50"
       >
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"
           className={cn(
-            "ui:z-50 ui:inline-flex ui:w-fit ui:max-w-xs ui:origin-(--transform-origin) ui:items-center ui:gap-1.5 ui:rounded-md ui:bg-foreground ui:px-3 ui:py-1.5 ui:text-xs ui:text-background ui:has-data-[slot=kbd]:pr-1.5 ui:data-[side=bottom]:slide-in-from-top-2 ui:data-[side=inline-end]:slide-in-from-left-2 ui:data-[side=inline-start]:slide-in-from-right-2 ui:data-[side=left]:slide-in-from-right-2 ui:data-[side=right]:slide-in-from-left-2 ui:data-[side=top]:slide-in-from-bottom-2 ui:**:data-[slot=kbd]:relative ui:**:data-[slot=kbd]:isolate ui:**:data-[slot=kbd]:z-50 ui:**:data-[slot=kbd]:rounded-sm ui:data-[state=delayed-open]:animate-in ui:data-[state=delayed-open]:fade-in-0 ui:data-[state=delayed-open]:zoom-in-95 ui:data-open:animate-in ui:data-open:fade-in-0 ui:data-open:zoom-in-95 ui:data-closed:animate-out ui:data-closed:fade-out-0 ui:data-closed:zoom-out-95",
+            "z-50 inline-flex w-fit max-w-xs origin-(--transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95",
             className,
           )}
           {...props}
         >
           {children}
-          <TooltipPrimitive.Arrow className="ui:z-50 ui:size-2.5 ui:translate-y-[calc(-50%-2px)] ui:rotate-45 ui:rounded-[2px] ui:bg-foreground ui:fill-foreground ui:data-[side=bottom]:top-1 ui:data-[side=inline-end]:top-1/2! ui:data-[side=inline-end]:-left-1 ui:data-[side=inline-end]:-translate-y-1/2 ui:data-[side=inline-start]:top-1/2! ui:data-[side=inline-start]:-right-1 ui:data-[side=inline-start]:-translate-y-1/2 ui:data-[side=left]:top-1/2! ui:data-[side=left]:-right-1 ui:data-[side=left]:-translate-y-1/2 ui:data-[side=right]:top-1/2! ui:data-[side=right]:-left-1 ui:data-[side=right]:-translate-y-1/2 ui:data-[side=top]:-bottom-2.5" />
+          <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=inline-end]:top-1/2! data-[side=inline-end]:-left-1 data-[side=inline-end]:-translate-y-1/2 data-[side=inline-start]:top-1/2! data-[side=inline-start]:-right-1 data-[side=inline-start]:-translate-y-1/2 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5" />
         </TooltipPrimitive.Popup>
       </TooltipPrimitive.Positioner>
     </TooltipPrimitive.Portal>

@@ -6,9 +6,9 @@ import { cn } from "../lib/utils";
 
 const Table = ({ className, ...props }: ComponentProps<"table">) => {
   return (
-    <div className="ui:relative ui:w-full ui:overflow-x-auto" data-slot="table-container">
+    <div className="relative w-full overflow-x-auto" data-slot="table-container">
       <table
-        className={cn("ui:w-full ui:caption-bottom ui:text-sm", className)}
+        className={cn("w-full caption-bottom text-sm", className)}
         data-slot="table"
         {...props}
       />
@@ -17,15 +17,13 @@ const Table = ({ className, ...props }: ComponentProps<"table">) => {
 };
 
 const TableHeader = ({ className, ...props }: ComponentProps<"thead">) => {
-  return (
-    <thead className={cn("ui:[&_tr]:border-b", className)} data-slot="table-header" {...props} />
-  );
+  return <thead className={cn("[&_tr]:border-b", className)} data-slot="table-header" {...props} />;
 };
 
 const TableBody = ({ className, ...props }: ComponentProps<"tbody">) => {
   return (
     <tbody
-      className={cn("ui:[&_tr:last-child]:border-0", className)}
+      className={cn("[&_tr:last-child]:border-0", className)}
       data-slot="table-body"
       {...props}
     />
@@ -35,10 +33,7 @@ const TableBody = ({ className, ...props }: ComponentProps<"tbody">) => {
 const TableFooter = ({ className, ...props }: ComponentProps<"tfoot">) => {
   return (
     <tfoot
-      className={cn(
-        "ui:bg-muted/50 ui:border-t ui:font-medium ui:[&>tr]:last:border-b-0",
-        className,
-      )}
+      className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)}
       data-slot="table-footer"
       {...props}
     />
@@ -49,7 +44,7 @@ const TableRow = ({ className, ...props }: ComponentProps<"tr">) => {
   return (
     <tr
       className={cn(
-        "ui:hover:bg-muted/50 ui:data-[state=selected]:bg-muted ui:border-b ui:transition-colors",
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
         className,
       )}
       data-slot="table-row"
@@ -62,7 +57,7 @@ const TableHead = ({ className, ...props }: ComponentProps<"th">) => {
   return (
     <th
       className={cn(
-        "ui:text-foreground ui:h-10 ui:px-2 ui:text-left ui:align-middle ui:font-medium ui:whitespace-nowrap ui:[&:has([role=checkbox])]:pr-0 ui:[&>[role=checkbox]]:translate-y-[2px]",
+        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className,
       )}
       data-slot="table-head"
@@ -75,7 +70,7 @@ const TableCell = ({ className, ...props }: ComponentProps<"td">) => {
   return (
     <td
       className={cn(
-        "ui:p-2 ui:align-middle ui:whitespace-nowrap ui:[&:has([role=checkbox])]:pr-0 ui:[&>[role=checkbox]]:translate-y-[2px]",
+        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className,
       )}
       data-slot="table-cell"
@@ -87,7 +82,7 @@ const TableCell = ({ className, ...props }: ComponentProps<"td">) => {
 const TableCaption = ({ className, ...props }: ComponentProps<"caption">) => {
   return (
     <caption
-      className={cn("ui:text-muted-foreground ui:mt-4 ui:text-sm", className)}
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
       data-slot="table-caption"
       {...props}
     />

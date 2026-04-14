@@ -11,30 +11,30 @@ type InputProps = Omit<ComponentProps<"input">, "className"> & {
 function Input({ className, endIcon, startIcon, type, ...props }: InputProps) {
   if (startIcon || endIcon) {
     return (
-      <div className={cn("ui:relative", className)}>
+      <div className={cn("relative", className)}>
         {startIcon && (
-          <div className="ui:text-muted-foreground ui:pointer-events-none ui:absolute ui:top-1/2 ui:left-3 ui:-translate-y-1/2 ui:transform">
+          <div className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 transform text-muted-foreground">
             {cloneElement(startIcon, {
-              className: cn("ui:h-4 ui:w-4", startIcon?.props?.className),
+              className: cn("h-4 w-4", startIcon?.props?.className),
             })}
           </div>
         )}
         <input
           className={cn(
-            "file:ui:text-foreground placeholder:ui:text-muted-foreground selection:ui:bg-primary selection:ui:text-primary-foreground ui:dark:bg-input/30 ui:border-input ui:flex ui:h-9 ui:w-full ui:min-w-0 ui:rounded-md ui:border ui:bg-transparent ui:py-1 ui:text-base ui:shadow-xs ui:transition-[color,box-shadow] ui:outline-none file:ui:inline-flex file:ui:h-7 file:ui:border-0 file:ui:bg-transparent file:ui:text-sm file:ui:font-medium ui:disabled:pointer-events-none ui:disabled:cursor-not-allowed ui:disabled:opacity-50 ui:md:text-sm",
-            "ui:focus-visible:border-ring ui:focus-visible:ring-ring/50 ui:focus-visible:ring-[3px]",
-            "ui:aria-invalid:ring-destructive/20 ui:dark:aria-invalid:ring-destructive/40 ui:aria-invalid:border-destructive",
-            startIcon ? "ui:pl-10" : "ui:px-3",
-            endIcon ? "ui:pr-10" : startIcon ? "" : "ui:px-3",
+            "flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30",
+            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+            startIcon ? "pl-10" : "px-3",
+            endIcon ? "pr-10" : startIcon ? "" : "px-3",
           )}
           data-slot="input"
           type={type}
           {...props}
         />
         {endIcon && (
-          <div className="ui:text-muted-foreground ui:absolute ui:top-1/2 ui:right-3 ui:-translate-y-1/2 ui:transform">
+          <div className="absolute top-1/2 right-3 -translate-y-1/2 transform text-muted-foreground">
             {cloneElement(endIcon, {
-              className: cn("ui:h-4 ui:w-4", endIcon?.props?.className),
+              className: cn("h-4 w-4", endIcon?.props?.className),
             })}
           </div>
         )}
@@ -45,9 +45,9 @@ function Input({ className, endIcon, startIcon, type, ...props }: InputProps) {
   return (
     <input
       className={cn(
-        "file:ui:text-foreground placeholder:ui:text-muted-foreground selection:ui:bg-primary selection:ui:text-primary-foreground ui:dark:bg-input/30 ui:border-input ui:flex ui:h-9 ui:w-full ui:min-w-0 ui:rounded-md ui:border ui:bg-transparent ui:px-3 ui:py-1 ui:text-base ui:shadow-xs ui:transition-[color,box-shadow] ui:outline-none file:ui:inline-flex file:ui:h-7 file:ui:border-0 file:ui:bg-transparent file:ui:text-sm file:ui:font-medium ui:disabled:pointer-events-none ui:disabled:cursor-not-allowed ui:disabled:opacity-50 ui:md:text-sm",
-        "ui:focus-visible:border-ring ui:focus-visible:ring-ring/50 ui:focus-visible:ring-[3px]",
-        "ui:aria-invalid:ring-destructive/20 ui:dark:aria-invalid:ring-destructive/40 ui:aria-invalid:border-destructive",
+        "flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30",
+        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+        "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
         className,
       )}
       data-slot="input"
