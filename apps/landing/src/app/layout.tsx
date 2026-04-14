@@ -59,7 +59,7 @@ const inter = Inter({
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html className="scroll-smooth" data-mode="dark" lang="en-US">
+    <html className="scroll-smooth" lang="en-US">
       {process.env.NODE_ENV === "development" && !process.env.CI && (
         <>
           <script
@@ -74,14 +74,15 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           />
         </>
       )}
-      <body className={cn("relative min-h-screen font-sans antialiased", inter.variable)}>
-        <>
-          <Header />
-
-          <main>{children}</main>
-
-          <Footer />
-        </>
+      <body
+        className={cn(
+          "relative flex min-h-dvh flex-col font-sans text-foreground antialiased",
+          inter.variable,
+        )}
+      >
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
 
         <AnalyticsWrapper />
       </body>
