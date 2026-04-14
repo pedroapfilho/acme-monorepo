@@ -7,17 +7,15 @@
     "config": "",
     "css": "src/styles/globals.css",
     "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": "ui"
+    "cssVariables": true
   },
   "iconLibrary": "lucide",
-  "rtl": false,
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@repo/ui/components",
+    "utils": "@repo/ui/lib/utils",
+    "hooks": "@repo/ui/hooks",
+    "lib": "@repo/ui/lib",
+    "ui": "@repo/ui/components"
   },
-  "registries": {}
+  "rtl": false
 }

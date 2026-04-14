@@ -14,7 +14,7 @@ function ToastViewport({ className, ...props }: ComponentProps<"ol">) {
   return (
     <ol
       className={cn(
-        "ui:fixed ui:top-0 ui:z-[100] ui:flex ui:max-h-screen ui:w-full ui:flex-col-reverse ui:p-4 ui:sm:top-auto ui:sm:right-0 ui:sm:bottom-0 ui:sm:flex-col ui:md:max-w-[420px]",
+        "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:top-auto sm:right-0 sm:bottom-0 sm:flex-col md:max-w-[420px]",
         className,
       )}
       tabIndex={-1}
@@ -25,20 +25,20 @@ function ToastViewport({ className, ...props }: ComponentProps<"ol">) {
 ToastViewport.displayName = "ToastViewport";
 
 const toastVariants = cva(
-  "ui:group ui:data-[state=open]:animate-in ui:data-[state=closed]:animate-out ui:data-[swipe=end]:animate-out ui:data-[state=closed]:fade-out-80 ui:data-[state=closed]:slide-out-to-right-full ui:data-[state=open]:slide-in-from-top-full ui:data-[state=open]:sm:slide-in-from-bottom-full ui:pointer-events-auto ui:relative ui:flex ui:w-full ui:items-center ui:justify-between ui:space-x-4 ui:overflow-hidden ui:rounded-md ui:border ui:p-6 ui:pr-8 ui:shadow-lg ui:transition-all ui:data-[swipe=cancel]:translate-x-0 ui:data-[swipe=move]:transition-none",
+  "group data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=move]:transition-none",
   {
     defaultVariants: {
       variant: "default",
     },
     variants: {
       variant: {
-        default: "ui:bg-background ui:text-foreground ui:border",
+        default: "bg-background text-foreground border",
         destructive:
-          "destructive ui:border-destructive ui:bg-destructive ui:text-destructive-foreground",
+          "destructive border-destructive bg-destructive text-destructive-foreground",
         success:
-          "ui:border-green-500 ui:bg-green-50 ui:text-green-900 ui:dark:border-green-400 ui:dark:bg-green-900/20 ui:dark:text-green-100",
+          "border-green-500 bg-green-50 text-green-900 dark:border-green-400 dark:bg-green-900/20 dark:text-green-100",
         warning:
-          "ui:border-orange-500 ui:bg-orange-50 ui:text-orange-900 ui:dark:border-orange-400 ui:dark:bg-orange-900/20 ui:dark:text-orange-100",
+          "border-orange-500 bg-orange-50 text-orange-900 dark:border-orange-400 dark:bg-orange-900/20 dark:text-orange-100",
       },
     },
   },
@@ -75,7 +75,7 @@ const ToastAction = ({
     <button
       aria-label={altText}
       className={cn(
-        "ui:ring-offset-background ui:hover:bg-secondary ui:focus:ring-ring ui:group-[.destructive]:border-muted/40 ui:group-[.destructive]:hover:border-destructive/30 ui:group-[.destructive]:hover:bg-destructive ui:group-[.destructive]:hover:text-destructive-foreground ui:group-[.destructive]:focus:ring-destructive ui:inline-flex ui:h-8 ui:shrink-0 ui:items-center ui:justify-center ui:rounded-md ui:border ui:bg-transparent ui:px-3 ui:text-sm ui:font-medium ui:transition-colors ui:focus:ring-2 ui:focus:ring-offset-2 ui:focus:outline-none ui:disabled:pointer-events-none ui:disabled:opacity-50",
+        "ring-offset-background hover:bg-secondary focus:ring-ring group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
       type="button"
@@ -89,26 +89,26 @@ const ToastClose = ({ className, ...props }: ComponentProps<"button">) => {
   return (
     <button
       className={cn(
-        "ui:text-foreground/50 ui:hover:text-foreground ui:absolute ui:top-2 ui:right-2 ui:rounded-md ui:p-1 ui:opacity-0 ui:transition-opacity ui:group-hover:opacity-100 ui:group-[.destructive]:text-red-300 ui:group-[.destructive]:hover:text-red-50 ui:focus:opacity-100 ui:focus:ring-2 ui:focus:outline-none ui:group-[.destructive]:focus:ring-red-400 ui:group-[.destructive]:focus:ring-offset-red-600",
+        "text-foreground/50 hover:text-foreground absolute top-2 right-2 rounded-md p-1 opacity-0 transition-opacity group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 focus:opacity-100 focus:ring-2 focus:outline-none group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
         className,
       )}
       data-toast-close=""
       type="button"
       {...props}
     >
-      <X className="ui:h-4 ui:w-4" />
+      <X className="h-4 w-4" />
     </button>
   );
 };
 ToastClose.displayName = "ToastClose";
 
 const ToastTitle = ({ className, ...props }: ComponentProps<"div">) => {
-  return <div className={cn("ui:text-sm ui:font-semibold", className)} {...props} />;
+  return <div className={cn("text-sm font-semibold", className)} {...props} />;
 };
 ToastTitle.displayName = "ToastTitle";
 
 const ToastDescription = ({ className, ...props }: ComponentProps<"div">) => {
-  return <div className={cn("ui:text-sm ui:opacity-90", className)} {...props} />;
+  return <div className={cn("text-sm opacity-90", className)} {...props} />;
 };
 ToastDescription.displayName = "ToastDescription";
 

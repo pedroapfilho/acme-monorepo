@@ -16,13 +16,6 @@ describe("cn", () => {
     expect(cn("p-4", "p-2")).toBe("p-2");
   });
 
-  it("should handle ui: prefixed classes", () => {
-    // ui: variant classes coexist with non-prefixed (different variant scope)
-    expect(cn("ui:p-4", "p-2")).toBe("ui:p-4 p-2");
-    // ui: prefixed classes conflict with each other
-    expect(cn("ui:p-4", "ui:p-2")).toBe("ui:p-2");
-  });
-
   it("should return empty string for no inputs", () => {
     expect(cn()).toBe("");
   });

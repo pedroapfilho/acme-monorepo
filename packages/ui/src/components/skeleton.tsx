@@ -17,23 +17,23 @@ type SkeletonAvatarProps = SkeletonProps & {
 const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
   ({ animation = "pulse", className, height, style, variant = "text", width, ...props }, ref) => {
     const variantClasses = {
-      circular: "ui:rounded-full",
-      rectangular: "ui:rounded-none",
-      rounded: "ui:rounded-lg",
-      text: "ui:rounded-md",
+      circular: "rounded-full",
+      rectangular: "rounded-none",
+      rounded: "rounded-lg",
+      text: "rounded-md",
     };
 
     const animationClasses = {
       none: "",
-      pulse: "ui:animate-pulse",
-      wave: "ui:animate-shimmer",
+      pulse: "animate-pulse",
+      wave: "animate-shimmer",
     };
 
     return (
       <div
         aria-hidden="true"
         className={cn(
-          "ui:bg-muted",
+          "bg-muted",
           variantClasses[variant],
           animationClasses[animation],
           className,
@@ -61,9 +61,9 @@ type SkeletonContainerProps = HTMLAttributes<HTMLDivElement> & {
 const SkeletonContainer = forwardRef<HTMLDivElement, SkeletonContainerProps>(
   ({ children, className, count = 1, spacing = "md", ...props }, ref) => {
     const spacingClasses = {
-      lg: "ui:space-y-4",
-      md: "ui:space-y-3",
-      sm: "ui:space-y-2",
+      lg: "space-y-4",
+      md: "space-y-3",
+      sm: "space-y-2",
     };
 
     if (count > 1 && !children) {
@@ -91,11 +91,11 @@ const SkeletonCard = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     return (
       <div
-        className={cn("ui:space-y-3 ui:rounded-lg ui:border ui:p-4", className)}
+        className={cn("space-y-3 rounded-lg border p-4", className)}
         ref={ref}
         {...props}
       >
-        <Skeleton className="ui:mb-4" height={200} variant="rectangular" />
+        <Skeleton className="mb-4" height={200} variant="rectangular" />
         <Skeleton variant="text" width="60%" />
         <Skeleton variant="text" width="80%" />
         <Skeleton variant="text" width="40%" />

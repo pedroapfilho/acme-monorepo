@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@repo/ui";
+import { Button } from "@repo/ui/components/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
