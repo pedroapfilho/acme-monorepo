@@ -1,3 +1,4 @@
+import { buttonVariants } from "@repo/ui/components/button-variants";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -22,18 +23,12 @@ const Page = () => {
           and ready to fork.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            href="/register"
-          >
+          <Link className={buttonVariants({ size: "lg" })} href="/register">
             Get started
           </Link>
-          <Link
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            href="/login"
-          >
+          <Link className={buttonVariants({ size: "lg", variant: "ghost" })} href="/login">
             Sign in
-            <ArrowUpRight className="size-4" />
+            <ArrowUpRight />
           </Link>
         </div>
       </section>
