@@ -1,5 +1,3 @@
-"use client";
-
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 import { type ComponentProps, type ReactElement } from "react";

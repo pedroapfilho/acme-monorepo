@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -24,11 +25,12 @@ const SignOutButton = () => {
   };
 
   return (
-    <div>
-      <Button disabled={isLoading} onClick={handleSignOut} variant="outline">
-        {isLoading ? "Signing out" : "Sign Out"}
+    <div className="flex flex-col gap-2">
+      <Button className="self-start" disabled={isLoading} onClick={handleSignOut} variant="outline">
+        {isLoading && <Loader2 className="size-4 animate-spin" />}
+        {isLoading ? "Signing out" : "Sign out"}
       </Button>
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 };

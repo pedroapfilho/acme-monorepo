@@ -1,4 +1,7 @@
+import { buttonVariants } from "@repo/ui/components/button";
+import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   description: "Welcome to Acme — the one template to rule them all.",
@@ -7,8 +10,28 @@ export const metadata: Metadata = {
 
 const Page = () => {
   return (
-    <div className="mx-auto flex max-w-(--breakpoint-xl) flex-col gap-8 px-4 sm:px-6 lg:px-8">
-      content
+    <div className="mx-auto flex max-w-(--breakpoint-xl) flex-col gap-16 px-6 py-20 md:px-8 md:py-28">
+      <section className="flex flex-col gap-8">
+        <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          Acme template
+        </p>
+        <h1 className="max-w-[20ch] text-5xl font-semibold tracking-tight text-balance md:text-6xl">
+          The one template to rule them all.
+        </h1>
+        <p className="max-w-[48ch] text-lg text-pretty text-muted-foreground md:text-xl">
+          A Next.js monorepo baseline with Better Auth, Prisma, and shadcn/ui — configured, tested,
+          and ready to fork.
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link className={buttonVariants({ size: "lg" })} href="/register">
+            Get started
+          </Link>
+          <Link className={buttonVariants({ size: "lg", variant: "ghost" })} href="/login">
+            Sign in
+            <ArrowUpRight />
+          </Link>
+        </div>
+      </section>
     </div>
   );
 };
