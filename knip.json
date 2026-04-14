@@ -5,24 +5,15 @@
     "eslint-plugin-*",
     "@tailwindcss/postcss",
     "oxlint-config-awesomeness",
-    "tw-animate-css",
     "postcss",
+    "postcss-load-config",
     "pino-pretty",
     "react-scan",
-    "@repo/tailwind-config",
-    "@repo/typescript-config",
     "tailwindcss",
     "@prisma/client",
-    "clsx",
-    "tailwind-merge",
     "jsdom",
-    "@vitest/coverage-v8",
-    "@testing-library/user-event"
+    "shadcn"
   ],
-  "ignore": [
-    "verify-auth.js",
-    "packages/ui/src/styles/globals.css",
-    "tests/e2e/setup/auth.setup.ts"
-  ],
+  "ignore": ["verify-auth.js", "tests/e2e/setup/auth.setup.ts"],
   "exclude": ["unresolved"]
 }

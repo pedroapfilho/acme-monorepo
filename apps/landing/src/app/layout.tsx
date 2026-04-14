@@ -1,12 +1,12 @@
 import "@/styles/globals.css";
 
+import { cn } from "@repo/ui/lib/utils";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { AnalyticsWrapper } from "@/components/analytics";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import { cn } from "@/lib/utils";
 
 const SITE_NAME = "Acme";
 

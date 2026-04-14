@@ -20,7 +20,7 @@
   },
   "sortPackageJson": true,
   "sortTailwindcss": {
-    "stylesheet": "./packages/config-tailwind/shared-styles.css",
+    "stylesheet": "./packages/ui/src/styles/globals.css",
     "attributes": ["class", "className"],
     "functions": ["cn", "cva"],
     "preserveDuplicates": false,

@@ -32,12 +32,7 @@ const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
     return (
       <div
         aria-hidden="true"
-        className={cn(
-          "bg-muted",
-          variantClasses[variant],
-          animationClasses[animation],
-          className,
-        )}
+        className={cn("bg-muted", variantClasses[variant], animationClasses[animation], className)}
         ref={ref}
         style={{
           height: height || "1.2em",
@@ -90,11 +85,7 @@ SkeletonContainer.displayName = "SkeletonContainer";
 const SkeletonCard = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
     return (
-      <div
-        className={cn("space-y-3 rounded-lg border p-4", className)}
-        ref={ref}
-        {...props}
-      >
+      <div className={cn("space-y-3 rounded-lg border p-4", className)} ref={ref} {...props}>
         <Skeleton className="mb-4" height={200} variant="rectangular" />
         <Skeleton variant="text" width="60%" />
         <Skeleton variant="text" width="80%" />
