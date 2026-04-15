@@ -1,5 +1,4 @@
 import type { HTMLAttributes } from "react";
-import { forwardRef } from "react";
 
 import { cn } from "../lib/utils";
 
@@ -14,38 +13,41 @@ type SkeletonAvatarProps = SkeletonProps & {
   size?: number;
 };
 
-const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
-  ({ animation = "pulse", className, height, style, variant = "text", width, ...props }, ref) => {
-    const variantClasses = {
-      circular: "rounded-full",
-      rectangular: "rounded-none",
-      rounded: "rounded-lg",
-      text: "rounded-md",
-    };
+const Skeleton = ({
+  animation = "pulse",
+  className,
+  height,
+  style,
+  variant = "text",
+  width,
+  ...props
+}: SkeletonProps) => {
+  const variantClasses = {
+    circular: "rounded-full",
+    rectangular: "rounded-none",
+    rounded: "rounded-lg",
+    text: "rounded-md",
+  };
 
-    const animationClasses = {
-      none: "",
-      pulse: "animate-pulse",
-      wave: "animate-shimmer",
-    };
+  const animationClasses = {
+    none: "",
+    pulse: "animate-pulse",
+    wave: "animate-shimmer",
+  };
 
-    return (
-      <div
-        aria-hidden="true"
-        className={cn("bg-muted", variantClasses[variant], animationClasses[animation], className)}
-        ref={ref}
-        style={{
-          height: height || "1.2em",
-          width: width || "100%",
-          ...style,
-        }}
-        {...props}
-      />
-    );
-  },
-);
-
-Skeleton.displayName = "Skeleton";
+  return (
+    <div
+      aria-hidden="true"
+      className={cn("bg-muted", variantClasses[variant], animationClasses[animation], className)}
+      style={{
+        height: height || "1.2em",
+        width: width || "100%",
+        ...style,
+      }}
+      {...props}
+    />
+  );
+};
 
 // Skeleton container for grouping multiple skeletons
 type SkeletonContainerProps = HTMLAttributes<HTMLDivElement> & {
@@ -53,65 +55,52 @@ type SkeletonContainerProps = HTMLAttributes<HTMLDivElement> & {
   spacing?: "sm" | "md" | "lg";
 };
 
-const SkeletonContainer = forwardRef<HTMLDivElement, SkeletonContainerProps>(
-  ({ children, className, count = 1, spacing = "md", ...props }, ref) => {
-    const spacingClasses = {
-      lg: "space-y-4",
-      md: "space-y-3",
-      sm: "space-y-2",
-    };
+const SkeletonContainer = ({
+  children,
+  className,
+  count = 1,
+  spacing = "md",
+  ...props
+}: SkeletonContainerProps) => {
+  const spacingClasses = {
+    lg: "space-y-4",
+    md: "space-y-3",
+    sm: "space-y-2",
+  };
 
-    if (count > 1 && !children) {
-      return (
-        <div className={cn(spacingClasses[spacing], className)} ref={ref} {...props}>
-          {Array.from({ length: count }).map((_, i) => (
-            <Skeleton key={i} />
-          ))}
-        </div>
-      );
-    }
-
+  if (count > 1 && !children) {
     return (
-      <div className={cn(spacingClasses[spacing], className)} ref={ref} {...props}>
-        {children}
+      <div className={cn(spacingClasses[spacing], className)} {...props}>
+        {Array.from({ length: count }).map((_, i) => (
+          <Skeleton key={i} />
+        ))}
       </div>
     );
-  },
-);
+  }
 
-SkeletonContainer.displayName = "SkeletonContainer";
+  return (
+    <div className={cn(spacingClasses[spacing], className)} {...props}>
+      {children}
+    </div>
+  );
+};
 
 // Pre-built skeleton patterns
-const SkeletonCard = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => {
-    return (
-      <div className={cn("space-y-3 rounded-lg border p-4", className)} ref={ref} {...props}>
-        <Skeleton className="mb-4" height={200} variant="rectangular" />
-        <Skeleton variant="text" width="60%" />
-        <Skeleton variant="text" width="80%" />
-        <Skeleton variant="text" width="40%" />
-      </div>
-    );
-  },
-);
+const SkeletonCard = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div className={cn("space-y-3 rounded-lg border p-4", className)} {...props}>
+      <Skeleton className="mb-4" height={200} variant="rectangular" />
+      <Skeleton variant="text" width="60%" />
+      <Skeleton variant="text" width="80%" />
+      <Skeleton variant="text" width="40%" />
+    </div>
+  );
+};
 
-SkeletonCard.displayName = "SkeletonCard";
-
-const SkeletonAvatar = forwardRef<HTMLDivElement, SkeletonAvatarProps>(
-  ({ className, size = 40, ...props }, ref) => {
-    return (
-      <Skeleton
-        className={className}
-        height={size}
-        ref={ref}
-        variant="circular"
-        width={size}
-        {...props}
-      />
-    );
-  },
-);
-
-SkeletonAvatar.displayName = "SkeletonAvatar";
+const SkeletonAvatar = ({ className, size = 40, ...props }: SkeletonAvatarProps) => {
+  return (
+    <Skeleton className={className} height={size} variant="circular" width={size} {...props} />
+  );
+};
 
 export { Skeleton, SkeletonContainer, SkeletonCard, SkeletonAvatar };
