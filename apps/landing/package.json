@@ -17,6 +17,7 @@
   "dependencies": {
     "@repo/ui": "workspace:*",
     "@vercel/analytics": "^2.0.1",
+    "lucide-react": "^1.8.0",
     "next": "^16.2.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"

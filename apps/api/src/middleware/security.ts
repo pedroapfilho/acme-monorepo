@@ -1,8 +1,10 @@
-import { Context, Next } from "hono";
+import type { Context, Next } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
 
-// Enhanced security headers
+const getClientIp = (c: Context): string =>
+  c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || c.env?.remoteAddr || "unknown";
+
 export const securityHeaders = secureHeaders({
   contentSecurityPolicy: {
     connectSrc: ["'self'"],
@@ -29,7 +31,6 @@ export const securityHeaders = secureHeaders({
   xXssProtection: "1; mode=block",
 });
 
-// Rate limiting configurations
 export const standardRateLimit = rateLimiter({
   handler: (c: Context) => {
     return c.json(
@@ -42,17 +43,12 @@ export const standardRateLimit = rateLimiter({
       429,
     );
   },
-  keyGenerator: (c: Context) => {
-    return (
-      c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || c.env?.remoteAddr || "unknown"
-    );
-  },
-  limit: 100, // limit each IP to 100 requests per windowMs
+  keyGenerator: (c: Context) => getClientIp(c),
+  limit: 100,
   standardHeaders: "draft-6",
   windowMs: 15 * 60 * 1000, // 15 minutes
 });
 
-// Strict rate limiting for auth endpoints
 export const authRateLimit = rateLimiter({
   handler: (c: Context) => {
     return c.json(
@@ -65,22 +61,13 @@ export const authRateLimit = rateLimiter({
       429,
     );
   },
-  keyGenerator: (c: Context) => {
-    const ip =
-      c.req.header("x-forwarded-for") ||
-      c.req.header("x-real-ip") ||
-      c.env?.remoteAddr ||
-      "unknown";
-    const path = c.req.path;
-    return `${ip}:${path}`;
-  },
-  limit: 5, // limit each IP to 5 requests per windowMs
+  keyGenerator: (c: Context) => `${getClientIp(c)}:${c.req.path}`,
+  limit: 5,
   skipSuccessfulRequests: false,
   standardHeaders: "draft-6",
   windowMs: 15 * 60 * 1000, // 15 minutes
 });
 
-// API rate limiting
 export const apiRateLimit = rateLimiter({
   handler: (c: Context) => {
     return c.json(
@@ -95,19 +82,13 @@ export const apiRateLimit = rateLimiter({
   },
   keyGenerator: (c: Context) => {
     const user = c.get("user");
-    const ip =
-      c.req.header("x-forwarded-for") ||
-      c.req.header("x-real-ip") ||
-      c.env?.remoteAddr ||
-      "unknown";
-    return user?.id ? `user:${user.id}` : `ip:${ip}`;
+    return user?.id ? `user:${user.id}` : `ip:${getClientIp(c)}`;
   },
-  limit: 30, // limit each IP to 30 requests per minute
+  limit: 30,
   standardHeaders: "draft-6",
   windowMs: 1 * 60 * 1000, // 1 minute
 });
 
-// Request size limiting middleware
 export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
   return async (c: Context, next: Next) => {
     const contentLength = c.req.header("content-length");
@@ -128,7 +109,6 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
   };
 };
 
-// Request ID middleware for tracing
 export const requestId = async (c: Context, next: Next) => {
   const requestId = c.req.header("x-request-id") || crypto.randomUUID();
   c.set("requestId", requestId);

@@ -2,7 +2,7 @@ import { prisma } from "@repo/db";
 import type { Prisma } from "@repo/db";
 
 import { logger } from "@/lib/logger";
-import { AppError } from "@/middleware/error-handler";
+import { AppError, isPrismaKnownError } from "@/middleware/error-handler";
 
 export class UserService {
   async findById(id: string) {
@@ -60,12 +60,11 @@ export class UserService {
 
   async update(id: string, data: Prisma.UserUpdateInput) {
     try {
-      // Validate username uniqueness if provided
-      if (data.username) {
+      if (typeof data.username === "string") {
         const existing = await prisma.user.findFirst({
           where: {
             NOT: { id },
-            username: data.username as string,
+            username: data.username,
           },
         });
 
@@ -97,7 +96,7 @@ export class UserService {
         throw error;
       }
 
-      if (error instanceof Error && error.message.includes("P2025")) {
+      if (isPrismaKnownError(error) && error.code === "P2025") {
         throw new AppError("User not found", 404, true, "USER_NOT_FOUND");
       }
 
@@ -116,7 +115,7 @@ export class UserService {
 
       return { success: true };
     } catch (error) {
-      if (error instanceof Error && error.message.includes("P2025")) {
+      if (isPrismaKnownError(error) && error.code === "P2025") {
         throw new AppError("User not found", 404, true, "USER_NOT_FOUND");
       }
 

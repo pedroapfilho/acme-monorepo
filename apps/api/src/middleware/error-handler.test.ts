@@ -73,8 +73,8 @@ describe("errorHandler", () => {
         inclusive: true,
         message: "Required",
         minimum: 1,
+        origin: "string",
         path: ["name"],
-        type: "string",
       },
     ]);
 
@@ -118,7 +118,10 @@ describe("errorHandler", () => {
 
   it("should handle P2002 as 409 DUPLICATE_ENTRY", async () => {
     const c = createMockContext();
-    const err = new Error("Unique constraint failed P2002");
+    const err = Object.assign(new Error("Unique constraint failed"), {
+      clientVersion: "7.0.0",
+      code: "P2002",
+    });
 
     await errorHandler(err, c);
 
@@ -130,7 +133,10 @@ describe("errorHandler", () => {
 
   it("should handle P2025 as 404 NOT_FOUND", async () => {
     const c = createMockContext();
-    const err = new Error("Record not found P2025");
+    const err = Object.assign(new Error("Record not found"), {
+      clientVersion: "7.0.0",
+      code: "P2025",
+    });
 
     await errorHandler(err, c);
 

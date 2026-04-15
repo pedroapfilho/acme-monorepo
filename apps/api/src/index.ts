@@ -22,7 +22,6 @@ import { v1UserRoutes } from "./routes/v1/users";
 
 const app = new Hono();
 
-// Global middleware
 app.use("*", requestId);
 app.use("*", compress());
 app.use("*", requestSizeLimit());
@@ -33,11 +32,11 @@ app.use(
     allowHeaders: ["Content-Type", "Authorization", "X-Request-Id"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     credentials: true,
-    origin: env.CORS_ORIGINS?.split(",") || ["http://localhost:3000"],
+    origin: env.CORS_ORIGINS.split(","),
   }),
 );
 
-// Logging middleware (skip for health check)
+// Skip logging for health checks
 app.use("*", async (c, next) => {
   if (c.req.path === "/healthz") {
     return next();
@@ -55,12 +54,10 @@ app.use("*", async (c, next) => {
   });
 });
 
-// Rate limiting
 app.use("/api/*", standardRateLimit);
 app.use("/auth/sign-up", authRateLimit);
 app.use("/auth/sign-in/*", authRateLimit);
 
-// Health check endpoint
 app.get("/healthz", (c) => {
   return c.json({
     service: "api",
@@ -70,10 +67,8 @@ app.get("/healthz", (c) => {
   });
 });
 
-// Readiness check endpoint
 app.get("/readyz", async (c) => {
   try {
-    // Check database connection
     await prisma.$queryRaw`SELECT 1`;
 
     return c.json({
@@ -98,25 +93,20 @@ app.get("/readyz", async (c) => {
   }
 });
 
-// Better Auth routes
 app.on(["POST", "GET"], "/auth/*", (c) => {
   return auth.handler(c.req.raw);
 });
 
-// API v1 routes
 const v1 = new Hono();
 v1.use("*", apiRateLimit);
 v1.route("/users", v1UserRoutes);
 
 app.route("/api/v1", v1);
 
-// 404 handler
 app.notFound(notFound);
 
-// Global error handler
 app.onError(errorHandler);
 
-// Start server
 const port = Number(env.PORT) || 4000;
 const hostname = env.HOST || "0.0.0.0";
 
@@ -136,7 +126,6 @@ serve({
   port,
 });
 
-// Graceful shutdown
 process.on("SIGTERM", async () => {
   logger.info("SIGTERM received, shutting down gracefully...");
   await prisma.$disconnect();

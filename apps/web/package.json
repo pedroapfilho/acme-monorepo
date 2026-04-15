@@ -20,6 +20,7 @@
     "@repo/ui": "workspace:*",
     "@tanstack/react-form": "^1.29.0",
     "better-auth": "^1.6.2",
+    "lucide-react": "^1.8.0",
     "next": "^16.2.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
