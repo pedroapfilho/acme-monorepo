@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import { Skeleton } from "@repo/ui/components/skeleton";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -22,7 +23,7 @@ const Page = async () => {
         <CardDescription>Enter your details below to create your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <Suspense>
+        <Suspense fallback={<Skeleton className="h-64 w-full" />}>
           <RegisterForm />
         </Suspense>
       </CardContent>
