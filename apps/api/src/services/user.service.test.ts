@@ -134,7 +134,9 @@ describe("UserService", () => {
 
     it("should throw AppError 404 on P2025 error", async () => {
       vi.mocked(prisma.user.findFirst).mockResolvedValue(null as never);
-      vi.mocked(prisma.user.update).mockRejectedValue(new Error("Record not found P2025"));
+      vi.mocked(prisma.user.update).mockRejectedValue(
+        Object.assign(new Error("Record not found"), { clientVersion: "7.0.0", code: "P2025" }),
+      );
 
       await expect(userService.update("missing", { name: "X" })).rejects.toMatchObject({
         code: "USER_NOT_FOUND",
@@ -164,7 +166,9 @@ describe("UserService", () => {
     });
 
     it("should throw AppError 404 on P2025 error", async () => {
-      vi.mocked(prisma.user.delete).mockRejectedValue(new Error("Record not found P2025"));
+      vi.mocked(prisma.user.delete).mockRejectedValue(
+        Object.assign(new Error("Record not found"), { clientVersion: "7.0.0", code: "P2025" }),
+      );
 
       await expect(userService.delete("missing")).rejects.toMatchObject({
         code: "USER_NOT_FOUND",

@@ -5,7 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { auth } from "../lib/auth";
 import { logger } from "../lib/logger";
 
-type AuthVariables = {
+export type AuthVariables = {
   user: {
     displayName?: string;
     email: string;
@@ -14,19 +14,25 @@ type AuthVariables = {
   };
 };
 
+const extractAuthHeaders = (c: Context): Headers => {
+  const headers = new Headers();
+
+  const authHeader = c.req.header("Authorization");
+  if (authHeader) {
+    headers.set("Authorization", authHeader);
+  }
+
+  const cookie = c.req.header("Cookie");
+  if (cookie) {
+    headers.set("Cookie", cookie);
+  }
+
+  return headers;
+};
+
 export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
   async (c: Context, next: Next) => {
-    const headers = new Headers();
-
-    const authHeader = c.req.header("Authorization");
-    if (authHeader) {
-      headers.set("Authorization", authHeader);
-    }
-
-    const cookie = c.req.header("Cookie");
-    if (cookie) {
-      headers.set("Cookie", cookie);
-    }
+    const headers = extractAuthHeaders(c);
 
     let session;
     try {
@@ -59,17 +65,7 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
 export const optionalAuthMiddleware = createMiddleware<{
   Variables: Partial<AuthVariables>;
 }>(async (c: Context, next: Next) => {
-  const headers = new Headers();
-
-  const authHeader = c.req.header("Authorization");
-  if (authHeader) {
-    headers.set("Authorization", authHeader);
-  }
-
-  const cookie = c.req.header("Cookie");
-  if (cookie) {
-    headers.set("Cookie", cookie);
-  }
+  const headers = extractAuthHeaders(c);
 
   try {
     const session = await auth.api.getSession({ headers });

@@ -1,9 +1,15 @@
-import { Context } from "hono";
+import type { Prisma } from "@repo/db";
+import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+
+export const isPrismaKnownError = (
+  err: unknown,
+): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
+  err instanceof Error && "code" in err && "clientVersion" in err;
 
 export class AppError extends Error {
   public readonly statusCode: number;
@@ -25,7 +31,6 @@ export class AppError extends Error {
 }
 
 export const errorHandler = async (err: Error, c: Context) => {
-  // Log the error
   logger.error({
     err,
     ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
@@ -34,7 +39,6 @@ export const errorHandler = async (err: Error, c: Context) => {
     userAgent: c.req.header("user-agent"),
   });
 
-  // Handle different error types
   if (err instanceof HTTPException) {
     return c.json(
       {
@@ -75,32 +79,32 @@ export const errorHandler = async (err: Error, c: Context) => {
     );
   }
 
-  // Database errors
-  if (err.message?.includes("P2002")) {
-    return c.json(
-      {
-        error: {
-          code: "DUPLICATE_ENTRY",
-          message: "A record with this value already exists",
+  if (isPrismaKnownError(err)) {
+    if (err.code === "P2002") {
+      return c.json(
+        {
+          error: {
+            code: "DUPLICATE_ENTRY",
+            message: "A record with this value already exists",
+          },
         },
-      },
-      409 as const,
-    );
+        409 as const,
+      );
+    }
+
+    if (err.code === "P2025") {
+      return c.json(
+        {
+          error: {
+            code: "NOT_FOUND",
+            message: "Record not found",
+          },
+        },
+        404 as const,
+      );
+    }
   }
 
-  if (err.message?.includes("P2025")) {
-    return c.json(
-      {
-        error: {
-          code: "NOT_FOUND",
-          message: "Record not found",
-        },
-      },
-      404 as const,
-    );
-  }
-
-  // Generic error response
   const message = env.NODE_ENV === "production" ? "An unexpected error occurred" : err.message;
 
   return c.json(

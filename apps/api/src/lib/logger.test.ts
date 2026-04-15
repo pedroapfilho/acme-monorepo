@@ -29,7 +29,7 @@ import { pinoHttp } from "pino-http";
  */
 const getHttpConfig = () => {
   const calls = vi.mocked(pinoHttp).mock.calls;
-  return calls[0]?.[0] as {
+  return calls[0]?.[0] as unknown as {
     autoLogging: { ignore: (req: IncomingMessage) => boolean };
     customErrorMessage: (req: IncomingMessage, res: ServerResponse, err: Error) => string;
     customLogLevel: (req: IncomingMessage, res: ServerResponse, err?: Error) => string;
