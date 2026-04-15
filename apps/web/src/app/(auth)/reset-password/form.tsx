@@ -136,7 +136,10 @@ const ResetPasswordForm = ({ token }: Props) => {
             {isLoading ? "Resetting..." : "Reset password"}
           </Button>
           <FieldDescription className="text-center">
-            Back to <Link href="/login">sign in</Link>
+            Back to{" "}
+            <Link className="text-foreground underline underline-offset-4" href="/login">
+              sign in
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>
