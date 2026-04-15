@@ -32,10 +32,8 @@ const toastVariants = cva(
       variant: {
         default: "border bg-background text-foreground",
         destructive: "destructive border-destructive bg-destructive text-destructive-foreground",
-        success:
-          "border-green-500 bg-green-50 text-green-900 dark:border-green-400 dark:bg-green-900/20 dark:text-green-100",
-        warning:
-          "border-orange-500 bg-orange-50 text-orange-900 dark:border-orange-400 dark:bg-orange-900/20 dark:text-orange-100",
+        success: "border-success/30 bg-success/10 text-success",
+        warning: "border-warning/30 bg-warning/10 text-warning",
       },
     },
   },
@@ -86,7 +84,7 @@ const ToastClose = ({ className, ...props }: ComponentProps<"button">) => {
   return (
     <button
       className={cn(
-        "absolute top-2 right-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity group-hover:opacity-100 group-[.destructive]:text-red-300 hover:text-foreground group-[.destructive]:hover:text-red-50 focus:opacity-100 focus:ring-2 focus:outline-none group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+        "absolute top-2 right-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity group-hover:opacity-100 group-[.destructive]:text-destructive-foreground/70 hover:text-foreground group-[.destructive]:hover:text-destructive-foreground focus:opacity-100 focus:ring-2 focus:outline-none group-[.destructive]:focus:ring-destructive-foreground group-[.destructive]:focus:ring-offset-destructive",
         className,
       )}
       data-toast-close=""
