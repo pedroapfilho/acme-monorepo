@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-const Layout = async ({ children }: { children: ReactNode }) => {
+const Layout = ({ children }: { children: ReactNode }) => {
   return <div>{children}</div>;
 };
 
