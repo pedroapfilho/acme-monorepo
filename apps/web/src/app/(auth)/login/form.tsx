@@ -105,7 +105,7 @@ const LoginForm = ({ from }: Props) => {
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <Link
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                    className="ml-auto text-sm text-foreground underline underline-offset-4"
                     href="/recover"
                   >
                     Forgot your password?
@@ -134,7 +134,10 @@ const LoginForm = ({ from }: Props) => {
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
           <FieldDescription className="text-center">
-            Don&apos;t have an account? <Link href="/register">Sign up</Link>
+            Don&apos;t have an account?{" "}
+            <Link className="text-foreground underline underline-offset-4" href="/register">
+              Sign up
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

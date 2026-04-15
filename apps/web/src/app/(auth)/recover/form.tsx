@@ -98,7 +98,10 @@ const RecoverForm = () => {
             {isLoading ? "Sending..." : "Send reset link"}
           </Button>
           <FieldDescription className="text-center">
-            Remembered your password? <Link href="/login">Sign in</Link>
+            Remembered your password?{" "}
+            <Link className="text-foreground underline underline-offset-4" href="/login">
+              Sign in
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>

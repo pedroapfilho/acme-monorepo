@@ -176,7 +176,10 @@ const RegisterForm = () => {
             {isLoading ? "Creating account..." : "Create account"}
           </Button>
           <FieldDescription className="text-center">
-            Already have an account? <Link href="/login">Sign in</Link>
+            Already have an account?{" "}
+            <Link className="text-foreground underline underline-offset-4" href="/login">
+              Sign in
+            </Link>
           </FieldDescription>
         </Field>
       </FieldGroup>
