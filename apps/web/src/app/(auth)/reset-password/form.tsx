@@ -75,7 +75,6 @@ const ResetPasswordForm = ({ token }: Props) => {
 
   return (
     <form
-      noValidate
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
