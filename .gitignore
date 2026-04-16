@@ -4,6 +4,7 @@
 node_modules
 .pnp
 .pnp.js
+.pnpm-store
 
 # testing
 coverage
@@ -16,6 +17,17 @@ test-results/
 .next/
 out/
 build
+next-env.d.ts
+
+# build
+dist/
+*.tsbuildinfo
+
+# turbo
+.turbo
+
+# vercel
+.vercel
 
 # misc
 .DS_Store
@@ -25,30 +37,27 @@ build
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 
 # local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+!.env.example
 
-# turbo
-.turbo
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
 
-# vercel
-.vercel
+# logs
+logs/
+*.log
 
-# build
-dist/
+# prisma generated
+**/src/generated/
 
 # redis
 *.rdb
 
-# prisma generated client
-packages/db/src/generated
-
-# counselors agent output
+# agent output
 agents/
-# typescript build info
-*.tsbuildinfo
