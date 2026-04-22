@@ -1,11 +1,11 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
-import { type ComponentProps, type ReactElement } from "react";
+import type { ComponentProps, ReactElement } from "react";
 
 import { cn } from "../lib/utils";
 
 const ToastProvider = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
+  return children;
 };
 
 function ToastViewport({ className, ...props }: ComponentProps<"ol">) {

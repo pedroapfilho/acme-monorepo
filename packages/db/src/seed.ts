@@ -38,8 +38,9 @@ try {
   }
 } catch (error) {
   console.error(error);
-
-  process.exit(1);
+  // Re-throw so the script exits non-zero with a stack trace; replaces
+  // process.exit(1) per unicorn/no-process-exit. Disconnect runs in `finally`.
+  throw error;
 } finally {
   await prisma.$disconnect();
 }

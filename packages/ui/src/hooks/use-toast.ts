@@ -52,22 +52,13 @@ type State = {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-const addToRemoveQueue = (toastId: string) => {
-  if (toastTimeouts.has(toastId)) {
-    return;
-  }
+const listeners: Array<(state: State) => void> = [];
 
-  const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId);
-    dispatch({
-      toastId,
-      type: "REMOVE_TOAST",
-    });
-  }, TOAST_REMOVE_DELAY);
+let memoryState: State = { toasts: [] };
 
-  toastTimeouts.set(toastId, timeout);
-};
-
+// Pure: no side effects, no scheduling. Timer scheduling is hoisted out into
+// dispatch so the reducer/dispatch/scheduleRemove cycle is broken and lint
+// can verify declaration order.
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST": {
@@ -86,15 +77,6 @@ export const reducer = (state: State, action: Action): State => {
 
     case "DISMISS_TOAST": {
       const { toastId } = action;
-
-      if (toastId) {
-        addToRemoveQueue(toastId);
-      } else {
-        state.toasts.forEach((t) => {
-          addToRemoveQueue(t.id);
-        });
-      }
-
       return {
         ...state,
         toasts: state.toasts.map((t) =>
@@ -125,16 +107,31 @@ export const reducer = (state: State, action: Action): State => {
   }
 };
 
-const listeners: Array<(state: State) => void> = [];
-
-let memoryState: State = { toasts: [] };
-
-function dispatch(action: Action) {
+const dispatch = (action: Action) => {
   memoryState = reducer(memoryState, action);
+
+  // DISMISS_TOAST schedules eventual REMOVE_TOAST after TOAST_REMOVE_DELAY.
+  // Scheduling lives here (not in the reducer) so the reducer stays pure
+  // and we avoid a reducer<->dispatch cyclic reference.
+  if (action.type === "DISMISS_TOAST") {
+    const ids = action.toastId ? [action.toastId] : memoryState.toasts.map((t) => t.id);
+
+    ids.forEach((id) => {
+      if (toastTimeouts.has(id)) {
+        return;
+      }
+      const timeout = setTimeout(() => {
+        toastTimeouts.delete(id);
+        dispatch({ toastId: id, type: "REMOVE_TOAST" });
+      }, TOAST_REMOVE_DELAY);
+      toastTimeouts.set(id, timeout);
+    });
+  }
+
   listeners.forEach((listener) => {
     listener(memoryState);
   });
-}
+};
 
 type Toast = Omit<ToasterToast, "id">;
 

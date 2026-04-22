@@ -28,7 +28,7 @@
     "lint-staged": "^16.4.0",
     "oxfmt": "^0.45.0",
     "oxlint": "^1.60.0",
-    "oxlint-config-awesomeness": "^2.0.0",
+    "oxlint-config-awesomeness": "^3.0.0",
     "turbo": "^2.9.6"
   },
   "lint-staged": {

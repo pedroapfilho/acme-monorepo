@@ -27,8 +27,8 @@ importers:
         specifier: ^1.60.0
         version: 1.60.0
       oxlint-config-awesomeness:
-        specifier: ^2.0.0
-        version: 2.0.0(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2)
+        specifier: ^3.0.0
+        version: 3.0.0(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2)
       turbo:
         specifier: ^2.9.6
         version: 2.9.6
@@ -4503,8 +4503,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  oxlint-config-awesomeness@2.0.0:
-    resolution: {integrity: sha512-7vvb0rzpGcpg0t3z6bgxFPBGhvfiFVUVtTWeUlOnr9KJIowgo14EHk58+1ApVQoWBGZAi4FG3p4QJe8CRBZZpA==}
+  oxlint-config-awesomeness@3.0.0:
+    resolution: {integrity: sha512-0wScDboV5XHxbvLx7dcSU00ZBdVtcQpQvD8l0daekggUgpahdSCD13CggBd1EhtCoMh/RFckQ3doyECA8JZXUg==}
     hasBin: true
     peerDependencies:
       oxlint: '>=1.58.0 <2.0.0'
@@ -8979,7 +8979,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.45.0
       '@oxfmt/binding-win32-x64-msvc': 0.45.0
 
-  oxlint-config-awesomeness@2.0.0(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2):
+  oxlint-config-awesomeness@3.0.0(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2):
     dependencies:
       eslint-plugin-no-only-tests: 3.3.0
       eslint-plugin-perfectionist: 5.8.0(eslint@9.39.2(jiti@2.6.1))(typescript@6.0.2)
