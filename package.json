@@ -32,7 +32,7 @@
     "turbo": "^2.9.6"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "!(*.d).{ts,tsx,js,jsx}": [
       "oxlint"
     ],
     "*.{ts,tsx,js,jsx,json,md}": [

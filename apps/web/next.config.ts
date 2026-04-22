@@ -1,12 +1,35 @@
+import { execFileSync } from "node:child_process";
+
 import type { NextConfig } from "next";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const resolveApiUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (process.env.NODE_ENV === "development") {
+    try {
+      const url = execFileSync("portless", ["get", "acme.api"], {
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      }).trim();
+      if (url.startsWith("http")) {
+        return url;
+      }
+    } catch {
+      // portless not installed or daemon not running — fall through
+    }
+  }
+  return "http://localhost:4000";
+};
+
+const apiUrl = resolveApiUrl();
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
+  env: { NEXT_PUBLIC_API_URL: apiUrl },
   reactStrictMode: true,
 
-  async rewrites() {
+  rewrites() {
     return [
       {
         destination: `${apiUrl}/auth/:path*`,
