@@ -41,8 +41,8 @@ const toastVariants = cva(
 
 const Toast = ({
   className,
+  onOpenChange: _onOpenChange,
   open,
-  onOpenChange,
   variant,
   ...props
 }: ComponentProps<"li"> &
@@ -62,8 +62,8 @@ const Toast = ({
 Toast.displayName = "Toast";
 
 const ToastAction = ({
-  className,
   altText,
+  className,
   ...props
 }: ComponentProps<"button"> & { altText: string }) => {
   return (

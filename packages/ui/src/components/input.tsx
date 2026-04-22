@@ -1,4 +1,5 @@
-import { ComponentProps, cloneElement, ReactElement } from "react";
+import type { ComponentProps, ReactElement } from "react";
+import { cloneElement } from "react";
 
 import { cn } from "../lib/utils";
 
@@ -6,6 +7,16 @@ type InputProps = Omit<ComponentProps<"input">, "className"> & {
   className?: string;
   endIcon?: ReactElement<{ className?: string }>;
   startIcon?: ReactElement<{ className?: string }>;
+};
+
+const resolveTrailingPad = (hasEnd: boolean, hasStart: boolean) => {
+  if (hasEnd) {
+    return "pr-10";
+  }
+  if (hasStart) {
+    return "";
+  }
+  return "px-3";
 };
 
 function Input({ className, endIcon, startIcon, type, ...props }: InputProps) {
@@ -25,7 +36,7 @@ function Input({ className, endIcon, startIcon, type, ...props }: InputProps) {
             "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
             "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
             startIcon ? "pl-10" : "px-3",
-            endIcon ? "pr-10" : startIcon ? "" : "px-3",
+            resolveTrailingPad(Boolean(endIcon), Boolean(startIcon)),
           )}
           data-slot="input"
           type={type}

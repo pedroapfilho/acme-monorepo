@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 import LoginForm from "@/app/(auth)/login/form";
 

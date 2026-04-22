@@ -46,9 +46,9 @@ type Action =
       type: ActionTypes["REMOVE_TOAST"];
     };
 
-interface State {
+type State = {
   toasts: Array<ToasterToast>;
-}
+};
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
@@ -60,7 +60,7 @@ const addToRemoveQueue = (toastId: string) => {
   const timeout = setTimeout(() => {
     toastTimeouts.delete(toastId);
     dispatch({
-      toastId: toastId,
+      toastId,
       type: "REMOVE_TOAST",
     });
   }, TOAST_REMOVE_DELAY);
@@ -70,17 +70,19 @@ const addToRemoveQueue = (toastId: string) => {
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD_TOAST":
+    case "ADD_TOAST": {
       return {
         ...state,
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
       };
+    }
 
-    case "UPDATE_TOAST":
+    case "UPDATE_TOAST": {
       return {
         ...state,
         toasts: state.toasts.map((t) => (t.id === action.toast.id ? { ...t, ...action.toast } : t)),
       };
+    }
 
     case "DISMISS_TOAST": {
       const { toastId } = action;
@@ -88,8 +90,8 @@ export const reducer = (state: State, action: Action): State => {
       if (toastId) {
         addToRemoveQueue(toastId);
       } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
+        state.toasts.forEach((t) => {
+          addToRemoveQueue(t.id);
         });
       }
 
@@ -105,7 +107,7 @@ export const reducer = (state: State, action: Action): State => {
         ),
       };
     }
-    case "REMOVE_TOAST":
+    case "REMOVE_TOAST": {
       if (action.toastId === undefined) {
         return {
           ...state,
@@ -116,6 +118,10 @@ export const reducer = (state: State, action: Action): State => {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
       };
+    }
+    default: {
+      return state;
+    }
   }
 };
 
@@ -135,9 +141,9 @@ type Toast = Omit<ToasterToast, "id">;
 function toast({ ...props }: Toast) {
   const id = genId();
 
-  const update = (props: ToasterToast) =>
+  const update = (next: ToasterToast) =>
     dispatch({
-      toast: { ...props, id },
+      toast: { ...next, id },
       type: "UPDATE_TOAST",
     });
   const dismiss = () => dispatch({ toastId: id, type: "DISMISS_TOAST" });
@@ -158,7 +164,7 @@ function toast({ ...props }: Toast) {
 
   return {
     dismiss,
-    id: id,
+    id,
     update,
   };
 }
@@ -173,7 +179,7 @@ function useToast() {
     listeners.push(setState);
     return () => {
       const index = listeners.indexOf(setState);
-      if (index > -1) {
+      if (index !== -1) {
         listeners.splice(index, 1);
       }
     };
