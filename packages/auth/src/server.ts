@@ -81,9 +81,9 @@ export const createAuth = (config: AuthConfig) => {
       },
     },
 
-    // The API mounts `app.on(["POST", "GET"], "/auth/*", auth.handler)` — Better Auth's default
-    // `/api/auth` base path doesn't match incoming request paths, making the router 404.
-    basePath: "/auth",
+    // Explicit to match the Next.js route handler mount at /api/auth/[...all].
+    // This is Better Auth's default but stated explicitly to match sibling repos.
+    basePath: "/api/auth",
 
     baseURL: resolveBaseUrl(),
 

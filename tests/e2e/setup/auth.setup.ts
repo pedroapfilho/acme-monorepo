@@ -2,7 +2,7 @@ import { mkdirSync } from "node:fs";
 
 import { expect, test as setup } from "@playwright/test";
 
-import { apiUrl } from "../../../playwright.config";
+import { webUrl } from "../../../playwright.config";
 
 const TEST_USER = {
   email: "e2e-test@acme.localhost",
@@ -14,8 +14,9 @@ setup("create and authenticate test user", async ({ page, request }) => {
   // Ensure .auth directory exists (fresh CI checkout won't have it)
   mkdirSync("tests/e2e/.auth", { recursive: true });
 
-  // Seed user via Better Auth API (201 created or 409 conflict are both OK)
-  const signUpResponse = await request.post(`${apiUrl}/auth/sign-up/email`, {
+  // Seed user via Better Auth (mounted at /api/auth on the web app).
+  // 201 created or 409 conflict (user already exists from a previous run) are both OK.
+  const signUpResponse = await request.post(`${webUrl}/api/auth/sign-up/email`, {
     data: {
       email: TEST_USER.email,
       name: TEST_USER.name,

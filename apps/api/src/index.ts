@@ -6,14 +6,12 @@ import { Hono } from "hono";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 
-import { auth } from "./lib/auth";
 import { env } from "./lib/env";
 import { logger } from "./lib/logger";
 import { errorHandler, notFound } from "./middleware/error-handler";
 import {
   securityHeaders,
   standardRateLimit,
-  authRateLimit,
   apiRateLimit,
   requestSizeLimit,
   requestId,
@@ -55,8 +53,6 @@ app.use("*", async (c, next) => {
 });
 
 app.use("/api/*", standardRateLimit);
-app.use("/auth/sign-up", authRateLimit);
-app.use("/auth/sign-in/*", authRateLimit);
 
 app.get("/healthz", (c) => {
   return c.json({
@@ -91,10 +87,6 @@ app.get("/readyz", async (c) => {
       503,
     );
   }
-});
-
-app.on(["POST", "GET"], "/auth/*", (c) => {
-  return auth.handler(c.req.raw);
 });
 
 const v1 = new Hono();

@@ -49,25 +49,6 @@ export const standardRateLimit = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
 });
 
-export const authRateLimit = rateLimiter({
-  handler: (c: Context) => {
-    return c.json(
-      {
-        error: {
-          code: "AUTH_RATE_LIMIT_EXCEEDED",
-          message: "Too many authentication attempts, please try again later",
-        },
-      },
-      429,
-    );
-  },
-  keyGenerator: (c: Context) => `${getClientIp(c)}:${c.req.path}`,
-  limit: 5,
-  skipSuccessfulRequests: false,
-  standardHeaders: "draft-6",
-  windowMs: 15 * 60 * 1000, // 15 minutes
-});
-
 export const apiRateLimit = rateLimiter({
   handler: (c: Context) => {
     return c.json(
