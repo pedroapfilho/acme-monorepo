@@ -85,10 +85,15 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.rateLimit?.storage).toBe("database");
   });
 
-  it("should have rate limiting enabled with correct window and max", () => {
-    expect(auth.options.rateLimit?.enabled).toBe(true);
+  it("should have correct rate-limiting window and max", () => {
     expect(auth.options.rateLimit?.window).toBe(60);
     expect(auth.options.rateLimit?.max).toBe(10);
+  });
+
+  it("should enable rate limiting in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(prodAuth.options.rateLimit?.enabled).toBe(true);
   });
 
   it("should parse TRUSTED_ORIGINS env var as comma-separated list", () => {

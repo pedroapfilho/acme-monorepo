@@ -134,7 +134,7 @@ export const createAuth = (config: AuthConfig) => {
     plugins: [username(), bearer(), ...extraPlugins],
 
     rateLimit: {
-      enabled: true,
+      enabled: process.env.NODE_ENV === "production",
       max: 10,
       storage: "database",
       window: 60,
