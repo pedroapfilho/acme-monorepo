@@ -61,3 +61,4 @@ logs/
 
 # agent output
 agents/
+.fallow/
