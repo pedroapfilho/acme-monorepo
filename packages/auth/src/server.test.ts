@@ -146,13 +146,6 @@ describe("Auth Server Configuration", () => {
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 
-  it("should disable rate limiting when CI is true", () => {
-    vi.stubEnv("CI", "true");
-
-    const ciAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(ciAuth.options.rateLimit?.enabled).toBe(false);
-  });
-
   it("should have displayName as optional additional user field", () => {
     const displayName = auth.options.user?.additionalFields?.displayName;
     expect(displayName).toEqual({

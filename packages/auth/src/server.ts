@@ -81,6 +81,10 @@ export const createAuth = (config: AuthConfig) => {
       },
     },
 
+    // The API mounts `app.on(["POST", "GET"], "/auth/*", auth.handler)` — Better Auth's default
+    // `/api/auth` base path doesn't match incoming request paths, making the router 404.
+    basePath: "/auth",
+
     baseURL: resolveBaseUrl(),
 
     database: prismaAdapter(prisma, {
@@ -130,7 +134,7 @@ export const createAuth = (config: AuthConfig) => {
     plugins: [username(), bearer(), ...extraPlugins],
 
     rateLimit: {
-      enabled: process.env.CI !== "true",
+      enabled: true,
       max: 10,
       storage: "database",
       window: 60,
