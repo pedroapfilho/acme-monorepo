@@ -16,11 +16,11 @@ export const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  // eslint-disable-next-line no-console -- startup env validation
-  console.error("❌ Invalid environment variables:");
-  // eslint-disable-next-line no-console -- startup env validation
-  console.error(z.treeifyError(parsedEnv.error));
-  process.exit(1);
+  // Throwing at module load aborts the process with a stack trace; preferable to
+  // process.exit which loses context and conflicts with unicorn/no-process-exit.
+  throw new Error(
+    `Invalid environment variables:\n${JSON.stringify(z.treeifyError(parsedEnv.error), null, 2)}`,
+  );
 }
 
 export const env = parsedEnv.data;

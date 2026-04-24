@@ -93,7 +93,7 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
   return async (c: Context, next: Next) => {
     const contentLength = c.req.header("content-length");
 
-    if (contentLength && Number.parseInt(contentLength) > maxSize) {
+    if (contentLength && Number.parseInt(contentLength, 10) > maxSize) {
       return c.json(
         {
           error: {
@@ -110,8 +110,8 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
 };
 
 export const requestId = async (c: Context, next: Next) => {
-  const requestId = c.req.header("x-request-id") || crypto.randomUUID();
-  c.set("requestId", requestId);
-  c.header("x-request-id", requestId);
+  const id = c.req.header("x-request-id") || crypto.randomUUID();
+  c.set("requestId", id);
+  c.header("x-request-id", id);
   await next();
 };

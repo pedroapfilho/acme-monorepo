@@ -21,15 +21,19 @@ const FieldGroup = ({ className, ...props }: ComponentProps<"div">) => (
   <div className={cn("flex flex-col gap-4", className)} {...props} />
 );
 
-const FieldLabel = ({ className, ...props }: ComponentProps<"label">) => (
-  <label
-    className={cn(
-      "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-      className,
-    )}
-    {...props}
-  />
-);
+const FieldLabel = ({ className, htmlFor, ...props }: ComponentProps<"label">) => {
+  const { id } = useFieldContext();
+  return (
+    <label
+      className={cn(
+        "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+        className,
+      )}
+      htmlFor={htmlFor ?? id}
+      {...props}
+    />
+  );
+};
 
 const FieldContent = ({ className, ...props }: ComponentProps<"div">) => (
   <div className={cn("flex flex-col gap-1", className)} {...props} />
@@ -47,15 +51,15 @@ const FieldError = ({
   if (!errors || errors.length === 0) {
     return null;
   }
-  const messages = errors
-    .filter(Boolean)
-    .map((e) =>
-      typeof e === "string"
-        ? e
-        : typeof e === "object" && e !== null && "message" in e
-          ? (e as { message: string }).message
-          : String(e),
-    );
+  const messages = errors.filter(Boolean).map((e) => {
+    if (typeof e === "string") {
+      return e;
+    }
+    if (typeof e === "object" && e !== null && "message" in e) {
+      return (e as { message: string }).message;
+    }
+    return String(e);
+  });
   if (messages.length === 0) {
     return null;
   }

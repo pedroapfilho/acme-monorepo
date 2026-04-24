@@ -1,7 +1,10 @@
 #!/usr/bin/env node
+/* eslint-disable no-console -- ad-hoc CLI verification script; console output IS the UI */
 
-const fs = require("node:fs");
-const path = require("node:path");
+import fs from "node:fs";
+import path from "node:path";
+
+const rootDir = import.meta.dirname;
 
 console.log("Verifying Better Auth Implementation...\n");
 
@@ -56,7 +59,7 @@ const checks = [
 let allPassed = true;
 
 checks.forEach((check) => {
-  const filePath = path.join(__dirname, check.file);
+  const filePath = path.join(rootDir, check.file);
   try {
     const content = fs.readFileSync(filePath, "utf8");
     const passed = check.pattern.test(content);
@@ -69,7 +72,7 @@ checks.forEach((check) => {
   } catch (error) {
     console.log(`FAIL ${check.name}`);
     console.log(`   File: ${check.file}`);
-    console.log(`   Error: ${error.message}`);
+    console.log(`   Error: ${error instanceof Error ? error.message : String(error)}`);
     allPassed = false;
   }
   console.log("");
@@ -83,7 +86,6 @@ if (allPassed) {
 }
 console.log("-".repeat(50));
 
-// Check environment variables
 console.log("\nEnvironment Variables Check:\n");
 const envFiles = [
   { file: "apps/web/.env.local", name: "Web App" },
@@ -91,7 +93,7 @@ const envFiles = [
 ];
 
 envFiles.forEach((env) => {
-  const envPath = path.join(__dirname, env.file);
+  const envPath = path.join(rootDir, env.file);
   try {
     const content = fs.readFileSync(envPath, "utf8");
     const hasSecret = content.includes("BETTER_AUTH_SECRET");
@@ -109,3 +111,7 @@ envFiles.forEach((env) => {
 });
 
 console.log("Verification complete!");
+
+if (!allPassed) {
+  process.exitCode = 1;
+}

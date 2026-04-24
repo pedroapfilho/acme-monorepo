@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 import type { PrismaClient } from "@repo/db";
 import { betterAuth } from "better-auth";
@@ -12,10 +12,20 @@ const getPortlessUrl = (name: string) => {
     return undefined;
   }
   try {
-    return execSync(`portless get ${name}`).toString().trim();
+    return execFileSync("portless", ["get", name], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
   } catch {
     return undefined;
   }
+};
+
+const resolveBaseUrl = (): string => {
+  if (process.env.NODE_ENV === "production" || process.env.CI) {
+    return process.env.BETTER_AUTH_URL || "http://localhost:4000";
+  }
+  return getPortlessUrl("acme.api") ?? process.env.BETTER_AUTH_URL ?? "http://localhost:4000";
 };
 
 const defaultTrustedOrigins = () => {
@@ -71,7 +81,7 @@ export const createAuth = (config: AuthConfig) => {
       },
     },
 
-    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:4000",
+    baseURL: resolveBaseUrl(),
 
     database: prismaAdapter(prisma, {
       provider: "postgresql",

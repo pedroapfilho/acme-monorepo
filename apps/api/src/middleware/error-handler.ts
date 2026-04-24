@@ -30,7 +30,7 @@ export class AppError extends Error {
   }
 }
 
-export const errorHandler = async (err: Error, c: Context) => {
+export const errorHandler = (err: Error, c: Context) => {
   logger.error({
     err,
     ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
