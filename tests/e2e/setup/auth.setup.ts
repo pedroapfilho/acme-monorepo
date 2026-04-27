@@ -32,7 +32,9 @@ setup("create and authenticate test user", async ({ page, request }) => {
   await page.getByRole("button", { name: "Sign in" }).click();
 
   await page.waitForURL("/dashboard");
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  // The dashboard heading reads "Welcome back, {firstName}" — assert the
+  // user-visible signed-in state, not a literal "Dashboard" word.
+  await expect(page.getByRole("heading", { name: /welcome back/i })).toBeVisible();
 
   // Persist auth state for browser projects
   await page.context().storageState({ path: "tests/e2e/.auth/user.json" });
