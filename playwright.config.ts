@@ -68,16 +68,22 @@ export default defineConfig({
     ? [
         {
           command: "pnpm --filter web exec next start --port 3000",
+          stderr: "pipe",
+          stdout: "pipe",
           timeout: 120_000,
           url: webUrl,
         },
         {
           command: "pnpm --filter api run start",
+          stderr: "pipe",
+          stdout: "pipe",
           timeout: 120_000,
           url: `${apiUrl}/healthz`,
         },
         {
           command: "pnpm --filter landing exec next start --port 3001",
+          stderr: "pipe",
+          stdout: "pipe",
           timeout: 120_000,
           url: landingUrl,
         },
