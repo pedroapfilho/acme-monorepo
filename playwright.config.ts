@@ -64,30 +64,31 @@ export default defineConfig({
     video: "retain-on-failure",
   },
 
-  webServer: [
-    {
-      command: process.env.CI
-        ? "pnpm --filter=web exec next start -p 3000"
-        : "pnpm run dev --filter=web",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      url: webUrl,
-    },
-    {
-      command: process.env.CI ? "pnpm --filter=api start" : "pnpm run dev --filter=api",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      url: `${apiUrl}/healthz`,
-    },
-    {
-      command: process.env.CI
-        ? "pnpm --filter=landing exec next start -p 3001"
-        : "pnpm run dev --filter=landing",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      url: landingUrl,
-    },
-  ],
+  webServer: process.env.CI
+    ? [
+        {
+          command: "pnpm --filter web exec next start --port 3000",
+          stderr: "pipe",
+          stdout: "pipe",
+          timeout: 120_000,
+          url: webUrl,
+        },
+        {
+          command: "pnpm --filter api run start",
+          stderr: "pipe",
+          stdout: "pipe",
+          timeout: 120_000,
+          url: `${apiUrl}/healthz`,
+        },
+        {
+          command: "pnpm --filter landing exec next start --port 3001",
+          stderr: "pipe",
+          stdout: "pipe",
+          timeout: 120_000,
+          url: landingUrl,
+        },
+      ]
+    : [],
 
   workers: process.env.CI ? 1 : undefined,
 });

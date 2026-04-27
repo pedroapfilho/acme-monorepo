@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "workspaces": {
+    "packages": ["apps/*", "packages/*"]
+  },
+  "entry": ["oxlint.config.ts", "**/prisma.config.ts"],
+  "ignorePatterns": ["verify-auth.js", "tests/e2e/setup/auth.setup.ts"],
+  "ignoreDependencies": [
+    "eslint-plugin-*",
+    "@tailwindcss/postcss",
+    "postcss",
+    "postcss-load-config",
+    "pino-pretty",
+    "react-scan",
+    "tailwindcss",
+    "@prisma/client",
+    "@vitest/coverage-v8",
+    "jsdom",
+    "shadcn",
+    "react"
+  ],
+  "rules": {
+    "unused-dependencies": "warn"
+  }
+}

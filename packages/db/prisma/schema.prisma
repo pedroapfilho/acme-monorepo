@@ -76,3 +76,12 @@ model Verification {
   @@unique([identifier, value])
   @@index([identifier])
 }
+
+// Better Auth database-backed rate limiting — required when auth config has
+// `rateLimit.storage: "database"`. Rows are written on first limited request.
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}

@@ -41,8 +41,8 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.advanced?.cookiePrefix).toBe("acme");
   });
 
-  it("should have secure cookie settings in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
+  it("should have secure cookie settings when BETTER_AUTH_URL is HTTPS", () => {
+    vi.stubEnv("BETTER_AUTH_URL", "https://acme.example");
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(true);
@@ -50,11 +50,25 @@ describe("Auth Server Configuration", () => {
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite).toBe("lax");
   });
 
-  it("should require email verification in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
+  it("should not set secure cookie when BETTER_AUTH_URL is HTTP (e.g. CI over plain HTTP)", () => {
+    vi.stubEnv("BETTER_AUTH_URL", "http://localhost:3000");
 
-    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(prodAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
+    const httpAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(httpAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(false);
+  });
+
+  it("should require email verification when Resend is configured", () => {
+    const verifyingAuth = createAuth({
+      prisma,
+      resendApiKey: "re_test_key",
+      secret: "test-secret-minimum-32-characters-long",
+    });
+    expect(verifyingAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
+  });
+
+  it("should NOT require email verification when Resend is absent", () => {
+    const noResendAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(noResendAuth.options.emailAndPassword?.requireEmailVerification).toBe(false);
   });
 
   it("should have bearer token plugin enabled", () => {
@@ -85,10 +99,15 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.rateLimit?.storage).toBe("database");
   });
 
-  it("should have rate limiting enabled with correct window and max", () => {
-    expect(auth.options.rateLimit?.enabled).toBe(true);
+  it("should have correct rate-limiting window and max", () => {
     expect(auth.options.rateLimit?.window).toBe(60);
     expect(auth.options.rateLimit?.max).toBe(10);
+  });
+
+  it("should enable rate limiting in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(prodAuth.options.rateLimit?.enabled).toBe(true);
   });
 
   it("should parse TRUSTED_ORIGINS env var as comma-separated list", () => {
@@ -144,13 +163,6 @@ describe("Auth Server Configuration", () => {
       secret: "test-secret-minimum-32-characters-long",
     });
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
-  });
-
-  it("should disable rate limiting when CI is true", () => {
-    vi.stubEnv("CI", "true");
-
-    const ciAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(ciAuth.options.rateLimit?.enabled).toBe(false);
   });
 
   it("should have displayName as optional additional user field", () => {

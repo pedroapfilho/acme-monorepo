@@ -74,12 +74,19 @@ export const createAuth = (config: AuthConfig) => {
           attributes: {
             httpOnly: true,
             sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
+            // Gate on whether BETTER_AUTH_URL is HTTPS, not on NODE_ENV. CI runs
+            // production builds (NODE_ENV=production) over HTTP — `secure: true`
+            // would make browsers silently drop the cookie, killing the auth flow.
+            secure: process.env.BETTER_AUTH_URL?.startsWith("https://") === true,
           },
           name: "session_token",
         },
       },
     },
+
+    // Explicit to match the Next.js route handler mount at /api/auth/[...all].
+    // This is Better Auth's default but stated explicitly to match sibling repos.
+    basePath: "/api/auth",
 
     baseURL: resolveBaseUrl(),
 
@@ -91,7 +98,11 @@ export const createAuth = (config: AuthConfig) => {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
-      requireEmailVerification: process.env.NODE_ENV === "production",
+      // Gate on Resend availability rather than NODE_ENV. If no API key is
+      // configured we physically can't send a verification email — requiring
+      // verification under that condition would lock all new users out
+      // (which is what was happening to e2e in CI before this change).
+      requireEmailVerification: Boolean(resendApiKey),
       sendResetPassword: resendApiKey
         ? async ({ url, user }) => {
             const { Resend } = await import("resend");
@@ -130,7 +141,7 @@ export const createAuth = (config: AuthConfig) => {
     plugins: [username(), bearer(), ...extraPlugins],
 
     rateLimit: {
-      enabled: process.env.CI !== "true",
+      enabled: process.env.NODE_ENV === "production",
       max: 10,
       storage: "database",
       window: 60,

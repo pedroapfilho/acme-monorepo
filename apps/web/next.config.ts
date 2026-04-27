@@ -29,15 +29,6 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_API_URL: apiUrl },
   reactStrictMode: true,
 
-  rewrites() {
-    return [
-      {
-        destination: `${apiUrl}/auth/:path*`,
-        source: "/api/auth/:path*",
-      },
-    ];
-  },
-
   serverExternalPackages: ["@prisma/client", "@repo/db"],
 
   transpilePackages: ["@repo/ui"],
