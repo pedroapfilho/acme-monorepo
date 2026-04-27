@@ -74,7 +74,10 @@ export const createAuth = (config: AuthConfig) => {
           attributes: {
             httpOnly: true,
             sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
+            // Gate on whether BETTER_AUTH_URL is HTTPS, not on NODE_ENV. CI runs
+            // production builds (NODE_ENV=production) over HTTP — `secure: true`
+            // would make browsers silently drop the cookie, killing the auth flow.
+            secure: process.env.BETTER_AUTH_URL?.startsWith("https://") === true,
           },
           name: "session_token",
         },

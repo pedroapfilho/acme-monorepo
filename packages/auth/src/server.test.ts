@@ -41,13 +41,20 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.advanced?.cookiePrefix).toBe("acme");
   });
 
-  it("should have secure cookie settings in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
+  it("should have secure cookie settings when BETTER_AUTH_URL is HTTPS", () => {
+    vi.stubEnv("BETTER_AUTH_URL", "https://acme.example");
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(true);
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.httpOnly).toBe(true);
     expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite).toBe("lax");
+  });
+
+  it("should not set secure cookie when BETTER_AUTH_URL is HTTP (e.g. CI over plain HTTP)", () => {
+    vi.stubEnv("BETTER_AUTH_URL", "http://localhost:3000");
+
+    const httpAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(httpAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(false);
   });
 
   it("should require email verification in production", () => {
