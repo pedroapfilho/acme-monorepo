@@ -29,7 +29,7 @@ setup("create and authenticate test user", async ({ page, request }) => {
   await page.goto("/login");
   await page.getByLabel("Email").fill(TEST_USER.email);
   await page.getByLabel("Password").fill(TEST_USER.password);
-  await page.getByRole("button", { name: "Log In" }).click();
+  await page.getByRole("button", { name: "Sign in" }).click();
 
   await page.waitForURL("/dashboard");
   await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
