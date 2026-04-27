@@ -70,12 +70,16 @@ export default defineConfig({
         ? "pnpm --filter=web exec next start -p 3000"
         : "pnpm run dev --filter=web",
       reuseExistingServer: !process.env.CI,
+      stderr: "pipe",
+      stdout: "pipe",
       timeout: 120_000,
       url: webUrl,
     },
     {
       command: process.env.CI ? "pnpm --filter=api start" : "pnpm run dev --filter=api",
       reuseExistingServer: !process.env.CI,
+      stderr: "pipe",
+      stdout: "pipe",
       timeout: 120_000,
       url: `${apiUrl}/healthz`,
     },
@@ -84,6 +88,8 @@ export default defineConfig({
         ? "pnpm --filter=landing exec next start -p 3001"
         : "pnpm run dev --filter=landing",
       reuseExistingServer: !process.env.CI,
+      stderr: "pipe",
+      stdout: "pipe",
       timeout: 120_000,
       url: landingUrl,
     },
