@@ -3,7 +3,10 @@
 import dynamic from "next/dynamic";
 
 const Analytics = dynamic(
-  () => import("@vercel/analytics/react").then((mod) => ({ default: mod.Analytics })),
+  async () => {
+    const mod = await import("@vercel/analytics/react");
+    return { default: mod.Analytics };
+  },
   { ssr: false },
 );
 

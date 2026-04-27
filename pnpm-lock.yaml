@@ -27,8 +27,8 @@ importers:
         specifier: ^1.60.0
         version: 1.60.0
       oxlint-config-awesomeness:
-        specifier: ^3.0.0
-        version: 3.0.0(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2)
+        specifier: ^3.0.1
+        version: 3.0.1(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2)
       turbo:
         specifier: ^2.9.6
         version: 2.9.6
@@ -165,7 +165,7 @@ importers:
         version: 1.29.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       better-auth:
         specifier: ^1.6.2
-        version: 1.6.2(fdf6dd2d7373a9888e96bd9ace6eb18c)
+        version: 1.6.2(364df2851abe4e9973450a08ce7e3cab)
       lucide-react:
         specifier: ^1.8.0
         version: 1.8.0(react@19.2.5)
@@ -226,7 +226,7 @@ importers:
         version: link:../db
       better-auth:
         specifier: ^1.6.2
-        version: 1.6.2(fdf6dd2d7373a9888e96bd9ace6eb18c)
+        version: 1.6.2(364df2851abe4e9973450a08ce7e3cab)
       resend:
         specifier: ^6.11.0
         version: 6.11.0
@@ -4398,8 +4398,8 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
-  oxlint-config-awesomeness@3.0.0:
-    resolution: {integrity: sha512-0wScDboV5XHxbvLx7dcSU00ZBdVtcQpQvD8l0daekggUgpahdSCD13CggBd1EhtCoMh/RFckQ3doyECA8JZXUg==}
+  oxlint-config-awesomeness@3.0.1:
+    resolution: {integrity: sha512-BQttWLrAp37aMmmvQbmaP0P9g0vTwbVhGxi91T5GWAi8t233667yM8FsWgAGhndO9wwIdiNnS88XDYolIiwGxA==}
     hasBin: true
     peerDependencies:
       oxlint: '>=1.58.0 <2.0.0'
@@ -7341,7 +7341,7 @@ snapshots:
 
   baseline-browser-mapping@2.10.18: {}
 
-  better-auth@1.6.2(fdf6dd2d7373a9888e96bd9ace6eb18c):
+  better-auth@1.6.2(364df2851abe4e9973450a08ce7e3cab):
     dependencies:
       '@better-auth/core': 1.6.2(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.2.0)
       '@better-auth/drizzle-adapter': 1.6.2(@better-auth/core@1.6.2(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(@opentelemetry/api@1.9.1)(better-call@1.3.5(zod@4.3.6))(jose@6.2.2)(kysely@0.28.16)(nanostores@1.2.0))(@better-auth/utils@0.4.0)(drizzle-orm@0.45.1(@electric-sql/pglite@0.4.1)(@opentelemetry/api@1.9.1)(@prisma/client@7.7.0(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2))(typescript@6.0.2))(@types/pg@8.20.0)(kysely@0.28.16)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.7)(prisma@7.7.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.2)))
@@ -8773,7 +8773,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.45.0
       '@oxfmt/binding-win32-x64-msvc': 0.45.0
 
-  oxlint-config-awesomeness@3.0.0(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2):
+  oxlint-config-awesomeness@3.0.1(eslint@9.39.2(jiti@2.6.1))(oxlint@1.60.0)(typescript@6.0.2):
     dependencies:
       eslint-plugin-no-only-tests: 3.3.0
       eslint-plugin-perfectionist: 5.8.0(eslint@9.39.2(jiti@2.6.1))(typescript@6.0.2)
