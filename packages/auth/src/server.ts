@@ -98,7 +98,11 @@ export const createAuth = (config: AuthConfig) => {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
-      requireEmailVerification: process.env.NODE_ENV === "production",
+      // Gate on Resend availability rather than NODE_ENV. If no API key is
+      // configured we physically can't send a verification email — requiring
+      // verification under that condition would lock all new users out
+      // (which is what was happening to e2e in CI before this change).
+      requireEmailVerification: Boolean(resendApiKey),
       sendResetPassword: resendApiKey
         ? async ({ url, user }) => {
             const { Resend } = await import("resend");

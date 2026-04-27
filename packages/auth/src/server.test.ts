@@ -57,11 +57,18 @@ describe("Auth Server Configuration", () => {
     expect(httpAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(false);
   });
 
-  it("should require email verification in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
+  it("should require email verification when Resend is configured", () => {
+    const verifyingAuth = createAuth({
+      prisma,
+      resendApiKey: "re_test_key",
+      secret: "test-secret-minimum-32-characters-long",
+    });
+    expect(verifyingAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
+  });
 
-    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(prodAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
+  it("should NOT require email verification when Resend is absent", () => {
+    const noResendAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(noResendAuth.options.emailAndPassword?.requireEmailVerification).toBe(false);
   });
 
   it("should have bearer token plugin enabled", () => {
