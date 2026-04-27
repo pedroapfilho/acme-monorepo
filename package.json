@@ -35,10 +35,10 @@
     "turbo": "^2.9.6"
   },
   "lint-staged": {
-    "!(*.d).{ts,tsx,js,jsx}": [
+    "!(*.d).{ts,tsx,mts,cts,js,jsx,mjs,cjs}": [
       "oxlint"
     ],
-    "*.{ts,tsx,js,jsx,json,md}": [
+    "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,md}": [
       "oxfmt"
     ]
   },
