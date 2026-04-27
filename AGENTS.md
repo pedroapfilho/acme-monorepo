@@ -34,12 +34,11 @@ pnpm db:seed                      # seed database
 
 ### Apps
 
-| App        | Framework                | Dev URL                          | Purpose                   |
-| ---------- | ------------------------ | -------------------------------- | ------------------------- |
-| `web`      | Next.js 16 (App Router)  | `https://acme.web.localhost`     | Main application          |
-| `landing`  | Next.js 16 (App Router)  | `https://acme.landing.localhost` | Marketing site            |
-| `api`      | Hono on Node.js (tsdown) | `https://acme.api.localhost`     | Backend API + auth server |
-| `workshop` | Storybook 10 (Vite)      | `:6006`                          | Component documentation   |
+| App       | Framework                | Dev URL                          | Purpose                   |
+| --------- | ------------------------ | -------------------------------- | ------------------------- |
+| `web`     | Next.js 16 (App Router)  | `https://acme.web.localhost`     | Main application          |
+| `landing` | Next.js 16 (App Router)  | `https://acme.landing.localhost` | Marketing site            |
+| `api`     | Hono on Node.js (tsdown) | `https://acme.api.localhost`     | Backend API + auth server |
 
 ### Packages
 
@@ -56,7 +55,7 @@ pnpm db:seed                      # seed database
 
 - **Auth flow**: `web`/`landing` use `@repo/auth/client` → calls `api` at `/auth/*` → `api` uses `@repo/auth/server` with Prisma adapter from `@repo/db`.
 - **API structure**: Hono app with versioned routes (`/api/v1/*`), Better Auth at `/auth/*`, health at `/healthz` and `/readyz`.
-- **UI consumption**: `web`, `landing`, and `workshop` all import from `@repo/ui`. Components use Tailwind with `ui:` prefix inside the package, unprefixed in consumer apps.
+- **UI consumption**: `web` and `landing` both import from `@repo/ui`. Components use Tailwind with `ui:` prefix inside the package, unprefixed in consumer apps.
 - **Build order**: Turborepo handles `^build` dependencies — packages build before apps that depend on them.
 
 ## Portless (Dev URLs)
