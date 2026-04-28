@@ -16,9 +16,12 @@ const getPortlessUrl = (name: string) => {
   }
 };
 
-export const webUrl = getPortlessUrl("acme.web") ?? "http://localhost:3000";
-export const apiUrl = getPortlessUrl("acme.api") ?? "http://localhost:4000";
-export const landingUrl = getPortlessUrl("acme.landing") ?? "http://localhost:3001";
+// CI servers bind to 0.0.0.0 (IPv4) but Node 18+ resolves `localhost` to ::1
+// first via getaddrinfo, and undici/fetch doesn't fall back to IPv4. Use the
+// explicit IPv4 loopback for CI probes; locally portless gives us the real URL.
+export const webUrl = getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
+export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
+export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
 
 export default defineConfig({
   forbidOnly: !!process.env.CI,
@@ -64,24 +67,30 @@ export default defineConfig({
     video: "retain-on-failure",
   },
 
+  // CI spawns three webServers in parallel. Wrapping each in `pnpm --filter`
+  // serializes them on pnpm's workspace state lock — the first wins, the
+  // rest hang silently for the full timeout. Run the binaries directly so
+  // each spawn is independent. Pnpm hoists shared bins to the repo-root
+  // `node_modules/.bin/`, so we reference them from there and pass the app
+  // directory as an arg to `next start`.
   webServer: process.env.CI
     ? [
         {
-          command: "pnpm --filter web exec next start --port 3000",
+          command: "node_modules/.bin/next start apps/web --port 3000",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
           url: webUrl,
         },
         {
-          command: "pnpm --filter api run start",
+          command: "node apps/api/dist/index.mjs",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
           url: `${apiUrl}/healthz`,
         },
         {
-          command: "pnpm --filter landing exec next start --port 3001",
+          command: "node_modules/.bin/next start apps/landing --port 3001",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,

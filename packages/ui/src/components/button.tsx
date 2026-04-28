@@ -1,3 +1,6 @@
+// CVA variants (variant, size) order semantically, not alphabetically
+// oxlint-disable perfectionist/sort-objects
+// oxlint-disable perfectionist/sort-jsx-props
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 
