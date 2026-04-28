@@ -66,29 +66,28 @@ export default defineConfig({
 
   // CI spawns three webServers in parallel. Wrapping each in `pnpm --filter`
   // serializes them on pnpm's workspace state lock — the first wins, the
-  // rest hang silently for the full timeout. Run the binaries directly with
-  // an explicit cwd so each spawn is independent.
+  // rest hang silently for the full timeout. Run the binaries directly so
+  // each spawn is independent. Pnpm hoists shared bins to the repo-root
+  // `node_modules/.bin/`, so we reference them from there and pass the app
+  // directory as an arg to `next start`.
   webServer: process.env.CI
     ? [
         {
-          command: "./node_modules/.bin/next start --port 3000",
-          cwd: "apps/web",
+          command: "node_modules/.bin/next start apps/web --port 3000",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
           url: webUrl,
         },
         {
-          command: "node dist/index.mjs",
-          cwd: "apps/api",
+          command: "node apps/api/dist/index.mjs",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
           url: `${apiUrl}/healthz`,
         },
         {
-          command: "./node_modules/.bin/next start --port 3001",
-          cwd: "apps/landing",
+          command: "node_modules/.bin/next start apps/landing --port 3001",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
