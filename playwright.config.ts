@@ -16,9 +16,12 @@ const getPortlessUrl = (name: string) => {
   }
 };
 
-export const webUrl = getPortlessUrl("acme.web") ?? "http://localhost:3000";
-export const apiUrl = getPortlessUrl("acme.api") ?? "http://localhost:4000";
-export const landingUrl = getPortlessUrl("acme.landing") ?? "http://localhost:3001";
+// CI servers bind to 0.0.0.0 (IPv4) but Node 18+ resolves `localhost` to ::1
+// first via getaddrinfo, and undici/fetch doesn't fall back to IPv4. Use the
+// explicit IPv4 loopback for CI probes; locally portless gives us the real URL.
+export const webUrl = getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
+export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
+export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
 
 export default defineConfig({
   forbidOnly: !!process.env.CI,
