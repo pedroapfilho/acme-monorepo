@@ -60,7 +60,35 @@ pnpm db:seed                      # seed database
 
 ## Portless (Dev URLs)
 
-Dev scripts use `portless run --name <project>.<app>`. URLs follow `https://<project>.<app>.localhost`. In git worktrees, the branch is auto-prepended: `https://<branch>.<project>.<app>.localhost`. Install globally: `npm install -g portless`.
+Every dev server runs behind portless, which gives each app a stable HTTPS URL on `.localhost` instead of guessing port numbers. Cookies, OAuth redirects, and CORS allowlists stay valid across project switches.
+
+### Setup (one-time per machine)
+
+```bash
+npm install -g portless                # global install (or upgrade)
+sudo portless proxy start --https      # start the daemon on :443
+```
+
+The proxy auto-restarts on subsequent invocations once trusted.
+
+### URLs
+
+| Service   | URL                              | Started by |
+| --------- | -------------------------------- | ---------- |
+| `web`     | `https://acme.web.localhost`     | `pnpm dev` |
+| `api`     | `https://acme.api.localhost`     | `pnpm dev` |
+| `landing` | `https://acme.landing.localhost` | `pnpm dev` |
+
+The api also exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt` — see `apps/api/src/lib/openapi.ts`.
+
+### Worktrees
+
+Branch name auto-prefixes the subdomain — no port collisions between concurrent worktrees, each gets its own auto-assigned backing port:
+
+```
+main worktree:        https://acme.web.localhost
+branch fix-styles:    https://fix-styles.acme.web.localhost
+```
 
 ## Dev Tools (Development Only)
 
