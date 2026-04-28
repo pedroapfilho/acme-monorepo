@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui/components/button";
+import { buttonVariants } from "@repo/ui/components/button";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -16,7 +16,9 @@ const NotFound = () => (
         The page you&rsquo;re looking for doesn&rsquo;t exist or has been moved.
       </p>
     </div>
-    <Button render={<Link href="/" />}>Go home</Button>
+    <Link className={buttonVariants()} href="/">
+      Go home
+    </Link>
   </main>
 );
 
