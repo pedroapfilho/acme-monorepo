@@ -61,7 +61,7 @@ const inter = Inter({
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html className="scroll-smooth" lang="en-US">
+    <html className="scroll-smooth" lang="en-US" suppressHydrationWarning>
       {process.env.NODE_ENV === "development" && !process.env.CI && (
         <>
           <script
