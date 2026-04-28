@@ -64,24 +64,31 @@ export default defineConfig({
     video: "retain-on-failure",
   },
 
+  // CI spawns three webServers in parallel. Wrapping each in `pnpm --filter`
+  // serializes them on pnpm's workspace state lock — the first wins, the
+  // rest hang silently for the full timeout. Run the binaries directly with
+  // an explicit cwd so each spawn is independent.
   webServer: process.env.CI
     ? [
         {
-          command: "pnpm --filter web exec next start --port 3000",
+          command: "./node_modules/.bin/next start --port 3000",
+          cwd: "apps/web",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
           url: webUrl,
         },
         {
-          command: "pnpm --filter api run start",
+          command: "node dist/index.mjs",
+          cwd: "apps/api",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
           url: `${apiUrl}/healthz`,
         },
         {
-          command: "pnpm --filter landing exec next start --port 3001",
+          command: "./node_modules/.bin/next start --port 3001",
+          cwd: "apps/landing",
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
