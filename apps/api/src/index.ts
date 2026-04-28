@@ -1,24 +1,26 @@
 import "dotenv/config";
 
 import { serve } from "@hono/node-server";
+import { createRoute, z } from "@hono/zod-openapi";
 import { prisma } from "@repo/db";
-import { Hono } from "hono";
+import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 
 import { env } from "./lib/env";
 import { logger } from "./lib/logger";
+import { createOpenAPIApp } from "./lib/openapi";
 import { errorHandler, notFound } from "./middleware/error-handler";
 import {
+  apiRateLimit,
+  requestId,
+  requestSizeLimit,
   securityHeaders,
   standardRateLimit,
-  apiRateLimit,
-  requestSizeLimit,
-  requestId,
 } from "./middleware/security";
 import { v1UserRoutes } from "./routes/v1/users";
 
-const app = new Hono();
+const app = createOpenAPIApp();
 
 app.use("*", requestId);
 app.use("*", compress());
@@ -53,35 +55,85 @@ app.use("*", async (c, next) => {
 });
 
 app.use("/api/*", standardRateLimit);
+app.use("/api/v1/*", apiRateLimit);
 
-app.get("/healthz", (c) => {
-  return c.json({
-    service: "api",
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    version: "1.0.0",
-  });
+const healthRoute = createRoute({
+  description: "Liveness probe — does not touch the database.",
+  method: "get",
+  path: "/healthz",
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: z.object({
+            service: z.string(),
+            status: z.literal("healthy"),
+            timestamp: z.iso.datetime(),
+            version: z.string(),
+          }),
+        },
+      },
+      description: "API is healthy",
+    },
+  },
+  summary: "Liveness check",
+  tags: ["System"],
 });
 
-app.get("/readyz", async (c) => {
+app.openapi(healthRoute, (c) =>
+  c.json(
+    {
+      service: "api",
+      status: "healthy" as const,
+      timestamp: new Date().toISOString(),
+      version: "1.0.0",
+    },
+    200,
+  ),
+);
+
+const readyzResponseSchema = z.object({
+  checks: z.object({ database: z.enum(["healthy", "unhealthy"]) }),
+  status: z.enum(["ready", "not ready"]),
+  timestamp: z.iso.datetime(),
+});
+
+const readyzRoute = createRoute({
+  description: "Readiness probe — verifies the database is reachable.",
+  method: "get",
+  path: "/readyz",
+  responses: {
+    200: {
+      content: { "application/json": { schema: readyzResponseSchema } },
+      description: "API is ready to serve traffic",
+    },
+    503: {
+      content: { "application/json": { schema: readyzResponseSchema } },
+      description: "API is not ready (e.g. database unreachable)",
+    },
+  },
+  summary: "Readiness check",
+  tags: ["System"],
+});
+
+app.openapi(readyzRoute, async (c) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
 
-    return c.json({
-      checks: {
-        database: "healthy",
+    return c.json(
+      {
+        checks: { database: "healthy" as const },
+        status: "ready" as const,
+        timestamp: new Date().toISOString(),
       },
-      status: "ready",
-      timestamp: new Date().toISOString(),
-    });
+      200,
+    );
   } catch (error) {
     logger.error({ error }, "Readiness check failed");
     return c.json(
       {
-        checks: {
-          database: "unhealthy",
-        },
-        status: "not ready",
+        checks: { database: "unhealthy" as const },
+        status: "not ready" as const,
         timestamp: new Date().toISOString(),
       },
       503,
@@ -89,11 +141,16 @@ app.get("/readyz", async (c) => {
   }
 });
 
-const v1 = new Hono();
-v1.use("*", apiRateLimit);
-v1.route("/users", v1UserRoutes);
+app.route("/api/v1/users", v1UserRoutes);
 
-app.route("/api/v1", v1);
+const openApiContent = app.getOpenAPI31Document({
+  info: { title: "Acme API", version: "v1" },
+  openapi: "3.1.0",
+});
+
+const llmsMarkdown = await createMarkdownFromOpenApi(JSON.stringify(openApiContent));
+
+app.get("/llms.txt", (c) => c.text(llmsMarkdown));
 
 app.notFound(notFound);
 
