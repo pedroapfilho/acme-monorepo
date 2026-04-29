@@ -11,19 +11,19 @@ import { nextCookies } from "better-auth/next-js";
 // Lazy singleton: deferred to first call so Next.js build-time page-data
 // collection workers don't throw when the env var isn't available yet.
 type Auth = ReturnType<typeof createAuth>;
-let _auth: Auth | undefined;
+let cachedAuth: Auth | undefined;
 
 export const getAuth = (): Auth => {
-  if (!_auth) {
+  if (!cachedAuth) {
     const secret = process.env.BETTER_AUTH_SECRET;
     if (!secret) {
       throw new Error("BETTER_AUTH_SECRET environment variable is required");
     }
-    _auth = createAuth({
+    cachedAuth = createAuth({
       extraPlugins: [nextCookies()],
       prisma,
       secret,
     });
   }
-  return _auth;
+  return cachedAuth;
 };
