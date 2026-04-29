@@ -98,6 +98,34 @@ export const createAuth = (config: AuthConfig) => {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
+      // requireEmailVerification activates Better Auth's enumeration-prevention
+      // path — signing up with an already-registered email returns a synthetic
+      // success response. onExistingUserSignUp below notifies the real account
+      // holder so they're not left waiting for a verification email that won't
+      // arrive. See better-auth docs "Email Enumeration Protection".
+      onExistingUserSignUp: resendApiKey
+        ? async ({ user }, request) => {
+            // Derive the web origin from the signup request (CORS already
+            // validated it via trustedOrigins) so the email links back to the
+            // app the user actually came from.
+            const origin = request?.headers.get("origin") ?? "";
+            const { Resend } = await import("resend");
+            const resend = new Resend(resendApiKey);
+            const { error } = await resend.emails.send({
+              from: fromEmail,
+              html: `<p>Someone tried to create a new acme account using your email address (${user.email}). If this was you, <a href="${origin}/login">sign in</a> or <a href="${origin}/recover">reset your password</a> instead. If not, you can safely ignore this email — no account changes were made.</p>`,
+              subject: "Sign-up attempt with your acme account",
+              to: user.email,
+            });
+            if (error) {
+              // Don't throw — Better Auth's enumeration-prevention path needs
+              // to return success regardless. Log so delivery failures don't
+              // break the auth response.
+              // eslint-disable-next-line no-console -- temporary until a structured logger lands
+              console.error("[Auth] Failed to send sign-up attempt email:", error);
+            }
+          }
+        : undefined,
       // Gate on Resend availability rather than NODE_ENV. If no API key is
       // configured we physically can't send a verification email — requiring
       // verification under that condition would lock all new users out
