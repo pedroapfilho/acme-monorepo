@@ -29,7 +29,19 @@ const resolveBaseUrl = (): string => {
 };
 
 const defaultTrustedOrigins = () => {
-  const origins = ["http://localhost:3000", "http://localhost:3001", "http://localhost:4000"];
+  // Both `localhost` and `127.0.0.1` are loopback but Better Auth's origin
+  // check is exact-string. CI's playwright config uses `127.0.0.1` explicitly
+  // (Node ≥18 resolves `localhost` to `::1` first; servers bind to 0.0.0.0/IPv4
+  // and undici doesn't fall back), so omitting the IPv4 form rejects every
+  // request from those tests with `[Better Auth]: Invalid origin`.
+  const origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:4000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:4000",
+  ];
 
   const portlessNames = ["acme.web", "acme.landing", "acme.api"];
   for (const name of portlessNames) {
