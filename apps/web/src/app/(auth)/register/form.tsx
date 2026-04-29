@@ -55,6 +55,15 @@ const RegisterForm = () => {
           return;
         }
 
+        // KNOWN ISSUE — Better Auth's enumeration-prevention path:
+        // when requireEmailVerification is true (it is, in production with
+        // Resend configured), signing up with an already-registered email
+        // returns success with token=null, then the dashboard middleware
+        // bounces the user back to /login because there's no session. From
+        // the user's POV: signup looked fine but they end up on the login
+        // page with no message — looks like silent failure.
+        // Fix needs a "check your email" intermediate UI (mirroring frow's
+        // pendingVerificationEmail pattern) gated on result.data?.token === null.
         router.push("/dashboard");
         router.refresh();
       } catch {
