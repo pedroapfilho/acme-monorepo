@@ -4,12 +4,14 @@ import { DashboardPage } from "../pages/dashboard.page";
 import { LoginPage } from "../pages/login.page";
 import { RecoverPage } from "../pages/recover.page";
 import { RegisterPage } from "../pages/register.page";
+import { ResetPasswordPage } from "../pages/reset-password.page";
 
 type Fixtures = {
   dashboardPage: DashboardPage;
   loginPage: LoginPage;
   recoverPage: RecoverPage;
   registerPage: RegisterPage;
+  resetPasswordPage: ResetPasswordPage;
 };
 
 const test = base.extend<Fixtures>({
@@ -24,6 +26,9 @@ const test = base.extend<Fixtures>({
   },
   registerPage: async ({ page }, use) => {
     await use(new RegisterPage(page));
+  },
+  resetPasswordPage: async ({ page }, use) => {
+    await use(new ResetPasswordPage(page));
   },
 });
 
