@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -9,21 +10,11 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import type { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
-
-type FormValues = z.infer<typeof loginSchema>;
-
-const defaultValues: FormValues = {
-  email: "",
-  password: "",
-};
 
 type Props = {
   from: string;
@@ -31,37 +22,20 @@ type Props = {
 
 const LoginForm = ({ from }: Props) => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [rootError, setRootError] = useState<string | null>(null);
-
-  const form = useForm({
-    defaultValues,
-    onSubmit: async ({ value }) => {
-      try {
-        setIsLoading(true);
-        setRootError(null);
-
-        const result = await authClient.signIn.email({
-          email: value.email,
-          password: value.password,
-        });
-
-        if (result.error) {
-          setRootError(result.error.message || "Invalid credentials");
-          return;
-        }
-
-        router.push(from);
-        router.refresh();
-      } catch {
-        setRootError("An error occurred during login. Please try again.");
-      } finally {
-        setIsLoading(false);
+  const { form, isLoading, rootError } = useAuthForm({
+    defaultValues: { email: "", password: "" },
+    onSubmit: async (values) => {
+      const result = await authClient.signIn.email({
+        email: values.email,
+        password: values.password,
+      });
+      if (result.error) {
+        throw new Error(result.error.message ?? "Invalid credentials");
       }
+      router.push(from);
+      router.refresh();
     },
-    validators: {
-      onSubmit: loginSchema,
-    },
+    schema: loginSchema,
   });
 
   return (

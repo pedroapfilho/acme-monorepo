@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -9,53 +10,27 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import type { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 
-type FormValues = z.infer<typeof recoverSchema>;
-
-const defaultValues: FormValues = {
-  email: "",
-};
-
 const RecoverForm = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [rootError, setRootError] = useState<string | null>(null);
-
-  const form = useForm({
-    defaultValues,
-    onSubmit: async ({ value }) => {
-      try {
-        setIsLoading(true);
-        setRootError(null);
-
-        const result = await authClient.requestPasswordReset({
-          email: value.email,
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
-
-        if (result.error) {
-          setRootError(result.error.message || "Failed to send password reset email");
-          return;
-        }
-
-        router.push("/login?message=password-reset-sent");
-      } catch {
-        setRootError("An error occurred. Please try again.");
-      } finally {
-        setIsLoading(false);
+  const { form, isLoading, rootError } = useAuthForm({
+    defaultValues: { email: "" },
+    onSubmit: async (values) => {
+      const result = await authClient.requestPasswordReset({
+        email: values.email,
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (result.error) {
+        throw new Error(result.error.message ?? "Failed to send password reset email");
       }
+      router.push("/login?message=password-reset-sent");
     },
-    validators: {
-      onSubmit: recoverSchema,
-    },
+    schema: recoverSchema,
   });
 
   return (

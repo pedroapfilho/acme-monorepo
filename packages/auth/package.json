@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./server": "./src/server.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./form": "./src/auth-form.ts"
   },
   "scripts": {
     "lint": "oxlint src",
@@ -22,8 +23,15 @@
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@tanstack/react-form": "^1.29.0",
     "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "react": "^19.2.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"
+  },
+  "peerDependencies": {
+    "@tanstack/react-form": "^1.29.0",
+    "react": "^19.0.0"
   }
 }

@@ -243,9 +243,18 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
+      '@tanstack/react-form':
+        specifier: ^1.29.0
+        version: 1.29.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      react:
+        specifier: ^19.2.5
+        version: 19.2.5
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
