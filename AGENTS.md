@@ -42,20 +42,20 @@ pnpm db:seed                      # seed database
 
 ### Packages
 
-| Package                   | Purpose                                                                                                                                                                                                                                                                    |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@repo/ui`                | Shared React components (Tailwind + CVA). Uses `ui:` prefix for Tailwind classes. Includes TanStack Form field components (`Field`, `FieldGroup`, `FieldLabel`, `FieldError`). `cn()` uses `extendTailwindMerge` with `experimentalParseClassName` to handle `ui:` prefix. |
-| `@repo/config-vitest`     | Shared Vitest config. Exports `react.ts` and `node.ts` configs.                                                                                                                                                                                                            |
-| `@repo/auth`              | Better Auth config. Exports `./server` (for api) and `./client` (for web/landing).                                                                                                                                                                                         |
-| `@repo/db`                | Prisma client singleton + schema. Models: User, Session, Account, Verification.                                                                                                                                                                                            |
-| `@repo/typescript-config` | Shared tsconfig bases: `nextjs.json`, `server.json`, `react-library.json`, `vite.json`.                                                                                                                                                                                    |
-| `@repo/tailwind-config`   | Shared Tailwind CSS config, PostCSS config, and design tokens (`shared-styles.css`).                                                                                                                                                                                       |
+| Package                   | Purpose                                                                                                                                |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `@repo/ui`                | Shared React components (Tailwind + CVA). Includes TanStack Form field components (`Field`, `FieldGroup`, `FieldLabel`, `FieldError`). |
+| `@repo/config-vitest`     | Shared Vitest config. Exports `react.ts` and `node.ts` configs.                                                                        |
+| `@repo/auth`              | Better Auth config. Exports `./server` (for api) and `./client` (for web/landing).                                                     |
+| `@repo/db`                | Prisma client singleton + schema. Models: User, Session, Account, Verification.                                                        |
+| `@repo/typescript-config` | Shared tsconfig bases: `nextjs.json`, `server.json`, `react-library.json`, `vite.json`.                                                |
+| `@repo/tailwind-config`   | Shared Tailwind CSS config, PostCSS config, and design tokens (`shared-styles.css`).                                                   |
 
 ### Key Relationships
 
 - **Auth flow**: `web`/`landing` use `@repo/auth/client` → calls `api` at `/auth/*` → `api` uses `@repo/auth/server` with Prisma adapter from `@repo/db`.
 - **API structure**: Hono app with versioned routes (`/api/v1/*`), Better Auth at `/auth/*`, health at `/healthz` and `/readyz`.
-- **UI consumption**: `web` and `landing` both import from `@repo/ui`. Components use Tailwind with `ui:` prefix inside the package, unprefixed in consumer apps.
+- **UI consumption**: `web` and `landing` both import from `@repo/ui`.
 - **Build order**: Turborepo handles `^build` dependencies — packages build before apps that depend on them.
 
 ## Portless (Dev URLs)
