@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -9,21 +10,11 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import type { z } from "zod";
 
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
-
-type FormValues = z.infer<typeof resetPasswordSchema>;
-
-const defaultValues: FormValues = {
-  confirmPassword: "",
-  password: "",
-};
 
 type Props = {
   token: string | null;
@@ -31,46 +22,25 @@ type Props = {
 
 const ResetPasswordForm = ({ token }: Props) => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [rootError, setRootError] = useState<string | null>(null);
-
-  const form = useForm({
-    defaultValues,
-    onSubmit: async ({ value }) => {
-      try {
-        if (!token) {
-          setRootError("Invalid reset token. Please request a new password reset.");
-          return;
-        }
-
-        if (value.password !== value.confirmPassword) {
-          setRootError("Passwords do not match");
-          return;
-        }
-
-        setIsLoading(true);
-        setRootError(null);
-
-        const result = await authClient.resetPassword({
-          newPassword: value.password,
-          token,
-        });
-
-        if (result.error) {
-          setRootError(result.error.message || "Failed to reset password");
-          return;
-        }
-
-        router.push("/login?message=password-reset-success");
-      } catch {
-        setRootError("An error occurred. Please try again.");
-      } finally {
-        setIsLoading(false);
+  const { form, isLoading, rootError } = useAuthForm({
+    defaultValues: { confirmPassword: "", password: "" },
+    onSubmit: async (values) => {
+      if (!token) {
+        throw new Error("Invalid reset token. Please request a new password reset.");
       }
+      if (values.password !== values.confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+      const result = await authClient.resetPassword({
+        newPassword: values.password,
+        token,
+      });
+      if (result.error) {
+        throw new Error(result.error.message ?? "Failed to reset password");
+      }
+      router.push("/login?message=password-reset-success");
     },
-    validators: {
-      onSubmit: resetPasswordSchema,
-    },
+    schema: resetPasswordSchema,
   });
 
   return (
