@@ -6,6 +6,8 @@ const TEST_USER = {
 };
 
 test.describe("Login", () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test("logs in with valid credentials", async ({ loginPage, page }) => {
     await loginPage.goto();
     await loginPage.login(TEST_USER.email, TEST_USER.password);
@@ -28,7 +30,9 @@ test.describe("Login", () => {
 
     await loginPage.expectErrorVisible();
   });
+});
 
+test.describe("Login (already authenticated)", () => {
   test("redirects to dashboard if already authenticated", async ({ page }) => {
     // storageState from setup means we're already logged in
     await page.goto("/login");
