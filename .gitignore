@@ -60,5 +60,5 @@ logs/
 *.rdb
 
 # agent output
-agents/
+/agents/
 .fallow/
