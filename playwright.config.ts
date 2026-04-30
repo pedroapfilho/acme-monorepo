@@ -80,7 +80,10 @@ export default defineConfig({
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
-          url: webUrl,
+          // Probe `/login` (returns 200) — web has no `/` route, so probing the
+          // root URL would 404 forever and Playwright would never proceed to
+          // spawn the api/landing webServers.
+          url: `${webUrl}/login`,
         },
         {
           command: "node apps/api/dist/index.mjs",
