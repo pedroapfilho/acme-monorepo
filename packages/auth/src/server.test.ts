@@ -41,20 +41,20 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.advanced?.cookiePrefix).toBe("acme");
   });
 
-  it("should have secure cookie settings when BETTER_AUTH_URL is HTTPS", () => {
+  it("should have secure cookies when BETTER_AUTH_URL is HTTPS", () => {
     vi.stubEnv("BETTER_AUTH_URL", "https://acme.example");
 
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(true);
-    expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.httpOnly).toBe(true);
-    expect(prodAuth.options.advanced?.cookies?.session_token?.attributes?.sameSite).toBe("lax");
+    expect(prodAuth.options.advanced?.useSecureCookies).toBe(true);
+    expect(prodAuth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
+    expect(prodAuth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
   });
 
-  it("should not set secure cookie when BETTER_AUTH_URL is HTTP (e.g. CI over plain HTTP)", () => {
+  it("should not set secure cookies when BETTER_AUTH_URL is HTTP (e.g. CI over plain HTTP)", () => {
     vi.stubEnv("BETTER_AUTH_URL", "http://localhost:3000");
 
     const httpAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(httpAuth.options.advanced?.cookies?.session_token?.attributes?.secure).toBe(false);
+    expect(httpAuth.options.advanced?.useSecureCookies).toBe(false);
   });
 
   it("should require email verification when Resend is configured", () => {
@@ -83,10 +83,6 @@ describe("Auth Server Configuration", () => {
     expect(hasUsername).toBe(true);
   });
 
-  it("should use custom session token name", () => {
-    expect(auth.options.advanced?.cookies?.session_token?.name).toBe("session_token");
-  });
-
   it("should have account linking enabled", () => {
     expect(auth.options.account?.accountLinking?.enabled).toBe(true);
   });
@@ -101,7 +97,7 @@ describe("Auth Server Configuration", () => {
 
   it("should have correct rate-limiting window and max", () => {
     expect(auth.options.rateLimit?.window).toBe(60);
-    expect(auth.options.rateLimit?.max).toBe(10);
+    expect(auth.options.rateLimit?.max).toBe(100);
   });
 
   it("should enable rate limiting in production", () => {

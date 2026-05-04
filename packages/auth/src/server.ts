@@ -84,21 +84,18 @@ export const createAuth = (config: AuthConfig) => {
       },
     },
 
+    // Fleet-canonical shape: defaultCookieAttributes + useSecureCookies.
+    // `useSecureCookies` gates on whether BETTER_AUTH_URL is HTTPS, not on
+    // NODE_ENV — CI runs production builds (NODE_ENV=production) over HTTP,
+    // and `secure: true` over HTTP would make browsers silently drop the
+    // session cookie, killing the auth flow.
     advanced: {
       cookiePrefix: "acme",
-      cookies: {
-        session_token: {
-          attributes: {
-            httpOnly: true,
-            sameSite: "lax",
-            // Gate on whether BETTER_AUTH_URL is HTTPS, not on NODE_ENV. CI runs
-            // production builds (NODE_ENV=production) over HTTP — `secure: true`
-            // would make browsers silently drop the cookie, killing the auth flow.
-            secure: process.env.BETTER_AUTH_URL?.startsWith("https://") === true,
-          },
-          name: "session_token",
-        },
+      defaultCookieAttributes: {
+        httpOnly: true,
+        sameSite: "lax" as const,
       },
+      useSecureCookies: process.env.BETTER_AUTH_URL?.startsWith("https://") === true,
     },
 
     // Explicit to match the Next.js route handler mount at /api/auth/[...all].
@@ -190,14 +187,12 @@ export const createAuth = (config: AuthConfig) => {
 
     plugins: [username(), bearer(), ...extraPlugins],
 
+    // Fleet-canonical rate-limit shape. CI runs production builds but the
+    // e2e suite hammers auth endpoints back-to-back across browsers; the
+    // limiter would 429 the suite, so it's gated off when CI is set.
     rateLimit: {
-      // CI runs production builds (NODE_ENV=production) but the e2e suite
-      // hammers the auth endpoints back-to-back across browsers — the 10/min
-      // production limit hits 429s on logout's per-test signup loop. Skip
-      // the limiter when CI is set so e2e exercises the same code paths
-      // without the noise.
       enabled: process.env.NODE_ENV === "production" && !process.env.CI,
-      max: 10,
+      max: 100,
       storage: "database",
       window: 60,
     },
@@ -210,7 +205,8 @@ export const createAuth = (config: AuthConfig) => {
         maxAge: 5 * 60, // 5 minutes
       },
       expiresIn: 60 * 60 * 24 * 7, // 7 days
-      updateAge: 60 * 60 * 24, // Update if older than 1 day
+      storeSessionInDatabase: true,
+      updateAge: 60 * 60 * 24, // Update session if older than 1 day
     },
     trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || defaultTrustedOrigins(),
     user: {
