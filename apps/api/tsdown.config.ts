@@ -8,7 +8,7 @@ export default defineConfig({
   deps: {
     // Workspace packages export .ts source — Node can't import those at runtime,
     // so tsdown must bundle them into the output instead of leaving them as external imports.
-    alwaysBundle: ["@repo/auth", "@repo/db", "@repo/transactional"],
+    alwaysBundle: ["@repo/auth", "@repo/auth/server", "@repo/db", "@repo/transactional"],
   },
   entry: ["src/index.ts"],
   format: ["esm"],
