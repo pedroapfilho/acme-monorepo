@@ -75,20 +75,22 @@ docker run -d --name acme-pg \
 
 ### 4. Configure environment variables
 
-Copy the root example and generate a Better Auth secret:
+Each package loads env vars from its **own** directory. Copy each example and edit as needed:
 
 ```bash
-cp .env.example .env
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+cp packages/db/.env.example packages/db/.env
 ```
 
-Then edit `.env` and set:
+(`apps/landing` reads no env vars at runtime, so it doesn't need a file.)
 
-- `BETTER_AUTH_SECRET` — any 32+ char random string. Generate with `openssl rand -base64 32`.
-- `DATABASE_URL` — must match your Postgres setup. The default in `.env.example` works with the Docker command above.
+Then edit each file and set:
 
-The other variables (`API_URL`, `NEXT_PUBLIC_API_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`, `BETTER_AUTH_URL`) are pre-set to the portless URLs and don't need changes for local dev.
+- `BETTER_AUTH_SECRET` — any 32+ char random string, **identical** across `apps/api/.env` and `apps/web/.env.local` (both validate sessions against it). Generate with `openssl rand -base64 32`.
+- `DATABASE_URL` — Replace the name and password placeholders.
 
-> **Note:** Per-app `.env.example` files inside `apps/api/` and `apps/web/` are legacy and reference `localhost:PORT` URLs that don't match the portless setup. Use the root `.env` only.
+The URL variables (`NEXT_PUBLIC_API_URL`, `BETTER_AUTH_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`) are pre-set to the portless URLs and don't need changes for local dev.
 
 ### 5. Initialize the database
 

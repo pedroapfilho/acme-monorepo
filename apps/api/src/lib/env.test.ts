@@ -20,12 +20,14 @@ describe("envSchema", () => {
     const result = envSchema.safeParse(validEnv);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.BETTER_AUTH_URL).toBe("http://localhost:4000");
+      expect(result.data.BETTER_AUTH_URL).toBe("https://acme.api.localhost");
       expect(result.data.PORT).toBe("4000");
       expect(result.data.HOST).toBe("0.0.0.0");
       expect(result.data.NODE_ENV).toBe("development");
       expect(result.data.FROM_EMAIL).toBe("noreply@acme.com");
-      expect(result.data.CORS_ORIGINS).toBe("http://localhost:3000,http://localhost:3001");
+      expect(result.data.CORS_ORIGINS).toBe(
+        "https://acme.web.localhost,https://acme.landing.localhost",
+      );
     }
   });
 
