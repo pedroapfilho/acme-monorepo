@@ -17,7 +17,12 @@
     "@vitest/coverage-v8",
     "jsdom",
     "shadcn",
-    "react"
+    "react",
+    "@react-email/ui",
+    "@react-email/preview-server",
+    "react-email",
+    "@types/react-dom",
+    "react-dom"
   ],
   "rules": {
     "unused-dependencies": "warn"
