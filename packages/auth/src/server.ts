@@ -1,6 +1,11 @@
 import { execFileSync } from "node:child_process";
 
 import type { PrismaClient } from "@repo/db";
+import {
+  sendPasswordResetEmail,
+  sendSignUpAttemptEmail,
+  sendWelcomeEmail,
+} from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins/bearer";
@@ -117,24 +122,22 @@ export const createAuth = (config: AuthConfig) => {
       // arrive. See better-auth docs "Email Enumeration Protection".
       onExistingUserSignUp: resendApiKey
         ? async ({ user }, request) => {
-            // Derive the web origin from the signup request (CORS already
-            // validated it via trustedOrigins) so the email links back to the
-            // app the user actually came from.
             const origin = request?.headers.get("origin") ?? "";
-            const { Resend } = await import("resend");
-            const resend = new Resend(resendApiKey);
-            const { error } = await resend.emails.send({
-              from: fromEmail,
-              html: `<p>Someone tried to create a new acme account using your email address (${user.email}). If this was you, <a href="${origin}/login">sign in</a> or <a href="${origin}/recover">reset your password</a> instead. If not, you can safely ignore this email — no account changes were made.</p>`,
-              subject: "Sign-up attempt with your acme account",
-              to: user.email,
-            });
-            if (error) {
+            const result = await sendSignUpAttemptEmail(
+              {
+                resetPasswordUrl: `${origin}/recover`,
+                signInUrl: `${origin}/login`,
+                userEmail: user.email,
+                username: user.name,
+              },
+              { apiKey: resendApiKey, from: fromEmail },
+            );
+            if (!result.success) {
               // Don't throw — Better Auth's enumeration-prevention path needs
               // to return success regardless. Log so delivery failures don't
               // break the auth response.
-              // eslint-disable-next-line no-console -- temporary until a structured logger lands
-              console.error("[Auth] Failed to send sign-up attempt email:", error);
+              // oxlint-disable-next-line no-console -- temporary until a structured logger lands
+              console.error("[Auth] Failed to send sign-up attempt email:", result.error);
             }
           }
         : undefined,
@@ -145,16 +148,16 @@ export const createAuth = (config: AuthConfig) => {
       requireEmailVerification: Boolean(resendApiKey),
       sendResetPassword: resendApiKey
         ? async ({ url, user }) => {
-            const { Resend } = await import("resend");
-            const resend = new Resend(resendApiKey);
-            const { error } = await resend.emails.send({
-              from: fromEmail,
-              html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
-              subject: "Reset your password",
-              to: user.email,
-            });
-            if (error) {
-              throw new Error(`Failed to send password reset email: ${error.message}`);
+            const result = await sendPasswordResetEmail(
+              {
+                resetUrl: url,
+                userEmail: user.email,
+                username: user.name,
+              },
+              { apiKey: resendApiKey, from: fromEmail },
+            );
+            if (!result.success) {
+              throw new Error(`Failed to send password reset email: ${result.error}`);
             }
           }
         : undefined,
@@ -163,16 +166,16 @@ export const createAuth = (config: AuthConfig) => {
     emailVerification: {
       sendVerificationEmail: resendApiKey
         ? async ({ url, user }) => {
-            const { Resend } = await import("resend");
-            const resend = new Resend(resendApiKey);
-            const { error } = await resend.emails.send({
-              from: fromEmail,
-              html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
-              subject: "Verify your email address",
-              to: user.email,
-            });
-            if (error) {
-              throw new Error(`Failed to send verification email: ${error.message}`);
+            const result = await sendWelcomeEmail(
+              {
+                userEmail: user.email,
+                username: user.name,
+                verificationUrl: url,
+              },
+              { apiKey: resendApiKey, from: fromEmail },
+            );
+            if (!result.success) {
+              throw new Error(`Failed to send verification email: ${result.error}`);
             }
           }
         : undefined,
