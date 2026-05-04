@@ -57,9 +57,23 @@ jobs:
           path: ~/.cache/ms-playwright
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.version }}
       - if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps
-      - if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps
+        run: pnpm exec playwright install
+      # System deps come from apt; Ubuntu mirrors occasionally fail mid-sync
+      # ("File has unexpected size... Mirror sync in progress?"). Retry up to
+      # 3 times with apt-get update in between to ride out transient mirror flaps.
+      - name: Install Playwright system deps
+        run: |
+          attempt=0
+          until pnpm exec playwright install-deps; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge 3 ]; then
+              echo "playwright install-deps failed after $attempt attempts"
+              exit 1
+            fi
+            echo "apt fetch failed (attempt $attempt); retrying in 30s..."
+            sleep 30
+            sudo apt-get update || true
+          done
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
