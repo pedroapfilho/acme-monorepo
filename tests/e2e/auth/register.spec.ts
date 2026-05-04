@@ -35,7 +35,9 @@ test.describe("Register", () => {
     await registerPage.goto();
     await registerPage.register("Short Pass", `short-${Date.now()}@example.com`, "short", "short");
 
-    await expect(page.getByText(/at least 12 characters/i)).toBeVisible();
+    // Both password and confirmPassword fields render the same length
+    // error, so .first() avoids a strict-mode "resolved to 2 elements" violation.
+    await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });
 

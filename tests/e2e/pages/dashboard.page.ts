@@ -9,7 +9,8 @@ export class DashboardPage {
   constructor(private readonly page: Page) {
     this.heading = page.getByRole("heading", { name: /dashboard/i });
     this.signOutButton = page.getByRole("button", { name: /sign out/i });
-    this.userEmail = page.getByText(/you are logged in as/i);
+    // Email lives under <dt>Email</dt> on the dashboard's user info dl.
+    this.userEmail = page.getByRole("term").filter({ hasText: /^email$/i });
   }
 
   goto = async () => {

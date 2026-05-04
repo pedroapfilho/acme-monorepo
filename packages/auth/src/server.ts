@@ -146,45 +146,57 @@ export const createAuth = (config: AuthConfig) => {
       // verification under that condition would lock all new users out
       // (which is what was happening to e2e in CI before this change).
       requireEmailVerification: Boolean(resendApiKey),
-      sendResetPassword: resendApiKey
-        ? async ({ url, user }) => {
-            const result = await sendPasswordResetEmail(
-              {
-                resetUrl: url,
-                userEmail: user.email,
-                username: user.name,
-              },
-              { apiKey: resendApiKey, from: fromEmail },
-            );
-            if (!result.success) {
-              throw new Error(`Failed to send password reset email: ${result.error}`);
-            }
-          }
-        : undefined,
+      // Always defined so the Better Auth endpoint accepts the request. The
+      // actual send only happens when Resend is configured; without it we
+      // succeed silently — the test/dev environment doesn't have email infra
+      // but the user-visible flow (form submit → redirect) still works.
+      sendResetPassword: async ({ url, user }) => {
+        if (!resendApiKey) {
+          return;
+        }
+        const result = await sendPasswordResetEmail(
+          {
+            resetUrl: url,
+            userEmail: user.email,
+            username: user.name,
+          },
+          { apiKey: resendApiKey, from: fromEmail },
+        );
+        if (!result.success) {
+          throw new Error(`Failed to send password reset email: ${result.error}`);
+        }
+      },
     },
 
     emailVerification: {
-      sendVerificationEmail: resendApiKey
-        ? async ({ url, user }) => {
-            const result = await sendWelcomeEmail(
-              {
-                userEmail: user.email,
-                username: user.name,
-                verificationUrl: url,
-              },
-              { apiKey: resendApiKey, from: fromEmail },
-            );
-            if (!result.success) {
-              throw new Error(`Failed to send verification email: ${result.error}`);
-            }
-          }
-        : undefined,
+      // Same no-op-without-Resend pattern as sendResetPassword above.
+      sendVerificationEmail: async ({ url, user }) => {
+        if (!resendApiKey) {
+          return;
+        }
+        const result = await sendWelcomeEmail(
+          {
+            userEmail: user.email,
+            username: user.name,
+            verificationUrl: url,
+          },
+          { apiKey: resendApiKey, from: fromEmail },
+        );
+        if (!result.success) {
+          throw new Error(`Failed to send verification email: ${result.error}`);
+        }
+      },
     },
 
     plugins: [username(), bearer(), ...extraPlugins],
 
     rateLimit: {
-      enabled: process.env.NODE_ENV === "production",
+      // CI runs production builds (NODE_ENV=production) but the e2e suite
+      // hammers the auth endpoints back-to-back across browsers — the 10/min
+      // production limit hits 429s on logout's per-test signup loop. Skip
+      // the limiter when CI is set so e2e exercises the same code paths
+      // without the noise.
+      enabled: process.env.NODE_ENV === "production" && !process.env.CI,
       max: 10,
       storage: "database",
       window: 60,

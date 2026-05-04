@@ -120,8 +120,12 @@ describe("Auth Server Configuration", () => {
     ]);
   });
 
-  it("should not configure reset password email when resendApiKey is absent", () => {
-    expect(auth.options.emailAndPassword?.sendResetPassword).toBeUndefined();
+  it("should always define reset password handler (no-op when resendApiKey is absent)", () => {
+    // The handler is always wired so the Better Auth /forget-password
+    // endpoint accepts the request — without an API key it just returns
+    // without sending an email, which keeps the user-visible flow working
+    // in dev/CI without email infra.
+    expect(auth.options.emailAndPassword?.sendResetPassword).toBeDefined();
   });
 
   it("should configure reset password email when resendApiKey is provided", () => {
@@ -152,8 +156,10 @@ describe("Auth Server Configuration", () => {
     expect(plugins.some((p) => p.id === "test-plugin")).toBe(true);
   });
 
-  it("should not configure verification email when resendApiKey is absent", () => {
-    expect(auth.options.emailVerification?.sendVerificationEmail).toBeUndefined();
+  it("should always define verification email handler (no-op when resendApiKey is absent)", () => {
+    // Same reasoning as sendResetPassword above — endpoint accepts the
+    // request, the actual send is gated on resendApiKey at call time.
+    expect(auth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 
   it("should configure verification email when resendApiKey is provided", () => {

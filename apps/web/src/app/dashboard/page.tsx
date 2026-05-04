@@ -13,10 +13,10 @@ const Dashboard = async () => {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-12">
       <header className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-muted-foreground">Signed in</p>
-        <h1 className="max-w-[24ch] text-3xl font-semibold tracking-tight text-balance">
+        <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
           Welcome back{session.user.name ? `, ${session.user.name.split(" ")[0]}` : ""}.
-        </h1>
+        </p>
       </header>
 
       <dl className="grid gap-4 border-t border-border pt-6 sm:grid-cols-2">

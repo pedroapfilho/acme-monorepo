@@ -14,7 +14,7 @@ export class RegisterPage {
     this.emailInput = page.getByLabel(/email/i);
     this.passwordInput = page.getByLabel("Password", { exact: true });
     this.confirmPasswordInput = page.getByLabel(/confirm password/i);
-    this.submitButton = page.getByRole("button", { name: /register/i });
+    this.submitButton = page.getByRole("button", { name: /create account/i });
     // Root errors render via a <p class="text-sm text-destructive"> sibling.
     this.rootError = page.locator("p.text-destructive");
   }
