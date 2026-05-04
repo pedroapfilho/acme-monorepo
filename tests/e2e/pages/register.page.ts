@@ -15,7 +15,8 @@ export class RegisterPage {
     this.passwordInput = page.getByLabel("Password", { exact: true });
     this.confirmPasswordInput = page.getByLabel(/confirm password/i);
     this.submitButton = page.getByRole("button", { name: /register/i });
-    this.rootError = page.locator(".text-red-500");
+    // Root errors render via a <p class="text-sm text-destructive"> sibling.
+    this.rootError = page.locator("p.text-destructive");
   }
 
   goto = async () => {

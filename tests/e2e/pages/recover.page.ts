@@ -9,7 +9,8 @@ export class RecoverPage {
   constructor(private readonly page: Page) {
     this.emailInput = page.getByLabel(/email/i);
     this.submitButton = page.getByRole("button", { name: /submit request/i });
-    this.rootError = page.locator(".text-red-500");
+    // Root errors render via a <p class="text-sm text-destructive"> sibling.
+    this.rootError = page.locator("p.text-destructive");
   }
 
   goto = async () => {

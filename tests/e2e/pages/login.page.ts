@@ -11,7 +11,8 @@ export class LoginPage {
     this.emailInput = page.getByLabel(/email/i);
     this.passwordInput = page.getByLabel(/password/i);
     this.submitButton = page.getByRole("button", { name: /sign in|log in/i });
-    this.rootError = page.locator(".text-red-500");
+    // Root errors render via a <p class="text-sm text-destructive"> sibling.
+    this.rootError = page.locator("p.text-destructive");
   }
 
   goto = async () => {
