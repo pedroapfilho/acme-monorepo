@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import ResetPasswordForm from "@/app/(auth)/reset-password/form";
 
 const metadata: Metadata = {
-  title: "Reset your password - Acme",
+  title: "Reset your password",
 };
 
 type Props = {

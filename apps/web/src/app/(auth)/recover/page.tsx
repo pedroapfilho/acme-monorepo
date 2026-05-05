@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import RecoverForm from "@/app/(auth)/recover/form";
 
 const metadata: Metadata = {
-  title: "Recover your account - Acme",
+  title: "Recover your account",
 };
 
 const Page = () => {

@@ -15,7 +15,7 @@ const Dashboard = async () => {
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Welcome back{session.user.name ? `, ${session.user.name.split(" ")[0]}` : ""}.
+          Welcome back{session.user.name ? `, ${session.user.name}` : ""}
         </p>
       </header>
 

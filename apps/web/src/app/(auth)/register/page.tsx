@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import RegisterForm from "@/app/(auth)/register/form";
 
 const metadata: Metadata = {
-  title: "Create an account - Acme",
+  title: "Create an account",
 };
 
 const Page = () => {

@@ -37,8 +37,8 @@ const metadata = {
     type: "website",
   },
   title: {
-    default: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
-    template: `%s - ${SITE_NAME}`,
+    default: `${SITE_NAME} | ${SHORT_DESCRIPTION}`,
+    template: `%s | ${SITE_NAME}`,
   },
   twitter: {
     card: "summary_large_image",

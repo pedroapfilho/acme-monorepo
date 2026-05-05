@@ -1,7 +1,8 @@
 import { buttonVariants } from "@repo/ui/components/button";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
+
+import { webAppUrl } from "@/lib/urls";
 
 export const metadata: Metadata = {
   description: "Welcome to Acme — the one template to rule them all.",
@@ -23,13 +24,16 @@ const Page = () => {
           and ready to fork.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <Link className={buttonVariants({ size: "lg" })} href="/register">
+          <a className={buttonVariants({ size: "lg" })} href={webAppUrl("/register")}>
             Get started
-          </Link>
-          <Link className={buttonVariants({ size: "lg", variant: "ghost" })} href="/login">
+          </a>
+          <a
+            className={buttonVariants({ size: "lg", variant: "ghost" })}
+            href={webAppUrl("/login")}
+          >
             Sign in
             <ArrowUpRight />
-          </Link>
+          </a>
         </div>
       </section>
     </div>

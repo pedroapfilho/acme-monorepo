@@ -11,13 +11,14 @@ import {
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 
 const RecoverForm = () => {
-  const router = useRouter();
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+
   const { form, isLoading, rootError } = useAuthForm({
     defaultValues: { email: "" },
     onSubmit: async (values) => {
@@ -28,10 +29,29 @@ const RecoverForm = () => {
       if (result.error) {
         throw new Error(result.error.message ?? "Failed to send password reset email");
       }
-      router.push("/login?message=password-reset-sent");
+      setSubmittedEmail(values.email);
     },
     schema: recoverSchema,
   });
+
+  if (submittedEmail) {
+    return (
+      <div className="flex flex-col items-center gap-2 text-center">
+        <p className="font-semibold">Check your email</p>
+        <p className="text-sm text-muted-foreground">
+          If <span className="font-medium text-foreground">{submittedEmail}</span> matches an
+          account, we&apos;ve sent a link to reset your password.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Back to{" "}
+          <Link className="text-foreground underline underline-offset-4" href="/login">
+            sign in
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form
