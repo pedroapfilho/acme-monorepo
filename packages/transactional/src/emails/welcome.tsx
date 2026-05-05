@@ -60,5 +60,4 @@ const WelcomeEmail = ({ userEmail, username, verificationUrl }: WelcomeEmailProp
 };
 
 export { WelcomeEmail };
-// fallow-ignore-next-line unused-export
 export default WelcomeEmail;
