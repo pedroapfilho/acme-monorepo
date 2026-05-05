@@ -1,6 +1,8 @@
 import { Heading, Link, Text } from "react-email";
 
-import { Button, Card, Divider } from "../components";
+import { Button } from "../components/button";
+import { Card } from "../components/card";
+import { Divider } from "../components/divider";
 
 import { BaseLayout } from "./base-layout";
 

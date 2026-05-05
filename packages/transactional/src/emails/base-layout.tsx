@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Body, Container, Head, Html, Link, Preview, Section, Tailwind, Text } from "react-email";
 
-import { AcmeLogo } from "../components";
+import { AcmeLogo } from "../components/acme-logo";
 import { tailwindConfig } from "../styles/theme";
 
 type BaseLayoutProps = {
