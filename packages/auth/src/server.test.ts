@@ -102,6 +102,10 @@ describe("Auth Server Configuration", () => {
 
   it("should enable rate limiting in production", () => {
     vi.stubEnv("NODE_ENV", "production");
+    // The rateLimit gate is `production && !CI` — GitHub Actions sets
+    // CI=true on the runner, so we must clear it for the production path
+    // to evaluate true under test.
+    vi.stubEnv("CI", "");
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.rateLimit?.enabled).toBe(true);
   });
