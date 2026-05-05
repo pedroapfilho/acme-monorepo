@@ -3,7 +3,11 @@
   "workspaces": {
     "packages": ["apps/*", "packages/*"]
   },
-  "entry": ["oxlint.config.ts", "**/prisma.config.ts"],
+  "entry": [
+    "oxlint.config.ts",
+    "**/prisma.config.ts",
+    "packages/transactional/src/emails/**/*.tsx"
+  ],
   "ignorePatterns": ["verify-auth.js", "tests/e2e/setup/auth.setup.ts"],
   "ignoreDependencies": [
     "eslint-plugin-*",
