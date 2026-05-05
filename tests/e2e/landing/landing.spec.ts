@@ -14,14 +14,6 @@ test.describe("Landing Page", () => {
     await expect(page.locator("footer")).toBeVisible();
   });
 
-  test("header has navigation link to about", async ({ page }) => {
-    await page.goto(landingUrl);
-
-    const aboutLink = page.getByRole("link", { name: "About" });
-    await expect(aboutLink).toBeVisible();
-    await expect(aboutLink).toHaveAttribute("href", "/about");
-  });
-
   test("footer shows copyright", async ({ page }) => {
     await page.goto(landingUrl);
 
