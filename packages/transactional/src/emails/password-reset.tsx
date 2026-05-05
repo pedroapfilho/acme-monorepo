@@ -70,5 +70,4 @@ const PasswordResetEmail = ({
 };
 
 export { PasswordResetEmail };
-// fallow-ignore-next-line unused-export
 export default PasswordResetEmail;

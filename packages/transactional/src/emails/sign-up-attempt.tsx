@@ -84,5 +84,4 @@ const SignUpAttemptEmail = ({
 };
 
 export { SignUpAttemptEmail };
-// fallow-ignore-next-line unused-export
 export default SignUpAttemptEmail;
