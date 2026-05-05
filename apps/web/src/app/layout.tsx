@@ -4,8 +4,6 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
-// next/font/google fonts are factory calls (`Inter({...})`), not constructors
-// oxlint-disable-next-line new-cap
 const inter = Inter({
   display: "swap", // Improve font loading performance
   subsets: ["latin"],

@@ -1,5 +1,3 @@
-// oxlint-disable require-await -- email sender functions present an async API for callers; React render itself is sync
-
 import * as React from "react";
 
 import { PasswordResetEmail } from "../emails/password-reset";
@@ -16,7 +14,9 @@ type EmailConfig = {
 
 const DEFAULT_FROM = "Acme <noreply@acme.com>";
 
-const sendWelcomeEmail = async (
+// These wrappers return `sendEmail`'s promise directly. Keeping them sync
+// avoids a useless extra microtask; callers `await` them either way.
+const sendWelcomeEmail = (
   {
     userEmail,
     username,
@@ -46,7 +46,7 @@ const sendWelcomeEmail = async (
   });
 };
 
-const sendSignUpAttemptEmail = async (
+const sendSignUpAttemptEmail = (
   {
     resetPasswordUrl,
     signInUrl,
@@ -79,7 +79,7 @@ const sendSignUpAttemptEmail = async (
   });
 };
 
-const sendPasswordResetEmail = async (
+const sendPasswordResetEmail = (
   {
     browserInfo,
     ipAddress,

@@ -52,8 +52,6 @@ const metadata = {
   },
 } satisfies Metadata;
 
-// next/font/google fonts are factory calls (`Inter({...})`), not constructors
-// oxlint-disable-next-line new-cap
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",

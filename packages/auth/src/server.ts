@@ -133,7 +133,6 @@ export const createAuth = (config: AuthConfig) => {
               // Don't throw — Better Auth's enumeration-prevention path needs
               // to return success regardless. Log so delivery failures don't
               // break the auth response.
-              // oxlint-disable-next-line no-console -- temporary until a structured logger lands
               console.error("[Auth] Failed to send sign-up attempt email:", result.error);
             }
           }

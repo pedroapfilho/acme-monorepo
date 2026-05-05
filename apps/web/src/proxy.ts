@@ -25,7 +25,6 @@ export const proxy = async (request: NextRequest) => {
     .catch((error) => {
       // Auth service failure (DB down, misconfiguration, etc.) — log so outages
       // are observable, then treat as unauthenticated to keep the pipeline moving.
-      // oxlint-disable-next-line no-console
       console.error("[proxy] getSession failed — treating as unauthenticated", { error, pathname });
       return null;
     });

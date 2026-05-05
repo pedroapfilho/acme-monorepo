@@ -25,8 +25,6 @@ const createOpenAPIApp = <V extends Record<string, unknown> = Record<string, nev
     ],
   });
 
-  // Scalar() is a factory from @scalar/hono-api-reference, not a constructor.
-  // oxlint-disable-next-line new-cap
   app.get("/docs", Scalar({ url: "/openapi.json" }));
 
   return app;
