@@ -62,3 +62,6 @@ logs/
 # agent output
 /agents/
 .fallow/
+
+# openlogs (dev-server log capture for AI agents)
+.openlogs/
