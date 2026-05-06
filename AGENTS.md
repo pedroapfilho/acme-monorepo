@@ -120,6 +120,26 @@ branch fix-styles:    https://fix-styles.acme.web.localhost
 - `fallow.yml` — `pnpm fallow:dead` (cross-file dead code, unused exports, circular deps)
 - All use `permissions: { contents: read }` and `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true`
 
+## Local CI (agent-ci)
+
+Run the full CI pipeline locally with [agent-ci](https://agent-ci.dev) before pushing — same workflows, ~0 ms cache, pause-on-failure.
+
+```bash
+pnpm ci:local         # full mirror (test + lint + format + fallow + e2e)
+pnpm ci:local:fast    # fast 4 (skips e2e) — also runs on git push via .husky/pre-push
+pnpm ci:local:e2e     # e2e only
+```
+
+On failure the runner pauses with the container alive. Fix the file, then:
+
+```bash
+pnpm exec agent-ci retry --name <runner-name>
+```
+
+Secrets (`${{ secrets.FOO }}`) come from `.env.agent-ci` (gitignored). Copy `.env.agent-ci.example` and fill in real values. Requires Docker (OrbStack on macOS).
+
+Before reporting a task done, agents should run `pnpm ci:local` and confirm green.
+
 ## Prisma
 
 `prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
