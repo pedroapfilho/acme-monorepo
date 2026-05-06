@@ -1,1 +1,12 @@
+# Refuse direct commits on main: cross-repo work happens via feature branches
+# created by orchestrator/scripts/worktree.sh. Override (emergency only):
+#   ORCHESTRATOR_ALLOW_MAIN_COMMIT=1 git commit ...
+branch=$(git symbolic-ref --short HEAD 2>/dev/null || echo "")
+if [ "$branch" = "main" ] && [ "${ORCHESTRATOR_ALLOW_MAIN_COMMIT:-}" != "1" ]; then
+  echo "ERROR: refusing commit on main." >&2
+  echo "Use a feature branch (orchestrator/scripts/worktree.sh <slug>) or" >&2
+  echo "set ORCHESTRATOR_ALLOW_MAIN_COMMIT=1 to override." >&2
+  exit 1
+fi
+
 pnpm lint-staged
