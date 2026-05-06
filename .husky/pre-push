@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# git exports GIT_DIR / GIT_INDEX_FILE during pre-push; they leak into
+# Docker-spawned actions/checkout and break repo sync. Strip them.
+unset GIT_DIR GIT_INDEX_FILE
+pnpm ci:local:fast
