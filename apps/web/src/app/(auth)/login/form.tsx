@@ -1,15 +1,8 @@
 "use client";
 
 import { useAuthForm } from "@repo/auth/form";
-import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { AuthForm, AuthFormField, AuthFormRootError, AuthFormSubmit } from "@repo/auth/form-fields";
+import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -39,74 +32,37 @@ const LoginForm = ({ from }: Props) => {
   });
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
+    <AuthForm form={form}>
       <FieldGroup>
-        <form.Field name="email">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
-                  id="email"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="m@example.com"
-                  type="email"
-                  value={field.state.value}
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
+        <AuthFormField
+          disabled={isLoading}
+          form={form}
+          label="Email"
+          name="email"
+          placeholder="m@example.com"
+          type="email"
+        />
 
-        <form.Field name="password">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Link
-                    className="ml-auto text-sm text-foreground underline underline-offset-4"
-                    href="/recover"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
-                  id="password"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  type="password"
-                  value={field.state.value}
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
+        <AuthFormField
+          disabled={isLoading}
+          form={form}
+          label="Password"
+          labelSlot={
+            <Link
+              className="ml-auto text-sm text-foreground underline underline-offset-4"
+              href="/recover"
+            >
+              Forgot your password?
+            </Link>
+          }
+          name="password"
+          type="password"
+        />
 
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
+        <AuthFormRootError message={rootError} />
 
         <Field>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Signing in..." : "Sign in"}
-          </Button>
+          <AuthFormSubmit isLoading={isLoading} label="Sign in" loadingLabel="Signing in..." />
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
             <Link className="text-foreground underline underline-offset-4" href="/register">
@@ -115,7 +71,7 @@ const LoginForm = ({ from }: Props) => {
           </FieldDescription>
         </Field>
       </FieldGroup>
-    </form>
+    </AuthForm>
   );
 };
 

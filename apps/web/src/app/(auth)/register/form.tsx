@@ -1,15 +1,8 @@
 "use client";
 
 import { useAuthForm } from "@repo/auth/form";
-import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { AuthForm, AuthFormField, AuthFormRootError, AuthFormSubmit } from "@repo/auth/form-fields";
+import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -76,112 +69,51 @@ const RegisterForm = () => {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
+    <AuthForm form={form}>
       <FieldGroup>
-        <form.Field name="name">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
-                  id="name"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="John Doe"
-                  value={field.state.value}
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
+        <AuthFormField
+          disabled={isLoading}
+          form={form}
+          label="Full Name"
+          name="name"
+          placeholder="John Doe"
+        />
 
-        <form.Field name="email">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
-                  id="email"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="m@example.com"
-                  type="email"
-                  value={field.state.value}
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
+        <AuthFormField
+          disabled={isLoading}
+          form={form}
+          label="Email"
+          name="email"
+          placeholder="m@example.com"
+          type="email"
+        />
 
         <div className="grid grid-cols-2 gap-4">
-          <form.Field name="password">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    disabled={isLoading}
-                    id="password"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          </form.Field>
+          <AuthFormField
+            disabled={isLoading}
+            form={form}
+            label="Password"
+            name="password"
+            type="password"
+          />
 
-          <form.Field name="confirmPassword">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    disabled={isLoading}
-                    id="confirmPassword"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          </form.Field>
+          <AuthFormField
+            disabled={isLoading}
+            form={form}
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+          />
         </div>
 
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
+        <AuthFormRootError message={rootError} />
 
         <Field>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Creating account..." : "Create account"}
-          </Button>
+          <AuthFormSubmit
+            isLoading={isLoading}
+            label="Create account"
+            loadingLabel="Creating account..."
+          />
           <FieldDescription className="text-center">
             Already have an account?{" "}
             <Link className="text-foreground underline underline-offset-4" href="/login">
@@ -190,7 +122,7 @@ const RegisterForm = () => {
           </FieldDescription>
         </Field>
       </FieldGroup>
-    </form>
+    </AuthForm>
   );
 };
 

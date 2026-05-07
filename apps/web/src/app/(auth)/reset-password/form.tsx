@@ -1,15 +1,8 @@
 "use client";
 
 import { useAuthForm } from "@repo/auth/form";
-import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { AuthForm, AuthFormField, AuthFormRootError, AuthFormSubmit } from "@repo/auth/form-fields";
+import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -44,66 +37,34 @@ const ResetPasswordForm = ({ token }: Props) => {
   });
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
+    <AuthForm form={form}>
       <FieldGroup>
         <div className="grid grid-cols-2 gap-4">
-          <form.Field name="password">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="password">New password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    disabled={isLoading}
-                    id="password"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          </form.Field>
+          <AuthFormField
+            disabled={isLoading}
+            form={form}
+            label="New password"
+            name="password"
+            type="password"
+          />
 
-          <form.Field name="confirmPassword">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    disabled={isLoading}
-                    id="confirmPassword"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          </form.Field>
+          <AuthFormField
+            disabled={isLoading}
+            form={form}
+            label="Confirm password"
+            name="confirmPassword"
+            type="password"
+          />
         </div>
 
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
+        <AuthFormRootError message={rootError} />
 
         <Field>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Resetting..." : "Reset password"}
-          </Button>
+          <AuthFormSubmit
+            isLoading={isLoading}
+            label="Reset password"
+            loadingLabel="Resetting..."
+          />
           <FieldDescription className="text-center">
             Back to{" "}
             <Link className="text-foreground underline underline-offset-4" href="/login">
@@ -112,7 +73,7 @@ const ResetPasswordForm = ({ token }: Props) => {
           </FieldDescription>
         </Field>
       </FieldGroup>
-    </form>
+    </AuthForm>
   );
 };
 

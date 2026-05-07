@@ -1,15 +1,8 @@
 "use client";
 
 import { useAuthForm } from "@repo/auth/form";
-import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { AuthForm, AuthFormField, AuthFormRootError, AuthFormSubmit } from "@repo/auth/form-fields";
+import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -54,44 +47,21 @@ const RecoverForm = () => {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
+    <AuthForm form={form}>
       <FieldGroup>
-        <form.Field name="email">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
-                  id="email"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="m@example.com"
-                  type="email"
-                  value={field.state.value}
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        </form.Field>
+        <AuthFormField
+          disabled={isLoading}
+          form={form}
+          label="Email"
+          name="email"
+          placeholder="m@example.com"
+          type="email"
+        />
 
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
+        <AuthFormRootError message={rootError} />
 
         <Field>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Sending..." : "Send reset link"}
-          </Button>
+          <AuthFormSubmit isLoading={isLoading} label="Send reset link" loadingLabel="Sending..." />
           <FieldDescription className="text-center">
             Remembered your password?{" "}
             <Link className="text-foreground underline underline-offset-4" href="/login">
@@ -100,7 +70,7 @@ const RecoverForm = () => {
           </FieldDescription>
         </Field>
       </FieldGroup>
-    </form>
+    </AuthForm>
   );
 };
 

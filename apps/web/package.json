@@ -18,7 +18,6 @@
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@tanstack/react-form": "^1.29.1",
     "better-auth": "^1.6.9",
     "lucide-react": "^1.14.0",
     "next": "^16.2.4",
