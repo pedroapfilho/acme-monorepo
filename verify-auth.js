@@ -12,47 +12,47 @@ const checks = [
   {
     file: "packages/auth/src/server.ts",
     name: "Auth Server Package",
-    pattern: /betterAuth|prismaAdapter/,
+    pattern: /betterAuth|prismaAdapter/v,
   },
   {
     file: "packages/auth/src/client.ts",
     name: "Auth Client Package",
-    pattern: /createAuthClient|usernameClient/,
+    pattern: /createAuthClient|usernameClient/v,
   },
   {
     file: "apps/api/src/lib/auth.ts",
     name: "API Shared Auth Instance",
-    pattern: /createAuth/,
+    pattern: /createAuth/v,
   },
   {
     file: "apps/api/src/index.ts",
     name: "API Hono Integration",
-    pattern: /auth\.handler/,
+    pattern: /auth\.handler/v,
   },
   {
     file: "apps/web/next.config.ts",
     name: "Web Proxy Rewrite",
-    pattern: /rewrites|\/api\/auth/,
+    pattern: /rewrites|\/api\/auth/v,
   },
   {
     file: "apps/web/src/middleware.ts",
     name: "Middleware Configuration",
-    pattern: /runtime.*nodejs|auth\.api\.getSession/,
+    pattern: /runtime.*nodejs|auth\.api\.getSession/v,
   },
   {
     file: "packages/db/prisma/schema.prisma",
     name: "Database Schema (PostgreSQL)",
-    pattern: /provider\s*=\s*"postgresql"/,
+    pattern: /provider\s*=\s*"postgresql"/v,
   },
   {
     file: "packages/auth/src/server.ts",
     name: "Enhanced Security (12-char passwords)",
-    pattern: /minPasswordLength:\s*12/,
+    pattern: /minPasswordLength:\s*12/v,
   },
   {
     file: "packages/auth/src/server.ts",
     name: "Cookie Cache Configuration",
-    pattern: /cookieCache.*enabled.*true/s,
+    pattern: /cookieCache.*enabled.*true/sv,
   },
 ];
 

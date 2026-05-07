@@ -3,15 +3,3 @@ packages:
   - packages/*
 
 nodeLinker: hoisted
-
-onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - "@prisma/client"
-  - "@prisma/engines"
-  - "@swc/core"
-  - "@tailwindcss/oxide"
-  - esbuild
-  - fallow
-  - prisma
-  - sharp
-  - unrs-resolver

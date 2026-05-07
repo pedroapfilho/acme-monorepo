@@ -31,7 +31,7 @@ export default defineConfig({
   // CI runs chromium only — chromium is the canonical Playwright signal;
   // firefox + webkit run locally / nightly.
   projects: [
-    { name: "setup", testMatch: /.*\.setup\.ts/ },
+    { name: "setup", testMatch: /.*\.setup\.ts/v },
     {
       dependencies: ["setup"],
       name: "chromium",

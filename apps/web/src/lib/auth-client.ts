@@ -8,5 +8,5 @@ import { createBetterAuthClient } from "@repo/auth/client";
 // prerender. All call sites are `"use client"` — SSR evaluation never actually
 // hits the client fetch path.
 export const authClient = createBetterAuthClient(
-  typeof window !== "undefined" ? `${window.location.origin}/api/auth` : "",
+  typeof window === "undefined" ? "" : `${window.location.origin}/api/auth`,
 );
