@@ -5,7 +5,7 @@
   "scripts": {
     "start": "turbo run start",
     "dev": "openlogs turbo run dev",
-    "lint": "turbo run lint",
+    "lint": "oxlint .",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "typecheck": "turbo run typecheck",
