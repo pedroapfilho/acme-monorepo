@@ -25,7 +25,7 @@ const updateUserSchema = z
       .min(3)
       .max(30)
       .regex(
-        /^[a-zA-Z0-9_-]+$/,
+        /^[a-zA-Z0-9_\-]+$/v,
         "Username can only contain letters, numbers, underscores, and hyphens",
       )
       .optional(),
