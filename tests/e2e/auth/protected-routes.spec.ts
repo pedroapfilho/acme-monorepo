@@ -5,7 +5,7 @@ test.describe("Protected Routes", () => {
     await page.context().clearCookies();
 
     await page.goto("/dashboard");
-    await page.waitForURL(/\/login/);
+    await page.waitForURL(/\/login/v);
 
     expect(page.url()).toContain("/login");
     expect(page.url()).toContain("from=%2Fdashboard");

@@ -37,7 +37,7 @@ test.describe("Register", () => {
 
     // Both password and confirmPassword fields render the same length
     // error, so .first() avoids a strict-mode "resolved to 2 elements" violation.
-    await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
+    await expect(page.getByText(/at least 12 characters/iv).first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });
 

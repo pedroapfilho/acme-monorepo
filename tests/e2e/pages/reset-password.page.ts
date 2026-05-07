@@ -12,8 +12,8 @@ export class ResetPasswordPage {
     // CardTitle renders as <div>, not a semantic heading — match by text.
     this.heading = page.getByText("Reset your password", { exact: true });
     this.passwordInput = page.getByLabel("New password", { exact: true });
-    this.confirmPasswordInput = page.getByLabel(/confirm password/i);
-    this.submitButton = page.getByRole("button", { name: /reset password/i });
+    this.confirmPasswordInput = page.getByLabel(/confirm password/iv);
+    this.submitButton = page.getByRole("button", { name: /reset password/iv });
     // Root errors render via a <p class="text-sm text-destructive"> sibling.
     this.rootError = page.locator("p.text-destructive");
   }

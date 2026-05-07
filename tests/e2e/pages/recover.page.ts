@@ -7,8 +7,8 @@ export class RecoverPage {
   private readonly rootError: Locator;
 
   constructor(private readonly page: Page) {
-    this.emailInput = page.getByLabel(/email/i);
-    this.submitButton = page.getByRole("button", { name: /send reset link/i });
+    this.emailInput = page.getByLabel(/email/iv);
+    this.submitButton = page.getByRole("button", { name: /send reset link/iv });
     // Root errors render via a <p class="text-sm text-destructive"> sibling.
     this.rootError = page.locator("p.text-destructive");
   }
