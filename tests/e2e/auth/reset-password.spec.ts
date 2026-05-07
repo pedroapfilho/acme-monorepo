@@ -15,7 +15,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto();
     await resetPasswordPage.submit("NewPassword123!", "NewPassword123!");
 
-    await resetPasswordPage.expectErrorText(/invalid reset token/iv);
+    await resetPasswordPage.expectErrorText(/invalid reset token/i);
     expect(page.url()).toContain("/reset-password");
   });
 
@@ -25,7 +25,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("any-token-value");
     await resetPasswordPage.submit("NewPassword123!", "DifferentPassword1!");
 
-    await resetPasswordPage.expectErrorText(/passwords do not match/iv);
+    await resetPasswordPage.expectErrorText(/passwords do not match/i);
     expect(page.url()).toContain("/reset-password");
   });
 
@@ -35,7 +35,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("any-token-value");
     await resetPasswordPage.submit("short", "short");
 
-    await expect(page.getByText(/at least 12 characters/iv).first()).toBeVisible();
+    await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });
 

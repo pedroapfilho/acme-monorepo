@@ -18,7 +18,7 @@ test.describe("Password Recovery", () => {
     await recoverPage.goto();
     await recoverPage.requestReset("not-an-email");
 
-    await expect(page.getByText(/invalid/iv)).toBeVisible();
+    await expect(page.getByText(/invalid/i)).toBeVisible();
     expect(page.url()).toContain("/recover");
   });
 });

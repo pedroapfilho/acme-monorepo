@@ -50,7 +50,7 @@ test.describe("Logout", () => {
     await page.waitForURL("/login");
 
     await page.goto("/dashboard");
-    await page.waitForURL(/\/login/v);
+    await page.waitForURL(/\/login/);
     expect(page.url()).toContain("/login");
   });
 });
