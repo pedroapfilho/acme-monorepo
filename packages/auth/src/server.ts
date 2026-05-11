@@ -1,5 +1,3 @@
-import { execFileSync } from "node:child_process";
-
 import type { PrismaClient } from "@repo/db";
 import {
   sendPasswordResetEmail,
@@ -12,26 +10,7 @@ import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
-const getPortlessUrl = (name: string) => {
-  if (process.env.CI) {
-    return undefined;
-  }
-  try {
-    return execFileSync("portless", ["get", name], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-  } catch {
-    return undefined;
-  }
-};
-
-const resolveBaseUrl = (): string => {
-  if (process.env.NODE_ENV === "production" || process.env.CI) {
-    return process.env.BETTER_AUTH_URL || "http://localhost:4000";
-  }
-  return getPortlessUrl("acme.api") ?? process.env.BETTER_AUTH_URL ?? "http://localhost:4000";
-};
+const resolveBaseUrl = (): string => process.env.BETTER_AUTH_URL || "http://localhost:4000";
 
 const defaultTrustedOrigins = () => {
   // Both `localhost` and `127.0.0.1` are loopback but Better Auth's origin
@@ -39,7 +18,7 @@ const defaultTrustedOrigins = () => {
   // (Node ≥18 resolves `localhost` to `::1` first; servers bind to 0.0.0.0/IPv4
   // and undici doesn't fall back), so omitting the IPv4 form rejects every
   // request from those tests with `[Better Auth]: Invalid origin`.
-  const origins = [
+  return [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:4000",
@@ -47,16 +26,6 @@ const defaultTrustedOrigins = () => {
     "http://127.0.0.1:3001",
     "http://127.0.0.1:4000",
   ];
-
-  const portlessNames = ["acme.web", "acme.landing", "acme.api"];
-  for (const name of portlessNames) {
-    const url = getPortlessUrl(name);
-    if (url) {
-      origins.push(url);
-    }
-  }
-
-  return origins;
 };
 
 type AuthConfig = {
@@ -207,7 +176,10 @@ export const createAuth = (config: AuthConfig) => {
       storeSessionInDatabase: true,
       updateAge: 60 * 60 * 24, // Update session if older than 1 day
     },
-    trustedOrigins: process.env.TRUSTED_ORIGINS?.split(",") || defaultTrustedOrigins(),
+    trustedOrigins:
+      process.env.TRUSTED_ORIGINS?.split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean) ?? defaultTrustedOrigins(),
     user: {
       additionalFields: {
         displayName: {
