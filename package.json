@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "turbo run start",
-    "dev": "turbo run dev",
+    "dev": "WORKTREE_NAME=$([ \"$(basename $PWD)\" = \"acme-monorepo\" ] || basename $PWD) turbo dev",
     "lint": "oxlint .",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
