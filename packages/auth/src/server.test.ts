@@ -110,14 +110,15 @@ describe("Auth Server Configuration", () => {
     expect(prodAuth.options.rateLimit?.enabled).toBe(true);
   });
 
-  it("should parse TRUSTED_ORIGINS env var as comma-separated list", () => {
+  it("should concat TRUSTED_ORIGINS env values with loopback defaults", () => {
     vi.stubEnv("TRUSTED_ORIGINS", "https://app.acme.com,https://api.acme.com");
 
     const envAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(envAuth.options.trustedOrigins).toEqual([
-      "https://app.acme.com",
-      "https://api.acme.com",
-    ]);
+    const trusted = envAuth.options.trustedOrigins;
+    expect(trusted).toContain("https://app.acme.com"); // env value
+    expect(trusted).toContain("https://api.acme.com"); // env value
+    expect(trusted).toContain("http://localhost:3000"); // loopback default
+    expect(trusted).toContain("http://127.0.0.1:3000"); // loopback default
   });
 
   it("should always define reset password handler (no-op when resendApiKey is absent)", () => {

@@ -18,7 +18,7 @@ const defaultTrustedOrigins = () => {
   // (Node ≥18 resolves `localhost` to `::1` first; servers bind to 0.0.0.0/IPv4
   // and undici doesn't fall back), so omitting the IPv4 form rejects every
   // request from those tests with `[Better Auth]: Invalid origin`.
-  return [
+  const origins = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:4000",
@@ -26,6 +26,15 @@ const defaultTrustedOrigins = () => {
     "http://127.0.0.1:3001",
     "http://127.0.0.1:4000",
   ];
+  // CONCAT, don't REPLACE: env values augment the loopback defaults so
+  // localhost stays trusted alongside portless/prod URLs (the setup script
+  // writes portless hosts to TRUSTED_ORIGINS). Trusting loopback in prod is
+  // harmless — the load balancer terminates before requests reach the app.
+  const extra =
+    process.env.TRUSTED_ORIGINS?.split(",")
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0) ?? [];
+  return [...origins, ...extra];
 };
 
 type AuthConfig = {
@@ -176,10 +185,7 @@ export const createAuth = (config: AuthConfig) => {
       storeSessionInDatabase: true,
       updateAge: 60 * 60 * 24, // Update session if older than 1 day
     },
-    trustedOrigins:
-      process.env.TRUSTED_ORIGINS?.split(",")
-        .map((origin) => origin.trim())
-        .filter(Boolean) ?? defaultTrustedOrigins(),
+    trustedOrigins: defaultTrustedOrigins(),
     user: {
       additionalFields: {
         displayName: {
