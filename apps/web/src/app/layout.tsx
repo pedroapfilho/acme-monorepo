@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import type { ReactNode } from "react";
 
 const inter = Inter({
@@ -94,15 +95,15 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
     <html className={inter.variable} lang="en">
       {process.env.NODE_ENV === "development" && !process.env.CI && (
         <>
-          <script
-            async
+          <Script
             crossOrigin="anonymous"
             src="https://unpkg.com/react-scan/dist/auto.global.js"
+            strategy="afterInteractive"
           />
-          <script
-            async
+          <Script
             crossOrigin="anonymous"
             src="https://unpkg.com/react-grab/dist/index.global.js"
+            strategy="afterInteractive"
           />
         </>
       )}

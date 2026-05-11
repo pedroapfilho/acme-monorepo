@@ -91,7 +91,7 @@ const ToastClose = ({ className, ...props }: ComponentProps<"button">) => {
       type="button"
       {...props}
     >
-      <X className="h-4 w-4" />
+      <X className="size-4" />
     </button>
   );
 };

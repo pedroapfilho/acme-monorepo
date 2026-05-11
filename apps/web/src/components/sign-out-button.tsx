@@ -8,7 +8,7 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 
 const SignOutButton = () => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ const SignOutButton = () => {
     setError(null);
     try {
       await authClient.signOut();
-      router.push("/login");
+      push("/login");
     } catch {
       setIsLoading(false);
       setError("Failed to sign out. Please try again.");

@@ -21,7 +21,7 @@ type Props = {
 };
 
 const ResetPasswordForm = ({ token }: Props) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const { form, isLoading, rootError } = useAuthForm({
     defaultValues: { confirmPassword: "", password: "" },
     onSubmit: async (values) => {
@@ -38,7 +38,7 @@ const ResetPasswordForm = ({ token }: Props) => {
       if (result.error) {
         throw new Error(result.error.message ?? "Failed to reset password");
       }
-      router.push("/login?message=password-reset-success");
+      push("/login?message=password-reset-success");
     },
     schema: resetPasswordSchema,
   });
