@@ -21,7 +21,7 @@ type Props = {
 };
 
 const LoginForm = ({ from }: Props) => {
-  const router = useRouter();
+  const { push, refresh } = useRouter();
   const { form, isLoading, rootError } = useAuthForm({
     defaultValues: { email: "", password: "" },
     onSubmit: async (values) => {
@@ -32,8 +32,8 @@ const LoginForm = ({ from }: Props) => {
       if (result.error) {
         throw new Error(result.error.message ?? "Invalid credentials");
       }
-      router.push(from);
-      router.refresh();
+      push(from);
+      refresh();
     },
     schema: loginSchema,
   });

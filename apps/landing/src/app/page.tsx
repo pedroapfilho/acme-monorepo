@@ -20,7 +20,7 @@ const Page = () => {
           The one template to rule them all.
         </h1>
         <p className="max-w-[48ch] text-lg text-pretty text-muted-foreground md:text-xl">
-          A Next.js monorepo baseline with Better Auth, Prisma, and shadcn/ui — configured, tested,
+          A Next.js monorepo baseline with Better Auth, Prisma, and shadcn/ui: configured, tested,
           and ready to fork.
         </p>
         <div className="flex flex-wrap items-center gap-3">

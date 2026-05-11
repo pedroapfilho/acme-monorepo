@@ -50,8 +50,10 @@ const sendEmail = async ({ apiKey, defaultReplyTo, template, ...config }: SendEm
     const validatedConfig = emailConfigSchema.parse(config);
     const resend = createResendClient(apiKey);
 
-    const html = await render(template);
-    const text = await render(template, { plainText: true });
+    const [html, text] = await Promise.all([
+      render(template),
+      render(template, { plainText: true }),
+    ]);
 
     const result = await resend.emails.send({
       bcc: validatedConfig.bcc,
@@ -104,8 +106,10 @@ const sendBatchEmails = async (
     const settledBatchData = await Promise.allSettled(
       emails.map(async ({ template, ...config }) => {
         const validatedConfig = emailConfigSchema.parse(config);
-        const html = await render(template);
-        const text = await render(template, { plainText: true });
+        const [html, text] = await Promise.all([
+          render(template),
+          render(template, { plainText: true }),
+        ]);
 
         return {
           bcc: validatedConfig.bcc,
@@ -167,8 +171,7 @@ const sendBatchEmails = async (
 };
 
 const previewEmail = async (template: ReactElement) => {
-  const html = await render(template);
-  const text = await render(template, { plainText: true });
+  const [html, text] = await Promise.all([render(template), render(template, { plainText: true })]);
 
   return {
     html,

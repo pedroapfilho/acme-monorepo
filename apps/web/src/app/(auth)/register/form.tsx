@@ -18,7 +18,7 @@ import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 
 const RegisterForm = () => {
-  const router = useRouter();
+  const { push, refresh } = useRouter();
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
 
   const { form, isLoading, rootError } = useAuthForm({
@@ -46,8 +46,8 @@ const RegisterForm = () => {
         setPendingVerificationEmail(values.email);
         return;
       }
-      router.push("/dashboard");
-      router.refresh();
+      push("/dashboard");
+      refresh();
     },
     schema: registerSchema,
   });
@@ -58,7 +58,7 @@ const RegisterForm = () => {
         <p className="font-semibold">Check your email</p>
         <p className="text-sm text-muted-foreground">
           If <span className="font-medium text-foreground">{pendingVerificationEmail}</span> is new
-          to acme, we&apos;ve sent a verification link — click it to activate your account.
+          to acme, we&apos;ve sent a verification link. Click it to activate your account.
         </p>
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}

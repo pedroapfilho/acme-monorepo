@@ -58,7 +58,7 @@ const SignUpAttemptEmail = ({
 
       <Card accent title="Didn't try to sign up?">
         <Text className="m-0 mb-2 text-base text-muted-foreground">
-          You can safely ignore this email — no account changes were made. If you keep getting these
+          You can safely ignore this email. No account changes were made. If you keep getting these
           notifications, someone may be probing for accounts using your email. We recommend:
         </Text>
         <ul className="m-0 list-inside list-disc text-base text-muted-foreground">

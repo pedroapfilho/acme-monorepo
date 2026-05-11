@@ -51,15 +51,21 @@ const FieldError = ({
   if (!errors || errors.length === 0) {
     return null;
   }
-  const messages = errors.filter(Boolean).map((e) => {
+  const messages = errors.reduce<Array<string>>((acc, e) => {
+    if (!e) {
+      return acc;
+    }
     if (typeof e === "string") {
-      return e;
+      acc.push(e);
+      return acc;
     }
-    if (typeof e === "object" && e !== null && "message" in e) {
-      return (e as { message: string }).message;
+    if (typeof e === "object" && "message" in e) {
+      acc.push((e as { message: string }).message);
+      return acc;
     }
-    return String(e);
-  });
+    acc.push(String(e));
+    return acc;
+  }, []);
   if (messages.length === 0) {
     return null;
   }
