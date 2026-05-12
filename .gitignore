@@ -42,7 +42,6 @@ yarn-error.log*
 # local env files
 .env*
 !.env.example
-!.env.agent-ci.example
 
 # IDE
 .idea
