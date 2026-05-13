@@ -30,8 +30,7 @@
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,
-      "persistent": true,
-      "env": ["WORKTREE_NAME"]
+      "persistent": true
     },
     "start": {
       "dependsOn": ["^build"],
