@@ -9,12 +9,13 @@
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "env": [
         "API_URL",
-        "BETTER_AUTH_URL",
+        "AUTH_ALLOWED_HOSTS",
         "BETTER_AUTH_SECRET",
         "CORS_ORIGINS",
         "DATABASE_URL",
         "NEXT_PUBLIC_API_URL",
-        "TRUSTED_ORIGINS"
+        "TRUSTED_ORIGINS",
+        "WEB_APP_URL"
       ]
     },
     "lint": {

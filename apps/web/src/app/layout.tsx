@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   description:
     "A modern, secure authentication platform built with Better Auth and Next.js. Fast, reliable, and developer-friendly.",
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
-  // Resolves Open Graph / Twitter card image URLs against this base. Falls
-  // back to the canonical local web origin when BETTER_AUTH_URL isn't set.
-  metadataBase: new URL(process.env.BETTER_AUTH_URL ?? "https://acme.web.localhost"),
+  // Resolves Open Graph / Twitter card image URLs against this base.
+  // Falls back to the canonical local web origin when WEB_APP_URL isn't set.
+  metadataBase: new URL(process.env.WEB_APP_URL ?? "https://acme.web.localhost"),
   publisher: "Acme",
   title: {
     default: "Acme | Secure Authentication Platform",
