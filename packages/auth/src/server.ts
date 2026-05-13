@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@repo/db";
 import {
+  sendChangeEmailConfirmation,
   sendPasswordResetEmail,
   sendSignUpAttemptEmail,
   sendWelcomeEmail,
@@ -202,6 +203,31 @@ export const createAuth = (config: AuthConfig) => {
           defaultValue: null,
           required: false,
           type: "string",
+        },
+      },
+      changeEmail: {
+        enabled: true,
+        // Two-step flow: sendChangeEmailConfirmation goes to the CURRENT email
+        // for consent. When the link is clicked, Better Auth re-invokes
+        // emailVerification.sendVerificationEmail (the signup-verification hook
+        // above) targeting the NEW email to confirm mailbox ownership. Same
+        // no-op-without-Resend pattern as the other hooks.
+        sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
+          if (!resendApiKey) {
+            return;
+          }
+          const result = await sendChangeEmailConfirmation(
+            {
+              changeUrl: url,
+              currentEmail: user.email,
+              newEmail,
+              username: user.name,
+            },
+            { apiKey: resendApiKey, from: fromEmail },
+          );
+          if (!result.success) {
+            throw new Error(`Failed to send change-email confirmation: ${result.error}`);
+          }
         },
       },
     },
