@@ -97,12 +97,10 @@ envFiles.forEach((env) => {
   try {
     const content = fs.readFileSync(envPath, "utf8");
     const hasSecret = content.includes("BETTER_AUTH_SECRET");
-    const hasUrl = content.includes("BETTER_AUTH_URL");
     const hasDb = content.includes("DATABASE_URL");
 
     console.log(`${env.name}:`);
     console.log(`  ${hasSecret ? "PASS" : "FAIL"} BETTER_AUTH_SECRET`);
-    console.log(`  ${hasUrl ? "PASS" : "FAIL"} BETTER_AUTH_URL`);
     console.log(`  ${hasDb ? "PASS" : "FAIL"} DATABASE_URL`);
     console.log("");
   } catch {

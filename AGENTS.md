@@ -140,4 +140,4 @@ Web and landing apps use `.env.local` files; api uses `.env` at its app root.
 - Path aliases: `@/*` maps to `src/*` in all apps and packages.
 - Auth password minimum: 12 characters. Sessions expire after 7 days.
 - API routes are versioned under `/api/v1/`. Auth routes are at `/auth/*`.
-- Turbo caches are sensitive to `API_URL`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_API_URL`, and `DATABASE_URL`.
+- Turbo caches are sensitive to `API_URL`, `AUTH_ALLOWED_HOSTS`, `NEXT_PUBLIC_API_URL`, `WEB_APP_URL`, and `DATABASE_URL`.

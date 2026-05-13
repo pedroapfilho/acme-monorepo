@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const envSchema = z.object({
+  AUTH_ALLOWED_HOSTS: z.string().optional(),
   BETTER_AUTH_SECRET: z.string().min(32),
-  BETTER_AUTH_URL: z.string().default("https://acme.api.localhost"),
   CORS_ORIGINS: z.string().default("https://acme.web.localhost,https://acme.landing.localhost"),
   DATABASE_URL: z.string().min(1),
   FROM_EMAIL: z.string().default("noreply@acme.com"),
