@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
 import { verification } from "../fixtures/verification.fixture";
-import { makeTestEmail } from "../helpers/test-email";
+import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
@@ -14,6 +14,7 @@ test.describe("Password reset", () => {
     await page.context().clearCookies();
 
     const email = makeTestEmail(testInfo);
+    const username = makeTestUsername(email);
     const originalPassword = "OriginalPassword1!";
     const newPassword = "BrandNewPassword2!";
 
@@ -21,16 +22,17 @@ test.describe("Password reset", () => {
     // directly — the reset flow itself doesn't require verified status, but a
     // user that exists.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Reset Me", password: originalPassword },
+      data: { email, name: "Reset Me", password: originalPassword, username },
     });
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(email);
     await page.goto(verify.url);
     await page.context().clearCookies();
 
-    // Request reset. Better Auth always returns 200 here (enumeration
-    // prevention) regardless of whether the email exists.
-    const reset = await request.post(`${webUrl}/api/auth/forget-password`, {
+    // Request reset. Better Auth's endpoint is `/request-password-reset`
+    // (the older `/forget-password` path was removed). Always returns 200
+    // here (enumeration prevention) regardless of whether the email exists.
+    const reset = await request.post(`${webUrl}/api/auth/request-password-reset`, {
       data: { email, redirectTo: "/reset-password" },
     });
     expect(reset.status()).toBe(200);

@@ -2,7 +2,7 @@ import { prisma } from "@repo/db";
 import { expect, test } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
-import { makeTestEmail } from "../helpers/test-email";
+import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
@@ -14,9 +14,10 @@ test.describe("Sign-up for an existing email (enumeration prevention)", () => {
     await page.context().clearCookies();
 
     const email = makeTestEmail(testInfo).toLowerCase();
+    const username = makeTestUsername(email);
 
     const first = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Original Name", password: "FirstPassword1!" },
+      data: { email, name: "Original Name", password: "FirstPassword1!", username },
     });
     expect([200, 201]).toContain(first.status());
 
@@ -25,7 +26,7 @@ test.describe("Sign-up for an existing email (enumeration prevention)", () => {
     // server-side. The test verifies the *contract* (no error, same status
     // class) and the *side-effect ceiling* (no duplicate row).
     const second = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Different Name", password: "SecondPassword2!" },
+      data: { email, name: "Different Name", password: "SecondPassword2!", username: `${username}-2` },
     });
     expect([200, 201]).toContain(second.status());
 

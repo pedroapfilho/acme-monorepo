@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
 import { verification } from "../fixtures/verification.fixture";
-import { makeTestEmail } from "../helpers/test-email";
+import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 // Skip the whole suite when Resend isn't configured. Without RESEND_API_KEY,
 // the auth server runs with requireEmailVerification: false, which is a
@@ -17,10 +17,11 @@ test.describe("Sign-up email verification", () => {
     await page.context().clearCookies();
 
     const email = makeTestEmail(testInfo);
+    const username = makeTestUsername(email);
     const password = "SecurePassword1!";
 
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Verify Me", password },
+      data: { email, name: "Verify Me", password, username },
     });
     // 200/201 with requireEmailVerification:true. Better Auth returns user
     // shape but no session cookie — confirmed by the redirect below.

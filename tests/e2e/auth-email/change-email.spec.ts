@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
 import { verification } from "../fixtures/verification.fixture";
-import { makeTestEmail } from "../helpers/test-email";
+import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
@@ -18,11 +18,12 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const newEmail = makeTestEmail(testInfo)
       .toLowerCase()
       .replace("delivered+", "delivered+new-");
+    const username = makeTestUsername(currentEmail);
     const password = "ChangeEmailPwd1!";
 
     // Seed + verify a user, then sign in to get a session.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email: currentEmail, name: "Change Me", password },
+      data: { email: currentEmail, name: "Change Me", password, username },
     });
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(currentEmail);

@@ -11,4 +11,10 @@ const makeTestEmail = (info: TestInfo): string => {
   return `delivered+${run}-${slug}@resend.dev`;
 };
 
-export { makeTestEmail };
+// Better Auth's `username()` plugin makes username effectively required at
+// signup. Derive a unique value from the test email so it stays unique-per-
+// run and traceable back to the spec without coordinating extra state.
+const makeTestUsername = (email: string): string =>
+  `e2e-${email.split("@")[0].replaceAll(/\W/g, "-").slice(0, 30)}`;
+
+export { makeTestEmail, makeTestUsername };
