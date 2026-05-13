@@ -12,9 +12,11 @@ const makeTestEmail = (info: TestInfo): string => {
 };
 
 // Better Auth's `username()` plugin makes username effectively required at
-// signup. Derive a unique value from the test email so it stays unique-per-
-// run and traceable back to the spec without coordinating extra state.
+// signup. Default validator is /^[a-zA-Z0-9_.]+$/ (see better-auth/plugins/
+// username/index.mjs:defaultUsernameValidator) — dashes are NOT allowed,
+// so the slug uses underscores. Derive from the test email to stay
+// unique-per-run and traceable back to the spec.
 const makeTestUsername = (email: string): string =>
-  `e2e-${email.split("@")[0].replaceAll(/\W/g, "-").slice(0, 30)}`;
+  `e2e_${email.split("@")[0].replaceAll(/\W/g, "_").slice(0, 30)}`;
 
 export { makeTestEmail, makeTestUsername };
