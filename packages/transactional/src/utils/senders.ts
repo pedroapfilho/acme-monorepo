@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { ChangeEmail } from "../emails/change-email";
 import { PasswordResetEmail } from "../emails/password-reset";
 import { SignUpAttemptEmail } from "../emails/sign-up-attempt";
 import { WelcomeEmail } from "../emails/welcome";
@@ -115,4 +116,45 @@ const sendPasswordResetEmail = (
   });
 };
 
-export { sendWelcomeEmail, sendPasswordResetEmail, sendSignUpAttemptEmail };
+const sendChangeEmailConfirmation = (
+  {
+    changeUrl,
+    currentEmail,
+    newEmail,
+    username,
+  }: {
+    changeUrl: string;
+    currentEmail: string;
+    newEmail: string;
+    username?: string;
+  },
+  config: EmailConfig,
+) => {
+  return sendEmail({
+    apiKey: config.apiKey,
+    defaultReplyTo: config.defaultReplyTo,
+    from: config.from || DEFAULT_FROM,
+    subject: "Confirm change of your Acme account email",
+    tags: [
+      { name: "type", value: "change-email-confirmation" },
+      ...(username ? [{ name: "username", value: username }] : []),
+    ],
+    template: React.createElement(ChangeEmail, {
+      changeUrl,
+      currentEmail,
+      newEmail,
+      username,
+    }),
+    // Send to CURRENT email — this is the consent step. Better Auth's
+    // sendVerificationEmail hook handles the second mailbox-ownership step
+    // to the NEW email when the confirmation link is clicked.
+    to: currentEmail,
+  });
+};
+
+export {
+  sendChangeEmailConfirmation,
+  sendWelcomeEmail,
+  sendPasswordResetEmail,
+  sendSignUpAttemptEmail,
+};
