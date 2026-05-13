@@ -10,32 +10,11 @@ import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
-const resolveBaseUrl = (): string => process.env.BETTER_AUTH_URL || "http://localhost:4000";
-
-const defaultTrustedOrigins = () => {
-  // Both `localhost` and `127.0.0.1` are loopback but Better Auth's origin
-  // check is exact-string. CI's playwright config uses `127.0.0.1` explicitly
-  // (Node ≥18 resolves `localhost` to `::1` first; servers bind to 0.0.0.0/IPv4
-  // and undici doesn't fall back), so omitting the IPv4 form rejects every
-  // request from those tests with `[Better Auth]: Invalid origin`.
-  const origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:4000",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-    "http://127.0.0.1:4000",
-  ];
-  // CONCAT, don't REPLACE: env values augment the loopback defaults so
-  // localhost stays trusted alongside portless/prod URLs (the setup script
-  // writes portless hosts to TRUSTED_ORIGINS). Trusting loopback in prod is
-  // harmless — the load balancer terminates before requests reach the app.
-  const extra =
-    process.env.TRUSTED_ORIGINS?.split(",")
-      .map((value) => value.trim())
-      .filter((value) => value.length > 0) ?? [];
-  return [...origins, ...extra];
-};
+const parseEnvList = (value: string | undefined): Array<string> =>
+  value
+    ?.split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0) ?? [];
 
 type AuthConfig = {
   extraPlugins?: Array<BetterAuthPlugin>;
@@ -62,25 +41,44 @@ export const createAuth = (config: AuthConfig) => {
       },
     },
 
-    // Fleet-canonical shape: defaultCookieAttributes + useSecureCookies.
-    // `useSecureCookies` gates on whether BETTER_AUTH_URL is HTTPS, not on
-    // NODE_ENV — CI runs production builds (NODE_ENV=production) over HTTP,
-    // and `secure: true` over HTTP would make browsers silently drop the
-    // session cookie, killing the auth flow.
     advanced: {
       cookiePrefix: "acme",
       defaultCookieAttributes: {
         httpOnly: true,
         sameSite: "lax" as const,
       },
-      useSecureCookies: process.env.BETTER_AUTH_URL?.startsWith("https://") === true,
+      // `useSecureCookies` is omitted intentionally — `baseURL.protocol: "auto"`
+      // derives the scheme from `x-forwarded-proto` / request URL and flips
+      // the `secure` cookie flag automatically. Forcing it here would re-
+      // introduce the HTTPS-in-CI footgun.
     },
 
     // Explicit to match the Next.js route handler mount at /api/auth/[...all].
     // This is Better Auth's default but stated explicitly to match sibling repos.
     basePath: "/api/auth",
 
-    baseURL: resolveBaseUrl(),
+    // Dynamic base URL: Better Auth derives the canonical origin from the
+    // incoming request when its host matches `allowedHosts`. `allowedHosts`
+    // also auto-extends `trustedOrigins`, so the explicit loopback list below
+    // only needs to cover origins that arrive without a matching host header
+    // (e.g. cross-origin CI requests where the browser sends localhost:3000
+    // but the server thinks it's :4000). See:
+    // https://better-auth.com/docs/reference/options#dynamic-base-url
+    baseURL: {
+      allowedHosts: [
+        // Local dev (portless `acme.{web,api,landing}.localhost` is two
+        // labels under `.localhost`, so we need `**` not `*`). Plain
+        // loopback ports are used by CI and the API server itself.
+        "**.localhost",
+        "localhost:*",
+        "127.0.0.1:*",
+        // Production + Vercel previews come from env so this file doesn't
+        // hardcode deployment domains.
+        ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS),
+      ],
+      fallback: "http://localhost:4000",
+      protocol: "auto",
+    },
 
     database: prismaAdapter(prisma, {
       provider: "postgresql",
@@ -185,7 +183,19 @@ export const createAuth = (config: AuthConfig) => {
       storeSessionInDatabase: true,
       updateAge: 60 * 60 * 24, // Update session if older than 1 day
     },
-    trustedOrigins: defaultTrustedOrigins(),
+    // `allowedHosts` already feeds `trustedOrigins`; the loopback set below
+    // covers exact-origin checks for plain `http://localhost:PORT` requests
+    // that wouldn't match a host pattern (Better Auth's origin check is
+    // exact-string for trustedOrigins).
+    trustedOrigins: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:4000",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+      "http://127.0.0.1:4000",
+      ...parseEnvList(process.env.TRUSTED_ORIGINS),
+    ],
     user: {
       additionalFields: {
         displayName: {

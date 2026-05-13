@@ -41,20 +41,40 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.advanced?.cookiePrefix).toBe("acme");
   });
 
-  it("should have secure cookies when BETTER_AUTH_URL is HTTPS", () => {
-    vi.stubEnv("BETTER_AUTH_URL", "https://acme.example");
-
-    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(prodAuth.options.advanced?.useSecureCookies).toBe(true);
-    expect(prodAuth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
-    expect(prodAuth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
+  it("should not set useSecureCookies — protocol: auto in baseURL handles it", () => {
+    // useSecureCookies is intentionally absent: baseURL.protocol="auto"
+    // flips the `secure` cookie flag based on x-forwarded-proto / request
+    // URL, so a static gate would re-introduce the HTTPS-in-CI footgun.
+    // Cast via Record to read the field even though our typed surface drops it.
+    const advanced = auth.options.advanced as Record<string, unknown> | undefined;
+    expect(advanced?.useSecureCookies).toBeUndefined();
+    expect(auth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
+    expect(auth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
   });
 
-  it("should not set secure cookies when BETTER_AUTH_URL is HTTP (e.g. CI over plain HTTP)", () => {
-    vi.stubEnv("BETTER_AUTH_URL", "http://localhost:3000");
+  it("should configure dynamic baseURL with allowedHosts + protocol auto", () => {
+    const baseURL = auth.options.baseURL;
+    if (typeof baseURL !== "object" || baseURL === null) {
+      throw new Error("expected dynamic baseURL object");
+    }
+    expect(baseURL.protocol).toBe("auto");
+    expect(baseURL.allowedHosts).toEqual(
+      expect.arrayContaining(["**.localhost", "localhost:*", "127.0.0.1:*"]),
+    );
+    expect(baseURL.fallback).toBe("http://localhost:4000");
+  });
 
-    const httpAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(httpAuth.options.advanced?.useSecureCookies).toBe(false);
+  it("should extend baseURL.allowedHosts from AUTH_ALLOWED_HOSTS env", () => {
+    vi.stubEnv("AUTH_ALLOWED_HOSTS", "acme.com,*.acme.com,*.vercel.app");
+
+    const envAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    const baseURL = envAuth.options.baseURL;
+    if (typeof baseURL !== "object" || baseURL === null) {
+      throw new Error("expected dynamic baseURL object");
+    }
+    expect(baseURL.allowedHosts).toEqual(
+      expect.arrayContaining(["acme.com", "*.acme.com", "*.vercel.app"]),
+    );
   });
 
   it("should require email verification when Resend is configured", () => {
