@@ -11,11 +11,19 @@ import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
-const parseEnvList = (value: string | undefined): Array<string> =>
-  value
-    ?.split(",")
-    .map((entry) => entry.trim())
-    .filter((entry) => entry.length > 0) ?? [];
+const parseEnvList = (value: string | undefined): Array<string> => {
+  if (!value) {
+    return [];
+  }
+  const result: Array<string> = [];
+  for (const entry of value.split(",")) {
+    const trimmed = entry.trim();
+    if (trimmed.length > 0) {
+      result.push(trimmed);
+    }
+  }
+  return result;
+};
 
 type AuthConfig = {
   extraPlugins?: Array<BetterAuthPlugin>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import type { z } from "zod";
 
 type UseAuthFormOptions<TValues> = {
@@ -15,27 +15,26 @@ type UseAuthFormOptions<TValues> = {
 const GENERIC_ERROR_MESSAGE = "An error occurred. Please try again.";
 
 const useAuthForm = <TValues>({ defaultValues, onSubmit, schema }: UseAuthFormOptions<TValues>) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [rootError, setRootError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      try {
-        setIsLoading(true);
-        setRootError(null);
-        await onSubmit(value);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE;
-        setRootError(message);
-      } finally {
-        setIsLoading(false);
-      }
+    onSubmit: ({ value }) => {
+      setRootError(null);
+      startTransition(async () => {
+        try {
+          await onSubmit(value);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : GENERIC_ERROR_MESSAGE;
+          setRootError(message);
+        }
+      });
     },
     validators: { onSubmit: schema },
   });
 
-  return { form, isLoading, rootError };
+  return { form, isLoading: isPending, rootError };
 };
 
 export { useAuthForm };

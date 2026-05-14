@@ -3,32 +3,32 @@
 import { Button } from "@repo/ui/components/button";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
 const SignOutButton = () => {
   const { push } = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const handleSignOut = async () => {
-    setIsLoading(true);
+  const handleSignOut = () => {
     setError(null);
-    try {
-      await authClient.signOut();
-      push("/login");
-    } catch {
-      setIsLoading(false);
-      setError("Failed to sign out. Please try again.");
-    }
+    startTransition(async () => {
+      try {
+        await authClient.signOut();
+        push("/login");
+      } catch {
+        setError("Failed to sign out. Please try again.");
+      }
+    });
   };
 
   return (
     <div className="flex flex-col gap-2">
-      <Button className="self-start" disabled={isLoading} onClick={handleSignOut} variant="outline">
-        {isLoading && <Loader2 className="size-4 animate-spin" />}
-        {isLoading ? "Signing out" : "Sign out"}
+      <Button className="self-start" disabled={isPending} onClick={handleSignOut} variant="outline">
+        {isPending && <Loader2 className="size-4 animate-spin" />}
+        {isPending ? "Signing out" : "Sign out"}
       </Button>
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
