@@ -17,6 +17,8 @@ const BaseLayout = ({
   preview,
   unsubscribeUrl,
 }: BaseLayoutProps) => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <Html>
       <Tailwind config={tailwindConfig}>
@@ -66,7 +68,7 @@ const BaseLayout = ({
               </Text>
 
               <Text className="m-0 text-xs text-muted-foreground">
-                © {new Date().getFullYear()} Acme. All rights reserved.
+                © {currentYear} Acme. All rights reserved.
               </Text>
             </Section>
           </Container>
