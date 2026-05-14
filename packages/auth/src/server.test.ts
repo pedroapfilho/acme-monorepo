@@ -41,15 +41,25 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.advanced?.cookiePrefix).toBe("acme");
   });
 
-  it("should not set useSecureCookies — protocol: auto in baseURL handles it", () => {
-    // useSecureCookies is intentionally absent: baseURL.protocol="auto"
-    // flips the `secure` cookie flag based on x-forwarded-proto / request
-    // URL, so a static gate would re-introduce the HTTPS-in-CI footgun.
-    // Cast via Record to read the field even though our typed surface drops it.
-    const advanced = auth.options.advanced as Record<string, unknown> | undefined;
-    expect(advanced?.useSecureCookies).toBeUndefined();
+  it("should gate useSecureCookies on WEB_APP_URL being HTTPS", () => {
+    // Without WEB_APP_URL the gate evaluates to false — CI runs on plain
+    // http://127.0.0.1, so cookies must not get the Secure flag (browsers
+    // drop Secure cookies on HTTP).
+    expect(auth.options.advanced?.useSecureCookies).toBe(false);
     expect(auth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
     expect(auth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
+  });
+
+  it("should set useSecureCookies when WEB_APP_URL is HTTPS", () => {
+    vi.stubEnv("WEB_APP_URL", "https://acme.web.localhost");
+    const httpsAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(httpsAuth.options.advanced?.useSecureCookies).toBe(true);
+  });
+
+  it("should NOT set useSecureCookies when WEB_APP_URL is HTTP", () => {
+    vi.stubEnv("WEB_APP_URL", "http://localhost:3000");
+    const httpAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    expect(httpAuth.options.advanced?.useSecureCookies).toBe(false);
   });
 
   it("should configure dynamic baseURL with allowedHosts + protocol auto", () => {
