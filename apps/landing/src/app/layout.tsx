@@ -3,7 +3,6 @@ import "@/styles/globals.css";
 import { cn } from "@repo/ui/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Script from "next/script";
 
 import { AnalyticsWrapper } from "@/components/analytics";
 import Footer from "@/components/footer";
@@ -61,20 +60,6 @@ const inter = Inter({
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html className="scroll-smooth" lang="en-US" suppressHydrationWarning>
-      {process.env.NODE_ENV === "development" && !process.env.CI && (
-        <>
-          <Script
-            crossOrigin="anonymous"
-            src="https://unpkg.com/react-scan/dist/auto.global.js"
-            strategy="afterInteractive"
-          />
-          <Script
-            crossOrigin="anonymous"
-            src="https://unpkg.com/react-grab/dist/index.global.js"
-            strategy="afterInteractive"
-          />
-        </>
-      )}
       <body
         className={cn(
           "relative flex min-h-dvh flex-col font-sans text-foreground antialiased",
