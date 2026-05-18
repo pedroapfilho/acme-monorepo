@@ -15,7 +15,6 @@
     "postcss",
     "postcss-load-config",
     "pino-pretty",
-    "react-scan",
     "tailwindcss",
     "@prisma/client",
     "@vitest/coverage-v8",
