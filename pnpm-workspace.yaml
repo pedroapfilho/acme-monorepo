@@ -3,3 +3,12 @@ packages:
   - packages/*
 
 nodeLinker: hoisted
+
+allowBuilds:
+  "@prisma/engines": true
+  esbuild: true
+  fallow: true
+  msw: true
+  prisma: true
+  sharp: true
+  vue-demi: true
