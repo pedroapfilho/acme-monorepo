@@ -5,7 +5,7 @@ packages:
 nodeLinker: hoisted
 
 allowBuilds:
-  '@prisma/engines': true
+  "@prisma/engines": true
   esbuild: true
   fallow: true
   msw: true
