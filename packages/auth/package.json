@@ -28,7 +28,8 @@
     "@types/react": "^19.2.14",
     "react": "^19.2.6",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "zod": "^4.4.3"
   },
   "peerDependencies": {
     "@tanstack/react-form": "^1.29.0",
