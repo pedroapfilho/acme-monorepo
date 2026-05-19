@@ -2,8 +2,6 @@ packages:
   - apps/*
   - packages/*
 
-nodeLinker: hoisted
-
 allowBuilds:
   "@prisma/engines": true
   esbuild: true
