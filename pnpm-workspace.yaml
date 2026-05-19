@@ -4,19 +4,11 @@ packages:
 
 nodeLinker: hoisted
 
-onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - "@prisma/client"
-  - "@prisma/engines"
-  - "@swc/core"
-  - "@tailwindcss/oxide"
-  - cpu-features
-  - esbuild
-  - fallow
-  - msw
-  - prisma
-  - protobufjs
-  - sharp
-  - ssh2
-  - unrs-resolver
-  - vue-demi
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  fallow: true
+  msw: true
+  prisma: true
+  sharp: true
+  vue-demi: true
