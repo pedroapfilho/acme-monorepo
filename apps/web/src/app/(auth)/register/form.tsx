@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -10,6 +9,8 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { toast } from "@repo/ui/components/sonner";
+import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -20,36 +21,46 @@ import { registerSchema } from "@/lib/form-schemas";
 const RegisterForm = () => {
   const { push, refresh } = useRouter();
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { form, isLoading, rootError } = useAuthForm({
+  const form = useForm({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
-    onSubmit: async (values) => {
-      if (values.password !== values.confirmPassword) {
-        throw new Error("Passwords do not match");
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      try {
+        if (value.password !== value.confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
+        const result = await authClient.signUp.email({
+          email: value.email,
+          name: value.name,
+          password: value.password,
+        });
+        if (result.error) {
+          throw new Error(result.error.message ?? "Failed to register");
+        }
+        // requireEmailVerification gates auto-sign-in: when active, Better Auth
+        // returns the user but no session token. The dashboard middleware would
+        // bounce the user back to /login (looking like silent failure), so show
+        // a verification UI instead. The wording stays ambiguous so it's also
+        // correct for the enumeration-prevention path (existing email →
+        // synthetic-success). The real account holder gets a separate
+        // notification email via emailAndPassword.onExistingUserSignUp.
+        if (!result.data?.token) {
+          setPendingVerificationEmail(value.email);
+          return;
+        }
+        push("/dashboard");
+        refresh();
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "An error occurred. Please try again.";
+        toast.error(message);
+      } finally {
+        setIsLoading(false);
       }
-      const result = await authClient.signUp.email({
-        email: values.email,
-        name: values.name,
-        password: values.password,
-      });
-      if (result.error) {
-        throw new Error(result.error.message ?? "Failed to register");
-      }
-      // requireEmailVerification gates auto-sign-in: when active, Better Auth
-      // returns the user but no session token. The dashboard middleware would
-      // bounce the user back to /login (looking like silent failure), so show
-      // a verification UI instead. The wording stays ambiguous so it's also
-      // correct for the enumeration-prevention path (existing email →
-      // synthetic-success). The real account holder gets a separate
-      // notification email via emailAndPassword.onExistingUserSignUp.
-      if (!result.data?.token) {
-        setPendingVerificationEmail(values.email);
-        return;
-      }
-      push("/dashboard");
-      refresh();
     },
-    schema: registerSchema,
+    validators: { onSubmit: registerSchema },
   });
 
   if (pendingVerificationEmail) {
@@ -175,8 +186,6 @@ const RegisterForm = () => {
             }}
           </form.Field>
         </div>
-
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
         <Field>
           <Button disabled={isLoading} type="submit">

@@ -5,8 +5,7 @@
   "type": "module",
   "exports": {
     "./server": "./src/server.ts",
-    "./client": "./src/client.ts",
-    "./form": "./src/auth-form.ts"
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "lint": "oxlint src",
