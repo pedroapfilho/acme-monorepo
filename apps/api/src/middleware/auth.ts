@@ -3,7 +3,6 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
 import { auth } from "../lib/auth";
-import { logger } from "../lib/logger";
 
 export type AuthVariables = {
   user: {
@@ -38,7 +37,7 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
     try {
       session = await auth.api.getSession({ headers });
     } catch (error) {
-      logger.error(
+      c.var.logger.error(
         { error, method: c.req.method, url: c.req.url },
         "authMiddleware: getSession threw — auth service unavailable",
       );
@@ -82,7 +81,7 @@ export const optionalAuthMiddleware = createMiddleware<{
     // Unexpected failures (DB down, malformed token, rate limit exception) must
     // not be silently discarded — a missing user context is otherwise
     // indistinguishable from an infrastructure outage.
-    logger.error(
+    c.var.logger.error(
       { error, method: c.req.method, url: c.req.url },
       "optionalAuthMiddleware: getSession threw unexpectedly",
     );

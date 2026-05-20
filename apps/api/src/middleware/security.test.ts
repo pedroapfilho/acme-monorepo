@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { describe, expect, it, vi } from "vitest";
 
-import { requestId, requestSizeLimit } from "./security";
+import { requestSizeLimit } from "./security";
 
 const createMockContext = (options: { headers?: Record<string, string> } = {}) => {
   const { headers = {} } = options;
@@ -76,42 +76,5 @@ describe("requestSizeLimit", () => {
       { error: { code: "PAYLOAD_TOO_LARGE", message: "Request entity too large" } },
       413,
     );
-  });
-});
-
-describe("requestId", () => {
-  const next = vi.fn();
-
-  it("should use existing x-request-id header", async () => {
-    const c = createMockContext({ headers: { "x-request-id": "existing-id" } });
-
-    await requestId(c, next);
-
-    expect(c.set).toHaveBeenCalledWith("requestId", "existing-id");
-    expect(c.header).toHaveBeenCalledWith("x-request-id", "existing-id");
-  });
-
-  it("should generate UUID when no x-request-id header", async () => {
-    const mockUuid = "generated-uuid-1234";
-    vi.spyOn(crypto, "randomUUID").mockReturnValue(
-      mockUuid as `${string}-${string}-${string}-${string}-${string}`,
-    );
-
-    const c = createMockContext();
-
-    await requestId(c, next);
-
-    expect(c.set).toHaveBeenCalledWith("requestId", mockUuid);
-    expect(c.header).toHaveBeenCalledWith("x-request-id", mockUuid);
-
-    vi.restoreAllMocks();
-  });
-
-  it("should call next", async () => {
-    const c = createMockContext({ headers: { "x-request-id": "test" } });
-
-    await requestId(c, next);
-
-    expect(next).toHaveBeenCalled();
   });
 });

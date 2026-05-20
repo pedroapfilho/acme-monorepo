@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.0.2",
+    "@hono/structured-logger": "^0.1.0",
     "@hono/zod-openapi": "^1.4.0",
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",

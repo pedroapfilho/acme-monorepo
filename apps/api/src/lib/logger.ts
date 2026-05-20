@@ -4,7 +4,7 @@ import { env } from "./env";
 
 const logLevel = env.NODE_ENV === "production" ? "info" : "debug";
 
-export const logger = pino({
+const logger = pino({
   base: {
     env: env.NODE_ENV,
   },
@@ -13,4 +13,7 @@ export const logger = pino({
     paths: ["req.headers.authorization", "req.headers.cookie", "res.headers"],
     remove: true,
   },
+  transport: env.NODE_ENV === "production" ? undefined : { target: "pino-pretty" },
 });
+
+export { logger };
