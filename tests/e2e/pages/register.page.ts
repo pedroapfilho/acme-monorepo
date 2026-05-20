@@ -15,8 +15,9 @@ export class RegisterPage {
     this.passwordInput = page.getByLabel("Password", { exact: true });
     this.confirmPasswordInput = page.getByLabel(/confirm password/i);
     this.submitButton = page.getByRole("button", { name: /create account/i });
-    // Root errors render via a <p class="text-sm text-destructive"> sibling.
-    this.rootError = page.locator("p.text-destructive");
+    // Root errors render as a Sonner toast (`toast.error(message)` from @repo/ui/components/sonner).
+    // Sonner emits error toasts as <li data-sonner-toast data-type="error">.
+    this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
   }
 
   goto = async () => {
