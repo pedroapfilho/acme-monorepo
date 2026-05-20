@@ -1,5 +1,14 @@
+import type { BaseLogger } from "@hono/structured-logger";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+
+declare module "hono" {
+  // oxlint-disable-next-line consistent-type-definitions -- declaration merging requires interface, not type
+  interface ContextVariableMap {
+    logger: BaseLogger;
+    requestId: string;
+  }
+}
 
 const createOpenAPIApp = <V extends Record<string, unknown> = Record<string, never>>() => {
   const app = new OpenAPIHono<{ Variables: V }>();

@@ -1,11 +1,13 @@
 import "dotenv/config";
 
 import { serve } from "@hono/node-server";
+import { structuredLogger } from "@hono/structured-logger";
 import { createRoute, z } from "@hono/zod-openapi";
 import { prisma } from "@repo/db";
 import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
+import { requestId } from "hono/request-id";
 
 import { env } from "./lib/env";
 import { logger } from "./lib/logger";
@@ -13,7 +15,6 @@ import { createOpenAPIApp } from "./lib/openapi";
 import { errorHandler, notFound } from "./middleware/error-handler";
 import {
   apiRateLimit,
-  requestId,
   requestSizeLimit,
   securityHeaders,
   standardRateLimit,
@@ -22,7 +23,13 @@ import { v1UserRoutes } from "./routes/v1/users";
 
 const app = createOpenAPIApp();
 
-app.use("*", requestId);
+app.use("*", requestId());
+app.use(
+  "*",
+  structuredLogger({
+    createLogger: (c) => logger.child({ requestId: c.var.requestId }),
+  }),
+);
 app.use("*", compress());
 app.use("*", requestSizeLimit());
 app.use("*", securityHeaders);
@@ -36,7 +43,7 @@ app.use(
   }),
 );
 
-// Skip logging for health checks
+// Skip logging for health checks; emit timing log for all other requests
 app.use("*", async (c, next) => {
   if (c.req.path === "/healthz") {
     return next();
@@ -46,7 +53,7 @@ app.use("*", async (c, next) => {
   await next();
   const ms = Date.now() - start;
 
-  logger.info({
+  c.var.logger.info({
     duration: ms,
     method: c.req.method,
     status: c.res.status,

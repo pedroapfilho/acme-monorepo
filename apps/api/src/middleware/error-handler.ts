@@ -4,7 +4,6 @@ import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 
 import { env } from "@/lib/env";
-import { logger } from "@/lib/logger";
 
 export const isPrismaKnownError = (
   err: unknown,
@@ -31,7 +30,7 @@ export class AppError extends Error {
 }
 
 export const errorHandler = (err: Error, c: Context) => {
-  logger.error({
+  c.var.logger.error({
     err,
     ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
     method: c.req.method,
