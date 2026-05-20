@@ -136,7 +136,7 @@ app.openapi(readyzRoute, async (c) => {
       200,
     );
   } catch (error) {
-    logger.error({ error }, "Readiness check failed");
+    c.var.logger.error({ error }, "Readiness check failed");
     return c.json(
       {
         checks: { database: "unhealthy" as const },
