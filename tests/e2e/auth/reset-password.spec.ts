@@ -25,7 +25,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("any-token-value");
     await resetPasswordPage.submit("NewPassword123!", "DifferentPassword1!");
 
-    await resetPasswordPage.expectErrorText(/passwords do not match/i);
+    await expect(page.getByText(/passwords do not match/i)).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });
 
@@ -46,8 +46,8 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.submit("ValidPassword123!", "ValidPassword123!");
 
     // Better Auth rejects unknown tokens — the form surfaces the server message
-    // (varies by version, but always renders into the destructive root error).
-    await expect(page.locator("p.text-destructive")).toBeVisible();
+    // via a Sonner toast (toast.error from @repo/ui/components/sonner).
+    await expect(page.locator('[data-sonner-toast][data-type="error"]')).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });
 });

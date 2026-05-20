@@ -52,7 +52,7 @@ test.describe("Register", () => {
       "DifferentPassword!",
     );
 
-    await registerPage.expectErrorText("Passwords do not match");
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
     expect(page.url()).toContain("/register");
   });
 
