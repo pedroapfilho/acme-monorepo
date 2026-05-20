@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -10,6 +9,8 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { toast } from "@repo/ui/components/sonner";
+import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -18,20 +19,30 @@ import { recoverSchema } from "@/lib/form-schemas";
 
 const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { form, isLoading, rootError } = useAuthForm({
+  const form = useForm({
     defaultValues: { email: "" },
-    onSubmit: async (values) => {
-      const result = await authClient.requestPasswordReset({
-        email: values.email,
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (result.error) {
-        throw new Error(result.error.message ?? "Failed to send password reset email");
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      try {
+        const result = await authClient.requestPasswordReset({
+          email: value.email,
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (result.error) {
+          throw new Error(result.error.message ?? "Failed to send password reset email");
+        }
+        setSubmittedEmail(value.email);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "An error occurred. Please try again.";
+        toast.error(message);
+      } finally {
+        setIsLoading(false);
       }
-      setSubmittedEmail(values.email);
     },
-    schema: recoverSchema,
+    validators: { onSubmit: recoverSchema },
   });
 
   if (submittedEmail) {
@@ -85,8 +96,6 @@ const RecoverForm = () => {
             );
           }}
         </form.Field>
-
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
         <Field>
           <Button disabled={isLoading} type="submit">

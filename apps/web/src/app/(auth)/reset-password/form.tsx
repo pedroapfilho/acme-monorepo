@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -10,8 +9,11 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { toast } from "@repo/ui/components/sonner";
+import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
@@ -22,25 +24,36 @@ type Props = {
 
 const ResetPasswordForm = ({ token }: Props) => {
   const { push } = useRouter();
-  const { form, isLoading, rootError } = useAuthForm({
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm({
     defaultValues: { confirmPassword: "", password: "" },
-    onSubmit: async (values) => {
-      if (!token) {
-        throw new Error("Invalid reset token. Please request a new password reset.");
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      try {
+        if (!token) {
+          throw new Error("Invalid reset token. Please request a new password reset.");
+        }
+        if (value.password !== value.confirmPassword) {
+          throw new Error("Passwords do not match");
+        }
+        const result = await authClient.resetPassword({
+          newPassword: value.password,
+          token,
+        });
+        if (result.error) {
+          throw new Error(result.error.message ?? "Failed to reset password");
+        }
+        push("/login?message=password-reset-success");
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "An error occurred. Please try again.";
+        toast.error(message);
+      } finally {
+        setIsLoading(false);
       }
-      if (values.password !== values.confirmPassword) {
-        throw new Error("Passwords do not match");
-      }
-      const result = await authClient.resetPassword({
-        newPassword: values.password,
-        token,
-      });
-      if (result.error) {
-        throw new Error(result.error.message ?? "Failed to reset password");
-      }
-      push("/login?message=password-reset-success");
     },
-    schema: resetPasswordSchema,
+    validators: { onSubmit: resetPasswordSchema },
   });
 
   return (
@@ -97,8 +110,6 @@ const ResetPasswordForm = ({ token }: Props) => {
             }}
           </form.Field>
         </div>
-
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
         <Field>
           <Button disabled={isLoading} type="submit">

@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthForm } from "@repo/auth/form";
 import { Button } from "@repo/ui/components/button";
 import {
   Field,
@@ -10,8 +9,11 @@ import {
   FieldLabel,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { toast } from "@repo/ui/components/sonner";
+import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
@@ -22,20 +24,31 @@ type Props = {
 
 const LoginForm = ({ from }: Props) => {
   const { push, refresh } = useRouter();
-  const { form, isLoading, rootError } = useAuthForm({
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm({
     defaultValues: { email: "", password: "" },
-    onSubmit: async (values) => {
-      const result = await authClient.signIn.email({
-        email: values.email,
-        password: values.password,
-      });
-      if (result.error) {
-        throw new Error(result.error.message ?? "Invalid credentials");
+    onSubmit: async ({ value }) => {
+      setIsLoading(true);
+      try {
+        const result = await authClient.signIn.email({
+          email: value.email,
+          password: value.password,
+        });
+        if (result.error) {
+          throw new Error(result.error.message ?? "Invalid credentials");
+        }
+        push(from);
+        refresh();
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "An error occurred. Please try again.";
+        toast.error(message);
+      } finally {
+        setIsLoading(false);
       }
-      push(from);
-      refresh();
     },
-    schema: loginSchema,
+    validators: { onSubmit: loginSchema },
   });
 
   return (
@@ -100,8 +113,6 @@ const LoginForm = ({ from }: Props) => {
             );
           }}
         </form.Field>
-
-        {rootError && <p className="text-sm text-destructive">{rootError}</p>}
 
         <Field>
           <Button disabled={isLoading} type="submit">
