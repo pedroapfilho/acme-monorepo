@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 
+import { Toaster } from "@repo/ui/components/sonner";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
@@ -104,6 +105,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       </head>
       <body className={inter.className} suppressHydrationWarning>
         {children}
+        <Toaster />
       </body>
     </html>
   );
