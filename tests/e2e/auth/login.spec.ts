@@ -24,11 +24,11 @@ test.describe("Login", () => {
     expect(page.url()).toContain("/login");
   });
 
-  test("shows validation error for invalid email", async ({ loginPage }) => {
+  test("shows validation error for invalid email", async ({ loginPage, page }) => {
     await loginPage.goto();
     await loginPage.login("not-an-email", TEST_USER.password);
 
-    await loginPage.expectErrorVisible();
+    await expect(page.getByText(/invalid email/i)).toBeVisible();
   });
 });
 
