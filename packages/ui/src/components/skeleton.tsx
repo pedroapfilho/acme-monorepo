@@ -3,7 +3,7 @@ import type { HTMLAttributes } from "react";
 import { cn } from "../lib/utils";
 
 type SkeletonProps = HTMLAttributes<HTMLDivElement> & {
-  animation?: "pulse" | "wave" | "none";
+  animation?: "pulse" | "none";
   height?: string | number;
   variant?: "text" | "circular" | "rectangular" | "rounded";
   width?: string | number;
@@ -32,7 +32,6 @@ const Skeleton = ({
   const animationClasses = {
     none: "",
     pulse: "animate-pulse",
-    wave: "animate-shimmer",
   };
 
   return (

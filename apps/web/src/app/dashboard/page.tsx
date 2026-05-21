@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/sign-out-button";
 import { getSession } from "@/lib/auth-helpers";
+
+export const metadata: Metadata = { title: "Dashboard" };
 
 const Dashboard = async () => {
   const session = await getSession();

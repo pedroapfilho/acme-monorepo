@@ -28,19 +28,17 @@ const CardHeader = ({ className, ...props }: ComponentProps<"div">) => {
   );
 };
 
-const CardTitle = ({ className, ...props }: ComponentProps<"div">) => {
+const CardTitle = ({ children, className, ...props }: ComponentProps<"h2">) => {
   return (
-    <div
-      className={cn("leading-none font-semibold", className)}
-      data-slot="card-title"
-      {...props}
-    />
+    <h2 className={cn("leading-none font-semibold", className)} data-slot="card-title" {...props}>
+      {children}
+    </h2>
   );
 };
 
-const CardDescription = ({ className, ...props }: ComponentProps<"div">) => {
+const CardDescription = ({ className, ...props }: ComponentProps<"p">) => {
   return (
-    <div
+    <p
       className={cn("text-sm text-muted-foreground", className)}
       data-slot="card-description"
       {...props}

@@ -7,24 +7,69 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  useFieldContext,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 
+type EmailFieldInputProps = {
+  errors: Array<unknown>;
+  isInvalid: boolean;
+  isLoading: boolean;
+  name: string;
+  onBlur: () => void;
+  onChange: (v: string) => void;
+  value: string;
+};
+
+const EmailFieldInput = ({
+  errors,
+  isInvalid,
+  isLoading,
+  name,
+  onBlur,
+  onChange,
+  value,
+}: EmailFieldInputProps) => {
+  const { id } = useFieldContext();
+  return (
+    <>
+      <Input
+        aria-describedby={isInvalid ? `${id}-error` : undefined}
+        aria-invalid={isInvalid}
+        autoComplete="email"
+        disabled={isLoading}
+        id="email"
+        name={name}
+        onBlur={onBlur}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="m@example.com"
+        required
+        type="email"
+        value={value}
+      />
+      {isInvalid && <FieldError errors={errors} />}
+    </>
+  );
+};
+
 const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {
       setIsLoading(true);
+      setFormError(null);
       try {
         const result = await authClient.requestPasswordReset({
           email: value.email,
@@ -37,6 +82,7 @@ const RecoverForm = () => {
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "An error occurred. Please try again.";
+        setFormError(message);
         toast.error(message);
       } finally {
         setIsLoading(false);
@@ -73,6 +119,9 @@ const RecoverForm = () => {
         void form.handleSubmit();
       }}
     >
+      <div aria-atomic="true" aria-live="polite" className="sr-only">
+        {formError}
+      </div>
       <FieldGroup>
         <form.Field name="email">
           {(field) => {
@@ -80,26 +129,29 @@ const RecoverForm = () => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
-                  id="email"
+                <EmailFieldInput
+                  errors={field.state.meta.errors}
+                  isInvalid={isInvalid}
+                  isLoading={isLoading}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="m@example.com"
-                  type="email"
+                  onChange={field.handleChange}
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
         </form.Field>
 
         <Field>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Sending..." : "Send reset link"}
+          <Button
+            aria-busy={isLoading}
+            aria-disabled={isLoading}
+            className="aria-busy:pointer-events-none aria-busy:opacity-50"
+            type="submit"
+          >
+            {isLoading && <Loader2 className="size-4 animate-spin" />}
+            {isLoading ? "Sending…" : "Send reset link"}
           </Button>
           <FieldDescription className="text-center">
             Remembered your password?{" "}
