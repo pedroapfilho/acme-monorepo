@@ -26,9 +26,15 @@ const SignOutButton = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Button className="self-start" disabled={isPending} onClick={handleSignOut} variant="outline">
+      <Button
+        aria-busy={isPending}
+        className="self-start"
+        disabled={isPending}
+        onClick={handleSignOut}
+        variant="outline"
+      >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? "Signing out" : "Sign out"}
+        {isPending ? "Signing out…" : "Sign out"}
       </Button>
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

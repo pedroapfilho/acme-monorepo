@@ -15,7 +15,7 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
@@ -29,7 +29,7 @@ type PasswordFieldInputProps = {
   errors: Array<unknown>;
   id: string;
   isInvalid: boolean;
-  isLoading: boolean;
+  isPending: boolean;
   name: string;
   onBlur: () => void;
   onChange: (v: string) => void;
@@ -41,7 +41,7 @@ const PasswordFieldInput = ({
   errors,
   id,
   isInvalid,
-  isLoading,
+  isPending,
   name,
   onBlur,
   onChange,
@@ -54,7 +54,7 @@ const PasswordFieldInput = ({
         aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
         aria-invalid={isInvalid}
         autoComplete={autoComplete}
-        disabled={isLoading}
+        disabled={isPending}
         id={id}
         name={name}
         onBlur={onBlur}
@@ -70,44 +70,45 @@ const PasswordFieldInput = ({
 
 const ResetPasswordForm = ({ token }: Props) => {
   const { push } = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", password: "" },
-    onSubmit: async ({ value }) => {
-      setIsLoading(true);
+    onSubmit: ({ value }) => {
       setFormError(null);
-      try {
-        if (!token) {
-          throw new Error("Invalid reset token. Please request a new password reset.");
+      startTransition(async () => {
+        try {
+          if (!token) {
+            throw new Error("Invalid reset token. Please request a new password reset.");
+          }
+          if (value.password !== value.confirmPassword) {
+            throw new Error("Passwords do not match");
+          }
+          const result = await authClient.resetPassword({
+            newPassword: value.password,
+            token,
+          });
+          if (result.error) {
+            throw new Error(result.error.message ?? "Failed to reset password");
+          }
+          push("/login?message=password-reset-success");
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "An error occurred. Please try again.";
+          setFormError(message);
+          toast.error(message);
         }
-        if (value.password !== value.confirmPassword) {
-          throw new Error("Passwords do not match");
-        }
-        const result = await authClient.resetPassword({
-          newPassword: value.password,
-          token,
-        });
-        if (result.error) {
-          throw new Error(result.error.message ?? "Failed to reset password");
-        }
-        push("/login?message=password-reset-success");
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "An error occurred. Please try again.";
-        setFormError(message);
-        toast.error(message);
-      } finally {
-        setIsLoading(false);
-      }
+      });
     },
     validators: { onSubmit: resetPasswordSchema },
   });
 
   return (
     <form
+      noValidate
       onSubmit={(e) => {
+        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
@@ -129,7 +130,7 @@ const ResetPasswordForm = ({ token }: Props) => {
                     errors={field.state.meta.errors}
                     id="password"
                     isInvalid={isInvalid}
-                    isLoading={isLoading}
+                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
@@ -151,7 +152,7 @@ const ResetPasswordForm = ({ token }: Props) => {
                     errors={field.state.meta.errors}
                     id="confirmPassword"
                     isInvalid={isInvalid}
-                    isLoading={isLoading}
+                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
@@ -165,13 +166,13 @@ const ResetPasswordForm = ({ token }: Props) => {
 
         <Field>
           <Button
-            aria-busy={isLoading}
-            aria-disabled={isLoading}
+            aria-busy={isPending}
+            aria-disabled={isPending}
             className="aria-busy:pointer-events-none aria-busy:opacity-50"
             type="submit"
           >
-            {isLoading && <Loader2 className="size-4 animate-spin" />}
-            {isLoading ? "Resetting…" : "Reset password"}
+            {isPending && <Loader2 className="size-4 animate-spin" />}
+            {isPending ? "Resetting…" : "Reset password"}
           </Button>
           <FieldDescription className="text-center">
             Back to{" "}

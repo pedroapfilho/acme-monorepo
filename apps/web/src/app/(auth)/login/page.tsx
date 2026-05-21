@@ -23,7 +23,10 @@ type Props = {
 };
 
 const Page = async ({ searchParams }: Props) => {
-  const { from = "/dashboard" } = await searchParams;
+  const { from } = await searchParams;
+  // Sanitise the redirect target server-side: accept only path-relative URLs to
+  // prevent open-redirect attacks (e.g. /login?from=https://evil.com).
+  const safeTo = from && from.startsWith("/") && !from.startsWith("//") ? from : "/dashboard";
 
   return (
     <Card>
@@ -32,7 +35,7 @@ const Page = async ({ searchParams }: Props) => {
         <CardDescription>Enter your details to sign in to your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <LoginForm from={from} />
+        <LoginForm from={safeTo} />
       </CardContent>
     </Card>
   );

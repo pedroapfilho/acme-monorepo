@@ -29,7 +29,7 @@ export default defineConfig({
     // (or similar) lands and these files migrate to it.
     {
       files: [
-        "apps/web/src/proxy.ts",
+        "apps/web/src/middleware.ts",
         "apps/web/src/lib/auth-helpers.ts",
         "packages/auth/src/server.ts",
       ],

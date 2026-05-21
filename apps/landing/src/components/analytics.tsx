@@ -1,14 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const Analytics = dynamic(
-  async () => {
-    const mod = await import("@vercel/analytics/react");
-    return { default: mod.Analytics };
-  },
-  { ssr: false },
-);
+import { Analytics } from "@vercel/analytics/react";
 
 const AnalyticsWrapper = () => {
   return <Analytics />;

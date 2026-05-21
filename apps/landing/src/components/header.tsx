@@ -9,7 +9,10 @@ const Header = () => {
         <Link aria-label="Homepage" className="text-sm font-semibold tracking-tight" href="/">
           Acme
         </Link>
-        <nav className="flex items-center gap-6 text-sm font-normal text-muted-foreground">
+        <nav
+          aria-label="Main"
+          className="flex items-center gap-6 text-sm font-normal text-muted-foreground"
+        >
           <a className="transition-colors hover:text-foreground" href={webAppUrl("/login")}>
             Sign in
           </a>

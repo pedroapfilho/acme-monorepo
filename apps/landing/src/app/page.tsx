@@ -32,7 +32,7 @@ const Page = () => {
             href={webAppUrl("/login")}
           >
             Sign in
-            <ArrowUpRight />
+            <ArrowUpRight aria-hidden="true" />
           </a>
         </div>
       </section>
