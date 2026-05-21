@@ -1,5 +1,5 @@
-import { prisma } from "@repo/db";
 import { expect, test } from "@playwright/test";
+import { prisma } from "@repo/db";
 
 import { webUrl } from "../../../playwright.config";
 import { verification } from "../fixtures/verification.fixture";
@@ -15,9 +15,7 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     await page.context().clearCookies();
 
     const currentEmail = makeTestEmail(testInfo).toLowerCase();
-    const newEmail = makeTestEmail(testInfo)
-      .toLowerCase()
-      .replace("delivered+", "delivered+new-");
+    const newEmail = makeTestEmail(testInfo).toLowerCase().replace("delivered+", "delivered+new-");
     const username = makeTestUsername(currentEmail);
     const password = "ChangeEmailPwd1!";
 
