@@ -7,10 +7,12 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  useFieldContext,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,15 +20,63 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 
+type FieldInputProps = {
+  autoComplete: string;
+  errors: Array<unknown>;
+  id: string;
+  isInvalid: boolean;
+  isLoading: boolean;
+  name: string;
+  onBlur: () => void;
+  onChange: (v: string) => void;
+  type?: string;
+  value: string;
+};
+
+const RegisterFieldInput = ({
+  autoComplete,
+  errors,
+  id,
+  isInvalid,
+  isLoading,
+  name,
+  onBlur,
+  onChange,
+  type = "text",
+  value,
+}: FieldInputProps) => {
+  const { id: fieldId } = useFieldContext();
+  return (
+    <>
+      <Input
+        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
+        aria-invalid={isInvalid}
+        autoComplete={autoComplete}
+        disabled={isLoading}
+        id={id}
+        name={name}
+        onBlur={onBlur}
+        onChange={(e) => onChange(e.target.value)}
+        required
+        type={type}
+        value={value}
+      />
+      {isInvalid && <FieldError errors={errors} />}
+    </>
+  );
+};
+
 const RegisterForm = () => {
   const { push, refresh } = useRouter();
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
     onSubmit: async ({ value }) => {
       setIsLoading(true);
+      setFormError(null);
       try {
         if (value.password !== value.confirmPassword) {
           throw new Error("Passwords do not match");
@@ -55,6 +105,7 @@ const RegisterForm = () => {
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "An error occurred. Please try again.";
+        setFormError(message);
         toast.error(message);
       } finally {
         setIsLoading(false);
@@ -95,6 +146,9 @@ const RegisterForm = () => {
         void form.handleSubmit();
       }}
     >
+      <div aria-atomic="true" aria-live="polite" className="sr-only">
+        {formError}
+      </div>
       <FieldGroup>
         <form.Field name="name">
           {(field) => {
@@ -102,17 +156,17 @@ const RegisterForm = () => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
+                <RegisterFieldInput
+                  autoComplete="name"
+                  errors={field.state.meta.errors}
                   id="name"
+                  isInvalid={isInvalid}
+                  isLoading={isLoading}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="John Doe"
+                  onChange={field.handleChange}
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
@@ -124,18 +178,18 @@ const RegisterForm = () => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  aria-invalid={isInvalid}
-                  disabled={isLoading}
+                <RegisterFieldInput
+                  autoComplete="email"
+                  errors={field.state.meta.errors}
                   id="email"
+                  isInvalid={isInvalid}
+                  isLoading={isLoading}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="m@example.com"
+                  onChange={field.handleChange}
                   type="email"
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
@@ -148,17 +202,18 @@ const RegisterForm = () => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    disabled={isLoading}
+                  <RegisterFieldInput
+                    autoComplete="new-password"
+                    errors={field.state.meta.errors}
                     id="password"
+                    isInvalid={isInvalid}
+                    isLoading={isLoading}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={field.handleChange}
                     type="password"
                     value={field.state.value}
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -170,17 +225,18 @@ const RegisterForm = () => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    disabled={isLoading}
+                  <RegisterFieldInput
+                    autoComplete="new-password"
+                    errors={field.state.meta.errors}
                     id="confirmPassword"
+                    isInvalid={isInvalid}
+                    isLoading={isLoading}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={field.handleChange}
                     type="password"
                     value={field.state.value}
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -188,8 +244,14 @@ const RegisterForm = () => {
         </div>
 
         <Field>
-          <Button disabled={isLoading} type="submit">
-            {isLoading ? "Creating account..." : "Create account"}
+          <Button
+            aria-busy={isLoading}
+            aria-disabled={isLoading}
+            className="aria-busy:pointer-events-none aria-busy:opacity-50"
+            type="submit"
+          >
+            {isLoading && <Loader2 className="size-4 animate-spin" />}
+            {isLoading ? "Creating account…" : "Create account"}
           </Button>
           <FieldDescription className="text-center">
             Already have an account?{" "}

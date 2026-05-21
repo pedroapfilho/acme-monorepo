@@ -6,7 +6,7 @@ import { webAppUrl } from "@/lib/urls";
 
 export const metadata: Metadata = {
   description: "Welcome to Acme — the one template to rule them all.",
-  title: "Home",
+  title: { absolute: "Acme — The one template to rule them all" },
 };
 
 const Page = () => {

@@ -48,6 +48,7 @@ const FieldError = ({
   errors,
   ...props
 }: ComponentProps<"p"> & { errors?: Array<unknown> }) => {
+  const { id } = useFieldContext();
   if (!errors || errors.length === 0) {
     return null;
   }
@@ -70,7 +71,12 @@ const FieldError = ({
     return null;
   }
   return (
-    <p className={cn("text-sm font-medium text-destructive", className)} {...props}>
+    <p
+      className={cn("text-sm font-medium text-destructive", className)}
+      id={`${id}-error`}
+      role="alert"
+      {...props}
+    >
       {messages.join(", ")}
     </p>
   );

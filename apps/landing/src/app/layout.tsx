@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
 import { cn } from "@repo/ui/lib/utils";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
 import { AnalyticsWrapper } from "@/components/analytics";
@@ -17,6 +17,17 @@ const LONG_DESCRIPTION = "Monorepo for base projects";
 const TWITTER_HANDLE = "acme";
 
 const SITE_URL = "https://www.acme-monorepo.com";
+
+export const viewport: Viewport = {
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { color: "white", media: "(prefers-color-scheme: light)" },
+    { color: "black", media: "(prefers-color-scheme: dark)" },
+  ],
+  userScalable: true,
+  width: "device-width",
+};
 
 const metadata = {
   description: LONG_DESCRIPTION,
@@ -53,6 +64,7 @@ const metadata = {
 } satisfies Metadata;
 
 const inter = Inter({
+  display: "swap",
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -66,8 +78,16 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           inter.variable,
         )}
       >
+        <a
+          className="sr-only fixed top-2 left-2 z-50 rounded-md bg-background px-3 py-2 text-sm font-medium text-foreground ring-1 ring-ring focus:not-sr-only"
+          href="#main-content"
+        >
+          Skip to content
+        </a>
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1" id="main-content">
+          {children}
+        </main>
         <Footer />
 
         <AnalyticsWrapper />
