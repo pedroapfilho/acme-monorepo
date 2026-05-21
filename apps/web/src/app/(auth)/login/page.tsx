@@ -26,8 +26,7 @@ const Page = async ({ searchParams }: Props) => {
   const { from } = await searchParams;
   // Sanitise the redirect target server-side: accept only path-relative URLs to
   // prevent open-redirect attacks (e.g. /login?from=https://evil.com).
-  const safeTo =
-    from && from.startsWith("/") && !from.startsWith("//") ? from : "/dashboard";
+  const safeTo = from && from.startsWith("/") && !from.startsWith("//") ? from : "/dashboard";
 
   return (
     <Card>

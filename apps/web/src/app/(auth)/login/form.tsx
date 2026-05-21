@@ -15,7 +15,7 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
@@ -27,7 +27,7 @@ type Props = {
 type FieldInputProps = {
   errors: Array<unknown>;
   isInvalid: boolean;
-  isLoading: boolean;
+  isPending: boolean;
   name: string;
   onBlur: () => void;
   onChange: (v: string) => void;
@@ -38,7 +38,7 @@ type FieldInputProps = {
 const EmailFieldInput = ({
   errors,
   isInvalid,
-  isLoading,
+  isPending,
   name,
   onBlur,
   onChange,
@@ -51,7 +51,7 @@ const EmailFieldInput = ({
         aria-describedby={isInvalid ? `${id}-error` : undefined}
         aria-invalid={isInvalid}
         autoComplete="email"
-        disabled={isLoading}
+        disabled={isPending}
         id="email"
         name={name}
         onBlur={onBlur}
@@ -69,7 +69,7 @@ const EmailFieldInput = ({
 const PasswordFieldInput = ({
   errors,
   isInvalid,
-  isLoading,
+  isPending,
   name,
   onBlur,
   onChange,
@@ -82,7 +82,7 @@ const PasswordFieldInput = ({
         aria-describedby={isInvalid ? `${id}-error` : undefined}
         aria-invalid={isInvalid}
         autoComplete="current-password"
-        disabled={isLoading}
+        disabled={isPending}
         id="password"
         name={name}
         onBlur={onBlur}
@@ -98,32 +98,31 @@ const PasswordFieldInput = ({
 
 const LoginForm = ({ from }: Props) => {
   const { push, refresh } = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
-    onSubmit: async ({ value }) => {
-      setIsLoading(true);
+    onSubmit: ({ value }) => {
       setFormError(null);
-      try {
-        const result = await authClient.signIn.email({
-          email: value.email,
-          password: value.password,
-        });
-        if (result.error) {
-          throw new Error(result.error.message ?? "Invalid credentials");
+      startTransition(async () => {
+        try {
+          const result = await authClient.signIn.email({
+            email: value.email,
+            password: value.password,
+          });
+          if (result.error) {
+            throw new Error(result.error.message ?? "Invalid credentials");
+          }
+          push(from);
+          refresh();
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "An error occurred. Please try again.";
+          setFormError(message);
+          toast.error(message);
         }
-        push(from);
-        refresh();
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "An error occurred. Please try again.";
-        setFormError(message);
-        toast.error(message);
-      } finally {
-        setIsLoading(false);
-      }
+      });
     },
     validators: { onSubmit: loginSchema },
   });
@@ -132,6 +131,7 @@ const LoginForm = ({ from }: Props) => {
     <form
       noValidate
       onSubmit={(e) => {
+        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
@@ -150,7 +150,7 @@ const LoginForm = ({ from }: Props) => {
                 <EmailFieldInput
                   errors={field.state.meta.errors}
                   isInvalid={isInvalid}
-                  isLoading={isLoading}
+                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
@@ -178,7 +178,7 @@ const LoginForm = ({ from }: Props) => {
                 <PasswordFieldInput
                   errors={field.state.meta.errors}
                   isInvalid={isInvalid}
-                  isLoading={isLoading}
+                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
@@ -191,13 +191,13 @@ const LoginForm = ({ from }: Props) => {
 
         <Field>
           <Button
-            aria-busy={isLoading}
-            aria-disabled={isLoading}
+            aria-busy={isPending}
+            aria-disabled={isPending}
             className="aria-busy:pointer-events-none aria-busy:opacity-50"
             type="submit"
           >
-            {isLoading && <Loader2 className="size-4 animate-spin" />}
-            {isLoading ? "Signing in…" : "Sign in"}
+            {isPending && <Loader2 className="size-4 animate-spin" />}
+            {isPending ? "Signing in…" : "Sign in"}
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}

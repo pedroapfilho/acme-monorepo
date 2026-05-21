@@ -14,7 +14,7 @@ import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
@@ -22,7 +22,7 @@ import { recoverSchema } from "@/lib/form-schemas";
 type EmailFieldInputProps = {
   errors: Array<unknown>;
   isInvalid: boolean;
-  isLoading: boolean;
+  isPending: boolean;
   name: string;
   onBlur: () => void;
   onChange: (v: string) => void;
@@ -32,7 +32,7 @@ type EmailFieldInputProps = {
 const EmailFieldInput = ({
   errors,
   isInvalid,
-  isLoading,
+  isPending,
   name,
   onBlur,
   onChange,
@@ -45,7 +45,7 @@ const EmailFieldInput = ({
         aria-describedby={isInvalid ? `${id}-error` : undefined}
         aria-invalid={isInvalid}
         autoComplete="email"
-        disabled={isLoading}
+        disabled={isPending}
         id="email"
         name={name}
         onBlur={onBlur}
@@ -62,31 +62,30 @@ const EmailFieldInput = ({
 
 const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { email: "" },
-    onSubmit: async ({ value }) => {
-      setIsLoading(true);
+    onSubmit: ({ value }) => {
       setFormError(null);
-      try {
-        const result = await authClient.requestPasswordReset({
-          email: value.email,
-          redirectTo: `${window.location.origin}/reset-password`,
-        });
-        if (result.error) {
-          throw new Error(result.error.message ?? "Failed to send password reset email");
+      startTransition(async () => {
+        try {
+          const result = await authClient.requestPasswordReset({
+            email: value.email,
+            redirectTo: `${window.location.origin}/reset-password`,
+          });
+          if (result.error) {
+            throw new Error(result.error.message ?? "Failed to send password reset email");
+          }
+          setSubmittedEmail(value.email);
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "An error occurred. Please try again.";
+          setFormError(message);
+          toast.error(message);
         }
-        setSubmittedEmail(value.email);
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "An error occurred. Please try again.";
-        setFormError(message);
-        toast.error(message);
-      } finally {
-        setIsLoading(false);
-      }
+      });
     },
     validators: { onSubmit: recoverSchema },
   });
@@ -114,6 +113,7 @@ const RecoverForm = () => {
     <form
       noValidate
       onSubmit={(e) => {
+        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
@@ -132,7 +132,7 @@ const RecoverForm = () => {
                 <EmailFieldInput
                   errors={field.state.meta.errors}
                   isInvalid={isInvalid}
-                  isLoading={isLoading}
+                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
@@ -145,13 +145,13 @@ const RecoverForm = () => {
 
         <Field>
           <Button
-            aria-busy={isLoading}
-            aria-disabled={isLoading}
+            aria-busy={isPending}
+            aria-disabled={isPending}
             className="aria-busy:pointer-events-none aria-busy:opacity-50"
             type="submit"
           >
-            {isLoading && <Loader2 className="size-4 animate-spin" />}
-            {isLoading ? "Sending…" : "Send reset link"}
+            {isPending && <Loader2 className="size-4 animate-spin" />}
+            {isPending ? "Sending…" : "Send reset link"}
           </Button>
           <FieldDescription className="text-center">
             Remembered your password?{" "}

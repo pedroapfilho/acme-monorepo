@@ -41,7 +41,6 @@ export const metadata: Metadata = {
     siteName: "Acme",
     title: "Acme - Secure Authentication Platform",
     type: "website",
-    url: "https://acme.example.com",
   },
 
   // Twitter

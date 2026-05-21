@@ -13,7 +13,7 @@ export const registerSchema = z.object({
 });
 
 export const recoverSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email("Enter a valid email address"),
 });
 
 export const resetPasswordSchema = z.object({
