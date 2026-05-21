@@ -1,5 +1,5 @@
-import { prisma } from "@repo/db";
 import { expect, test } from "@playwright/test";
+import { prisma } from "@repo/db";
 
 import { webUrl } from "../../../playwright.config";
 import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
@@ -26,7 +26,12 @@ test.describe("Sign-up for an existing email (enumeration prevention)", () => {
     // server-side. The test verifies the *contract* (no error, same status
     // class) and the *side-effect ceiling* (no duplicate row).
     const second = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Different Name", password: "SecondPassword2!", username: `${username}_2` },
+      data: {
+        email,
+        name: "Different Name",
+        password: "SecondPassword2!",
+        username: `${username}_2`,
+      },
     });
     expect([200, 201]).toContain(second.status());
 

@@ -23,9 +23,7 @@ const requireSecret = (): string => {
 // `{email}` keyed with the auth secret. Reconstructing it lets tests skip
 // inbox polling entirely. See node_modules/better-auth/dist/api/routes/
 // email-verification.mjs:createEmailVerificationToken.
-const forVerifyEmail = async (
-  email: string,
-): Promise<{ token: string; url: string }> => {
+const forVerifyEmail = async (email: string): Promise<{ token: string; url: string }> => {
   const token = await signJWT({ email: email.toLowerCase() }, requireSecret(), 3600);
   const callbackURL = encodeURIComponent("/dashboard");
   const url = `${webUrl}/api/auth/verify-email?token=${token}&callbackURL=${callbackURL}`;
@@ -46,10 +44,7 @@ type ChangeEmailUrls = {
   verificationUrl: string;
 };
 
-const forChangeEmail = async (
-  currentEmail: string,
-  newEmail: string,
-): Promise<ChangeEmailUrls> => {
+const forChangeEmail = async (currentEmail: string, newEmail: string): Promise<ChangeEmailUrls> => {
   const secret = requireSecret();
   const callbackURL = encodeURIComponent("/dashboard");
   const basePayload = {
