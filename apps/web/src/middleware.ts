@@ -7,7 +7,8 @@ const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
 const authRoutes = ["/login", "/register", "/forgot-password", "/recover", "/reset-password"];
 
-export const proxy = async (request: NextRequest) => {
+// Named export kept for tests; default export activates Next.js middleware.
+export const middleware = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
@@ -42,6 +43,8 @@ export const proxy = async (request: NextRequest) => {
 
   return NextResponse.next();
 };
+
+export default middleware;
 
 export const config = {
   matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)"],
