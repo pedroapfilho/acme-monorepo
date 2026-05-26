@@ -1,6 +1,3 @@
-// Client
-export { createResendClient } from "./client";
-
 // Components
 export { AcmeLogo } from "./components/acme-logo";
 export { Button } from "./components/button";

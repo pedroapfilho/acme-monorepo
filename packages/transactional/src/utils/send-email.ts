@@ -1,8 +1,7 @@
 import type { ReactElement } from "react";
 import { render } from "react-email";
+import { Resend } from "resend";
 import { z } from "zod";
-
-import { createResendClient } from "../client";
 
 const emailConfigSchema = z.object({
   bcc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
@@ -48,7 +47,7 @@ const sendEmail = async ({ apiKey, defaultReplyTo, template, ...config }: SendEm
 
   try {
     const validatedConfig = emailConfigSchema.parse(config);
-    const resend = createResendClient(apiKey);
+    const resend = new Resend(apiKey);
 
     const [html, text] = await Promise.all([
       render(template),
@@ -101,7 +100,7 @@ const sendBatchEmails = async (
   }
 
   try {
-    const resend = createResendClient(apiKey);
+    const resend = new Resend(apiKey);
 
     const settledBatchData = await Promise.allSettled(
       emails.map(async ({ template, ...config }) => {
