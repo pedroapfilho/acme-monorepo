@@ -78,9 +78,7 @@ export const optionalAuthMiddleware = createMiddleware<{
       });
     }
   } catch (error) {
-    // Unexpected failures (DB down, malformed token, rate limit exception) must
-    // not be silently discarded — a missing user context is otherwise
-    // indistinguishable from an infrastructure outage.
+    // Log unexpected failures; a missing user context is otherwise indistinguishable from an outage.
     c.var.logger.error(
       { error, method: c.req.method, url: c.req.url },
       "optionalAuthMiddleware: getSession threw unexpectedly",

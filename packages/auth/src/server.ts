@@ -56,19 +56,8 @@ export const createAuth = (config: AuthConfig) => {
         httpOnly: true,
         sameSite: "lax" as const,
       },
-      // Force the `Secure` cookie flag when WEB_APP_URL is HTTPS. The
-      // dynamic-baseURL `protocol: "auto"` setting documents this as
-      // automatic, but in practice under Next.js + a reverse proxy
-      // (portless in dev, Vercel in prod), Better Auth doesn't reliably
-      // see the HTTPS scheme via `x-forwarded-proto` or `request.url`,
-      // so cookies end up without `Secure`.
-      //
-      // WEB_APP_URL is the explicit signal we already use everywhere:
-      // set to `https://acme.web.localhost` in dev (.env.example) and
-      // `https://app.acme.com` in prod; unset in CI (which runs on
-      // plain http://127.0.0.1) — so the gate naturally avoids the
-      // HTTPS-in-CI footgun that bare `true` or NODE_ENV gating would
-      // re-introduce.
+      // Reverse proxy (portless / Vercel) hides the HTTPS scheme from Better Auth's auto-detection;
+      // gate on WEB_APP_URL instead — unset in CI keeps tests on plain HTTP.
       useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
     },
 

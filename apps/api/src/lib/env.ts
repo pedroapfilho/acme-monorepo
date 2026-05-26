@@ -16,8 +16,6 @@ export const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  // Throwing at module load aborts the process with a stack trace; preferable to
-  // process.exit which loses context and conflicts with unicorn/no-process-exit.
   throw new Error(
     `Invalid environment variables:\n${JSON.stringify(z.treeifyError(parsedEnv.error), null, 2)}`,
   );
