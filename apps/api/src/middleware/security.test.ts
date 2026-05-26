@@ -1,78 +1,58 @@
-import type { Context } from "hono";
 import { describe, expect, it, vi } from "vitest";
 
 import { requestSizeLimit } from "./security";
-
-const createMockContext = (options: { headers?: Record<string, string> } = {}) => {
-  const { headers = {} } = options;
-  const variables = new Map<string, unknown>();
-
-  return {
-    get: vi.fn((key: string) => variables.get(key)),
-    header: vi.fn(),
-    json: vi.fn((body: unknown, status?: number) => ({ body, status })),
-    req: {
-      header: vi.fn((name: string) => headers[name]),
-      method: "GET",
-      path: "/test",
-      url: "http://localhost/test",
-    },
-    set: vi.fn((key: string, value: unknown) => {
-      variables.set(key, value);
-    }),
-  } as unknown as Context & { json: ReturnType<typeof vi.fn> };
-};
+import { createMockContext } from "./test-helpers";
 
 describe("requestSizeLimit", () => {
   const next = vi.fn();
 
-  it("should reject requests exceeding max size", async () => {
+  it("rejects requests exceeding max size", async () => {
     const middleware = requestSizeLimit(1024);
-    const c = createMockContext({ headers: { "content-length": "2048" } });
+    const { ctx, mocks } = createMockContext({ headers: { "content-length": "2048" } });
 
-    await middleware(c, next);
+    await middleware(ctx, next);
 
-    expect(c.json).toHaveBeenCalledWith(
+    expect(mocks.json).toHaveBeenCalledWith(
       { error: { code: "PAYLOAD_TOO_LARGE", message: "Request entity too large" } },
       413,
     );
     expect(next).not.toHaveBeenCalled();
   });
 
-  it("should pass requests within size limit", async () => {
+  it("passes requests within size limit", async () => {
     const middleware = requestSizeLimit(1024);
-    const c = createMockContext({ headers: { "content-length": "512" } });
+    const { ctx } = createMockContext({ headers: { "content-length": "512" } });
 
-    await middleware(c, next);
+    await middleware(ctx, next);
 
     expect(next).toHaveBeenCalled();
   });
 
-  it("should pass requests with no content-length header", async () => {
+  it("passes requests with no content-length header", async () => {
     const middleware = requestSizeLimit(1024);
-    const c = createMockContext();
+    const { ctx } = createMockContext();
 
-    await middleware(c, next);
-
-    expect(next).toHaveBeenCalled();
-  });
-
-  it("should use default 10MB limit when no argument provided", async () => {
-    const middleware = requestSizeLimit();
-    const c = createMockContext({ headers: { "content-length": "5000000" } });
-
-    await middleware(c, next);
+    await middleware(ctx, next);
 
     expect(next).toHaveBeenCalled();
   });
 
-  it("should reject when exceeding default 10MB limit", async () => {
+  it("uses default 10MB limit when no argument provided", async () => {
     const middleware = requestSizeLimit();
-    const c = createMockContext({ headers: { "content-length": "20000000" } });
+    const { ctx } = createMockContext({ headers: { "content-length": "5000000" } });
 
-    await middleware(c, next);
+    await middleware(ctx, next);
 
-    expect(c.json).toHaveBeenCalledWith(
+    expect(next).toHaveBeenCalled();
+  });
+
+  it("rejects when exceeding default 10MB limit", async () => {
+    const middleware = requestSizeLimit();
+    const { ctx, mocks } = createMockContext({ headers: { "content-length": "20000000" } });
+
+    await middleware(ctx, next);
+
+    expect(mocks.json).toHaveBeenCalledWith(
       { error: { code: "PAYLOAD_TOO_LARGE", message: "Request entity too large" } },
       413,
     );
