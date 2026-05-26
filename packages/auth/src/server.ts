@@ -56,8 +56,8 @@ export const createAuth = (config: AuthConfig) => {
         httpOnly: true,
         sameSite: "lax" as const,
       },
-      // Reverse proxy (portless / Vercel) hides the HTTPS scheme from Better Auth's auto-detection;
-      // gate on WEB_APP_URL instead — unset in CI keeps tests on plain HTTP.
+      // `protocol: "auto"` doesn't reliably detect HTTPS through portless/Vercel reverse proxies;
+      // WEB_APP_URL is the explicit signal. Unset in CI keeps cookies on plain HTTP.
       useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
     },
 

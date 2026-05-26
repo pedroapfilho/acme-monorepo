@@ -7,7 +7,6 @@ type CreateMockContextOptions = {
 };
 
 export type MockContextMocks = {
-  body: ReturnType<typeof vi.fn>;
   get: ReturnType<typeof vi.fn>;
   header: ReturnType<typeof vi.fn>;
   json: ReturnType<typeof vi.fn>;
@@ -25,7 +24,6 @@ export const createMockContext = (
   const variables = new Map<string, unknown>(Object.entries(opts.variables ?? {}));
 
   const mocks: MockContextMocks = {
-    body: vi.fn((body: unknown, status?: number) => ({ body, status })),
     get: vi.fn((key: string) => variables.get(key)),
     header: vi.fn(),
     json: vi.fn((body: unknown, status?: number) => ({ body, status })),
@@ -38,7 +36,6 @@ export const createMockContext = (
   };
 
   const ctx = {
-    body: mocks.body,
     get: mocks.get,
     header: mocks.header,
     json: mocks.json,
