@@ -1,8 +1,8 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
+import { deleteUser, findUserById, updateUser } from "@/lib/users";
 import type { AuthVariables } from "@/middleware/auth";
 import { authMiddleware } from "@/middleware/auth";
-import { userService } from "@/services/user.service";
 
 const userSchema = z
   .object({
@@ -39,7 +39,7 @@ const errorSchema = z
   })
   .openapi("Error");
 
-type ServiceUser = Awaited<ReturnType<typeof userService.findById>>;
+type ServiceUser = Awaited<ReturnType<typeof findUserById>>;
 
 const serializeUser = (user: ServiceUser) => ({
   ...user,
@@ -70,7 +70,7 @@ const getMeRoute = createRoute({
 
 v1UserRoutes.openapi(getMeRoute, async (c) => {
   const user = c.get("user");
-  const fullUser = await userService.findById(user.id);
+  const fullUser = await findUserById(user.id);
   return c.json({ data: serializeUser(fullUser) }, 200);
 });
 
@@ -106,7 +106,7 @@ const updateMeRoute = createRoute({
 v1UserRoutes.openapi(updateMeRoute, async (c) => {
   const user = c.get("user");
   const data = c.req.valid("json");
-  const updatedUser = await userService.update(user.id, data);
+  const updatedUser = await updateUser(user.id, data);
   return c.json({ data: serializeUser(updatedUser) }, 200);
 });
 
@@ -131,7 +131,7 @@ const deleteMeRoute = createRoute({
 
 v1UserRoutes.openapi(deleteMeRoute, async (c) => {
   const user = c.get("user");
-  await userService.delete(user.id);
+  await deleteUser(user.id);
   return c.json({ message: "Account deleted successfully" }, 200);
 });
 
@@ -170,7 +170,7 @@ const listUsersRoute = createRoute({
 
 v1UserRoutes.openapi(listUsersRoute, async (c) => {
   const user = c.get("user");
-  const fullUser = await userService.findById(user.id);
+  const fullUser = await findUserById(user.id);
 
   return c.json(
     {
