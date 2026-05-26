@@ -2,6 +2,8 @@
 
 This file provides guidance to AI coding agents when working with code in this repository.
 
+Project conventions and defaults are documented in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
+
 ## Commands
 
 ```bash
