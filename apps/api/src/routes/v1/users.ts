@@ -116,8 +116,7 @@ const deleteMeRoute = createRoute({
   middleware: [authMiddleware] as const,
   path: "/me",
   responses: {
-    200: {
-      content: { "application/json": { schema: z.object({ message: z.string() }) } },
+    204: {
       description: "Account deleted",
     },
     401: {
@@ -132,7 +131,7 @@ const deleteMeRoute = createRoute({
 v1UserRoutes.openapi(deleteMeRoute, async (c) => {
   const user = c.get("user");
   await deleteUser(user.id);
-  return c.json({ message: "Account deleted successfully" }, 200);
+  return c.body(null, 204);
 });
 
 // TODO: Add a proper role/permission system (e.g. user.role === "admin").

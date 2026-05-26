@@ -5,17 +5,5 @@ import { getAuth } from "./auth";
 
 export const getSession = cache(async () => {
   const headersList = await headers();
-
-  try {
-    const session = await getAuth().api.getSession({
-      headers: headersList,
-    });
-
-    return session;
-  } catch (error) {
-    // Auth failures (DB down, misconfiguration) must not be silent — they
-    // look identical to "logged out" without a log entry to diagnose.
-    console.error("[auth-helpers] getSession failed", { error });
-    return null;
-  }
+  return getAuth().api.getSession({ headers: headersList });
 });
