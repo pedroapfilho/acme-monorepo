@@ -14,10 +14,6 @@ vi.mock("@/lib/env", () => ({
   env: { NODE_ENV: "test" },
 }));
 
-vi.mock("@/lib/logger", () => ({
-  logger: { error: vi.fn(), info: vi.fn() },
-}));
-
 import { auth } from "@/lib/auth";
 
 import { authMiddleware, optionalAuthMiddleware } from "./auth";
@@ -36,6 +32,7 @@ const createMockContext = (headers: Record<string, string> = {}) => {
     set: vi.fn((key: string, value: unknown) => {
       variables.set(key, value);
     }),
+    var: { logger: { error: vi.fn(), info: vi.fn() } },
   } as unknown as Context;
 };
 
