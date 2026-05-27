@@ -20,10 +20,12 @@ const DEFAULT_FROM = "Acme <noreply@acme.com>";
 const sendWelcomeEmail = (
   {
     userEmail,
+    userId,
     username,
     verificationUrl,
   }: {
     userEmail: string;
+    userId: string;
     username?: string;
     verificationUrl: string;
   },
@@ -36,7 +38,7 @@ const sendWelcomeEmail = (
     subject: `Welcome to Acme${username ? `, ${username}` : ""}! Please verify your email`,
     tags: [
       { name: "type", value: "welcome" },
-      ...(username ? [{ name: "username", value: username }] : []),
+      { name: "userId", value: userId },
     ],
     template: React.createElement(WelcomeEmail, {
       userEmail,
@@ -52,11 +54,13 @@ const sendSignUpAttemptEmail = (
     resetPasswordUrl,
     signInUrl,
     userEmail,
+    userId,
     username,
   }: {
     resetPasswordUrl: string;
     signInUrl: string;
     userEmail: string;
+    userId: string;
     username?: string;
   },
   config: EmailConfig,
@@ -68,7 +72,7 @@ const sendSignUpAttemptEmail = (
     subject: "Sign-up attempt with your Acme account",
     tags: [
       { name: "type", value: "sign-up-attempt" },
-      ...(username ? [{ name: "username", value: username }] : []),
+      { name: "userId", value: userId },
     ],
     template: React.createElement(SignUpAttemptEmail, {
       resetPasswordUrl,
@@ -86,12 +90,14 @@ const sendPasswordResetEmail = (
     ipAddress,
     resetUrl,
     userEmail,
+    userId,
     username,
   }: {
     browserInfo?: string;
     ipAddress?: string;
     resetUrl: string;
     userEmail: string;
+    userId: string;
     username?: string;
   },
   config: EmailConfig,
@@ -103,7 +109,7 @@ const sendPasswordResetEmail = (
     subject: "Reset your Acme password",
     tags: [
       { name: "type", value: "password-reset" },
-      ...(username ? [{ name: "username", value: username }] : []),
+      { name: "userId", value: userId },
     ],
     template: React.createElement(PasswordResetEmail, {
       browserInfo,
@@ -121,11 +127,13 @@ const sendChangeEmailConfirmation = (
     changeUrl,
     currentEmail,
     newEmail,
+    userId,
     username,
   }: {
     changeUrl: string;
     currentEmail: string;
     newEmail: string;
+    userId: string;
     username?: string;
   },
   config: EmailConfig,
@@ -137,7 +145,7 @@ const sendChangeEmailConfirmation = (
     subject: "Confirm change of your Acme account email",
     tags: [
       { name: "type", value: "change-email-confirmation" },
-      ...(username ? [{ name: "username", value: username }] : []),
+      { name: "userId", value: userId },
     ],
     template: React.createElement(ChangeEmail, {
       changeUrl,
