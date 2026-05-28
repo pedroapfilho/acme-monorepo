@@ -3,11 +3,25 @@ import { render } from "react-email";
 import { Resend } from "resend";
 import { z } from "zod";
 
+// Resend accepts either a bare email or RFC 5322 "Display Name <email>" form
+// for from / reply-to. `z.string().email()` only matches bare addresses, so
+// extract the bracketed address when present and validate that. The default
+// for `from` also uses the wrapped form to surface a friendly display name
+// in inboxes, so the validator has to accept it.
+const senderAddressSchema = z.string().refine(
+  (val) => {
+    const wrapped = val.match(/^.+<([^<>\s]+)>$/v);
+    const email = wrapped ? wrapped[1] : val;
+    return z.email().safeParse(email).success;
+  },
+  { message: "Must be a valid email or 'Display Name <email>' format" },
+);
+
 const emailConfigSchema = z.object({
   bcc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
   cc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
-  from: z.string().email().default("Acme <noreply@acme.com>"),
-  replyTo: z.string().email().optional(),
+  from: senderAddressSchema.default("Acme <noreply@acme.com>"),
+  replyTo: senderAddressSchema.optional(),
   subject: z.string(),
   tags: z
     .array(
@@ -20,7 +34,10 @@ const emailConfigSchema = z.object({
   to: z.union([z.string().email(), z.array(z.string().email())]),
 });
 
-type EmailConfig = z.infer<typeof emailConfigSchema>;
+// z.input keeps `from` optional for callers — the Zod default fills it in
+// during parse. Using z.infer (the output type) would require every caller
+// to pass `from`, defeating the default.
+type EmailConfig = z.input<typeof emailConfigSchema>;
 
 type SendEmailOptions = EmailConfig & {
   apiKey: string;
