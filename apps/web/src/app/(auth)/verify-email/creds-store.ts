@@ -31,8 +31,8 @@ const consumeCreds = (token: string): Creds | null => {
 
 // Test-only escape hatch — vitest's per-test isolation doesn't reset module
 // state, and exporting this is cheaper than mocking the module.
-const __resetCredsStore = () => {
+const resetCredsStoreForTests = () => {
   store.clear();
 };
 
-export { __resetCredsStore, consumeCreds, stashCreds };
+export { resetCredsStoreForTests, consumeCreds, stashCreds };

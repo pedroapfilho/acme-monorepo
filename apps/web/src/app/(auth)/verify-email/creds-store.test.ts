@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { __resetCredsStore, consumeCreds, stashCreds } from "./creds-store";
+import { resetCredsStoreForTests, consumeCreds, stashCreds } from "./creds-store";
 
 describe("creds-store", () => {
   afterEach(() => {
-    __resetCredsStore();
+    resetCredsStoreForTests();
   });
 
   it("issues a token and returns the stashed creds exactly once", () => {
