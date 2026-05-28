@@ -25,7 +25,11 @@ const requireSecret = (): string => {
 // email-verification.mjs:createEmailVerificationToken.
 const forVerifyEmail = async (email: string): Promise<{ token: string; url: string }> => {
   const token = await signJWT({ email: email.toLowerCase() }, requireSecret(), 3600);
-  const callbackURL = encodeURIComponent("/dashboard");
+  // Matches @repo/auth's emailVerification.callbackURL — the verify-email
+  // handler redirects here after token exchange, and (with
+  // autoSignInAfterVerification: false) does so without setting a session
+  // cookie on the device that clicked the link.
+  const callbackURL = encodeURIComponent("/verify-email/success");
   const url = `${webUrl}/api/auth/verify-email?token=${token}&callbackURL=${callbackURL}`;
   return { token, url };
 };
