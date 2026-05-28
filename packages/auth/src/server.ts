@@ -151,6 +151,16 @@ export const createAuth = (config: AuthConfig) => {
     },
 
     emailVerification: {
+      // Off: the device that clicks the verification link never receives a
+      // session cookie. The original signup tab — on any device — is the one
+      // that completes sign-in, via the /verify-email pending screen's
+      // polling. Without this, a phone-clicks-link-on-desktop-signup flow
+      // would mint a session on the phone and leave the desktop stranded.
+      autoSignInAfterVerification: false,
+      // Where Better Auth's verify-email handler redirects after token
+      // exchange. The success page renders "Email verified, you can close
+      // this page" — no session, no buttons.
+      callbackURL: "/verify-email/success",
       // Same no-op-without-Resend pattern as sendResetPassword above.
       sendVerificationEmail: async ({ url, user }) => {
         if (!resendApiKey) {

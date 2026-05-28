@@ -202,6 +202,14 @@ describe("Auth Server Configuration", () => {
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 
+  it("sets emailVerification.callbackURL to /verify-email/success", () => {
+    expect(auth.options.emailVerification?.callbackURL).toBe("/verify-email/success");
+  });
+
+  it("disables autoSignInAfterVerification so the link-clicker never gets a session", () => {
+    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(false);
+  });
+
   it("should have displayName as optional additional user field", () => {
     const displayName = auth.options.user?.additionalFields?.displayName;
     expect(displayName).toEqual({
