@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { stashCreds } from "@/app/(auth)/verify-email/creds-store";
+import { stashCredentials } from "@/app/(auth)/verify-email/credentials-store";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 
@@ -100,7 +100,7 @@ const RegisterForm = () => {
           // holder also gets a separate notification email via
           // emailAndPassword.onExistingUserSignUp.
           if (!result.data?.token) {
-            const handoff = stashCreds({ email: value.email, password: value.password });
+            const handoff = stashCredentials({ email: value.email, password: value.password });
             push(`/verify-email?k=${handoff}`);
             return;
           }

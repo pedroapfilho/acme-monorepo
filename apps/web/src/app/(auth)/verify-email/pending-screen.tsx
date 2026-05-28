@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
-import { consumeCreds } from "./creds-store";
+import { consumeCredentials } from "./credentials-store";
 
 const POLL_INTERVAL_MS = 5000;
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -24,7 +24,7 @@ type Props = {
   token: string | null;
 };
 
-type Creds = {
+type Credentials = {
   email: string;
   password: string;
 };
@@ -34,8 +34,11 @@ const PendingScreen = ({ token }: Props) => {
   // useMemo so HMR / strict-mode double-mount doesn't burn the one-shot token.
   // The store itself is idempotent on the second read (returns null), and the
   // mounted component holds the value for the rest of its lifetime.
-  const initialCreds = useMemo<Creds | null>(() => (token ? consumeCreds(token) : null), [token]);
-  const [creds] = useState<Creds | null>(initialCreds);
+  const initialCredentials = useMemo<Credentials | null>(
+    () => (token ? consumeCredentials(token) : null),
+    [token],
+  );
+  const [credentials] = useState<Credentials | null>(initialCredentials);
   const [cooldown, setCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
 
@@ -46,15 +49,15 @@ const PendingScreen = ({ token }: Props) => {
     };
   }, []);
 
-  // Polling — gated on `creds` being present. Each tick attempts signIn.email;
+  // Polling — gated on `credentials` being present. Each tick attempts signIn.email;
   // unverified accounts produce an error which we swallow and keep polling.
   // visibilitychange pauses the timer while the tab is hidden so backgrounded
   // tabs stop hammering the auth endpoint.
   useEffect(() => {
-    if (!creds) {
+    if (!credentials) {
       return;
     }
-    const { email, password } = creds;
+    const { email, password } = credentials;
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -103,7 +106,7 @@ const PendingScreen = ({ token }: Props) => {
       }
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [creds, router]);
+  }, [credentials, router]);
 
   // Resend cooldown — ticks down each second after a successful resend.
   useEffect(() => {
@@ -119,22 +122,22 @@ const PendingScreen = ({ token }: Props) => {
   }, [cooldown]);
 
   const onResend = useCallback(async () => {
-    if (!creds || cooldown > 0 || isResending) {
+    if (!credentials || cooldown > 0 || isResending) {
       return;
     }
     setIsResending(true);
     try {
       await authClient.sendVerificationEmail({
         callbackURL: "/verify-email/success",
-        email: creds.email,
+        email: credentials.email,
       });
       setCooldown(RESEND_COOLDOWN_SECONDS);
     } finally {
       setIsResending(false);
     }
-  }, [cooldown, creds, isResending]);
+  }, [cooldown, credentials, isResending]);
 
-  if (!creds) {
+  if (!credentials) {
     return (
       <Card>
         <CardHeader className="text-center">
@@ -158,7 +161,7 @@ const PendingScreen = ({ token }: Props) => {
         <CardTitle className="text-xl">Check your inbox</CardTitle>
         <CardDescription>
           We sent a verification link to{" "}
-          <span className="font-medium text-foreground">{creds.email}</span>. Click it to finish
+          <span className="font-medium text-foreground">{credentials.email}</span>. Click it to finish
           signing in — this page will continue automatically.
         </CardDescription>
       </CardHeader>
