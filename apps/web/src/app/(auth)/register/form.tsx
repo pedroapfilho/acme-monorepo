@@ -82,6 +82,12 @@ const RegisterForm = () => {
             throw new Error("Passwords do not match");
           }
           const result = await authClient.signUp.email({
+            // Better Auth builds the verification URL from `body.callbackURL`
+            // (defaulting to "/"), NOT from `emailVerification.callbackURL`
+            // in betterAuth() config — that option is unused by the sign-up
+            // route. Sending the success page explicitly keeps the email
+            // link landing on /verify-email/success instead of /.
+            callbackURL: "/verify-email/success",
             email: value.email,
             name: value.name,
             password: value.password,
