@@ -3,12 +3,13 @@ import { prisma } from "@repo/db";
 
 import { webUrl } from "../../../playwright.config";
 import { verification } from "../fixtures/verification.fixture";
+import { extractLink, waitForEmail } from "../helpers/resend";
 import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
 test.describe("Change email (two-stage confirmation + verification)", () => {
-  test("user changes email to a new address and signs in with the new one", async ({
+  test("user changes email — both stage-1 and stage-2 mails leave Resend, new email signs in", async ({
     page,
     request,
   }, testInfo) => {
@@ -19,7 +20,8 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const username = makeTestUsername(currentEmail);
     const password = "ChangeEmailPwd1!";
 
-    // Seed + verify a user, then sign in to get a session.
+    // Seed + verify a user, then sign in to get a session. Welcome email isn't
+    // under test here; reuse the JWT-reconstruction path.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email: currentEmail, name: "Change Me", password, username },
     });
@@ -32,25 +34,40 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const cookies = await page.context().cookies();
     const cookieHeader = cookies.map((c) => `${c.name}=${c.value}`).join("; ");
 
+    const since = Date.now();
+
     const change = await request.post(`${webUrl}/api/auth/change-email`, {
       data: { newEmail },
       headers: { Cookie: cookieHeader },
     });
     expect(change.status()).toBe(200);
 
-    const { confirmationUrl, verificationUrl } = await verification.forChangeEmail(
-      currentEmail,
-      newEmail,
-    );
+    // Stage 1 — current-mailbox owner consents. Assert the confirmation
+    // email landed in Resend's outbox before following it.
+    const stage1Mail = await waitForEmail({
+      sinceMs: since,
+      subject: /confirm|change/i,
+      to: currentEmail,
+    });
+    expect(stage1Mail.last_event).not.toBe("bounced");
+    const stage1Url = extractLink(stage1Mail, /\/api\/auth\/verify-email\?token=/v);
 
-    // Stage 1 — current-mailbox owner consents. Better Auth's verify-email
-    // handler issues stage-2 internally and redirects to callbackURL.
-    await page.goto(confirmationUrl);
+    // Stage-1 click — Better Auth's verify-email handler issues stage-2
+    // internally (sent to newEmail) and redirects to callbackURL.
+    await page.goto(stage1Url);
     await page.waitForURL("/dashboard");
 
-    // Stage 2 — new-mailbox owner proves access. This is the call that
+    // Stage 2 — assert the verification mail to the NEW address actually sent.
+    const stage2Mail = await waitForEmail({
+      sinceMs: since,
+      to: newEmail,
+    });
+    expect(stage2Mail.last_event).not.toBe("bounced");
+    const stage2Url = extractLink(stage2Mail, /\/api\/auth\/verify-email\?token=/v);
+
+    // Stage-2 click — proves new-mailbox access. This is the call that
     // actually updates the user record.
-    await page.goto(verificationUrl);
+    await page.goto(stage2Url);
     await page.waitForURL("/dashboard");
 
     // DB now reflects the new email. The user row count is unchanged.

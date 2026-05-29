@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
-import { verification } from "../fixtures/verification.fixture";
+import { extractLink, waitForEmail } from "../helpers/resend";
 import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 // Skip the whole suite when Resend isn't configured. Without RESEND_API_KEY,
@@ -10,10 +10,11 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
 test.describe("Sign-up email verification", () => {
-  test("verify link lands on success page; original tab signs in via polling", async ({
+  test("verify email is sent, link verifies the user, sign-in then succeeds", async ({
     browser,
     request,
   }, testInfo) => {
+    const since = Date.now();
     const email = makeTestEmail(testInfo);
     const username = makeTestUsername(email);
     const password = "SecurePassword1!";
@@ -31,14 +32,25 @@ test.describe("Sign-up email verification", () => {
     });
     expect(preSignIn.status()).not.toBe(200);
 
-    // Cross-device: click the verify URL in a fresh BrowserContext (no
-    // shared cookies). With autoSignInAfterVerification: false, this lands
-    // on the success page WITHOUT creating a session in this context — the
-    // polling tab elsewhere is the one that completes sign-in.
+    // Assert the verification email actually left Resend. This is the
+    // regression we care about: "JWT format was valid but the email never
+    // sent" silently passed the old reconstruction-based path.
+    const mail = await waitForEmail({
+      sinceMs: since,
+      subject: /verify/i,
+      to: email,
+    });
+    expect(mail.last_event).not.toBe("bounced");
+
+    // Pull the verification URL out of the rendered HTML and follow it in a
+    // fresh BrowserContext (cross-device click). With
+    // autoSignInAfterVerification: false, this lands on the success page
+    // WITHOUT creating a session in the clicker context — the polling tab
+    // elsewhere is the one that completes sign-in.
+    const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
-    const { url } = await verification.forVerifyEmail(email);
-    await clickerPage.goto(url);
+    await clickerPage.goto(verifyUrl);
     await expect(clickerPage).toHaveURL(/\/verify-email\/success$/v);
     await expect(clickerPage.getByRole("heading", { name: "Email verified" })).toBeVisible();
     const clickerCookies = await clickerContext.cookies(webUrl);
