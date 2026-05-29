@@ -68,6 +68,8 @@ export default defineConfig({
 
   use: {
     baseURL: webUrl,
+    // Portless serves a self-signed cert locally; CI hits plain HTTP so the toggle scopes the relaxation to the dev environment only.
+    ignoreHTTPSErrors: !process.env.CI,
     screenshot: "only-on-failure",
     trace: "on-first-retry",
     video: "retain-on-failure",
