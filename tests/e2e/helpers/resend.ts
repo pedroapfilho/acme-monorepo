@@ -16,6 +16,11 @@
 
 const RESEND_API = "https://api.resend.com";
 
+const sleep = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
 type ResendListItem = {
   bcc: string | null;
   cc: string | null;
@@ -48,15 +53,65 @@ const requireApiKey = (): string => {
   return key;
 };
 
+// Resend caps the team at 5 req/s and returns 429 with a `retry-after`
+// header (seconds) when the suite bursts past that. Parallel auth-email
+// specs reliably trip it — every test polls `GET /emails` at 1Hz, so 4
+// workers × spec startup hits the ceiling. Mirrors vercel/fetch-retry's
+// defaults (factor 6, 5 retries, max retry-after 20s) so behavior matches
+// the most-deployed reference for this pattern. See
+// https://resend.com/docs/api-reference/rate-limit and
+// https://github.com/vercel/fetch-retry/blob/master/index.js.
+const RETRY_MAX_ATTEMPTS = 5;
+const RETRY_MAX_RETRY_AFTER_SECONDS = 20;
+const RETRY_BASE_MS = 200;
+const RETRY_FACTOR = 6;
+const RETRY_JITTER_MS = 100;
+
+const computeBackoffMs = (attempt: number): number => {
+  // 200, 1200, 7200, 43200, … capped at MAX_RETRY_AFTER. Adds ±0–100ms
+  // jitter so a stampede of clients doesn't re-synchronize.
+  const base = Math.min(
+    RETRY_BASE_MS * RETRY_FACTOR ** attempt,
+    RETRY_MAX_RETRY_AFTER_SECONDS * 1000,
+  );
+  return base + Math.floor(Math.random() * RETRY_JITTER_MS);
+};
+
+const isRetryableStatus = (status: number): boolean =>
+  status === 429 || (status >= 500 && status < 600);
+
 const resendFetch = async (path: string): Promise<Response> => {
-  const response = await fetch(`${RESEND_API}${path}`, {
-    headers: { Authorization: `Bearer ${requireApiKey()}` },
-  });
-  if (!response.ok) {
-    const body = await response.text().catch(() => "<unreadable>");
-    throw new Error(`Resend ${path} → ${response.status}: ${body}`);
+  const url = `${RESEND_API}${path}`;
+  const headers = { Authorization: `Bearer ${requireApiKey()}` };
+
+  let attempt = 0;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    // eslint-disable-next-line no-await-in-loop
+    const response = await fetch(url, { headers });
+
+    if (!isRetryableStatus(response.status) || attempt >= RETRY_MAX_ATTEMPTS) {
+      if (!response.ok) {
+        // eslint-disable-next-line no-await-in-loop
+        const body = await response.text().catch(() => "<unreadable>");
+        throw new Error(`Resend ${path} → ${response.status}: ${body}`);
+      }
+      return response;
+    }
+
+    // Honor server-suggested wait when present (Resend sends `retry-after`
+    // in seconds — never an HTTP-date for this API). Fall back to
+    // exponential backoff for 5xx or odd 429s without the header.
+    const retryAfter = Number.parseInt(response.headers.get("retry-after") ?? "", 10);
+    const delayMs = Number.isFinite(retryAfter)
+      ? Math.min(retryAfter, RETRY_MAX_RETRY_AFTER_SECONDS) * 1000 +
+        Math.floor(Math.random() * RETRY_JITTER_MS)
+      : computeBackoffMs(attempt);
+
+    // eslint-disable-next-line no-await-in-loop
+    await sleep(delayMs);
+    attempt += 1;
   }
-  return response;
 };
 
 const listEmails = async (limit = 100): Promise<Array<ResendListItem>> => {
@@ -85,11 +140,6 @@ type WaitForOptions = {
   pollMs?: number;
   timeoutMs?: number;
 };
-
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
 
 // Polls `GET /emails` until a matching message appears, then fetches its
 // HTML body via `GET /emails/:id`. Throws if the deadline elapses with no
