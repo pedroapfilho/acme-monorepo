@@ -28,11 +28,26 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(currentEmail);
     await page.goto(verify.url);
-    await page.waitForURL("/dashboard");
+    // forVerifyEmail builds a callbackURL=/verify-email/success URL, and the
+    // verify-email handler runs with autoSignInAfterVerification: false — so
+    // the click lands on /verify-email/success without setting a session
+    // cookie. Sign in explicitly to attach the session for the change-email
+    // request below.
+    await page.waitForURL(/\/verify-email\/success$/v);
+    const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
+      data: { email: currentEmail, password },
+    });
+    expect(signIn.status()).toBe(200);
 
-    // Reuse the existing browser context's session cookie for the API call.
-    const cookies = await page.context().cookies();
-    const cookieHeader = cookies.map((c) => `${c.name}=${c.value}`).join("; ");
+    // Build the Cookie header from the sign-in response's Set-Cookie headers
+    // (the browser context hasn't received them — we made the call via the
+    // `request` fixture).
+    const setCookie = signIn.headers()["set-cookie"];
+    const cookieHeader =
+      setCookie
+        ?.split(/\n/)
+        .map((c) => c.split(";")[0].trim())
+        .join("; ") ?? "";
 
     const since = Date.now();
 
