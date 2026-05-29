@@ -51,7 +51,10 @@ test.describe("Password reset", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    const resetUrl = extractLink(mail, /\/reset-password\?token=/v);
+    // Better Auth builds `${baseURL}/reset-password/<token>?callbackURL=<redirectTo>`
+    // (token is a path segment, not a query param). The endpoint validates and
+    // redirects to the UI's `/reset-password?token=...`.
+    const resetUrl = extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/v);
     await page.goto(resetUrl);
 
     // The reset page reads token from query. Fill new password.
