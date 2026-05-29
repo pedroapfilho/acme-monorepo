@@ -51,6 +51,32 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
       .filter(Boolean)
       .join("; ");
 
+    // Also seed the session cookie into the browser context so the later
+    // page.goto(stage1Url/stage2Url) calls have an authenticated session
+    // and the proxy doesn't bounce them to /login.
+    const webHost = new URL(webUrl).hostname;
+    const parsedCookies = setCookie
+      .split(/,(?=\s*[\w-]+=)/u)
+      .map((c) => {
+        const [nameValue] = c.split(";");
+        const eq = nameValue.indexOf("=");
+        return { name: nameValue.slice(0, eq).trim(), value: nameValue.slice(eq + 1).trim() };
+      })
+      .filter((c) => c.name);
+    const browserCookies = [];
+    for (const c of parsedCookies) {
+      browserCookies.push({
+        domain: webHost,
+        httpOnly: true,
+        name: c.name,
+        path: "/",
+        sameSite: "Lax" as const,
+        secure: true,
+        value: c.value,
+      });
+    }
+    await page.context().addCookies(browserCookies);
+
     const since = Date.now();
 
     const change = await request.post(`${webUrl}/api/auth/change-email`, {
