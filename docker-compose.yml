@@ -12,7 +12,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # Postgres 18 expects the mount at /var/lib/postgresql (major-version subdir lives inside). See docker-library/postgres#1259.
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U acme -d acme"]
       interval: 10s
