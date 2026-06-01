@@ -23,7 +23,7 @@ describe("envSchema", () => {
       expect(result.data.PORT).toBe("4000");
       expect(result.data.HOST).toBe("0.0.0.0");
       expect(result.data.NODE_ENV).toBe("development");
-      expect(result.data.FROM_EMAIL).toBe("noreply@acme.com");
+      expect(result.data.FROM_EMAIL).toBe("onboarding@resend.dev");
       expect(result.data.CORS_ORIGINS).toBe(
         "https://acme.web.localhost,https://acme.landing.localhost",
       );

@@ -21,7 +21,9 @@ export const getAuth = (): Auth => {
     }
     cachedAuth = createAuth({
       extraPlugins: [nextCookies()],
+      fromEmail: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
       prisma,
+      resendApiKey: process.env.RESEND_API_KEY,
       secret,
     });
   }

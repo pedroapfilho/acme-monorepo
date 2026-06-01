@@ -8,6 +8,11 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
+// auth-email specs seed their own users and bypass the storageState the rest
+// of the suite relies on — they need a clean cookie jar so the signup POST
+// isn't rejected as "already signed in".
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Change email (two-stage confirmation + verification)", () => {
   test("user changes email — both stage-1 and stage-2 mails leave Resend, new email signs in", async ({
     page,

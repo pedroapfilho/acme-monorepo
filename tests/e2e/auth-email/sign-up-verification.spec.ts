@@ -9,6 +9,8 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 // different code path — these tests would assert against the wrong behavior.
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Sign-up email verification", () => {
   test("verify email is sent, link verifies the user, sign-in then succeeds", async ({
     browser,
