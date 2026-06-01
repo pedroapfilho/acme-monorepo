@@ -7,6 +7,8 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Password reset", () => {
   test("user can request reset, set a new password, and sign in", async ({
     page,

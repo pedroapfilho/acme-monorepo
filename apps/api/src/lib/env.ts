@@ -5,7 +5,7 @@ export const envSchema = z.object({
   BETTER_AUTH_SECRET: z.string().min(32),
   CORS_ORIGINS: z.string().default("https://acme.web.localhost,https://acme.landing.localhost"),
   DATABASE_URL: z.string().min(1),
-  FROM_EMAIL: z.string().default("noreply@acme.com"),
+  FROM_EMAIL: z.string().default("onboarding@resend.dev"),
   HOST: z.string().default("0.0.0.0"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.string().default("4000"),

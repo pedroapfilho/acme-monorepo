@@ -7,6 +7,8 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe("Sign-up for an existing email (enumeration prevention)", () => {
   test("second signup returns synthetic success, notifies the real account holder, no duplicate row", async ({
     page,
