@@ -65,8 +65,12 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      # CI runs the chromium project only (playwright.config.ts filters
+      # firefox/webkit out under CI). Installing all three browsers
+      # doubles wall-clock and risks transient CDN hangs on firefox/
+      # webkit downloads — pin the install to chromium.
       - if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install
+        run: pnpm exec playwright install chromium
       # System deps come from apt; Ubuntu mirrors occasionally fail mid-sync
       # ("File has unexpected size... Mirror sync in progress?"). Retry up
       # to 3 times with apt-get update in between to ride out transient
