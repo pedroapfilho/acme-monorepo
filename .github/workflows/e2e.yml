@@ -57,41 +57,13 @@ jobs:
       - run: pnpm build --filter=web --filter=api --filter=landing
       - name: Seed E2E test user
         run: pnpm --filter web exec tsx scripts/ensure-e2e-user.ts
-      - name: Get Playwright version
-        id: pw
-        run: echo "version=$(pnpm exec playwright --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v4
-        id: pw-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: pw-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      # CI runs the chromium project only (playwright.config.ts filters
-      # firefox/webkit out under CI). Use `--with-deps` so the browser
-      # download + apt system-deps install happen in one step, with a
-      # hard 10-min timeout so a stalled CDN extract doesn't sit idle
-      # for the full 45-min job budget. Invoke the binary directly via
-      # `node node_modules/.bin/playwright` — the pnpm-exec wrapper has
-      # been observed to hang silently after the chromium zip download
-      # on fresh caches.
-      - name: Install Playwright (chromium + system deps)
-        if: steps.pw-cache.outputs.cache-hit != 'true'
-        timeout-minutes: 10
-        run: node node_modules/.bin/playwright install --with-deps chromium
-      - name: Install Playwright system deps (cached browser)
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        timeout-minutes: 5
-        run: |
-          attempt=0
-          until node node_modules/.bin/playwright install-deps chromium; do
-            attempt=$((attempt + 1))
-            if [ "$attempt" -ge 3 ]; then
-              echo "playwright install-deps failed after $attempt attempts"
-              exit 1
-            fi
-            echo "apt fetch failed (attempt $attempt); retrying in 30s..."
-            sleep 30
-            sudo apt-get update || true
-          done
+      # Canonical Playwright CI pattern (playwright.dev/docs/ci): browser
+      # download + apt system deps in one step. Caching is explicitly
+      # *not* recommended by the docs — restore time is comparable to a
+      # fresh download. The chromium pin matches playwright.config.ts
+      # which filters firefox/webkit out under CI.
+      - name: Install Playwright browsers and system deps
+        run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
