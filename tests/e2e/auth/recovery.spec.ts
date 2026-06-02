@@ -18,7 +18,8 @@ test.describe("Password Recovery", () => {
     await recoverPage.goto();
     await recoverPage.requestReset("not-an-email");
 
-    await expect(page.getByText(/invalid/i)).toBeVisible();
+    // Form renders "Enter a valid email address" in an `alert` slot.
+    await expect(page.getByText(/valid email/i).first()).toBeVisible();
     expect(page.url()).toContain("/recover");
   });
 });

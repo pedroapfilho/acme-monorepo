@@ -19,10 +19,19 @@ const createIsolatedUser = async (request: APIRequestContext): Promise<string> =
   return email;
 };
 
+// With RESEND_API_KEY set, requireEmailVerification flips on and a
+// fresh-signup-then-sign-in flow can't land at /dashboard — the user
+// stays on the verify-pending screen. The auth-email/* suite covers
+// the Resend path; these UI logout assertions belong to the
+// no-Resend local-dev path.
+const skipUnderResend = !!process.env.RESEND_API_KEY;
+
 test.describe("Logout", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("signs out and redirects to login", async ({ dashboardPage, loginPage, page, request }) => {
+    test.skip(skipUnderResend, "Resend-enabled flow blocks fresh-signup → sign-in");
+
     const email = await createIsolatedUser(request);
     await loginPage.goto();
     await loginPage.login(email, PASSWORD);
@@ -41,6 +50,8 @@ test.describe("Logout", () => {
     page,
     request,
   }) => {
+    test.skip(skipUnderResend, "Resend-enabled flow blocks fresh-signup → sign-in");
+
     const email = await createIsolatedUser(request);
     await loginPage.goto();
     await loginPage.login(email, PASSWORD);

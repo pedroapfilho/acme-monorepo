@@ -25,7 +25,9 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("any-token-value");
     await resetPasswordPage.submit("NewPassword123!", "DifferentPassword1!");
 
-    await expect(page.getByText(/passwords do not match/i)).toBeVisible();
+    // sr-only live region + sonner toast both render the same string —
+    // strict-mode needs `.first()`.
+    await expect(page.getByText(/passwords do not match/i).first()).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });
 

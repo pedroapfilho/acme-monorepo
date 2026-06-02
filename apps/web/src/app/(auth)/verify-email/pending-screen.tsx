@@ -161,8 +161,8 @@ const PendingScreen = ({ token }: Props) => {
         <CardTitle className="text-xl">Check your inbox</CardTitle>
         <CardDescription>
           We sent a verification link to{" "}
-          <span className="font-medium text-foreground">{credentials.email}</span>. Click it to finish
-          signing in — this page will continue automatically.
+          <span className="font-medium text-foreground">{credentials.email}</span>. Click it to
+          finish signing in — this page will continue automatically.
         </CardDescription>
       </CardHeader>
       <CardContent className="text-center text-sm text-muted-foreground">

@@ -25,11 +25,11 @@ Reduce code-review friction and prevent future "which way do we do this?" debate
 
 Three independent PRs, designed to minimize file-level overlap so they can land in any order:
 
-| PR | Theme | Risk |
-|---|---|---|
-| **A** | Structural + dead deps + api file rename | Medium |
+| PR    | Theme                                                                | Risk   |
+| ----- | -------------------------------------------------------------------- | ------ |
+| **A** | Structural + dead deps + api file rename                             | Medium |
 | **B** | Pattern standardization + transactional file rename + CONVENTIONS.md | Higher |
-| **C** | Comment + cast hygiene | Low |
+| **C** | Comment + cast hygiene                                               | Low    |
 
 The api `services/` → `lib/` rename is folded into PR A (it owns `user.service.ts` already) so PR B doesn't touch the same file. PR B owns the transactional `utils/` → `lib/` rename and the new conventions doc.
 
@@ -159,17 +159,18 @@ Short reference doc capturing the defaults. Final content lives in the PR; outli
 
 ### C1. Comment trim pass
 
-| File | Lines (current) | Action |
-|---|---|---|
-| `packages/auth/src/server.ts` | 59-71 | Compress 12-line cookie-Secure block → one sentence on the reverse-proxy edge case |
-| `apps/api/src/lib/env.ts` | 19-22 | Drop the "throwing vs `process.exit`" defense; code is self-explanatory |
-| `apps/api/src/middleware/auth.ts` | 81-83 | Keep the "must not be silent" WHY; drop the parenthetical examples list |
+| File                              | Lines (current) | Action                                                                             |
+| --------------------------------- | --------------- | ---------------------------------------------------------------------------------- |
+| `packages/auth/src/server.ts`     | 59-71           | Compress 12-line cookie-Secure block → one sentence on the reverse-proxy edge case |
+| `apps/api/src/lib/env.ts`         | 19-22           | Drop the "throwing vs `process.exit`" defense; code is self-explanatory            |
+| `apps/api/src/middleware/auth.ts` | 81-83           | Keep the "must not be silent" WHY; drop the parenthetical examples list            |
 
 Then a quick sweep of the rest of the codebase for the same shape: verbose JSDoc explaining trivial behavior, history references, redundant `// returns: ...` lines, "added for X" tags.
 
 ### C2. Typed Context mock helper
 
 - New file: `apps/api/src/middleware/test-helpers.ts`
+
   ```ts
   type MockContextOptions = {
     headers?: Record<string, string>;
@@ -182,7 +183,9 @@ Then a quick sweep of the rest of the codebase for the same shape: verbose JSDoc
 
     return {
       get: vi.fn((key: string) => variables.get(key)),
-      set: vi.fn((key: string, value: unknown) => { variables.set(key, value); }),
+      set: vi.fn((key: string, value: unknown) => {
+        variables.set(key, value);
+      }),
       var: { logger },
       req: {
         header: vi.fn((name: string) => opts.headers?.[name]),
@@ -194,6 +197,7 @@ Then a quick sweep of the rest of the codebase for the same shape: verbose JSDoc
     } satisfies Partial<Context>;
   };
   ```
+
 - Each of `auth.test.ts`, `error-handler.test.ts`, `security.test.ts` drops its local `createMockContext` and imports from the helper.
 - The `as unknown as Context` casts go away (`satisfies Partial<Context>` is the proper escape hatch).
 
