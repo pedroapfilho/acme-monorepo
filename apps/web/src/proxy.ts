@@ -25,6 +25,7 @@ export const proxy = async (request: NextRequest) => {
     .catch((error) => {
       // Auth service failure (DB down, misconfiguration, etc.) — log so outages
       // are observable, then treat as unauthenticated to keep the pipeline moving.
+      // eslint-disable-next-line no-console -- proxy runs server-side; this is the runtime observability channel.
       console.error("[proxy] getSession failed — treating as unauthenticated", { error, pathname });
       return null;
     });

@@ -15,10 +15,12 @@
 ## File Map
 
 ### Preflight PR
+
 - Modify: `apps/api/src/middleware/auth.test.ts` (already unstaged)
 - Modify: `apps/api/src/middleware/error-handler.test.ts` (already unstaged)
 
 ### PR A — Structural
+
 - Delete: `apps/api/src/services/user.service.ts`
 - Delete: `apps/api/src/services/user.service.test.ts`
 - Delete: `apps/api/src/services/` (empty after the two deletions)
@@ -32,6 +34,7 @@
 - Modify: `packages/auth/package.json`
 
 ### PR B — Patterns + CONVENTIONS.md
+
 - Modify: `apps/api/src/routes/v1/users.ts` (deleteMe response → 204)
 - Modify: `apps/web/src/lib/auth-helpers.ts` (drop try/catch)
 - Move: `packages/transactional/src/utils/send-email.ts` → `packages/transactional/src/lib/send-email.ts`
@@ -41,6 +44,7 @@
 - Modify: `CLAUDE.md` (add link to CONVENTIONS.md)
 
 ### PR C — Hygiene
+
 - Create: `apps/api/src/middleware/test-helpers.ts`
 - Modify: `apps/api/src/middleware/auth.test.ts`
 - Modify: `apps/api/src/middleware/error-handler.test.ts`
@@ -58,6 +62,7 @@ The current working tree has two unstaged fixes (`auth.test.ts`, `error-handler.
 ### Task P1: Land the middleware test fixes
 
 **Files:**
+
 - Modify: `apps/api/src/middleware/auth.test.ts` (already in working tree)
 - Modify: `apps/api/src/middleware/error-handler.test.ts` (already in working tree)
 
@@ -65,10 +70,12 @@ The current working tree has two unstaged fixes (`auth.test.ts`, `error-handler.
 
 Run: `git diff --stat apps/api/src/middleware/`
 Expected:
+
 ```
  apps/api/src/middleware/auth.test.ts          |  4 ++++
  apps/api/src/middleware/error-handler.test.ts | 11 ++++-------
 ```
+
 If anything else is touched, stop and investigate.
 
 - [ ] **Step 2: Run api tests to confirm they pass with the unstaged fix in place**
@@ -141,6 +148,7 @@ Expected: All checks pass.
 ### Task A2: Write the failing test for `findUserById` in the new location
 
 **Files:**
+
 - Create: `apps/api/src/lib/users.test.ts`
 
 - [ ] **Step 1: Create the new test file with the same coverage as the old service test, against the new function-based API**
@@ -352,6 +360,7 @@ Expected: FAIL with "Failed to resolve import './users'".
 ### Task A3: Implement `apps/api/src/lib/users.ts`
 
 **Files:**
+
 - Create: `apps/api/src/lib/users.ts`
 
 - [ ] **Step 1: Write the new module with `userSelect` constant + four async functions**
@@ -476,15 +485,19 @@ Expected: PASS (`Tests  12 passed (12)`).
 ### Task A4: Update the route call sites in `apps/api/src/routes/v1/users.ts`
 
 **Files:**
+
 - Modify: `apps/api/src/routes/v1/users.ts`
 
 - [ ] **Step 1: Replace the import line**
 
 In `apps/api/src/routes/v1/users.ts`, replace:
+
 ```ts
 import { userService } from "@/services/user.service";
 ```
+
 with:
+
 ```ts
 import { deleteUser, findUserById, updateUser } from "@/lib/users";
 ```
@@ -492,22 +505,25 @@ import { deleteUser, findUserById, updateUser } from "@/lib/users";
 - [ ] **Step 2: Update the `ServiceUser` type alias**
 
 Replace:
+
 ```ts
 type ServiceUser = Awaited<ReturnType<typeof userService.findById>>;
 ```
+
 with:
+
 ```ts
 type ServiceUser = Awaited<ReturnType<typeof findUserById>>;
 ```
 
 - [ ] **Step 3: Update the four call sites**
 
-| Line (current) | Old | New |
-|---|---|---|
-| 73 | `await userService.findById(user.id)` | `await findUserById(user.id)` |
-| 109 | `await userService.update(user.id, data)` | `await updateUser(user.id, data)` |
-| 134 | `await userService.delete(user.id)` | `await deleteUser(user.id)` |
-| 173 | `await userService.findById(user.id)` | `await findUserById(user.id)` |
+| Line (current) | Old                                       | New                               |
+| -------------- | ----------------------------------------- | --------------------------------- |
+| 73             | `await userService.findById(user.id)`     | `await findUserById(user.id)`     |
+| 109            | `await userService.update(user.id, data)` | `await updateUser(user.id, data)` |
+| 134            | `await userService.delete(user.id)`       | `await deleteUser(user.id)`       |
+| 173            | `await userService.findById(user.id)`     | `await findUserById(user.id)`     |
 
 - [ ] **Step 4: Run typecheck + tests**
 
@@ -517,6 +533,7 @@ Expected: typecheck clean; all api tests pass (both `services/user.service.test.
 ### Task A5: Delete the old service files
 
 **Files:**
+
 - Delete: `apps/api/src/services/user.service.ts`
 - Delete: `apps/api/src/services/user.service.test.ts`
 - Delete: `apps/api/src/services/` (directory, if empty)
@@ -542,6 +559,7 @@ Expected: typecheck clean; all api tests pass (lower total than before — `user
 ### Task A6: Inline the `createResendClient` wrapper
 
 **Files:**
+
 - Delete: `packages/transactional/src/client.ts`
 - Modify: `packages/transactional/src/utils/send-email.ts`
 - Modify: `packages/transactional/src/index.ts`
@@ -549,11 +567,14 @@ Expected: typecheck clean; all api tests pass (lower total than before — `user
 - [ ] **Step 1: Remove the re-export from the package barrel**
 
 In `packages/transactional/src/index.ts`, delete lines 1-2:
+
 ```ts
 // Client
 export { createResendClient } from "./client";
 ```
+
 The file becomes:
+
 ```ts
 // Components
 export { AcmeLogo } from "./components/acme-logo";
@@ -579,28 +600,37 @@ export { emailTheme, tailwindConfig } from "./styles/theme";
 In `packages/transactional/src/utils/send-email.ts`:
 
 1. Replace the import block at the top:
+
 ```ts
 import { createResendClient } from "../client";
 ```
+
 with:
+
 ```ts
 import { Resend } from "resend";
 ```
 
 2. Replace line 51 (inside `sendEmail`):
+
 ```ts
 const resend = createResendClient(apiKey);
 ```
+
 with:
+
 ```ts
 const resend = new Resend(apiKey);
 ```
 
 3. Replace line 104 (inside `sendBatchEmails`):
+
 ```ts
 const resend = createResendClient(apiKey);
 ```
+
 with:
+
 ```ts
 const resend = new Resend(apiKey);
 ```
@@ -626,6 +656,7 @@ Expected: zero matches.
 ### Task A7: Fix the `lucide-react` phantom dep
 
 **Files:**
+
 - Modify: `packages/ui/package.json`
 
 - [ ] **Step 1: Confirm `lucide-react` is unused inside `packages/ui/src`**
@@ -646,11 +677,13 @@ pnpm build --filter @repo/ui
 pnpm build --filter web
 pnpm build --filter landing
 ```
+
 Expected: all clean.
 
 ### Task A8: Remove unused `@tanstack/react-form` devDep from `packages/auth`
 
 **Files:**
+
 - Modify: `packages/auth/package.json`
 
 - [ ] **Step 1: Confirm it is not imported anywhere in `packages/auth/src`**
@@ -669,6 +702,7 @@ pnpm install
 pnpm --filter @repo/auth typecheck
 pnpm --filter @repo/auth test
 ```
+
 Expected: both clean.
 
 ### Task A9: Final verification + commit + push + PR
@@ -683,6 +717,7 @@ pnpm test
 pnpm fallow:dead
 pnpm build
 ```
+
 Expected: every command green. `pnpm fallow:dead` should now report zero unused deps.
 
 - [ ] **Step 2: Commit**
@@ -748,6 +783,7 @@ Expected: All checks pass.
 ### Task B2: Change `DELETE /me` to 204 No Content
 
 **Files:**
+
 - Modify: `apps/api/src/routes/v1/users.ts` (the `deleteMeRoute` schema + handler)
 
 - [ ] **Step 1: Update the route schema**
@@ -755,6 +791,7 @@ Expected: All checks pass.
 In `apps/api/src/routes/v1/users.ts`, replace the `responses` block of `deleteMeRoute`:
 
 Old (lines 118-127 in the current file):
+
 ```ts
   responses: {
     200: {
@@ -769,6 +806,7 @@ Old (lines 118-127 in the current file):
 ```
 
 New:
+
 ```ts
   responses: {
     204: {
@@ -786,6 +824,7 @@ New:
 Replace the handler body:
 
 Old:
+
 ```ts
 v1UserRoutes.openapi(deleteMeRoute, async (c) => {
   const user = c.get("user");
@@ -795,6 +834,7 @@ v1UserRoutes.openapi(deleteMeRoute, async (c) => {
 ```
 
 New — only the return statement changes; leave the existing delete call as-is. If PR A has already merged, the call reads `await deleteUser(user.id)`; if not, it reads `await userService.delete(user.id)`. PR B does not touch that line:
+
 ```ts
 v1UserRoutes.openapi(deleteMeRoute, async (c) => {
   const user = c.get("user");
@@ -809,11 +849,13 @@ v1UserRoutes.openapi(deleteMeRoute, async (c) => {
 pnpm --filter api typecheck
 pnpm --filter api test
 ```
+
 Expected: both clean.
 
 ### Task B3: Stop swallowing errors in `apps/web/src/lib/auth-helpers.ts`
 
 **Files:**
+
 - Modify: `apps/web/src/lib/auth-helpers.ts`
 
 - [ ] **Step 1: Replace the file**
@@ -840,6 +882,7 @@ The `try/catch` and `console.error` are gone. Better Auth returns `null` for "no
 pnpm --filter web typecheck
 pnpm --filter web test
 ```
+
 Expected: both clean.
 
 - [ ] **Step 3: Manual smoke (optional)**
@@ -849,6 +892,7 @@ Start `pnpm dev --filter web`, navigate to a page that calls `getSession`, confi
 ### Task B4: Rename `packages/transactional/src/utils/` → `lib/`
 
 **Files:**
+
 - Move: `packages/transactional/src/utils/send-email.ts` → `packages/transactional/src/lib/send-email.ts`
 - Move: `packages/transactional/src/utils/senders.ts` → `packages/transactional/src/lib/senders.ts`
 - Modify: `packages/transactional/src/index.ts`
@@ -865,6 +909,7 @@ rmdir packages/transactional/src/utils
 - [ ] **Step 2: Update the barrel exports in `packages/transactional/src/index.ts`**
 
 Change:
+
 ```ts
 export { sendEmail, sendBatchEmails, previewEmail } from "./utils/send-email";
 export {
@@ -874,7 +919,9 @@ export {
   sendSignUpAttemptEmail,
 } from "./utils/senders";
 ```
+
 to:
+
 ```ts
 export { sendEmail, sendBatchEmails, previewEmail } from "./lib/send-email";
 export {
@@ -888,9 +935,11 @@ export {
 - [ ] **Step 3: Update any cross-file imports inside `packages/transactional/src/lib/`**
 
 `senders.ts` may import from `./send-email`; since both files moved together, relative imports stay the same. Confirm:
+
 ```bash
 git grep -n "from \"\\.\\./utils" packages/transactional
 ```
+
 Expected: zero matches.
 
 - [ ] **Step 4: Verify**
@@ -900,11 +949,13 @@ pnpm --filter @repo/transactional typecheck
 pnpm --filter @repo/transactional build
 pnpm --filter @repo/transactional test
 ```
+
 Expected: all clean.
 
 ### Task B5: Write `docs/CONVENTIONS.md`
 
 **Files:**
+
 - Create: `docs/CONVENTIONS.md`
 
 - [ ] **Step 1: Create the file**
@@ -926,7 +977,7 @@ This document records the defaults used across the acme monorepo. New code shoul
 
 - Never swallow into `null`, `{}`, or empty arrays. A returned-null on the success path is fine when it means "no row"; a returned-null in a catch block is silent failure.
 - In api middleware and route handlers: throw `HTTPException` (for HTTP-specific errors) or `AppError` (for domain errors). The central handler renders the response and logs via `c.var.logger`.
-- In Next.js RSC helpers (e.g. `apps/web/src/lib/auth-helpers.ts`): do not wrap in try/catch unless you are handling a *specific* expected error. Let unknown failures propagate — Next.js renders `error.tsx` and Vercel captures the stack with full context.
+- In Next.js RSC helpers (e.g. `apps/web/src/lib/auth-helpers.ts`): do not wrap in try/catch unless you are handling a _specific_ expected error. Let unknown failures propagate — Next.js renders `error.tsx` and Vercel captures the stack with full context.
 - `console.error` is not a logger. The api uses `c.var.logger` (from `@hono/structured-logger`); the web app relies on Next.js + Vercel error capture for thrown exceptions.
 
 ## File organization
@@ -974,6 +1025,7 @@ This document records the defaults used across the acme monorepo. New code shoul
 ### Task B6: Link `CONVENTIONS.md` from `CLAUDE.md`
 
 **Files:**
+
 - Modify: `CLAUDE.md`
 
 - [ ] **Step 1: Add a one-line pointer near the top of CLAUDE.md, right after the `Commands` section heading or in the existing intro**
@@ -981,7 +1033,6 @@ This document records the defaults used across the acme monorepo. New code shoul
 In `CLAUDE.md`, find the line `This file provides guidance to AI coding agents when working with code in this repository.` and add immediately after it:
 
 ```markdown
-
 Project conventions and defaults are documented in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 ```
 
@@ -996,6 +1047,7 @@ pnpm typecheck
 pnpm test
 pnpm build
 ```
+
 Expected: every command green.
 
 - [ ] **Step 2: Commit**
@@ -1061,6 +1113,7 @@ Expected: All checks pass.
 ### Task C2: Create the shared test-context helper
 
 **Files:**
+
 - Create: `apps/api/src/middleware/test-helpers.ts`
 
 - [ ] **Step 1: Write the helper**
@@ -1134,6 +1187,7 @@ Expected: clean.
 ### Task C3: Refactor `auth.test.ts` to use the shared helper
 
 **Files:**
+
 - Modify: `apps/api/src/middleware/auth.test.ts`
 
 - [ ] **Step 1: Replace the file contents**
@@ -1304,6 +1358,7 @@ Expected: 10 tests passing, no `as unknown as` in the file.
 ### Task C4: Refactor `error-handler.test.ts` to use the shared helper
 
 **Files:**
+
 - Modify: `apps/api/src/middleware/error-handler.test.ts`
 
 - [ ] **Step 1: Replace the file contents**
@@ -1495,6 +1550,7 @@ Expected: all passing, no `as unknown as` in the file.
 ### Task C5: Refactor `security.test.ts` to use the shared helper
 
 **Files:**
+
 - Modify: `apps/api/src/middleware/security.test.ts`
 
 - [ ] **Step 1: Replace the file contents**
@@ -1577,6 +1633,7 @@ Expected: zero matches.
 ### Task C6: Trim cookie-Secure comment in `packages/auth/src/server.ts`
 
 **Files:**
+
 - Modify: `packages/auth/src/server.ts:55-72`
 
 - [ ] **Step 1: Replace the 12-line comment block**
@@ -1584,6 +1641,7 @@ Expected: zero matches.
 In `packages/auth/src/server.ts`, replace lines 59-71 (the multi-paragraph block above `useSecureCookies:`) with a single-line comment:
 
 Old (lines 59-71):
+
 ```ts
       // Force the `Secure` cookie flag when WEB_APP_URL is HTTPS. The
       // dynamic-baseURL `protocol: "auto"` setting documents this as
@@ -1602,6 +1660,7 @@ Old (lines 59-71):
 ```
 
 New:
+
 ```ts
       // Reverse proxy (portless / Vercel) hides the HTTPS scheme from Better Auth's auto-detection;
       // gate on WEB_APP_URL instead — unset in CI keeps tests on plain HTTP.
@@ -1614,16 +1673,19 @@ New:
 pnpm --filter @repo/auth typecheck
 pnpm --filter @repo/auth test
 ```
+
 Expected: both clean.
 
 ### Task C7: Trim the env-throw comment in `apps/api/src/lib/env.ts`
 
 **Files:**
+
 - Modify: `apps/api/src/lib/env.ts:18-23`
 
 - [ ] **Step 1: Drop the defensive justification**
 
 Replace:
+
 ```ts
 if (!parsedEnv.success) {
   // Throwing at module load aborts the process with a stack trace; preferable to
@@ -1633,7 +1695,9 @@ if (!parsedEnv.success) {
   );
 }
 ```
+
 with:
+
 ```ts
 if (!parsedEnv.success) {
   throw new Error(
@@ -1648,11 +1712,13 @@ if (!parsedEnv.success) {
 pnpm --filter api typecheck
 pnpm --filter api test
 ```
+
 Expected: both clean.
 
 ### Task C8: Trim the optional-auth-middleware comment
 
 **Files:**
+
 - Modify: `apps/api/src/middleware/auth.ts:80-87`
 
 - [ ] **Step 1: Compress the parenthetical**
@@ -1660,6 +1726,7 @@ Expected: both clean.
 In `apps/api/src/middleware/auth.ts`, replace lines 81-83:
 
 Old:
+
 ```ts
   } catch (error) {
     // Unexpected failures (DB down, malformed token, rate limit exception) must
@@ -1669,6 +1736,7 @@ Old:
 ```
 
 New:
+
 ```ts
   } catch (error) {
     // Log unexpected failures; a missing user context is otherwise indistinguishable from an outage.
@@ -1681,6 +1749,7 @@ New:
 pnpm --filter api typecheck
 pnpm --filter api test
 ```
+
 Expected: both clean.
 
 ### Task C9: Quick sweep for other AI-slop comments
@@ -1688,6 +1757,7 @@ Expected: both clean.
 This step is bounded — look at the files below; if a comment is WHAT-shaped, redundant, or history-shaped, trim it. Do not rewrite WHY-comments that are pulling their weight. Maximum ~10 minutes; this is not a rabbit hole.
 
 **Files to scan (one at a time):**
+
 - `apps/api/src/index.ts`
 - `apps/api/src/lib/auth.ts`
 - `apps/api/src/lib/openapi.ts`
@@ -1712,6 +1782,7 @@ This step is bounded — look at the files below; if a comment is WHAT-shaped, r
 pnpm lint
 pnpm format:check
 ```
+
 Expected: clean.
 
 ### Task C10: Final verification + commit + push + PR
@@ -1725,6 +1796,7 @@ pnpm typecheck
 pnpm test
 pnpm build
 ```
+
 Expected: every command green; api test count unchanged at 56 (the structural test moves are PR A, not PR C).
 
 - [ ] **Step 2: Confirm zero `as unknown as` casts in middleware tests**
