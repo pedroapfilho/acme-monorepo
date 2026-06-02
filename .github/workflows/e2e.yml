@@ -66,19 +66,23 @@ jobs:
           path: ~/.cache/ms-playwright
           key: pw-${{ runner.os }}-${{ steps.pw.outputs.version }}
       # CI runs the chromium project only (playwright.config.ts filters
-      # firefox/webkit out under CI). Installing all three browsers
-      # doubles wall-clock and risks transient CDN hangs on firefox/
-      # webkit downloads — pin the install to chromium.
-      - if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install chromium
-      # System deps come from apt; Ubuntu mirrors occasionally fail mid-sync
-      # ("File has unexpected size... Mirror sync in progress?"). Retry up
-      # to 3 times with apt-get update in between to ride out transient
-      # mirror flaps.
-      - name: Install Playwright system deps
+      # firefox/webkit out under CI). Use `--with-deps` so the browser
+      # download + apt system-deps install happen in one step, with a
+      # hard 10-min timeout so a stalled CDN extract doesn't sit idle
+      # for the full 45-min job budget. Invoke the binary directly via
+      # `node node_modules/.bin/playwright` — the pnpm-exec wrapper has
+      # been observed to hang silently after the chromium zip download
+      # on fresh caches.
+      - name: Install Playwright (chromium + system deps)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 10
+        run: node node_modules/.bin/playwright install --with-deps chromium
+      - name: Install Playwright system deps (cached browser)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
         run: |
           attempt=0
-          until pnpm exec playwright install-deps; do
+          until node node_modules/.bin/playwright install-deps chromium; do
             attempt=$((attempt + 1))
             if [ "$attempt" -ge 3 ]; then
               echo "playwright install-deps failed after $attempt attempts"
