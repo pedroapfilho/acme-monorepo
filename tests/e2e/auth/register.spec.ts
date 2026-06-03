@@ -1,12 +1,7 @@
 import { test, expect } from "../fixtures/auth.fixture";
 
-// Skip flag for the two tests that assert the pre-Resend signup flow.
-// With RESEND_API_KEY set, Better Auth runs in
-// requireEmailVerification + enumeration-prevention mode: signup
-// returns 200 without a session and lands on a verify-pending screen,
-// and duplicate signups return synthetic success. The auth-email/*
-// suite covers the Resend path end-to-end (delivery assertions
-// included), so these UI assertions are moot when Resend is wired up.
+// With RESEND_API_KEY set, requireEmailVerification gates signup → /dashboard;
+// the auth-email/* suite covers that path with delivery assertions.
 const skipUnderResend = !!process.env.RESEND_API_KEY;
 
 test.describe("Register", () => {
@@ -15,7 +10,6 @@ test.describe("Register", () => {
 
     const uniqueEmail = `test-${Date.now()}@example.com`;
 
-    // Clear storageState so we're not already logged in
     await page.context().clearCookies();
 
     await registerPage.goto();
@@ -48,8 +42,7 @@ test.describe("Register", () => {
     await registerPage.goto();
     await registerPage.register("Short Pass", `short-${Date.now()}@example.com`, "short", "short");
 
-    // Both password and confirmPassword fields render the same length
-    // error, so .first() avoids a strict-mode "resolved to 2 elements" violation.
+    // Both password fields render the same error; .first() avoids strict-mode 2-element violation.
     await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });
@@ -65,8 +58,7 @@ test.describe("Register", () => {
       "DifferentPassword!",
     );
 
-    // The inline error and the sonner toast both render "Passwords do
-    // not match" — strict-mode needs `.first()` to pick one.
+    // Inline error + sonner toast both render the same string; .first() picks one for strict-mode.
     await expect(page.getByText("Passwords do not match").first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });

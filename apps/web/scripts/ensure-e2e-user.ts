@@ -1,16 +1,5 @@
-/**
- * Idempotent LOCAL-only seed for the E2E test user. Invoked by Playwright's
- * setup spec (and CI) before any other spec runs, so the e2e suite never
- * depends on the local DB being in any particular state — nuke it,
- * re-sync, skip a step, the user will be (re)created on next run.
- *
- * NEVER point this at prod: it creates a known-password user. The
- * hard-coded `postgresql://...@localhost:...` check on DATABASE_URL is
- * the guard.
- *
- * Invoke:
- *   pnpm --filter web exec tsx scripts/ensure-e2e-user.ts
- */
+// Idempotent LOCAL-only seed for the e2e test user. The DATABASE_URL loopback
+// check below is the guard that keeps this from running against prod.
 
 import { prisma } from "@repo/db";
 
@@ -35,23 +24,16 @@ const main = async () => {
   const ctx = await getAuth().$context;
   const hashed = await ctx.password.hash(PASSWORD);
 
-  // Upsert returns the actual user row — existing users keep their
-  // original id, not SLUG — so use the returned `id` for the account FK.
+  // Existing rows keep their original id (not SLUG), so use the returned `id` for the account FK.
   const user = await prisma.user.upsert({
     create: {
       email: EMAIL,
-      // Better Auth refuses sign-in for unverified accounts when
-      // requireEmailVerification is on, so the seeded user has to land
-      // already verified. Safe because this script is local-only
-      // (DATABASE_URL guard above).
+      // requireEmailVerification blocks sign-in for unverified accounts.
       emailVerified: true,
       id: SLUG,
       name: NAME,
     },
     update: {
-      // Re-runs keep existing rows intact. Refresh the verification flag
-      // so accounts seeded before this fix get backfilled instead of
-      // staying stuck on EMAIL_NOT_VERIFIED.
       emailVerified: true,
       name: NAME,
     },

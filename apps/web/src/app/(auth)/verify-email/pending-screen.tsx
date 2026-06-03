@@ -31,9 +31,7 @@ type Credentials = {
 
 const PendingScreen = ({ token }: Props) => {
   const router = useRouter();
-  // useMemo so HMR / strict-mode double-mount doesn't burn the one-shot token.
-  // The store itself is idempotent on the second read (returns null), and the
-  // mounted component holds the value for the rest of its lifetime.
+  // useMemo so strict-mode double-mount doesn't burn the one-shot token.
   const initialCredentials = useMemo<Credentials | null>(
     () => (token ? consumeCredentials(token) : null),
     [token],
@@ -49,10 +47,7 @@ const PendingScreen = ({ token }: Props) => {
     };
   }, []);
 
-  // Polling — gated on `credentials` being present. Each tick attempts signIn.email;
-  // unverified accounts produce an error which we swallow and keep polling.
-  // visibilitychange pauses the timer while the tab is hidden so backgrounded
-  // tabs stop hammering the auth endpoint.
+  // Poll signIn.email until verification succeeds; pause while the tab is hidden.
   useEffect(() => {
     if (!credentials) {
       return;
@@ -90,9 +85,6 @@ const PendingScreen = ({ token }: Props) => {
       if (cancelled || document.visibilityState !== "visible") {
         return;
       }
-      // Resume by firing an immediate poll; the pending timer (if any) gets
-      // overwritten on the next schedule and harmlessly fires a stale tick
-      // that re-checks `cancelled` and bails.
       void tick();
     };
 
@@ -108,7 +100,6 @@ const PendingScreen = ({ token }: Props) => {
     };
   }, [credentials, router]);
 
-  // Resend cooldown — ticks down each second after a successful resend.
   useEffect(() => {
     if (cooldown <= 0) {
       return;

@@ -12,16 +12,8 @@ const TEST_USER = {
 
 const STORAGE_STATE_PATH = "tests/e2e/.auth/user.json";
 
-// Seeds storageState by signing the pre-seeded e2e user in via the auth
-// API (no browser, no form). The user itself is created by
-// `apps/web/scripts/ensure-e2e-user.ts` — that script writes directly to
-// Prisma with `emailVerified: true`, so this sign-in works even when
-// `requireEmailVerification` is on (the Resend-gated CI/prod path).
-//
-// The previous UI-form login was racy: TanStack Form's onSubmit attaches
-// after React hydrates, and Playwright clicked the submit button before
-// that landed, falling back to a native GET form submit that left the
-// user stranded on /login. API sign-in sidesteps that entirely.
+// API sign-in (not UI form) avoids the TanStack Form hydration race where
+// Playwright clicks before onSubmit attaches and falls back to a native GET.
 setup("create and authenticate test user", async ({ page, request }) => {
   mkdirSync("tests/e2e/.auth", { recursive: true });
 
@@ -30,12 +22,8 @@ setup("create and authenticate test user", async ({ page, request }) => {
   });
   expect(signIn.status()).toBe(200);
 
-  // Thread the Set-Cookie headers from the API response into the browser
-  // context so dependent specs start authenticated. `headersArray()`
-  // preserves multiple Set-Cookie entries (Better Auth issues two:
-  // session_token + session_data); `headers()["set-cookie"]` flattens
-  // them into a single comma-joined string and the dot in the cookie
-  // name makes re-splitting fragile.
+  // headersArray() preserves multiple Set-Cookie entries; headers()["set-cookie"]
+  // flattens them and the dot in the cookie name makes re-splitting fragile.
   const setCookieHeaders = signIn
     .headersArray()
     .filter((h) => h.name.toLowerCase() === "set-cookie")

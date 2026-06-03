@@ -42,9 +42,7 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should gate useSecureCookies on WEB_APP_URL being HTTPS", () => {
-    // Without WEB_APP_URL the gate evaluates to false — CI runs on plain
-    // http://127.0.0.1, so cookies must not get the Secure flag (browsers
-    // drop Secure cookies on HTTP).
+    // Without WEB_APP_URL → false. Browsers drop Secure cookies on plain HTTP.
     expect(auth.options.advanced?.useSecureCookies).toBe(false);
     expect(auth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
     expect(auth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
@@ -132,9 +130,7 @@ describe("Auth Server Configuration", () => {
 
   it("should enable rate limiting in production", () => {
     vi.stubEnv("NODE_ENV", "production");
-    // The rateLimit gate is `production && !CI` — GitHub Actions sets
-    // CI=true on the runner, so we must clear it for the production path
-    // to evaluate true under test.
+    // Gate is `production && !CI`; clear CI so the prod path evaluates true.
     vi.stubEnv("CI", "");
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.rateLimit?.enabled).toBe(true);
@@ -152,10 +148,6 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should always define reset password handler (no-op when resendApiKey is absent)", () => {
-    // The handler is always wired so the Better Auth /forget-password
-    // endpoint accepts the request — without an API key it just returns
-    // without sending an email, which keeps the user-visible flow working
-    // in dev/CI without email infra.
     expect(auth.options.emailAndPassword?.sendResetPassword).toBeDefined();
   });
 
@@ -188,8 +180,6 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should always define verification email handler (no-op when resendApiKey is absent)", () => {
-    // Same reasoning as sendResetPassword above — endpoint accepts the
-    // request, the actual send is gated on resendApiKey at call time.
     expect(auth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 

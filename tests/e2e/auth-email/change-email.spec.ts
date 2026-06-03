@@ -8,9 +8,8 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
-// auth-email specs seed their own users and bypass the storageState the rest
-// of the suite relies on — they need a clean cookie jar so the signup POST
-// isn't rejected as "already signed in".
+// Clean cookie jar: this spec seeds its own user; the shared storageState
+// session would make the signup POST 400 as "already signed in".
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("Change email (two-stage confirmation + verification)", () => {
@@ -25,30 +24,21 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const username = makeTestUsername(currentEmail);
     const password = "ChangeEmailPwd1!";
 
-    // Seed + verify a user, then sign in to get a session. Welcome email isn't
-    // under test here; reuse the JWT-reconstruction path.
+    // Welcome email isn't under test; use JWT reconstruction for the verify step.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email: currentEmail, name: "Change Me", password, username },
     });
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(currentEmail);
     await page.goto(verify.url);
-    // forVerifyEmail builds a callbackURL=/verify-email/success URL, and the
-    // verify-email handler runs with autoSignInAfterVerification: false — so
-    // the click lands on /verify-email/success without setting a session
-    // cookie. Sign in explicitly to attach the session for the change-email
-    // request below.
+    // autoSignInAfterVerification is off, so the verify click sets no cookie.
     await page.waitForURL(/\/verify-email\/success$/v);
     const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email: currentEmail, password },
     });
     expect(signIn.status()).toBe(200);
 
-    // Parse Set-Cookie from the sign-in response and forward as Cookie on the
-    // change-email call. Playwright's APIRequestContext storage state doesn't
-    // include cookies set via API responses, so we have to thread the cookie
-    // through manually. Better Auth issues a single `__Secure-<prefix>.
-    // session_token` cookie marked HttpOnly/Secure/SameSite=Lax.
+    // Playwright's APIRequestContext doesn't persist API-set cookies, so thread Set-Cookie manually.
     const setCookie = signIn.headers()["set-cookie"] ?? "";
     const cookieHeader = setCookie
       .split(/,(?=\s*[\w-]+=)/u)
@@ -56,9 +46,7 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
       .filter(Boolean)
       .join("; ");
 
-    // Also seed the session cookie into the browser context so the later
-    // page.goto(stage1Url/stage2Url) calls have an authenticated session
-    // and the proxy doesn't bounce them to /login.
+    // Seed cookies into the browser context too, so the later page.goto() calls are authed.
     const webHost = new URL(webUrl).hostname;
     const parsedCookies = setCookie
       .split(/,(?=\s*[\w-]+=)/u)

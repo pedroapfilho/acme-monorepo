@@ -1,18 +1,6 @@
-// Resend test-inbox client used by the auth-email specs to assert that
-// transactional emails were actually sent (and not silently dropped by a
-// regressed sender, missing API key, schema-validation rejection, etc.).
-//
-// Why poll the live API instead of reconstructing JWTs locally:
-// reconstruction proves the token format is correct, but says NOTHING about
-// whether the email left our infrastructure. We've been bitten by that —
-// "the JWT was valid but the email never sent" is the bug class this helper
-// catches. The JWT/DB-poll path in `verification.fixture.ts` remains useful
-// for tests where delivery isn't under test (e.g. seeding a verified user
-// before a different scenario).
-//
-// All sends in e2e use `delivered+<label>@resend.dev` (see helpers/test-email.ts).
-// Resend short-circuits delivery for these addresses but still records the
-// send in the API, so `GET /emails` lists them in test-mode runs.
+// Polls Resend's `GET /emails` so specs can assert mails actually left the API,
+// catching "JWT valid but send never happened" regressions that JWT
+// reconstruction in verification.fixture.ts can't see.
 
 const RESEND_API = "https://api.resend.com";
 
@@ -53,14 +41,8 @@ const requireApiKey = (): string => {
   return key;
 };
 
-// Resend caps the team at 5 req/s and returns 429 with a `retry-after`
-// header (seconds) when the suite bursts past that. Parallel auth-email
-// specs reliably trip it — every test polls `GET /emails` at 1Hz, so 4
-// workers × spec startup hits the ceiling. Mirrors vercel/fetch-retry's
-// defaults (factor 6, 5 retries, max retry-after 20s) so behavior matches
-// the most-deployed reference for this pattern. See
-// https://resend.com/docs/api-reference/rate-limit and
-// https://github.com/vercel/fetch-retry/blob/master/index.js.
+// Resend caps the team at 5 req/s; parallel specs polling at 1Hz trip 429s.
+// Defaults mirror vercel/fetch-retry (factor 6, 5 retries, retry-after cap 20s).
 const RETRY_MAX_ATTEMPTS = 5;
 const RETRY_MAX_RETRY_AFTER_SECONDS = 20;
 const RETRY_BASE_MS = 200;

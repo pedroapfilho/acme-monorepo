@@ -82,11 +82,8 @@ const RegisterForm = () => {
             throw new Error("Passwords do not match");
           }
           const result = await authClient.signUp.email({
-            // Better Auth builds the verification URL from `body.callbackURL`
-            // (defaulting to "/"), NOT from `emailVerification.callbackURL`
-            // in betterAuth() config — that option is unused by the sign-up
-            // route. Sending the success page explicitly keeps the email
-            // link landing on /verify-email/success instead of /.
+            // Better Auth builds the verification URL from `body.callbackURL`;
+            // emailVerification.callbackURL config is ignored by the sign-up route.
             callbackURL: "/verify-email/success",
             email: value.email,
             name: value.name,
@@ -95,16 +92,9 @@ const RegisterForm = () => {
           if (result.error) {
             throw new Error(result.error.message ?? "Failed to register");
           }
-          // requireEmailVerification gates auto-sign-in: when active, Better
-          // Auth returns the user without a session token. Hand off email +
-          // password (in-memory only — never to storage) to the dedicated
-          // /verify-email screen, which polls signIn.email until the user
-          // clicks the verification link from their inbox. The branch also
-          // covers Better Auth's enumeration-prevention path (existing email
-          // → synthetic-success-without-token), since the screen's "check
-          // your inbox" wording is correct in both cases — the real account
-          // holder also gets a separate notification email via
-          // emailAndPassword.onExistingUserSignUp.
+          // No token → either requireEmailVerification is on, or the email
+          // already exists (enumeration prevention). Both land on the pending
+          // screen, which polls signIn.email until verification clicks through.
           if (!result.data?.token) {
             const handoff = stashCredentials({ email: value.email, password: value.password });
             push(`/verify-email?k=${handoff}`);
@@ -127,7 +117,6 @@ const RegisterForm = () => {
     <form
       noValidate
       onSubmit={(e) => {
-        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
