@@ -84,12 +84,14 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 ## Conventions & gotchas
 
 ### Forms
+
 - **@tanstack/react-form** (NOT react-hook-form). Validate `onBlur` + `onChange` with Zod.
 - Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`.
 - Field primitives from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`.
 - **Never** put `field` in a `useEffect` / `useCallback` dependency array — it's a new object every render. Use `field.form.setFieldValue(field.name, value)` with stable refs.
 
 ### Auth
+
 - Password minimum **12 characters**. Sessions expire after 7 days.
 - `web` / `landing` use `@repo/auth/client` → calls `api` at `/auth/*`.
 - `api` uses `@repo/auth/server` with the Prisma adapter from `@repo/db`.
@@ -97,15 +99,18 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 - `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
 
 ### API
+
 - Routes versioned under `/api/v1/*`. Auth at `/auth/*`. Health at `/healthz`, `/readyz`.
 - Hono app uses `@hono/structured-logger` + `@hono/zod-openapi`.
 - Build via **tsdown** (NOT tsc) — outputs to `dist/`.
 
 ### Prisma
+
 - `prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
 - `db:generate` is declared in `turbo.json` `build.dependsOn`, so `pnpm build` will regenerate the client before app builds.
 
 ### Tooling
+
 - Linter: **oxlint**, config in `.oxlintrc.json` via `oxlint-config-awesomeness`.
 - Formatter: **oxfmt**, config in `.oxfmtrc.json`. Sorts Tailwind classes and imports.
 - Pre-commit: Husky + lint-staged runs `oxlint` on JS/TS files and `oxfmt` on JS/TS/JSON/MD.
@@ -113,9 +118,11 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 - Path alias: `@/*` → `src/*` in every app and package.
 
 ### Dev-only React tools
+
 - **React Scan** and **React Grab** are loaded via `<script>` in the root layout when `NODE_ENV=development`. Neither runs in production builds.
 
 ### Turbo cache keys
+
 `build.env` is sensitive to: `API_URL`, `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `NEXT_PUBLIC_API_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
 
 ## Environment
