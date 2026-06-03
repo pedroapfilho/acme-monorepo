@@ -1,145 +1,162 @@
 # AGENTS.md
 
-This file provides guidance to AI coding agents when working with code in this repository.
+Guidance for AI coding agents working in `acme` — the template monorepo and source of truth for all `saas`-profile sibling projects.
 
-Project conventions and defaults are documented in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
+Project conventions and defaults live in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
-## Commands
+## Stack
+
+- **Framework:** Next.js 16 (App Router, Turbopack dev), Hono on Node 24
+- **Language:** TypeScript (strict)
+- **Styling:** Tailwind CSS v4, base-ui primitives, shadcn-style composition
+- **Database:** Prisma 7, PostgreSQL 18
+- **Auth:** Better Auth (email + password, secure cookies)
+- **Email:** Resend via `@repo/transactional` (React Email templates)
+- **Monorepo:** Turborepo + pnpm 11 workspaces (`apps/*`, `packages/*`)
+- **Lint / format:** oxlint + oxfmt (NOT ESLint / Prettier)
+- **Testing:** Vitest (unit), Playwright (e2e, chromium/firefox/webkit)
+
+## Layout
+
+```
+apps/
+  web/        Next.js — main app             https://acme.web.localhost
+  landing/    Next.js — marketing site       https://acme.landing.localhost
+  api/        Hono + tsdown — REST + auth    https://acme.api.localhost
+packages/
+  ui/                  Shared React components, TanStack Form fields, base styles
+  auth/                Better Auth config — exports ./server (api) and ./client (web/landing)
+  db/                  Prisma client singleton + schema (User, Session, Account, Verification)
+  transactional/       React Email templates + Resend sender
+  config-typescript/   Shared tsconfig bases (nextjs / server / react-library / vite)
+  config-vitest/       Shared Vitest configs (react.ts, node.ts)
+docs/                  CONVENTIONS.md + superpowers specs
+agents/counselors/     Agent role definitions
+tests/                 Root Playwright e2e specs
+docker-compose.yml     Local Postgres 18 on :5432
+```
+
+## Dev workflow
+
+Real scripts from root `package.json`:
 
 ```bash
-# Development (runs all apps concurrently via Turborepo)
-pnpm dev                          # all apps via portless
-pnpm dev --filter=web             # single app
-pnpm dev --filter=api
+pnpm dev                 # turbo dev — runs all apps behind portless concurrently
+pnpm build               # turbo run build (db:generate runs first via dependsOn)
+pnpm start               # turbo run start
+pnpm typecheck           # turbo run typecheck (tsc --noEmit per workspace)
+pnpm lint                # oxlint . at the root
+pnpm format              # oxfmt (write)
+pnpm format:check        # oxfmt --check (used in CI)
 
-# Build / Lint / Typecheck
-pnpm build                        # all packages + apps (turbo cached)
-pnpm lint                         # oxlint across all packages
-pnpm typecheck                    # tsc --noEmit across all packages
-pnpm format                       # oxfmt (write)
-pnpm format:check                 # oxfmt (check only, used in CI)
+pnpm test                # turbo run test — Vitest in every workspace
+pnpm test:e2e            # playwright test (requires web + api running)
+pnpm test:e2e:ui         # playwright with interactive UI
 
-# Testing
-pnpm test                         # vitest unit tests
-pnpm test:e2e                     # playwright (requires web + api running)
-pnpm test:e2e:ui                  # playwright with interactive UI
+pnpm db:generate         # prisma generate
+pnpm db:push             # prisma db push
+pnpm db:seed             # seed sample data
 
-# Database (Prisma, schema in packages/db/prisma/schema.prisma)
-pnpm db:generate                  # generate Prisma client
-pnpm db:push                      # push schema to database
-pnpm db:seed                      # seed database
+pnpm fallow:dead         # cross-file dead code / unused exports / cycles
+pnpm fallow:dupes        # duplicate-code detection
+pnpm fallow:health       # repo health score
+pnpm fallow:audit        # base=main audit
+pnpm clean               # turbo run clean && rm -rf node_modules
 ```
 
-## Architecture
+Per-app dev: `pnpm dev --filter=web` (or `api` / `landing`).
 
-**Monorepo** managed by pnpm workspaces + Turborepo. Node 24, pnpm 10.
+## Portless (dev URLs)
 
-### Apps
+Every app's `dev` script wraps the framework in `portless run --name <subdomain> …`, giving each one a stable HTTPS URL on `:443` instead of guessing port numbers. Cookies, OAuth redirects, and CORS allowlists stay valid across worktree switches.
 
-| App       | Framework                | Dev URL                          | Purpose                   |
-| --------- | ------------------------ | -------------------------------- | ------------------------- |
-| `web`     | Next.js 16 (App Router)  | `https://acme.web.localhost`     | Main application          |
-| `landing` | Next.js 16 (App Router)  | `https://acme.landing.localhost` | Marketing site            |
-| `api`     | Hono on Node.js (tsdown) | `https://acme.api.localhost`     | Backend API + auth server |
-
-### Packages
-
-| Package                   | Purpose                                                                                                                                |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `@repo/ui`                | Shared React components (Tailwind + CVA). Includes TanStack Form field components (`Field`, `FieldGroup`, `FieldLabel`, `FieldError`). |
-| `@repo/config-vitest`     | Shared Vitest config. Exports `react.ts` and `node.ts` configs.                                                                        |
-| `@repo/auth`              | Better Auth config. Exports `./server` (for api) and `./client` (for web/landing).                                                     |
-| `@repo/db`                | Prisma client singleton + schema. Models: User, Session, Account, Verification.                                                        |
-| `@repo/typescript-config` | Shared tsconfig bases: `nextjs.json`, `server.json`, `react-library.json`, `vite.json`.                                                |
-| `@repo/tailwind-config`   | Shared Tailwind CSS config, PostCSS config, and design tokens (`shared-styles.css`).                                                   |
-
-### Key Relationships
-
-- **Auth flow**: `web`/`landing` use `@repo/auth/client` → calls `api` at `/auth/*` → `api` uses `@repo/auth/server` with Prisma adapter from `@repo/db`.
-- **API structure**: Hono app with versioned routes (`/api/v1/*`), Better Auth at `/auth/*`, health at `/healthz` and `/readyz`.
-- **UI consumption**: `web` and `landing` both import from `@repo/ui`.
-- **Build order**: Turborepo handles `^build` dependencies — packages build before apps that depend on them.
-
-## Portless (Dev URLs)
-
-Every dev server runs behind portless, which gives each app a stable HTTPS URL on `.localhost` instead of guessing port numbers. Cookies, OAuth redirects, and CORS allowlists stay valid across project switches.
-
-### Setup (one-time per machine)
+One-time per machine:
 
 ```bash
-npm install -g portless                # global install (or upgrade)
-sudo portless proxy start --https      # start the daemon on :443
+npm install -g portless
+sudo portless proxy start --https     # binds :443, trusts the local cert
 ```
 
-The proxy auto-restarts on subsequent invocations once trusted.
+Worktrees auto-prefix the subdomain — `main` → `https://acme.web.localhost`, branch `fix-styles` → `https://fix-styles.acme.web.localhost`. Each gets an auto-assigned backing port; no collisions.
 
-### URLs
+The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt` — see `apps/api/src/lib/openapi.ts`.
 
-| Service   | URL                              | Started by |
-| --------- | -------------------------------- | ---------- |
-| `web`     | `https://acme.web.localhost`     | `pnpm dev` |
-| `api`     | `https://acme.api.localhost`     | `pnpm dev` |
-| `landing` | `https://acme.landing.localhost` | `pnpm dev` |
+## Conventions & gotchas
 
-The api also exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt` — see `apps/api/src/lib/openapi.ts`.
+### Forms
+- **@tanstack/react-form** (NOT react-hook-form). Validate `onBlur` + `onChange` with Zod.
+- Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`.
+- Field primitives from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`.
+- **Never** put `field` in a `useEffect` / `useCallback` dependency array — it's a new object every render. Use `field.form.setFieldValue(field.name, value)` with stable refs.
 
-### Worktrees
+### Auth
+- Password minimum **12 characters**. Sessions expire after 7 days.
+- `web` / `landing` use `@repo/auth/client` → calls `api` at `/auth/*`.
+- `api` uses `@repo/auth/server` with the Prisma adapter from `@repo/db`.
+- `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env.local` — both validate sessions against it.
+- `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
 
-Branch name auto-prefixes the subdomain — no port collisions between concurrent worktrees, each gets its own auto-assigned backing port:
+### API
+- Routes versioned under `/api/v1/*`. Auth at `/auth/*`. Health at `/healthz`, `/readyz`.
+- Hono app uses `@hono/structured-logger` + `@hono/zod-openapi`.
+- Build via **tsdown** (NOT tsc) — outputs to `dist/`.
 
-```
-main worktree:        https://acme.web.localhost
-branch fix-styles:    https://fix-styles.acme.web.localhost
-```
+### Prisma
+- `prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
+- `db:generate` is declared in `turbo.json` `build.dependsOn`, so `pnpm build` will regenerate the client before app builds.
 
-## Dev Tools (Development Only)
+### Tooling
+- Linter: **oxlint**, config in `.oxlintrc.json` via `oxlint-config-awesomeness`.
+- Formatter: **oxfmt**, config in `.oxfmtrc.json`. Sorts Tailwind classes and imports.
+- Pre-commit: Husky + lint-staged runs `oxlint` on JS/TS files and `oxfmt` on JS/TS/JSON/MD.
+- Bundler for `api`: **tsdown**. Next.js apps use Turbopack in dev.
+- Path alias: `@/*` → `src/*` in every app and package.
 
-- **React Scan** — highlights unnecessary re-renders, loaded via `<script>` in root layout when `NODE_ENV=development`
-- **React Grab** — inspect React component tree, loaded via `<script>` in root layout when `NODE_ENV=development`
-- Neither tool runs in production builds
+### Dev-only React tools
+- **React Scan** and **React Grab** are loaded via `<script>` in the root layout when `NODE_ENV=development`. Neither runs in production builds.
 
-## Tooling
-
-- **Linter**: oxlint (NOT ESLint). Config in `.oxlintrc.json`. Uses `oxlint-config-awesomeness`.
-- **Formatter**: oxfmt (NOT Prettier). Config in `.oxfmtrc.json`. Sorts Tailwind classes and imports.
-- **Pre-commit**: Husky + lint-staged runs `oxlint` (on `.ts,.tsx,.js,.jsx` files) and `oxfmt` (on `.ts,.tsx,.js,.jsx,.json,.md` files).
-- **Testing**: Vitest for unit tests, Playwright for e2e (chromium, firefox, webkit). `@repo/config-vitest` exports `react.ts` and `node.ts` configs.
-- **Bundler (api)**: tsdown (not tsc). Outputs to `dist/`. Turbopack for Next.js dev.
-
-## Forms
-
-- **@tanstack/react-form** (NOT react-hook-form)
-- Validation: `onBlur` + `onChange` validators with Zod schemas
-- Display errors with `field.state.meta.isTouched && !field.state.meta.isValid`
-- Field components from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`
-- NEVER use `field.handleChange` inside `useEffect` or `useCallback` with `field` in deps — use `field.form.setFieldValue(field.name, value)` with stable refs
-
-## CI (GitHub Actions)
-
-- `test.yml` — `pnpm test`
-- `lint.yml` — `pnpm oxlint --format=github .`
-- `format.yml` — `pnpm run format:check`
-- `fallow.yml` — `pnpm fallow:dead` (cross-file dead code, unused exports, circular deps)
-- All use `permissions: { contents: read }` and `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true`
-
-## Prisma
-
-`prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
+### Turbo cache keys
+`build.env` is sensitive to: `API_URL`, `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `NEXT_PUBLIC_API_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
 
 ## Environment
 
-Copy `.env.example` to `.env` at root. Key variables:
+Each package loads env vars from **its own** directory — there is no root `.env`.
 
-- `DATABASE_URL` — PostgreSQL connection string
-- `BETTER_AUTH_SECRET` — min 32 characters
+```bash
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+cp packages/db/.env.example packages/db/.env
+```
+
+`apps/landing` reads no runtime env vars. Key variables:
+
+- `DATABASE_URL` — PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`)
+- `BETTER_AUTH_SECRET` — min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS` — comma-separated allowed origins
-- `NEXT_PUBLIC_API_URL` — API URL for client-side requests (web/landing use this)
+- `NEXT_PUBLIC_API_URL` — API URL for client-side requests (defaults to portless URL)
+- `BETTER_AUTH_URL` — Better Auth base URL (api hostname)
 
-Web and landing apps use `.env.local` files; api uses `.env` at its app root.
+Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 
-## Conventions
+## CI (GitHub Actions)
 
-- Path aliases: `@/*` maps to `src/*` in all apps and packages.
-- Auth password minimum: 12 characters. Sessions expire after 7 days.
-- API routes are versioned under `/api/v1/`. Auth routes are at `/auth/*`.
-- Turbo caches are sensitive to `API_URL`, `AUTH_ALLOWED_HOSTS`, `NEXT_PUBLIC_API_URL`, `WEB_APP_URL`, and `DATABASE_URL`.
+Currently only `.github/workflows/e2e.yml` is checked in. Test / lint / format / fallow workflows run locally via pre-commit; expand CI as needed and keep `permissions: { contents: read }` plus `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true` on any new workflow.
+
+## Notable decisions
+
+- **acme is the template.** Sibling repos (localcine, collabtime, frow, easeia) inherit every shared standard from here. Change acme first, then propagate — see `~/dev/orchestrator/standards.md`.
+- **Prisma client field** of `prisma.config.ts` deliberately falls back to `""` to keep CI green without secrets.
+- **pnpm 11 + Node 24** are the minimums (engines).
+- **No `@repo/tailwind-config` package** — Tailwind v4 reads tokens directly from `packages/ui/src/styles/globals.css` via the `@theme` directive; shared base styles also live there.
+- **base-ui (not Radix)** is the primitive layer. Wrappers in `@repo/ui` stay free of spurious `"use client"` directives.
+- **landings expose `lib/urls.ts`** with a `webAppUrl()` helper — never hardcode production URLs in marketing pages.
+
+## References
+
+- Conventions: [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md)
+- Orchestrator (cross-repo standards + verifiers): `~/dev/orchestrator`
+- Portless: <https://www.npmjs.com/package/portless>
+- Better Auth: <https://www.better-auth.com>
+- Turborepo: <https://turborepo.com>
+- Hono: <https://hono.dev>
+- React Email: <https://react.email>
