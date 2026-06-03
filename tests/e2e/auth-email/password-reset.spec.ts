@@ -21,9 +21,7 @@ test.describe("Password reset", () => {
     const originalPassword = "OriginalPassword1!";
     const newPassword = "BrandNewPassword2!";
 
-    // Seed a user via the API. Bypass verification with the JWT-reconstruction
-    // helper — delivery of the *welcome* email isn't under test here. (See
-    // sign-up-verification.spec.ts for that assertion.)
+    // Welcome-email delivery isn't under test here; use JWT reconstruction.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email, name: "Reset Me", password: originalPassword, username },
     });
@@ -32,20 +30,16 @@ test.describe("Password reset", () => {
     await page.goto(verify.url);
     await page.context().clearCookies();
 
-    // Pin the cutoff AFTER the welcome email was sent so we don't pick it up
-    // when looking for the password-reset mail.
+    // Pin cutoff AFTER the welcome email so the reset-mail search doesn't match it.
     const since = Date.now();
 
-    // Request reset. Better Auth's endpoint is `/request-password-reset`
-    // (the older `/forget-password` path was removed). Always returns 200
-    // here (enumeration prevention) regardless of whether the email exists.
+    // Always 200 (enumeration prevention) regardless of whether the email exists.
     const reset = await request.post(`${webUrl}/api/auth/request-password-reset`, {
       data: { email, redirectTo: "/reset-password" },
     });
     expect(reset.status()).toBe(200);
 
-    // Assert the reset email actually left Resend — this is the bug class
-    // "we sent a 200 but never delivered" that the old DB-poll path missed.
+    // Assert the reset email actually left Resend (200 with no send is the regression).
     const mail = await waitForEmail({
       sinceMs: since,
       subject: /reset/i,
@@ -53,19 +47,14 @@ test.describe("Password reset", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    // Better Auth builds `${baseURL}/reset-password/<token>?callbackURL=<redirectTo>`
-    // (token is a path segment, not a query param). The endpoint validates and
-    // redirects to the UI's `/reset-password?token=...`.
+    // Better Auth builds `/reset-password/<token>?callbackURL=...` (token is a path segment).
     const resetUrl = extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/v);
     await page.goto(resetUrl);
 
-    // The reset page reads token from query. Fill new password.
     await page.getByLabel("New password", { exact: true }).fill(newPassword);
     await page.getByLabel(/confirm password/i).fill(newPassword);
     await page.getByRole("button", { name: /reset password/i }).click();
 
-    // After reset, Better Auth lands the user back on /login (the form's
-    // success path); old password should fail, new password should succeed.
     await page.waitForURL(/\/login/);
 
     await page.getByLabel("Email").fill(email);

@@ -5,11 +5,8 @@ import { expect, test } from "../fixtures/auth.fixture";
 
 const PASSWORD = "TestPassword123!";
 
-// Logout invalidates the session row in the database. If these tests reused the
-// shared `e2e-test@acme.localhost` user from the setup project, the moment one
-// of them ran, every other test sharing that storageState would 401 once the
-// 5-minute Better Auth cookie cache expired (packages/auth/src/server.ts:193).
-// So each logout test owns a freshly created user instead.
+// Logout invalidates the DB session row; reusing the shared storageState user
+// would 401 every other spec once Better Auth's 5-minute cookie cache expires.
 const createIsolatedUser = async (request: APIRequestContext): Promise<string> => {
   const email = `logout-test-${crypto.randomUUID()}@acme.localhost`;
   const response = await request.post(`${webUrl}/api/auth/sign-up/email`, {
@@ -19,11 +16,8 @@ const createIsolatedUser = async (request: APIRequestContext): Promise<string> =
   return email;
 };
 
-// With RESEND_API_KEY set, requireEmailVerification flips on and a
-// fresh-signup-then-sign-in flow can't land at /dashboard — the user
-// stays on the verify-pending screen. The auth-email/* suite covers
-// the Resend path; these UI logout assertions belong to the
-// no-Resend local-dev path.
+// With RESEND_API_KEY set, requireEmailVerification blocks fresh-signup → /dashboard;
+// the auth-email/* suite covers that path.
 const skipUnderResend = !!process.env.RESEND_API_KEY;
 
 test.describe("Logout", () => {

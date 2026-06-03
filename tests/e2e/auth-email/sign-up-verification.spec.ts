@@ -4,9 +4,6 @@ import { webUrl } from "../../../playwright.config";
 import { extractLink, waitForEmail } from "../helpers/resend";
 import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
-// Skip the whole suite when Resend isn't configured. Without RESEND_API_KEY,
-// the auth server runs with requireEmailVerification: false, which is a
-// different code path — these tests would assert against the wrong behavior.
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -40,9 +37,7 @@ test.describe("Sign-up email verification", () => {
     });
     expect(preSignIn.status()).not.toBe(200);
 
-    // Assert the verification email actually left Resend. This is the
-    // regression we care about: "JWT format was valid but the email never
-    // sent" silently passed the old reconstruction-based path.
+    // Assert the verification email actually left Resend (not just that the JWT was valid).
     const mail = await waitForEmail({
       sinceMs: since,
       subject: /verify/i,
@@ -50,11 +45,8 @@ test.describe("Sign-up email verification", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    // Pull the verification URL out of the rendered HTML and follow it in a
-    // fresh BrowserContext (cross-device click). With
-    // autoSignInAfterVerification: false, this lands on the success page
-    // WITHOUT creating a session in the clicker context — the polling tab
-    // elsewhere is the one that completes sign-in.
+    // Follow the link in a fresh context (cross-device click); autoSignInAfterVerification
+    // is off, so this lands on /success without minting a session for the clicker.
     const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
@@ -65,8 +57,7 @@ test.describe("Sign-up email verification", () => {
     expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeUndefined();
     await clickerContext.close();
 
-    // Original-tab path: signIn now succeeds. Polling client-side does this
-    // continuously; the test just exercises the same code path once.
+    // Original-tab path: signIn now succeeds (the polling pending screen does this in a loop).
     const postSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email, password },
     });

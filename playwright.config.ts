@@ -28,8 +28,7 @@ export default defineConfig({
   fullyParallel: true,
   globalTeardown: "./tests/e2e/teardown/cleanup.ts",
 
-  // CI runs chromium only — chromium is the canonical Playwright signal;
-  // firefox + webkit run locally / nightly.
+  // CI: chromium only. firefox + webkit run locally / nightly.
   projects: [
     { name: "setup", testMatch: /.*\.setup\.ts/v },
     {
@@ -73,12 +72,8 @@ export default defineConfig({
     video: "retain-on-failure",
   },
 
-  // CI spawns three webServers in parallel. Wrapping each in `pnpm --filter`
-  // serializes them on pnpm's workspace state lock — the first wins, the
-  // rest hang silently for the full timeout. Run the binaries directly so
-  // each spawn is independent. Pnpm hoists shared bins to the repo-root
-  // `node_modules/.bin/`, so we reference them from there and pass the app
-  // directory as an arg to `next start`.
+  // Spawn binaries directly: `pnpm --filter` would serialize the three webServers
+  // on pnpm's workspace lock and the losers hang silently.
   webServer: process.env.CI
     ? [
         {
@@ -86,9 +81,7 @@ export default defineConfig({
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
-          // Probe `/login` (returns 200) — web has no `/` route, so probing the
-          // root URL would 404 forever and Playwright would never proceed to
-          // spawn the api/landing webServers.
+          // Web has no `/` route; probe /login so readiness detection lands a 200.
           url: `${webUrl}/login`,
         },
         {
