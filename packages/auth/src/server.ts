@@ -133,9 +133,7 @@ export const createAuth = (config: AuthConfig) => {
     },
 
     emailVerification: {
-      // Keep the session on the original signup tab; cross-device clicks
-      // shouldn't strand the desktop by minting a session on the phone.
-      autoSignInAfterVerification: false,
+      autoSignInAfterVerification: true,
       callbackURL: "/verify-email/success",
       sendVerificationEmail: async ({ url, user }) => {
         if (!resendApiKey) {

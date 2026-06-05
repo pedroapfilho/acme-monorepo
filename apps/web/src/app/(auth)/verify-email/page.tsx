@@ -8,11 +8,11 @@ export const metadata: Metadata = {
   title: "Verify your email",
 };
 
-type SearchParams = Promise<{ k?: string }>;
+type SearchParams = Promise<{ email?: string }>;
 
 const VerifyEmailPage = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const { k } = await searchParams;
-  return <PendingScreen token={k ?? null} />;
+  const { email } = await searchParams;
+  return <PendingScreen email={email ?? null} />;
 };
 
 export default VerifyEmailPage;

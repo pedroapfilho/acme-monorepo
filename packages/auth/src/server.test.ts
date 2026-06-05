@@ -196,8 +196,8 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.emailVerification?.callbackURL).toBe("/verify-email/success");
   });
 
-  it("disables autoSignInAfterVerification so the link-clicker never gets a session", () => {
-    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(false);
+  it("enables autoSignInAfterVerification so the verification link mints a session", () => {
+    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(true);
   });
 
   it("should have displayName as optional additional user field", () => {

@@ -10,95 +10,19 @@ import {
   CardTitle,
 } from "@repo/ui/components/card";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
-import { consumeCredentials } from "./credentials-store";
-
-const POLL_INTERVAL_MS = 5000;
 const RESEND_COOLDOWN_SECONDS = 60;
 
 type Props = {
-  token: string | null;
+  email: string | null;
 };
 
-type Credentials = {
-  email: string;
-  password: string;
-};
-
-const PendingScreen = ({ token }: Props) => {
-  const router = useRouter();
-  // useMemo so strict-mode double-mount doesn't burn the one-shot token.
-  const initialCredentials = useMemo<Credentials | null>(
-    () => (token ? consumeCredentials(token) : null),
-    [token],
-  );
-  const [credentials] = useState<Credentials | null>(initialCredentials);
+const PendingScreen = ({ email }: Props) => {
   const [cooldown, setCooldown] = useState(0);
   const [isResending, setIsResending] = useState(false);
-
-  const isMountedRef = useRef(true);
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  // Poll signIn.email until verification succeeds; pause while the tab is hidden.
-  useEffect(() => {
-    if (!credentials) {
-      return;
-    }
-    const { email, password } = credentials;
-
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    const tick = async () => {
-      if (cancelled) {
-        return;
-      }
-      if (document.visibilityState !== "visible") {
-        timer = setTimeout(() => {
-          void tick();
-        }, POLL_INTERVAL_MS);
-        return;
-      }
-      const result = await authClient.signIn.email({ email, password });
-      if (cancelled || !isMountedRef.current) {
-        return;
-      }
-      if (!result.error && result.data) {
-        router.push("/dashboard");
-        router.refresh();
-        return;
-      }
-      timer = setTimeout(() => {
-        void tick();
-      }, POLL_INTERVAL_MS);
-    };
-
-    const onVisibility = () => {
-      if (cancelled || document.visibilityState !== "visible") {
-        return;
-      }
-      void tick();
-    };
-
-    document.addEventListener("visibilitychange", onVisibility);
-    void tick();
-
-    return () => {
-      cancelled = true;
-      if (timer) {
-        clearTimeout(timer);
-      }
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [credentials, router]);
 
   useEffect(() => {
     if (cooldown <= 0) {
@@ -112,29 +36,29 @@ const PendingScreen = ({ token }: Props) => {
     };
   }, [cooldown]);
 
-  const onResend = useCallback(async () => {
-    if (!credentials || cooldown > 0 || isResending) {
+  const handleResend = async () => {
+    if (!email || cooldown > 0 || isResending) {
       return;
     }
     setIsResending(true);
     try {
       await authClient.sendVerificationEmail({
         callbackURL: "/verify-email/success",
-        email: credentials.email,
+        email,
       });
       setCooldown(RESEND_COOLDOWN_SECONDS);
     } finally {
       setIsResending(false);
     }
-  }, [cooldown, credentials, isResending]);
+  };
 
-  if (!credentials) {
+  if (!email) {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Verifying your email</CardTitle>
+          <CardTitle className="text-xl">Check your inbox</CardTitle>
           <CardDescription>
-            Click the verification link from your inbox. Once you do, sign in to continue.
+            Click the verification link we sent to finish signing up, then sign in below.
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex flex-col gap-2">
@@ -152,8 +76,8 @@ const PendingScreen = ({ token }: Props) => {
         <CardTitle className="text-xl">Check your inbox</CardTitle>
         <CardDescription>
           We sent a verification link to{" "}
-          <span className="font-medium text-foreground">{credentials.email}</span>. Click it to
-          finish signing in — this page will continue automatically.
+          <span className="font-medium text-foreground">{email}</span>. Click it to verify, then
+          sign in.
         </CardDescription>
       </CardHeader>
       <CardContent className="text-center text-sm text-muted-foreground">
@@ -164,13 +88,16 @@ const PendingScreen = ({ token }: Props) => {
           className="w-full"
           disabled={cooldown > 0 || isResending}
           onClick={() => {
-            void onResend();
+            void handleResend();
           }}
           type="button"
           variant="outline"
         >
           {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend verification email"}
         </Button>
+        <Link className={buttonVariants({ className: "w-full" })} href="/login">
+          Sign in
+        </Link>
         <Link
           className="text-sm text-muted-foreground underline-offset-4 hover:underline"
           href="/register"
