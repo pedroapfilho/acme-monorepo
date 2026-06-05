@@ -7,7 +7,7 @@ import { WelcomeEmail } from "../emails/welcome";
 
 import { sendEmail } from "./send-email";
 
-type EmailConfig = {
+type MailerConfig = {
   apiKey: string;
   defaultReplyTo?: string;
   from?: string;
@@ -15,102 +15,70 @@ type EmailConfig = {
 
 const DEFAULT_FROM = "Acme <noreply@acme.com>";
 
-// These wrappers return `sendEmail`'s promise directly. Keeping them sync
-// avoids a useless extra microtask; callers `await` them either way.
-const sendWelcomeEmail = (
-  {
-    userEmail,
-    userId,
-    username,
-    verificationUrl,
-  }: {
-    userEmail: string;
-    userId: string;
-    username?: string;
-    verificationUrl: string;
-  },
-  config: EmailConfig,
-) => {
-  return sendEmail({
-    apiKey: config.apiKey,
-    defaultReplyTo: config.defaultReplyTo,
-    from: config.from || DEFAULT_FROM,
-    subject: `Welcome to Acme${username ? `, ${username}` : ""}! Please verify your email`,
-    tags: [
-      { name: "type", value: "welcome" },
-      { name: "userId", value: userId },
-    ],
-    template: React.createElement(WelcomeEmail, {
-      userEmail,
-      username,
-      verificationUrl,
-    }),
-    to: userEmail,
-  });
+type WelcomePayload = {
+  userEmail: string;
+  userId: string;
+  username?: string;
+  verificationUrl: string;
 };
 
-const sendSignUpAttemptEmail = (
-  {
-    resetPasswordUrl,
-    signInUrl,
-    userEmail,
-    userId,
-    username,
-  }: {
-    resetPasswordUrl: string;
-    signInUrl: string;
-    userEmail: string;
-    userId: string;
-    username?: string;
-  },
-  config: EmailConfig,
-) => {
-  return sendEmail({
-    apiKey: config.apiKey,
-    defaultReplyTo: config.defaultReplyTo,
-    from: config.from || DEFAULT_FROM,
-    subject: "Sign-up attempt with your Acme account",
-    tags: [
-      { name: "type", value: "sign-up-attempt" },
-      { name: "userId", value: userId },
-    ],
-    template: React.createElement(SignUpAttemptEmail, {
-      resetPasswordUrl,
-      signInUrl,
-      userEmail,
-      username,
-    }),
-    to: userEmail,
-  });
+type SignUpAttemptPayload = {
+  resetPasswordUrl: string;
+  signInUrl: string;
+  userEmail: string;
+  userId: string;
+  username?: string;
 };
 
-const sendPasswordResetEmail = (
-  {
+type PasswordResetPayload = {
+  browserInfo?: string;
+  ipAddress?: string;
+  resetUrl: string;
+  userEmail: string;
+  userId: string;
+  username?: string;
+};
+
+type ChangeEmailPayload = {
+  changeUrl: string;
+  currentEmail: string;
+  newEmail: string;
+  userId: string;
+  username?: string;
+};
+
+type TransactionalEmail =
+  | ({ type: "welcome" } & WelcomePayload)
+  | ({ type: "sign-up-attempt" } & SignUpAttemptPayload)
+  | ({ type: "password-reset" } & PasswordResetPayload)
+  | ({ type: "change-email-confirmation" } & ChangeEmailPayload);
+
+type EmailBuild = { subject: string; template: React.ReactElement; to: string };
+
+type TemplateBuilder<P> = (payload: P) => EmailBuild;
+
+// Adding a new transactional email = one new payload type + one entry below.
+const TEMPLATES = {
+  "change-email-confirmation": ({
+    changeUrl,
+    currentEmail,
+    newEmail,
+    username,
+  }: ChangeEmailPayload) => ({
+    subject: "Confirm change of your Acme account email",
+    template: React.createElement(ChangeEmail, { changeUrl, currentEmail, newEmail, username }),
+    // `to: currentEmail` is the consent step. Better Auth's sendVerificationEmail
+    // hook handles the mailbox-ownership step to the NEW email when clicked.
+    to: currentEmail,
+  }),
+  "password-reset": ({
     browserInfo,
     ipAddress,
     resetUrl,
     userEmail,
-    userId,
     username,
-  }: {
-    browserInfo?: string;
-    ipAddress?: string;
-    resetUrl: string;
-    userEmail: string;
-    userId: string;
-    username?: string;
-  },
-  config: EmailConfig,
-) => {
-  return sendEmail({
-    apiKey: config.apiKey,
-    defaultReplyTo: config.defaultReplyTo,
-    from: config.from || DEFAULT_FROM,
+  }: PasswordResetPayload) => ({
     subject: "Reset your Acme password",
-    tags: [
-      { name: "type", value: "password-reset" },
-      { name: "userId", value: userId },
-    ],
     template: React.createElement(PasswordResetEmail, {
       browserInfo,
       ipAddress,
@@ -119,50 +87,52 @@ const sendPasswordResetEmail = (
       username,
     }),
     to: userEmail,
-  });
+  }),
+  "sign-up-attempt": ({
+    resetPasswordUrl,
+    signInUrl,
+    userEmail,
+    username,
+  }: SignUpAttemptPayload) => ({
+    subject: "Sign-up attempt with your Acme account",
+    template: React.createElement(SignUpAttemptEmail, {
+      resetPasswordUrl,
+      signInUrl,
+      userEmail,
+      username,
+    }),
+    to: userEmail,
+  }),
+  welcome: ({ userEmail, username, verificationUrl }: WelcomePayload) => ({
+    subject: `Welcome to Acme${username ? `, ${username}` : ""}! Please verify your email`,
+    template: React.createElement(WelcomeEmail, { userEmail, username, verificationUrl }),
+    to: userEmail,
+  }),
+} satisfies {
+  "change-email-confirmation": TemplateBuilder<ChangeEmailPayload>;
+  "password-reset": TemplateBuilder<PasswordResetPayload>;
+  "sign-up-attempt": TemplateBuilder<SignUpAttemptPayload>;
+  welcome: TemplateBuilder<WelcomePayload>;
 };
 
-const sendChangeEmailConfirmation = (
-  {
-    changeUrl,
-    currentEmail,
-    newEmail,
-    userId,
-    username,
-  }: {
-    changeUrl: string;
-    currentEmail: string;
-    newEmail: string;
-    userId: string;
-    username?: string;
-  },
-  config: EmailConfig,
-) => {
+const sendTransactionalEmail = (email: TransactionalEmail, config: MailerConfig) => {
+  // The `type` discriminator keys directly into TEMPLATES; TS narrows the payload
+  // shape per branch, but the lookup itself is structural.
+  const builder = TEMPLATES[email.type] as TemplateBuilder<typeof email>;
+  const { subject, template, to } = builder(email);
   return sendEmail({
     apiKey: config.apiKey,
     defaultReplyTo: config.defaultReplyTo,
     from: config.from || DEFAULT_FROM,
-    subject: "Confirm change of your Acme account email",
+    subject,
     tags: [
-      { name: "type", value: "change-email-confirmation" },
-      { name: "userId", value: userId },
+      { name: "type", value: email.type },
+      { name: "userId", value: email.userId },
     ],
-    template: React.createElement(ChangeEmail, {
-      changeUrl,
-      currentEmail,
-      newEmail,
-      username,
-    }),
-    // Send to CURRENT email — this is the consent step. Better Auth's
-    // sendVerificationEmail hook handles the second mailbox-ownership step
-    // to the NEW email when the confirmation link is clicked.
-    to: currentEmail,
+    template,
+    to,
   });
 };
 
-export {
-  sendChangeEmailConfirmation,
-  sendWelcomeEmail,
-  sendPasswordResetEmail,
-  sendSignUpAttemptEmail,
-};
+export type { MailerConfig, TransactionalEmail };
+export { sendTransactionalEmail };
