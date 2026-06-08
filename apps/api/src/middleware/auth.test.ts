@@ -22,10 +22,8 @@ import { createMockContext } from "./test-helpers";
 const mockSession = {
   session: { id: "session-1" },
   user: {
-    displayName: "Test User",
     email: "test@example.com",
     id: "user-1",
-    username: "testuser",
   },
 };
 
@@ -43,10 +41,8 @@ describe("authMiddleware", () => {
     await authMiddleware(ctx, next);
 
     expect(mocks.set).toHaveBeenCalledWith("user", {
-      displayName: "Test User",
       email: "test@example.com",
       id: "user-1",
-      username: "testuser",
     });
     expect(next).toHaveBeenCalled();
   });
@@ -113,10 +109,8 @@ describe("optionalAuthMiddleware", () => {
     await optionalAuthMiddleware(ctx, next);
 
     expect(mocks.set).toHaveBeenCalledWith("user", {
-      displayName: "Test User",
       email: "test@example.com",
       id: "user-1",
-      username: "testuser",
     });
     expect(next).toHaveBeenCalled();
   });

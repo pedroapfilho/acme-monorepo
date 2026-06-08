@@ -6,10 +6,8 @@ import { auth } from "../lib/auth";
 
 export type AuthVariables = {
   user: {
-    displayName?: string;
     email: string;
     id: string;
-    username?: string;
   };
 };
 
@@ -51,10 +49,8 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
     }
 
     c.set("user", {
-      displayName: session.user.displayName,
       email: session.user.email,
       id: session.user.id,
-      username: session.user.username,
     });
 
     await next();
@@ -71,10 +67,8 @@ export const optionalAuthMiddleware = createMiddleware<{
 
     if (session && session.user) {
       c.set("user", {
-        displayName: session.user.displayName,
         email: session.user.email,
         id: session.user.id,
-        username: session.user.username,
       });
     }
   } catch (error) {
