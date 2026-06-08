@@ -1,10 +1,6 @@
 import type { PrismaClient } from "@repo/db";
-import {
-  sendChangeEmailConfirmation,
-  sendPasswordResetEmail,
-  sendSignUpAttemptEmail,
-  sendWelcomeEmail,
-} from "@repo/transactional";
+import type { MailerConfig } from "@repo/transactional";
+import { sendTransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins/bearer";
@@ -41,6 +37,10 @@ export const createAuth = (config: AuthConfig) => {
     resendApiKey,
     secret,
   } = config;
+
+  const mailer: MailerConfig | null = resendApiKey
+    ? { apiKey: resendApiKey, from: fromEmail }
+    : null;
 
   return betterAuth({
     account: {
@@ -90,18 +90,19 @@ export const createAuth = (config: AuthConfig) => {
       minPasswordLength: 12,
       // Notifies the real account holder when a duplicate signup is silently
       // swallowed by Better Auth's enumeration-prevention path.
-      onExistingUserSignUp: resendApiKey
+      onExistingUserSignUp: mailer
         ? async ({ user }, request) => {
             const origin = request?.headers.get("origin") ?? "";
-            const result = await sendSignUpAttemptEmail(
+            const result = await sendTransactionalEmail(
               {
                 resetPasswordUrl: `${origin}/recover`,
                 signInUrl: `${origin}/login`,
+                type: "sign-up-attempt",
                 userEmail: user.email,
                 userId: user.id,
                 username: user.name,
               },
-              { apiKey: resendApiKey, from: fromEmail },
+              mailer,
             );
             if (!result.success) {
               // Don't throw: enumeration-prevention must return success regardless.
@@ -111,20 +112,21 @@ export const createAuth = (config: AuthConfig) => {
         : undefined,
       // Gated on Resend availability: without an API key we can't deliver,
       // so requiring verification would lock every new user out.
-      requireEmailVerification: Boolean(resendApiKey),
-      // Always wired so the endpoint accepts the request; send is gated on resendApiKey.
+      requireEmailVerification: Boolean(mailer),
+      // Always wired so the endpoint accepts the request; send is gated on mailer.
       sendResetPassword: async ({ url, user }) => {
-        if (!resendApiKey) {
+        if (!mailer) {
           return;
         }
-        const result = await sendPasswordResetEmail(
+        const result = await sendTransactionalEmail(
           {
             resetUrl: url,
+            type: "password-reset",
             userEmail: user.email,
             userId: user.id,
             username: user.name,
           },
-          { apiKey: resendApiKey, from: fromEmail },
+          mailer,
         );
         if (!result.success) {
           throw new Error(`Failed to send password reset email: ${result.error}`);
@@ -138,17 +140,18 @@ export const createAuth = (config: AuthConfig) => {
       autoSignInAfterVerification: false,
       callbackURL: "/verify-email/success",
       sendVerificationEmail: async ({ url, user }) => {
-        if (!resendApiKey) {
+        if (!mailer) {
           return;
         }
-        const result = await sendWelcomeEmail(
+        const result = await sendTransactionalEmail(
           {
+            type: "welcome",
             userEmail: user.email,
             userId: user.id,
             username: user.name,
             verificationUrl: url,
           },
-          { apiKey: resendApiKey, from: fromEmail },
+          mailer,
         );
         if (!result.success) {
           throw new Error(`Failed to send verification email: ${result.error}`);
@@ -201,18 +204,19 @@ export const createAuth = (config: AuthConfig) => {
         // Stage 1 of the two-step change flow: confirmation to the CURRENT email.
         // Stage 2 (verification to the NEW email) reuses sendVerificationEmail above.
         sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
-          if (!resendApiKey) {
+          if (!mailer) {
             return;
           }
-          const result = await sendChangeEmailConfirmation(
+          const result = await sendTransactionalEmail(
             {
               changeUrl: url,
               currentEmail: user.email,
               newEmail,
+              type: "change-email-confirmation",
               userId: user.id,
               username: user.name,
             },
-            { apiKey: resendApiKey, from: fromEmail },
+            mailer,
           );
           if (!result.success) {
             throw new Error(`Failed to send change-email confirmation: ${result.error}`);
