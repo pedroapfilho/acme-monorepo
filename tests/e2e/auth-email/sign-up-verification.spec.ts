@@ -45,8 +45,8 @@ test.describe("Sign-up email verification", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    // Follow the link in a fresh context (cross-device click); autoSignInAfterVerification
-    // is off, so this lands on /success without minting a session for the clicker.
+    // Follow the link in a fresh context. autoSignInAfterVerification: true,
+    // so the clicker tab/device gets a session cookie on the verification click.
     const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
@@ -54,10 +54,11 @@ test.describe("Sign-up email verification", () => {
     await expect(clickerPage).toHaveURL(/\/verify-email\/success$/v);
     await expect(clickerPage.getByRole("heading", { name: "Email verified" })).toBeVisible();
     const clickerCookies = await clickerContext.cookies(webUrl);
-    expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeUndefined();
+    expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeDefined();
     await clickerContext.close();
 
-    // Original-tab path: signIn now succeeds (the polling pending screen does this in a loop).
+    // Independent sign-in (different device/context) also succeeds now that
+    // the email is verified — the original signup tab can hit /login normally.
     const postSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email, password },
     });

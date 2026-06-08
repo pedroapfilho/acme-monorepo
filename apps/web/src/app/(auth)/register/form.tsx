@@ -17,7 +17,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { stashCredentials } from "@/app/(auth)/verify-email/credentials-store";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 
@@ -94,10 +93,11 @@ const RegisterForm = () => {
           }
           // No token → either requireEmailVerification is on, or the email
           // already exists (enumeration prevention). Both land on the pending
-          // screen, which polls signIn.email until verification clicks through.
+          // screen with the email pre-filled for the resend button. The
+          // verification link itself is what signs the user in, via Better
+          // Auth's autoSignInAfterVerification.
           if (!result.data?.token) {
-            const handoff = stashCredentials({ email: value.email, password: value.password });
-            push(`/verify-email?k=${handoff}`);
+            push(`/verify-email?email=${encodeURIComponent(value.email)}`);
             return;
           }
           push("/dashboard");
