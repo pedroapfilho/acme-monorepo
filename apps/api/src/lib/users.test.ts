@@ -15,10 +15,6 @@ vi.mock("@/lib/env", () => ({
   env: { NODE_ENV: "test" },
 }));
 
-vi.mock("@/lib/logger", () => ({
-  logger: { error: vi.fn(), info: vi.fn() },
-}));
-
 import { prisma } from "@repo/db";
 
 import { AppError } from "@/middleware/error-handler";
@@ -35,6 +31,9 @@ const mockUser = {
   updatedAt: new Date("2024-01-01"),
   username: "testuser",
 };
+
+const prismaKnownError = (code: string) =>
+  Object.assign(new Error("Prisma error"), { clientVersion: "7.0.0", code });
 
 describe("findUserById", () => {
   beforeEach(() => {
@@ -62,14 +61,11 @@ describe("findUserById", () => {
     });
   });
 
-  it("throws AppError 500 on database error", async () => {
-    vi.mocked(prisma.user.findUnique).mockRejectedValue(new Error("DB connection lost"));
+  it("propagates database errors to the central error handler", async () => {
+    const dbError = new Error("DB connection lost");
+    vi.mocked(prisma.user.findUnique).mockRejectedValue(dbError);
 
-    await expect(findUserById("user-1")).rejects.toThrow(AppError);
-    await expect(findUserById("user-1")).rejects.toMatchObject({
-      code: "USER_FETCH_ERROR",
-      statusCode: 500,
-    });
+    await expect(findUserById("user-1")).rejects.toThrow(dbError);
   });
 });
 
@@ -94,13 +90,11 @@ describe("findUserByEmail", () => {
     expect(result).toBeNull();
   });
 
-  it("throws AppError 500 on database error", async () => {
-    vi.mocked(prisma.user.findUnique).mockRejectedValue(new Error("DB error"));
+  it("propagates database errors to the central error handler", async () => {
+    const dbError = new Error("DB error");
+    vi.mocked(prisma.user.findUnique).mockRejectedValue(dbError);
 
-    await expect(findUserByEmail("test@example.com")).rejects.toMatchObject({
-      code: "USER_FETCH_ERROR",
-      statusCode: 500,
-    });
+    await expect(findUserByEmail("test@example.com")).rejects.toThrow(dbError);
   });
 });
 
@@ -135,26 +129,20 @@ describe("updateUser", () => {
     expect(prisma.user.findFirst).not.toHaveBeenCalled();
   });
 
-  it("throws AppError 404 on P2025 error", async () => {
+  it("propagates P2025 to the central error handler", async () => {
     vi.mocked(prisma.user.findFirst).mockResolvedValue(null as never);
-    vi.mocked(prisma.user.update).mockRejectedValue(
-      Object.assign(new Error("Record not found"), { clientVersion: "7.0.0", code: "P2025" }),
-    );
+    const notFound = prismaKnownError("P2025");
+    vi.mocked(prisma.user.update).mockRejectedValue(notFound);
 
-    await expect(updateUser("missing", { name: "X" })).rejects.toMatchObject({
-      code: "USER_NOT_FOUND",
-      statusCode: 404,
-    });
+    await expect(updateUser("missing", { name: "X" })).rejects.toMatchObject({ code: "P2025" });
   });
 
-  it("throws AppError 500 on generic database error", async () => {
+  it("propagates generic database errors to the central error handler", async () => {
     vi.mocked(prisma.user.findFirst).mockResolvedValue(null as never);
-    vi.mocked(prisma.user.update).mockRejectedValue(new Error("Connection refused"));
+    const dbError = new Error("Connection refused");
+    vi.mocked(prisma.user.update).mockRejectedValue(dbError);
 
-    await expect(updateUser("user-1", { name: "X" })).rejects.toMatchObject({
-      code: "USER_UPDATE_ERROR",
-      statusCode: 500,
-    });
+    await expect(updateUser("user-1", { name: "X" })).rejects.toThrow(dbError);
   });
 });
 
@@ -172,23 +160,17 @@ describe("deleteUser", () => {
     expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
   });
 
-  it("throws AppError 404 on P2025 error", async () => {
-    vi.mocked(prisma.user.delete).mockRejectedValue(
-      Object.assign(new Error("Record not found"), { clientVersion: "7.0.0", code: "P2025" }),
-    );
+  it("propagates P2025 to the central error handler", async () => {
+    const notFound = prismaKnownError("P2025");
+    vi.mocked(prisma.user.delete).mockRejectedValue(notFound);
 
-    await expect(deleteUser("missing")).rejects.toMatchObject({
-      code: "USER_NOT_FOUND",
-      statusCode: 404,
-    });
+    await expect(deleteUser("missing")).rejects.toMatchObject({ code: "P2025" });
   });
 
-  it("throws AppError 500 on generic database error", async () => {
-    vi.mocked(prisma.user.delete).mockRejectedValue(new Error("DB error"));
+  it("propagates generic database errors to the central error handler", async () => {
+    const dbError = new Error("DB error");
+    vi.mocked(prisma.user.delete).mockRejectedValue(dbError);
 
-    await expect(deleteUser("user-1")).rejects.toMatchObject({
-      code: "USER_DELETE_ERROR",
-      statusCode: 500,
-    });
+    await expect(deleteUser("user-1")).rejects.toThrow(dbError);
   });
 });
