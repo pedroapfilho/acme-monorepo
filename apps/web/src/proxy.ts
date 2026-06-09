@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { getAuth } from "@/lib/auth";
+import { log } from "@/lib/observability";
 
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
@@ -25,8 +26,7 @@ export const proxy = async (request: NextRequest) => {
     .catch((error) => {
       // Auth service failure (DB down, misconfiguration, etc.) — log so outages
       // are observable, then treat as unauthenticated to keep the pipeline moving.
-      // eslint-disable-next-line no-console -- proxy runs server-side; this is the runtime observability channel.
-      console.error("[proxy] getSession failed — treating as unauthenticated", { error, pathname });
+      log.error({ error, message: "proxy: getSession failed — treating as unauthenticated", pathname });
       return null;
     });
 

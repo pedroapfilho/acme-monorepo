@@ -30,8 +30,7 @@ export class AppError extends Error {
 }
 
 export const errorHandler = (err: Error, c: Context) => {
-  c.var.logger.error({
-    err,
+  c.get("log").error(err, {
     ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
     method: c.req.method,
     url: c.req.url,

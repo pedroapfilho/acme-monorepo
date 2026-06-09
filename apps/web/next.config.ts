@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
 
   serverExternalPackages: ["@prisma/client", "@repo/db"],
 
-  transpilePackages: ["@repo/ui"],
+  transpilePackages: ["@repo/ui", "@repo/observability"],
 };
 
 export default nextConfig;
