@@ -35,10 +35,11 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
     try {
       session = await auth.api.getSession({ headers });
     } catch (error) {
-      c.var.logger.error(
-        { error, method: c.req.method, url: c.req.url },
-        "authMiddleware: getSession threw — auth service unavailable",
-      );
+      c.get("log").error("authMiddleware: getSession threw — auth service unavailable", {
+        error,
+        method: c.req.method,
+        url: c.req.url,
+      });
       throw new HTTPException(503, { message: "Authentication service unavailable" });
     }
 
@@ -73,10 +74,11 @@ export const optionalAuthMiddleware = createMiddleware<{
     }
   } catch (error) {
     // Log unexpected failures; a missing user context is otherwise indistinguishable from an outage.
-    c.var.logger.error(
-      { error, method: c.req.method, url: c.req.url },
-      "optionalAuthMiddleware: getSession threw unexpectedly",
-    );
+    c.get("log").error("optionalAuthMiddleware: getSession threw unexpectedly", {
+      error,
+      method: c.req.method,
+      url: c.req.url,
+    });
   }
 
   await next();

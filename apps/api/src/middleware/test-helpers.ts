@@ -12,6 +12,8 @@ export type MockContextMocks = {
   json: ReturnType<typeof vi.fn>;
   loggerError: ReturnType<typeof vi.fn>;
   loggerInfo: ReturnType<typeof vi.fn>;
+  loggerSet: ReturnType<typeof vi.fn>;
+  loggerWarn: ReturnType<typeof vi.fn>;
   reqHeader: ReturnType<typeof vi.fn>;
   set: ReturnType<typeof vi.fn>;
 };
@@ -21,14 +23,32 @@ export type MockContextMocks = {
 export const createMockContext = (
   opts: CreateMockContextOptions = {},
 ): { ctx: Context; mocks: MockContextMocks } => {
-  const variables = new Map<string, unknown>(Object.entries(opts.variables ?? {}));
+  const loggerError = vi.fn();
+  const loggerInfo = vi.fn();
+  const loggerSet = vi.fn();
+  const loggerWarn = vi.fn();
+
+  // Seed evlog's request logger so `c.get("log")` resolves in tests.
+  const evlogLogger = {
+    error: loggerError,
+    info: loggerInfo,
+    set: loggerSet,
+    warn: loggerWarn,
+  };
+
+  const variables = new Map<string, unknown>([
+    ["log", evlogLogger],
+    ...Object.entries(opts.variables ?? {}),
+  ]);
 
   const mocks: MockContextMocks = {
     get: vi.fn((key: string) => variables.get(key)),
     header: vi.fn(),
     json: vi.fn((body: unknown, status?: number) => ({ body, status })),
-    loggerError: vi.fn(),
-    loggerInfo: vi.fn(),
+    loggerError,
+    loggerInfo,
+    loggerSet,
+    loggerWarn,
     reqHeader: vi.fn((name: string) => opts.headers?.[name]),
     set: vi.fn((key: string, value: unknown) => {
       variables.set(key, value);
@@ -46,7 +66,7 @@ export const createMockContext = (
       url: "http://localhost/test",
     },
     set: mocks.set,
-    var: { logger: { error: mocks.loggerError, info: mocks.loggerInfo } },
+    var: { log: evlogLogger },
   } as unknown as Context;
 
   return { ctx, mocks };
