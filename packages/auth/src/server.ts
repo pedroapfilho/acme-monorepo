@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@repo/db";
+import { log } from "@repo/observability";
 import type { MailerConfig } from "@repo/transactional";
 import { sendTransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
@@ -106,7 +107,10 @@ export const createAuth = (config: AuthConfig) => {
             );
             if (!result.success) {
               // Don't throw: enumeration-prevention must return success regardless.
-              console.error("[Auth] Failed to send sign-up attempt email:", result.error);
+              log.error({
+                error: result.error,
+                message: "Auth: failed to send sign-up attempt email",
+              });
             }
           }
         : undefined,

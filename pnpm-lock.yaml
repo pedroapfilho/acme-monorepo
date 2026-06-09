@@ -230,6 +230,9 @@ importers:
       '@repo/db':
         specifier: workspace:*
         version: link:../db
+      '@repo/observability':
+        specifier: workspace:*
+        version: link:../observability
       '@repo/transactional':
         specifier: workspace:*
         version: link:../transactional
