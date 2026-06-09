@@ -99,6 +99,9 @@ importers:
 
   apps/landing:
     dependencies:
+      '@repo/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
