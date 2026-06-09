@@ -160,6 +160,9 @@ importers:
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@repo/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
