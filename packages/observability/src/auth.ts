@@ -1,4 +1,5 @@
-import { createAuthMiddleware } from "evlog/better-auth";
+import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
+import "./fields";
 
 /**
  * Wraps evlog's Better Auth middleware. Returns identify(log, headers, path?)
@@ -6,7 +7,7 @@ import { createAuthMiddleware } from "evlog/better-auth";
  * current wide event. Identity is resolved in the request middleware layer —
  * NOT in betterAuth() config — so no auth-config hooks are required.
  */
-const createIdentify = <TAuth>(auth: TAuth, opts?: { exclude?: Array<string> }) =>
-  createAuthMiddleware(auth as never, { exclude: opts?.exclude ?? ["/api/auth/**"] });
+const createIdentify = (auth: BetterAuthInstance, opts?: { exclude?: Array<string> }) =>
+  createAuthMiddleware(auth, { exclude: opts?.exclude ?? ["/api/auth/**"] });
 
 export { createIdentify };

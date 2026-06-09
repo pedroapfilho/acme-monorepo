@@ -19,4 +19,11 @@ describe("buildConfig", () => {
   it("has no external drain", () => {
     expect(buildConfig("api", "development").drain).toBeUndefined();
   });
+  it("mirrors development settings in test for debuggability", () => {
+    const cfg = buildConfig("api", "test");
+    expect(cfg.pretty).toBe(true);
+    expect(cfg.redact).toBe(false);
+    expect(cfg.minLevel).toBe("debug");
+    expect(cfg.env).toEqual({ environment: "test", service: "api" });
+  });
 });
