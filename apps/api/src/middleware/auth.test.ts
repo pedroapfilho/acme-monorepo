@@ -86,12 +86,13 @@ describe("authMiddleware", () => {
 
   it("throws 503 when getSession throws", async () => {
     vi.mocked(auth.api.getSession).mockRejectedValue(new Error("DB down"));
-    const { ctx } = createMockContext();
+    const { ctx, mocks } = createMockContext();
 
     await expect(authMiddleware(ctx, next)).rejects.toThrow(HTTPException);
     await expect(authMiddleware(ctx, next)).rejects.toMatchObject({
       status: 503,
     });
+    expect(mocks.loggerError).toHaveBeenCalled();
   });
 });
 

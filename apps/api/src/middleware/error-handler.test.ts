@@ -44,6 +44,7 @@ describe("errorHandler", () => {
 
     await errorHandler(err, ctx);
 
+    expect(mocks.loggerError).toHaveBeenCalled();
     expect(mocks.json).toHaveBeenCalledWith(
       { error: { code: "HTTP_EXCEPTION", message: "Forbidden" } },
       403,
