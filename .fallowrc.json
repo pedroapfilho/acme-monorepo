@@ -6,11 +6,15 @@
   "entry": [
     "oxlint.config.ts",
     "**/prisma.config.ts",
+    "apps/web/scripts/ensure-e2e-user.ts",
+    "apps/*/src/lib/observability.ts",
     "packages/transactional/src/emails/**/*.tsx"
   ],
   "ignorePatterns": ["verify-auth.js", "tests/e2e/setup/auth.setup.ts"],
   "ignoreDependencies": [
     "eslint-plugin-*",
+    "better-auth",
+    "hono",
     "@tailwindcss/postcss",
     "postcss",
     "postcss-load-config",

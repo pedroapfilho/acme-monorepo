@@ -22,18 +22,6 @@
   "dependencies": {
     "evlog": "^2.18.1"
   },
-  "peerDependencies": {
-    "better-auth": "^1.6.10",
-    "hono": "^4.12.0",
-    "next": "^16.0.0",
-    "react": "^19.0.0"
-  },
-  "peerDependenciesMeta": {
-    "better-auth": { "optional": true },
-    "hono": { "optional": true },
-    "next": { "optional": true },
-    "react": { "optional": true }
-  },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
@@ -45,5 +33,25 @@
     "react": "^19.2.6",
     "typescript": "^6.0.3",
     "vitest": "^4.1.5"
+  },
+  "peerDependencies": {
+    "better-auth": "^1.6.10",
+    "hono": "^4.12.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "better-auth": {
+      "optional": true
+    },
+    "hono": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   }
 }

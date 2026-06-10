@@ -10,8 +10,8 @@ import { z } from "zod";
 // in inboxes, so the validator has to accept it.
 const senderAddressSchema = z.string().refine(
   (val) => {
-    const wrapped = val.match(/^.+<([^<>\s]+)>$/v);
-    const email = wrapped ? wrapped[1] : val;
+    const wrapped = val.match(/^.+<(?<address>[^<>\s]+)>$/v);
+    const email = wrapped?.groups?.address ?? val;
     return z.email().safeParse(email).success;
   },
   { message: "Must be a valid email or 'Display Name <email>' format" },

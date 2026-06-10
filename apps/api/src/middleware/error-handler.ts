@@ -5,7 +5,7 @@ import { ZodError } from "zod";
 
 import { env } from "@/lib/env";
 
-export const isPrismaKnownError = (
+const isPrismaKnownError = (
   err: unknown,
 ): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
   err instanceof Error && "code" in err && "clientVersion" in err;

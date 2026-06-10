@@ -174,7 +174,7 @@ const waitForEmail = async (
 const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
   // Match an href="..." attribute whose URL satisfies the pattern.
-  const hrefMatches = haystack.matchAll(/href="([^"]+)"/gv);
+  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/gv);
   for (const [, href] of hrefMatches) {
     const decoded = href.replaceAll("&amp;", "&");
     if (pattern.test(decoded)) {

@@ -1,6 +1,8 @@
-import { createLogger, initLogger } from "evlog";
-import { buildConfig } from "./config";
 import "./fields";
+
+import { createLogger, initLogger } from "evlog";
+
+import { buildConfig } from "./config";
 
 /** Initialize the global evlog logger for a long-running BullMQ worker process. */
 const initWorkerLogger = (opts: { service: string }): void => {

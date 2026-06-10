@@ -1,5 +1,6 @@
-import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
 import "./fields";
+
+import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
 
 /**
  * Wraps evlog's Better Auth middleware. Returns identify(log, headers, path?)
