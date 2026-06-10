@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import { prisma } from ".";
 
 const DEFAULT_USERS = [
