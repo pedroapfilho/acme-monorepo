@@ -37,7 +37,7 @@ Monorepo template for all projects. Source of truth for shared patterns, tooling
 ### Prerequisites
 
 - **Node.js 24** (use `nvm install 24 && nvm use 24`)
-- **pnpm 10** (`npm install -g pnpm@10`)
+- **pnpm 11** (`npm install -g pnpm@11`)
 - **PostgreSQL** running locally on `:5432` (or use Docker — see below)
 - **portless** for stable HTTPS dev URLs (see step 2)
 

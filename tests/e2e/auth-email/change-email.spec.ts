@@ -31,9 +31,9 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(currentEmail);
     await page.goto(verify.url);
-    // autoSignInAfterVerification: true sets a session cookie on the clicker
-    // page, but the test then drives the rest of the flow via the
-    // APIRequestContext, which doesn't share cookies — so sign in separately.
+    // autoSignInAfterVerification: false means the verify click lands on
+    // /verify-email/success without setting a session cookie — so sign in
+    // explicitly to attach the session for the change-email request below.
     await page.waitForURL(/\/verify-email\/success$/v);
     const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email: currentEmail, password },

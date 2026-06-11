@@ -54,7 +54,7 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
       id: session.user.id,
     });
 
-    await next();
+    return next();
   },
 );
 
@@ -81,5 +81,5 @@ export const optionalAuthMiddleware = createMiddleware<{
     });
   }
 
-  await next();
+  return next();
 });

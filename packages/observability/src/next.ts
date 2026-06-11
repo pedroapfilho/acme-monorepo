@@ -1,7 +1,9 @@
+import "./fields";
+
 import { createEvlog, evlogMiddleware } from "evlog/next";
 import { createInstrumentation } from "evlog/next/instrumentation";
+
 import { buildConfig } from "./config";
-import "./fields";
 
 /** Per-app Next factory. Returns request-scoped helpers + instrumentation hooks. */
 const createObservability = (opts: { service: string }) => {

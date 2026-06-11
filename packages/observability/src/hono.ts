@@ -1,7 +1,9 @@
+import "./fields";
+
 import { initLogger, log } from "evlog";
 import { evlog, type EvlogVariables } from "evlog/hono";
+
 import { buildConfig } from "./config";
-import "./fields";
 
 /** Initialize the global evlog logger for a long-running Hono (Railway) service. */
 const initApiLogger = (opts: { service: string }): void => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { createJobLogger, initWorkerLogger } from "./worker";
 
 describe("worker surface", () => {

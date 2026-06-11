@@ -27,11 +27,12 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@repo/db": "workspace:*",
-    "fallow": "^2.69.0",
+    "better-auth": "^1.6.10",
+    "fallow": "^2.85.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.4",
-    "oxfmt": "^0.48.0",
-    "oxlint": "^1.63.0",
+    "oxfmt": "^0.52.0",
+    "oxlint": "^1.67.0",
     "oxlint-config-awesomeness": "^3.0.2",
     "turbo": "^2.9.12"
   },

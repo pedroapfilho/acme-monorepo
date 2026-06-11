@@ -86,6 +86,6 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
       );
     }
 
-    await next();
+    return await next();
   };
 };

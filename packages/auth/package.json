@@ -9,7 +9,7 @@
   },
   "scripts": {
     "lint": "oxlint src",
-    "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

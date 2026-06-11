@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { buildConfig } from "./config";
 
 describe("buildConfig", () => {
