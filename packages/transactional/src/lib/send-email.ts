@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { z } from "zod";
 
 // Resend accepts either a bare email or RFC 5322 "Display Name <email>" form
-// for from / reply-to. `z.string().email()` only matches bare addresses, so
+// for from / reply-to. `z.email()` only matches bare addresses, so
 // extract the bracketed address when present and validate that. The default
 // for `from` also uses the wrapped form to surface a friendly display name
 // in inboxes, so the validator has to accept it.
@@ -18,8 +18,8 @@ const senderAddressSchema = z.string().refine(
 );
 
 const emailConfigSchema = z.object({
-  bcc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
-  cc: z.union([z.string().email(), z.array(z.string().email())]).optional(),
+  bcc: z.union([z.email(), z.array(z.email())]).optional(),
+  cc: z.union([z.email(), z.array(z.email())]).optional(),
   from: senderAddressSchema.default("Acme <noreply@acme.com>"),
   replyTo: senderAddressSchema.optional(),
   subject: z.string(),
@@ -31,7 +31,7 @@ const emailConfigSchema = z.object({
       }),
     )
     .optional(),
-  to: z.union([z.string().email(), z.array(z.string().email())]),
+  to: z.union([z.email(), z.array(z.email())]),
 });
 
 // z.input keeps `from` optional for callers — the Zod default fills it in
