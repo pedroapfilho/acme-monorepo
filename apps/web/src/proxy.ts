@@ -6,7 +6,7 @@ import { log } from "@/lib/observability";
 
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
-const authRoutes = ["/login", "/register", "/forgot-password", "/recover", "/reset-password"];
+const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
 
 export const proxy = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
