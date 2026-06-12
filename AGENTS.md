@@ -22,7 +22,7 @@ Project conventions and defaults live in [`docs/CONVENTIONS.md`](docs/CONVENTION
 apps/
   web/        Next.js — main app             https://acme.web.localhost
   landing/    Next.js — marketing site       https://acme.landing.localhost
-  api/        Hono + tsdown — REST + auth    https://acme.api.localhost
+  api/        Hono + tsdown — REST API       https://acme.api.localhost
 packages/
   ui/                  Shared React components, TanStack Form fields, base styles
   auth/                Better Auth config — exports ./server (api) and ./client (web/landing)
@@ -93,15 +93,16 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 ### Auth
 
 - Password minimum **12 characters**. Sessions expire after 7 days.
-- `web` / `landing` use `@repo/auth/client` → calls `api` at `/auth/*`.
-- `api` uses `@repo/auth/server` with the Prisma adapter from `@repo/db`.
+- The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
+- `web` / `landing` use `@repo/auth/client` → calls same-origin `/api/auth`.
+- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify — it does not serve the auth routes.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env.local` — both validate sessions against it.
 - `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
 
 ### API
 
-- Routes versioned under `/api/v1/*`. Auth at `/auth/*`. Health at `/healthz`, `/readyz`.
-- Hono app uses `@hono/structured-logger` + `@hono/zod-openapi`.
+- Routes versioned under `/api/v1/*`. Health at `/healthz`, `/readyz`.
+- Hono app uses `@repo/observability` (evlog) for logging + `@hono/zod-openapi`.
 - Build via **tsdown** (NOT tsc) — outputs to `dist/`.
 
 ### Prisma
@@ -116,10 +117,6 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 - Pre-commit: Husky + lint-staged runs `oxlint` on JS/TS files and `oxfmt` on JS/TS/JSON/MD.
 - Bundler for `api`: **tsdown**. Next.js apps use Turbopack in dev.
 - Path alias: `@/*` → `src/*` in every app and package.
-
-### Dev-only React tools
-
-- **React Scan** and **React Grab** are loaded via `<script>` in the root layout when `NODE_ENV=development`. Neither runs in production builds.
 
 ### Turbo cache keys
 
@@ -147,7 +144,7 @@ Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 
 ## CI (GitHub Actions)
 
-Currently only `.github/workflows/e2e.yml` is checked in. Test / lint / format / fallow workflows run locally via pre-commit; expand CI as needed and keep `permissions: { contents: read }` plus `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true` on any new workflow.
+Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`, `react-doctor.yml`, `test.yml`. The standard workflows pin `actions/checkout`, `pnpm/action-setup`, and `actions/setup-node` to `@v6`, which run on Node 24 natively — no `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env var. Keep `permissions: { contents: read }` on any new workflow (`react-doctor.yml` needs extra PR-comment permissions).
 
 ## Notable decisions
 
