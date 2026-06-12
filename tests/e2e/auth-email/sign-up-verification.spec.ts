@@ -9,7 +9,7 @@ test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("Sign-up email verification", () => {
-  test("verify email is sent, link verifies the user, sign-in then succeeds", async ({
+  test("verify email is sent, clicking the link signs in the clicking device", async ({
     browser,
     request,
   }, testInfo) => {
@@ -20,7 +20,6 @@ test.describe("Sign-up email verification", () => {
 
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: {
-        callbackURL: "/verify-email/success",
         email,
         name: "Verify Me",
         password,
@@ -45,22 +44,20 @@ test.describe("Sign-up email verification", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    // Follow the link in a fresh BrowserContext (cross-device click). With
-    // autoSignInAfterVerification: false, this lands on the success page
-    // WITHOUT creating a session in the clicker context — the polling tab
-    // elsewhere is the one that completes sign-in.
+    // Follow the link in a fresh BrowserContext. The link IS the login:
+    // autoSignInAfterVerification mints a session on the clicking device and
+    // the callback lands on the app root (which routes signed-in users to
+    // /dashboard).
     const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
     await clickerPage.goto(verifyUrl);
-    await expect(clickerPage).toHaveURL(/\/verify-email\/success$/v);
-    await expect(clickerPage.getByRole("heading", { name: "Email verified" })).toBeVisible();
+    await expect(clickerPage).toHaveURL(/\/dashboard$/v);
     const clickerCookies = await clickerContext.cookies(webUrl);
-    expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeUndefined();
+    expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeDefined();
     await clickerContext.close();
 
-    // Original-tab path: signIn now succeeds. The pending screen polls this
-    // continuously; the test just exercises the same code path once.
+    // The email is now verified, so a plain credentials sign-in succeeds too.
     const postSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email, password },
     });

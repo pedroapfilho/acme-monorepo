@@ -192,12 +192,16 @@ describe("Auth Server Configuration", () => {
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 
-  it("sets emailVerification.callbackURL to /verify-email/success", () => {
-    expect(auth.options.emailVerification?.callbackURL).toBe("/verify-email/success");
+  it("sets emailVerification.callbackURL to the app root", () => {
+    expect(auth.options.emailVerification?.callbackURL).toBe("/");
   });
 
-  it("disables autoSignInAfterVerification so the link-clicker device stays sessionless", () => {
-    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(false);
+  it("enables autoSignInAfterVerification so the verification link is the login", () => {
+    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(true);
+  });
+
+  it("re-sends the verification email on unverified sign-in attempts", () => {
+    expect(auth.options.emailVerification?.sendOnSignIn).toBe(true);
   });
 
   it("should have displayName as optional additional user field", () => {
