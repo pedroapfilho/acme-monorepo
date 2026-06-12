@@ -74,6 +74,7 @@ const PendingScreen = ({ token }: Props) => {
         return;
       }
       if (!result.error && result.data) {
+        // oxlint-disable-next-line react-doctor/nextjs-no-client-side-redirect -- poll-driven navigation after email verification; no server redirect possible
         router.push("/dashboard");
         router.refresh();
         return;
@@ -83,14 +84,14 @@ const PendingScreen = ({ token }: Props) => {
       }, POLL_INTERVAL_MS);
     };
 
-    const onVisibility = () => {
+    const handleVisibilityChange = () => {
       if (cancelled || document.visibilityState !== "visible") {
         return;
       }
       void tick();
     };
 
-    document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     void tick();
 
     return () => {
@@ -98,7 +99,7 @@ const PendingScreen = ({ token }: Props) => {
       if (timer) {
         clearTimeout(timer);
       }
-      document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [credentials, router]);
 
@@ -115,7 +116,7 @@ const PendingScreen = ({ token }: Props) => {
     };
   }, [cooldown]);
 
-  const onResend = useCallback(async () => {
+  const handleResend = useCallback(async () => {
     if (!credentials || cooldown > 0 || isResending) {
       return;
     }
@@ -167,7 +168,7 @@ const PendingScreen = ({ token }: Props) => {
           className="w-full"
           disabled={cooldown > 0 || isResending}
           onClick={() => {
-            void onResend();
+            void handleResend();
           }}
           type="button"
           variant="outline"
