@@ -1,6 +1,7 @@
 import type { Prisma } from "@repo/db";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { ZodError } from "zod";
 
 import { env } from "@/lib/env";
@@ -10,14 +11,14 @@ const isPrismaKnownError = (
 ): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
   err instanceof Error && "code" in err && "clientVersion" in err;
 
-export class AppError extends Error {
-  public readonly statusCode: number;
+class AppError extends Error {
+  public readonly statusCode: ContentfulStatusCode;
   public readonly isOperational: boolean;
   public readonly code?: string;
 
   constructor(
     message: string,
-    statusCode: number = 500,
+    statusCode: ContentfulStatusCode = 500,
     isOperational: boolean = true,
     code?: string,
   ) {
@@ -29,7 +30,7 @@ export class AppError extends Error {
   }
 }
 
-export const errorHandler = (err: Error, c: Context) => {
+const errorHandler = (err: Error, c: Context) => {
   c.get("log").error(err, {
     ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
     method: c.req.method,
@@ -73,7 +74,7 @@ export const errorHandler = (err: Error, c: Context) => {
           message: err.message,
         },
       },
-      err.statusCode as 400 | 401 | 403 | 404 | 409 | 422 | 500,
+      err.statusCode,
     );
   }
 
@@ -117,7 +118,7 @@ export const errorHandler = (err: Error, c: Context) => {
   );
 };
 
-export const notFound = (c: Context) => {
+const notFound = (c: Context) => {
   return c.json(
     {
       error: {
@@ -128,3 +129,5 @@ export const notFound = (c: Context) => {
     404 as const,
   );
 };
+
+export { AppError, errorHandler, notFound };

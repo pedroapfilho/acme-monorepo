@@ -16,17 +16,6 @@ export default defineConfig({
         ],
       },
     },
-    // Pre-logger error sinks for auth/proxy failures (DB down, misconfig).
-    {
-      files: [
-        "apps/web/src/middleware.ts",
-        "apps/web/src/lib/auth-helpers.ts",
-        "packages/auth/src/server.ts",
-      ],
-      rules: {
-        "no-console": "off",
-      },
-    },
     // Playwright's selector engine rejects /v-flagged regex literals at runtime.
     {
       files: ["tests/**", "playwright.config.ts"],

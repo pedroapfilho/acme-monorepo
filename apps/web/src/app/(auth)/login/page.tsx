@@ -19,20 +19,27 @@ const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ from?: string; message?: string }>;
 };
 
 const Page = async ({ searchParams }: Props) => {
-  const { from } = await searchParams;
+  const { from, message } = await searchParams;
   // Sanitise the redirect target server-side: accept only path-relative URLs to
   // prevent open-redirect attacks (e.g. /login?from=https://evil.com).
   const safeTo = from && from.startsWith("/") && !from.startsWith("//") ? from : "/dashboard";
+  // The reset-password form lands here with this param — confirm the reset so
+  // the user isn't dropped on a bare login form wondering if it worked.
+  const isAfterPasswordReset = message === "password-reset-success";
 
   return (
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>Enter your details to sign in to your account</CardDescription>
+        <CardDescription>
+          {isAfterPasswordReset
+            ? "Your password was reset. Sign in with your new password."
+            : "Enter your details to sign in to your account"}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <LoginForm from={safeTo} />
