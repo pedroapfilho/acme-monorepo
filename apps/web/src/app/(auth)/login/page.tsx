@@ -8,6 +8,7 @@ import {
 import type { Metadata } from "next";
 
 import LoginForm from "@/app/(auth)/login/form";
+import { safeRedirectPath } from "@/lib/redirect-validation";
 
 const metadata: Metadata = {
   description: "Sign in to your Acme account to access your dashboard and manage your profile.",
@@ -24,9 +25,10 @@ type Props = {
 
 const Page = async ({ searchParams }: Props) => {
   const { from } = await searchParams;
-  // Sanitise the redirect target server-side: accept only path-relative URLs to
-  // prevent open-redirect attacks (e.g. /login?from=https://evil.com).
-  const safeTo = from && from.startsWith("/") && !from.startsWith("//") ? from : "/dashboard";
+  // Sanitise the redirect target server-side: safeRedirectPath is the single
+  // open-redirect gate — only in-app relative paths survive (e.g.
+  // /login?from=https://evil.com falls back to /dashboard).
+  const safeTo = safeRedirectPath(from);
 
   return (
     <Card>

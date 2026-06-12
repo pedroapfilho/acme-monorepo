@@ -20,6 +20,10 @@ import { useState, useTransition } from "react";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 
+type Props = {
+  from: string;
+};
+
 type FieldInputProps = {
   autoComplete: string;
   errors: Array<unknown>;
@@ -66,7 +70,7 @@ const RegisterFieldInput = ({
   );
 };
 
-const RegisterForm = () => {
+const RegisterForm = ({ from }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
@@ -81,7 +85,10 @@ const RegisterForm = () => {
           if (value.password !== value.confirmPassword) {
             throw new Error("Passwords do not match");
           }
+          // Better Auth bakes callbackURL into the verification link, so the
+          // email clicker lands back on the page that sent them to auth.
           const result = await authClient.signUp.email({
+            callbackURL: from,
             email: value.email,
             name: value.name,
             password: value.password,
@@ -96,7 +103,7 @@ const RegisterForm = () => {
             setSentToEmail(value.email);
             return;
           }
-          push("/dashboard");
+          push(from);
           refresh();
         } catch (error) {
           const message =
@@ -239,7 +246,12 @@ const RegisterForm = () => {
           </Button>
           <FieldDescription className="text-center">
             Already have an account?{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/login">
+            {/* Carry the redirect context across the form switch so login can
+                push it after sign-in. */}
+            <Link
+              className="text-foreground underline underline-offset-4"
+              href={from === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(from)}`}
+            >
               Sign in
             </Link>
           </FieldDescription>

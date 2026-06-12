@@ -215,7 +215,14 @@ const LoginForm = ({ from }: Props) => {
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/register">
+            {/* Carry the redirect context across the form switch so signup can
+                bake it into the verification email's callbackURL. */}
+            <Link
+              className="text-foreground underline underline-offset-4"
+              href={
+                from === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(from)}`
+              }
+            >
               Sign up
             </Link>
           </FieldDescription>
