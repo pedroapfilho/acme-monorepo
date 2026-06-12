@@ -94,7 +94,7 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 
 - Password minimum **12 characters**. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
-- `web` / `landing` use `@repo/auth/client` → calls same-origin `/api/auth`.
+- `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
 - `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify — it does not serve the auth routes.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env.local` — both validate sessions against it.
 - `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
@@ -144,7 +144,7 @@ Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 
 ## CI (GitHub Actions)
 
-Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`, `react-doctor.yml`, `test.yml`. The standard workflows pin `actions/checkout`, `pnpm/action-setup`, and `actions/setup-node` to `@v6`, which run on Node 24 natively — no `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env var. Keep `permissions: { contents: read }` on any new workflow (`react-doctor.yml` needs extra PR-comment permissions).
+Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`, `react-doctor.yml`, `test.yml`. The standard workflows pin `actions/checkout`, `pnpm/action-setup`, and `actions/setup-node` to `@v6`, which run on Node 24 natively — no `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env var. Keep `permissions: { contents: read }` on any new workflow (`react-doctor.yml` needs extra PR-comment permissions and still uses `actions/checkout@v5`).
 
 ## Notable decisions
 
