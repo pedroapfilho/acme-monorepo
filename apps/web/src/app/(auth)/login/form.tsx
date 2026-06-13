@@ -100,11 +100,13 @@ const LoginForm = ({ from }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const [showUnverifiedNotice, setShowUnverifiedNotice] = useState(false);
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
     onSubmit: ({ value }) => {
       setFormError(null);
+      setShowUnverifiedNotice(false);
       startTransition(async () => {
         try {
           const result = await authClient.signIn.email({
@@ -112,6 +114,12 @@ const LoginForm = ({ from }: Props) => {
             password: value.password,
           });
           if (result.error) {
+            // Better Auth 403s unverified accounts and (sendOnSignIn) re-sends
+            // the verification link — informational, not a credentials error.
+            if (result.error.code === "EMAIL_NOT_VERIFIED") {
+              setShowUnverifiedNotice(true);
+              return;
+            }
             throw new Error(result.error.message ?? "Invalid credentials");
           }
           push(from);
@@ -190,6 +198,12 @@ const LoginForm = ({ from }: Props) => {
           }}
         </form.Field>
 
+        {showUnverifiedNotice && (
+          <output aria-live="polite" className="block text-center text-sm">
+            This email isn&apos;t verified yet — we just sent you a new link.
+          </output>
+        )}
+
         <Field>
           <Button
             aria-busy={isPending}
@@ -202,7 +216,14 @@ const LoginForm = ({ from }: Props) => {
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/register">
+            {/* Carry the redirect context across the form switch so signup can
+                bake it into the verification email's callbackURL. */}
+            <Link
+              className="text-foreground underline underline-offset-4"
+              href={
+                from === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(from)}`
+              }
+            >
               Sign up
             </Link>
           </FieldDescription>

@@ -17,9 +17,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import { stashCredentials } from "@/app/(auth)/verify-email/credentials-store";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
+
+type Props = {
+  from: string;
+};
 
 type FieldInputProps = {
   autoComplete: string;
@@ -67,10 +70,11 @@ const RegisterFieldInput = ({
   );
 };
 
-const RegisterForm = () => {
+const RegisterForm = ({ from }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const [sentToEmail, setSentToEmail] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
@@ -81,10 +85,10 @@ const RegisterForm = () => {
           if (value.password !== value.confirmPassword) {
             throw new Error("Passwords do not match");
           }
+          // Better Auth bakes callbackURL into the verification link, so the
+          // email clicker lands back on the page that sent them to auth.
           const result = await authClient.signUp.email({
-            // Better Auth builds the verification URL from `body.callbackURL`;
-            // emailVerification.callbackURL config is ignored by the sign-up route.
-            callbackURL: "/verify-email/success",
+            callbackURL: from,
             email: value.email,
             name: value.name,
             password: value.password,
@@ -93,13 +97,13 @@ const RegisterForm = () => {
             throw new Error(result.error.message ?? "Failed to register");
           }
           // No token means requireEmailVerification suppressed auto-sign-in (or enumeration prevention
-          // returned synthetic success); both paths route to /verify-email with the same "check inbox" UX.
+          // returned synthetic success); both paths show the same inline "check your email" state.
+          // Clicking the emailed link verifies AND signs in the clicking device.
           if (!result.data?.token) {
-            const handoff = stashCredentials({ email: value.email, password: value.password });
-            push(`/verify-email?k=${handoff}`);
+            setSentToEmail(value.email);
             return;
           }
-          push("/dashboard");
+          push(from);
           refresh();
         } catch (error) {
           const message =
@@ -111,6 +115,18 @@ const RegisterForm = () => {
     },
     validators: { onSubmit: registerSchema },
   });
+
+  if (sentToEmail) {
+    return (
+      <output aria-live="polite" className="block space-y-1 text-center">
+        <span className="block font-medium">Check your email</span>
+        <span className="block text-sm text-muted-foreground">
+          We sent a verification link to <span className="font-medium">{sentToEmail}</span>. Click
+          it to verify your account and sign in.
+        </span>
+      </output>
+    );
+  }
 
   return (
     // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
@@ -231,7 +247,12 @@ const RegisterForm = () => {
           </Button>
           <FieldDescription className="text-center">
             Already have an account?{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/login">
+            {/* Carry the redirect context across the form switch so login can
+                push it after sign-in. */}
+            <Link
+              className="text-foreground underline underline-offset-4"
+              href={from === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(from)}`}
+            >
               Sign in
             </Link>
           </FieldDescription>

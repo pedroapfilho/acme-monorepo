@@ -22,7 +22,7 @@ const requireSecret = (): string => {
 // Better Auth would have emailed, so tests can skip inbox polling.
 const forVerifyEmail = async (email: string): Promise<{ token: string; url: string }> => {
   const token = await signJWT({ email: email.toLowerCase() }, requireSecret(), 3600);
-  const callbackURL = encodeURIComponent("/verify-email/success");
+  const callbackURL = encodeURIComponent("/");
   const url = `${webUrl}/api/auth/verify-email?token=${token}&callbackURL=${callbackURL}`;
   return { token, url };
 };
