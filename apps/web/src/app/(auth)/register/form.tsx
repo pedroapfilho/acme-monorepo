@@ -82,9 +82,6 @@ const RegisterForm = ({ from }: Props) => {
       setFormError(null);
       startTransition(async () => {
         try {
-          if (value.password !== value.confirmPassword) {
-            throw new Error("Passwords do not match");
-          }
           // Better Auth bakes callbackURL into the verification link, so the
           // email clicker lands back on the page that sent them to auth.
           const result = await authClient.signUp.email({

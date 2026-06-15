@@ -91,6 +91,32 @@ describe("registerSchema", () => {
     const result = registerSchema.safeParse({ ...validData, confirmPassword: "short" });
     expect(result.success).toBe(false);
   });
+
+  it("should reject when passwords do not match, with the issue on confirmPassword", () => {
+    const result = registerSchema.safeParse({
+      ...validData,
+      confirmPassword: "differentpassword",
+      password: "securepassword",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: "Passwords do not match",
+          path: ["confirmPassword"],
+        }),
+      );
+    }
+  });
+
+  it("should accept when passwords match", () => {
+    const result = registerSchema.safeParse({
+      ...validData,
+      confirmPassword: "securepassword",
+      password: "securepassword",
+    });
+    expect(result.success).toBe(true);
+  });
 });
 
 describe("recoverSchema", () => {
@@ -144,6 +170,30 @@ describe("resetPasswordSchema", () => {
     const result = resetPasswordSchema.safeParse({
       confirmPassword: "123456789012",
       password: "123456789012",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject when passwords do not match, with the issue on confirmPassword", () => {
+    const result = resetPasswordSchema.safeParse({
+      confirmPassword: "newpassword34",
+      password: "newpassword12",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: "Passwords do not match",
+          path: ["confirmPassword"],
+        }),
+      );
+    }
+  });
+
+  it("should accept when passwords match", () => {
+    const result = resetPasswordSchema.safeParse({
+      confirmPassword: "newpassword12",
+      password: "newpassword12",
     });
     expect(result.success).toBe(true);
   });

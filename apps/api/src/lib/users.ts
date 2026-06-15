@@ -34,24 +34,27 @@ export const findUserByEmail = (email: string) =>
   });
 
 export const updateUser = async (id: string, data: Prisma.UserUpdateInput) => {
-  if (typeof data.username === "string") {
-    const existing = await prisma.user.findFirst({
-      where: {
-        NOT: { id },
-        username: data.username,
-      },
+  try {
+    return await prisma.user.update({
+      data,
+      select: userSelect,
+      where: { id },
     });
-
-    if (existing) {
-      throw new AppError("Username already taken", 400, true, "USERNAME_TAKEN");
+  } catch (error) {
+    // Only a username change can raise a username-uniqueness violation. Guarding
+    // on data.username keeps an unrelated P2002 (email, displayUsername) flowing
+    // to the central handler as a generic 409 instead of a misleading
+    // USERNAME_TAKEN.
+    if (
+      typeof data.username === "string" &&
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      throw new AppError("Username already taken", 409, true, "USERNAME_TAKEN");
     }
+    throw error;
   }
-
-  return prisma.user.update({
-    data,
-    select: userSelect,
-    where: { id },
-  });
 };
 
 export const deleteUser = async (id: string) => {

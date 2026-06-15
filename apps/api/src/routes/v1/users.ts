@@ -34,8 +34,12 @@ const updateUserSchema = z
 
 const errorSchema = z
   .object({
-    code: z.string().optional(),
-    error: z.string(),
+    error: z.object({
+      code: z.string(),
+      details: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+      message: z.string(),
+      stack: z.string().optional(),
+    }),
   })
   .openapi("Error");
 
@@ -92,11 +96,15 @@ const updateMeRoute = createRoute({
     },
     400: {
       content: { "application/json": { schema: errorSchema } },
-      description: "Validation error or username taken",
+      description: "Validation error",
     },
     401: {
       content: { "application/json": { schema: errorSchema } },
       description: "Unauthorized",
+    },
+    409: {
+      content: { "application/json": { schema: errorSchema } },
+      description: "Username already taken",
     },
   },
   summary: "Update current user",
