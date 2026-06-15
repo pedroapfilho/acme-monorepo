@@ -45,12 +45,10 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
+      - uses: pnpm/setup@v1
         with:
-          node-version: "24"
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
+          runtime: node@24
+          cache: true
       - run: pnpm db:generate
       - run: pnpm db:push
       - run: pnpm build --filter=web --filter=api --filter=landing
