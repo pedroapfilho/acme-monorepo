@@ -104,7 +104,6 @@ describe("updateUser", () => {
   });
 
   it("updates and returns user", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(null as never);
     vi.mocked(prisma.user.update).mockResolvedValue(mockUser as never);
 
     const result = await updateUser("user-1", { name: "New Name" });
@@ -112,25 +111,27 @@ describe("updateUser", () => {
     expect(result).toEqual(mockUser);
   });
 
-  it("throws AppError 400 when username is taken", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as never);
+  it("throws AppError 409 USERNAME_TAKEN when a username change hits the unique constraint", async () => {
+    const conflict = prismaKnownError("P2002");
+    vi.mocked(prisma.user.update).mockRejectedValue(conflict);
 
     await expect(updateUser("user-2", { username: "testuser" })).rejects.toMatchObject({
       code: "USERNAME_TAKEN",
-      statusCode: 400,
+      statusCode: 409,
     });
   });
 
-  it("skips username check when username is not provided", async () => {
-    vi.mocked(prisma.user.update).mockResolvedValue(mockUser as never);
+  it("does NOT mislabel a non-username P2002 as USERNAME_TAKEN", async () => {
+    const conflict = prismaKnownError("P2002");
+    vi.mocked(prisma.user.update).mockRejectedValue(conflict);
 
-    await updateUser("user-1", { name: "Updated" });
-
-    expect(prisma.user.findFirst).not.toHaveBeenCalled();
+    // The update did not change the username, so the P2002 (e.g. email) must
+    // propagate untouched for the central handler's generic 409 DUPLICATE_ENTRY.
+    await expect(updateUser("user-1", { name: "X" })).rejects.toMatchObject({ code: "P2002" });
+    await expect(updateUser("user-1", { name: "X" })).rejects.not.toBeInstanceOf(AppError);
   });
 
   it("propagates P2025 to the central error handler", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(null as never);
     const notFound = prismaKnownError("P2025");
     vi.mocked(prisma.user.update).mockRejectedValue(notFound);
 
@@ -138,7 +139,6 @@ describe("updateUser", () => {
   });
 
   it("propagates generic database errors to the central error handler", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(null as never);
     const dbError = new Error("Connection refused");
     vi.mocked(prisma.user.update).mockRejectedValue(dbError);
 
