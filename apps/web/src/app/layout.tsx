@@ -6,27 +6,27 @@ import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
 const inter = Inter({
-  display: "swap", // Improve font loading performance
+  display: "swap",
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
   authors: [{ name: "Acme Team" }],
+  category: "technology",
   creator: "Acme",
   description:
     "A modern, secure authentication platform built with Better Auth and Next.js. Fast, reliable, and developer-friendly.",
+  icons: {
+    apple: "/apple-touch-icon.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+  },
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
+  manifest: "/site.webmanifest",
   // Resolves Open Graph / Twitter card image URLs against this base.
   // Falls back to the canonical local web origin when WEB_APP_URL isn't set.
   metadataBase: new URL(process.env.WEB_APP_URL ?? "https://acme.web.localhost"),
-  publisher: "Acme",
-  title: {
-    default: "Acme | Secure Authentication Platform",
-    template: "%s | Acme",
-  },
-
-  // Open Graph
   openGraph: {
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
     images: [
@@ -42,16 +42,7 @@ export const metadata: Metadata = {
     title: "Acme - Secure Authentication Platform",
     type: "website",
   },
-
-  // Twitter
-  twitter: {
-    card: "summary_large_image",
-    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
-    images: ["/twitter-image.png"],
-    title: "Acme - Secure Authentication Platform",
-  },
-
-  // Robots
+  publisher: "Acme",
   robots: {
     follow: true,
     googleBot: {
@@ -63,19 +54,16 @@ export const metadata: Metadata = {
     },
     index: true,
   },
-
-  // Icons
-  icons: {
-    apple: "/apple-touch-icon.png",
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
+  title: {
+    default: "Acme | Secure Authentication Platform",
+    template: "%s | Acme",
   },
-
-  // Manifest
-  manifest: "/site.webmanifest",
-
-  // Other
-  category: "technology",
+  twitter: {
+    card: "summary_large_image",
+    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
+    images: ["/twitter-image.png"],
+    title: "Acme - Secure Authentication Platform",
+  },
 };
 
 export const viewport: Viewport = {
@@ -93,7 +81,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html className={inter.variable} lang="en">
       <head>
-        {/* Additional meta tags */}
         <meta content="telephone=no" name="format-detection" />
         <meta content="#000000" name="msapplication-TileColor" />
 
