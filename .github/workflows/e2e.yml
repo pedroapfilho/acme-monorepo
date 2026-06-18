@@ -27,7 +27,7 @@ jobs:
       # themselves and the rest of the suite still runs. When set, the
       # auth server flips on requireEmailVerification — the seed script
       # bypasses that for the canonical e2e-test user by writing
-      # emailVerified: true directly to Prisma.
+      # emailVerified: true directly to Drizzle.
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
     services:
       postgres:
@@ -49,7 +49,6 @@ jobs:
         with:
           runtime: node@24
           cache: true
-      - run: pnpm db:generate
       - run: pnpm db:push
       - run: pnpm build --filter=web --filter=api --filter=landing
       - name: Seed E2E test user
