@@ -1,6 +1,6 @@
 import { db, user } from "@repo/db";
 import { eq } from "drizzle-orm";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AppError } from "@/middleware/error-handler";
 
@@ -80,15 +80,13 @@ describe("updateUser", () => {
   });
 
   it("does NOT mislabel a non-username 23505 as USERNAME_TAKEN", async () => {
-    await db
-      .insert(user)
-      .values(
-        makeUser({
-          email: "taken-email@example.com",
-          id: TEST_USER_2_ID,
-          updatedAt: new Date().toISOString(),
-        }),
-      );
+    await db.insert(user).values(
+      makeUser({
+        email: "taken-email@example.com",
+        id: TEST_USER_2_ID,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
     const caughtError = await updateUser(TEST_USER_ID, { email: "taken-email@example.com" }).catch(
       (error: unknown) => error,
     );
@@ -118,5 +116,50 @@ describe("deleteUser", () => {
       code: "USER_NOT_FOUND",
       statusCode: 404,
     });
+  });
+});
+
+describe("propagates generic database errors", () => {
+  it("findUserById rethrows non-AppError db errors unchanged", async () => {
+    const dbError = new Error("db connection lost");
+    const spy = vi.spyOn(db.query.user, "findFirst").mockRejectedValueOnce(dbError);
+    await expect(findUserById(TEST_USER_ID)).rejects.toBe(dbError);
+    spy.mockRestore();
+  });
+
+  it("findUserByEmail rethrows non-AppError db errors unchanged", async () => {
+    const dbError = new Error("db connection lost");
+    const spy = vi.spyOn(db, "select").mockImplementationOnce(() => {
+      throw dbError;
+    });
+    await expect(findUserByEmail("integration-test@example.com")).rejects.toBe(dbError);
+    spy.mockRestore();
+  });
+
+  it("updateUser rethrows non-pg non-AppError db errors unchanged", async () => {
+    const dbError = new Error("db connection lost");
+    const spy = vi.spyOn(db, "update").mockImplementationOnce(() => {
+      throw dbError;
+    });
+    await expect(updateUser(TEST_USER_ID, { name: "X" })).rejects.toBe(dbError);
+    spy.mockRestore();
+  });
+});
+
+describe("updatedAt auto-advance", () => {
+  it("updateUser causes updatedAt to advance", async () => {
+    const before = await db.query.user.findFirst({ where: eq(user.id, TEST_USER_ID) });
+    const beforeTs = before?.updatedAt ?? "";
+
+    // Small pause to ensure the timestamp can differ
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 10);
+    });
+
+    await updateUser(TEST_USER_ID, { name: "Timestamp Check" });
+    const after = await db.query.user.findFirst({ where: eq(user.id, TEST_USER_ID) });
+    const afterTs = after?.updatedAt ?? "";
+
+    expect(afterTs > beforeTs).toBe(true);
   });
 });
