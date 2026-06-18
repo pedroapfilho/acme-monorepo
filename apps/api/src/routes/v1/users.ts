@@ -43,7 +43,7 @@ const errorSchema = z
   })
   .openapi("Error");
 
-type ServiceUser = Awaited<ReturnType<typeof findUserById>>;
+type ServiceUser = Awaited<ReturnType<typeof updateUser>>;
 
 const serializeUser = (user: ServiceUser) => ({
   ...user,
