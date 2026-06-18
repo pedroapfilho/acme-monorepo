@@ -12,7 +12,7 @@ export default mergeConfig(
     test: {
       env: {
         BETTER_AUTH_SECRET: "test-secret-minimum-32-characters-long",
-        DATABASE_URL: "postgresql://acme:acme123@localhost:5432/acme",
+        DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://acme:acme123@localhost:5432/acme",
       },
     },
   }),
