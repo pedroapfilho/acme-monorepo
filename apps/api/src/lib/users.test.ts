@@ -43,6 +43,21 @@ describe("findUserById", () => {
     });
     await expect(findUserById("non-existent")).rejects.toBeInstanceOf(AppError);
   });
+
+  it("does not expose image or displayUsername in the returned object", async () => {
+    const result = await findUserById(TEST_USER_ID);
+    expect(result).not.toHaveProperty("image");
+    expect(result).not.toHaveProperty("displayUsername");
+    // Projected fields should all be present
+    expect(result).toHaveProperty("id");
+    expect(result).toHaveProperty("email");
+    expect(result).toHaveProperty("name");
+    expect(result).toHaveProperty("emailVerified");
+    expect(result).toHaveProperty("createdAt");
+    expect(result).toHaveProperty("updatedAt");
+    expect(result).toHaveProperty("username");
+    expect(result).toHaveProperty("displayName");
+  });
 });
 
 describe("findUserByEmail", () => {
@@ -122,7 +137,9 @@ describe("deleteUser", () => {
 describe("propagates generic database errors", () => {
   it("findUserById rethrows non-AppError db errors unchanged", async () => {
     const dbError = new Error("db connection lost");
-    const spy = vi.spyOn(db.query.user, "findFirst").mockRejectedValueOnce(dbError);
+    const spy = vi.spyOn(db, "select").mockImplementationOnce(() => {
+      throw dbError;
+    });
     await expect(findUserById(TEST_USER_ID)).rejects.toBe(dbError);
     spy.mockRestore();
   });

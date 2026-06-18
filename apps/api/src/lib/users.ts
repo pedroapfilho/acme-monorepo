@@ -16,7 +16,7 @@ const userColumns = {
 };
 
 export const findUserById = async (id: string) => {
-  const result = await db.query.user.findFirst({ where: eq(user.id, id) });
+  const [result] = await db.select(userColumns).from(user).where(eq(user.id, id)).limit(1);
   if (!result) {
     throw new AppError("User not found", 404, true, "USER_NOT_FOUND");
   }
