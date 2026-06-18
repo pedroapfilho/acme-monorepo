@@ -1,4 +1,5 @@
 export * from "./client";
+export * from "./relations";
 export * from "./schema";
 
 import type * as schema from "./schema";
