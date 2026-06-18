@@ -5,7 +5,7 @@
   "globalEnv": ["NODE_ENV"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "env": [
         "API_URL",
