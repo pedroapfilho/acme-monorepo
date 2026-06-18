@@ -1,6 +1,7 @@
 import { db, user } from "@repo/db";
 import { eq } from "drizzle-orm";
 
+import { extractPgCode } from "@/lib/pg-error";
 import { AppError } from "@/middleware/error-handler";
 
 const userColumns = {
@@ -14,34 +15,8 @@ const userColumns = {
   username: user.username,
 };
 
-// Drizzle wraps pg errors in DrizzleQueryError; unwrap to get the pg error code.
-const extractPgCode = (err: unknown): string | undefined => {
-  if (typeof err !== "object" || err === null) {
-    return undefined;
-  }
-  // DrizzleQueryError wraps the pg error in .cause
-  if ("cause" in err) {
-    const cause = (err as { cause: unknown }).cause;
-    if (typeof cause === "object" && cause !== null && "code" in cause) {
-      const code = (cause as { code: unknown }).code;
-      if (typeof code === "string" && /^\d{5}$/v.test(code)) {
-        return code;
-      }
-    }
-  }
-  // Direct pg error (has code directly)
-  if ("code" in err) {
-    const code = (err as { code: unknown }).code;
-    if (typeof code === "string" && /^\d{5}$/v.test(code)) {
-      return code;
-    }
-  }
-  return undefined;
-};
-
 export const findUserById = async (id: string) => {
-  const found = await db.select(userColumns).from(user).where(eq(user.id, id));
-  const result = found[0];
+  const result = await db.query.user.findFirst({ where: eq(user.id, id) });
   if (!result) {
     throw new AppError("User not found", 404, true, "USER_NOT_FOUND");
   }
