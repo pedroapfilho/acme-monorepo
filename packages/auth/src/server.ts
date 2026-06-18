@@ -1,9 +1,10 @@
-import type { PrismaClient } from "@repo/db";
+import type { db } from "@repo/db";
+import * as schema from "@repo/db";
 import { log } from "@repo/observability";
 import type { MailerConfig } from "@repo/transactional";
 import { sendTransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
@@ -23,18 +24,18 @@ const parseEnvList = (value: string | undefined): Array<string> => {
 };
 
 type AuthConfig = {
+  db: typeof db;
   extraPlugins?: Array<BetterAuthPlugin>;
   fromEmail?: string;
-  prisma: PrismaClient;
   resendApiKey?: string;
   secret: string;
 };
 
 export const createAuth = (config: AuthConfig) => {
   const {
+    db: database,
     extraPlugins = [],
     fromEmail = "noreply@acme.com",
-    prisma,
     resendApiKey,
     secret,
   } = config;
@@ -81,8 +82,9 @@ export const createAuth = (config: AuthConfig) => {
       protocol: "auto",
     },
 
-    database: prismaAdapter(prisma, {
-      provider: "postgresql",
+    database: drizzleAdapter(database, {
+      provider: "pg",
+      schema,
     }),
 
     emailAndPassword: {
