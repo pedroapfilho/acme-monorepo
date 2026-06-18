@@ -53,9 +53,6 @@ yarn-error.log*
 logs/
 *.log
 
-# prisma generated
-**/src/generated/
-
 # redis
 *.rdb
 
