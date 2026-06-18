@@ -20,7 +20,9 @@ export const verification = pgTable(
     expiresAt: timestamp({ mode: "string", precision: 3 }).notNull(),
     id: text().primaryKey().notNull(),
     identifier: text().notNull(),
-    updatedAt: timestamp({ mode: "string", precision: 3 }).notNull(),
+    updatedAt: timestamp({ mode: "string", precision: 3 })
+      .notNull()
+      .$onUpdate(() => new Date().toISOString()),
     value: text().notNull(),
   },
   (table) => [
@@ -63,7 +65,9 @@ export const user = pgTable(
     id: text().primaryKey().notNull(),
     image: text(),
     name: text(),
-    updatedAt: timestamp({ mode: "string", precision: 3 }).notNull(),
+    updatedAt: timestamp({ mode: "string", precision: 3 })
+      .notNull()
+      .$onUpdate(() => new Date().toISOString()),
     username: text(),
   },
   (table) => [
@@ -90,7 +94,9 @@ export const session = pgTable(
     id: text().primaryKey().notNull(),
     ipAddress: text(),
     token: text().notNull(),
-    updatedAt: timestamp({ mode: "string", precision: 3 }).notNull(),
+    updatedAt: timestamp({ mode: "string", precision: 3 })
+      .notNull()
+      .$onUpdate(() => new Date().toISOString()),
     userAgent: text(),
     userId: text().notNull(),
   },
@@ -123,7 +129,9 @@ export const account = pgTable(
     refreshToken: text(),
     refreshTokenExpiresAt: timestamp({ mode: "string", precision: 3 }),
     scope: text(),
-    updatedAt: timestamp({ mode: "string", precision: 3 }).notNull(),
+    updatedAt: timestamp({ mode: "string", precision: 3 })
+      .notNull()
+      .$onUpdate(() => new Date().toISOString()),
     userId: text().notNull(),
   },
   (table) => [
