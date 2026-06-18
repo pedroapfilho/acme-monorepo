@@ -47,8 +47,8 @@ type ServiceUser = Awaited<ReturnType<typeof findUserById>>;
 
 const serializeUser = (user: ServiceUser) => ({
   ...user,
-  createdAt: user.createdAt.toISOString(),
-  updatedAt: user.updatedAt.toISOString(),
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
 });
 
 const v1UserRoutes = new OpenAPIHono<{ Variables: AuthVariables }>();

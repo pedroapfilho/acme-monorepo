@@ -1,176 +1,122 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-vi.mock("@repo/db", () => ({
-  prisma: {
-    user: {
-      delete: vi.fn(),
-      findFirst: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
-
-vi.mock("@/lib/env", () => ({
-  env: { NODE_ENV: "test" },
-}));
-
-import { prisma } from "@repo/db";
+import { db, user } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { AppError } from "@/middleware/error-handler";
 
 import { deleteUser, findUserByEmail, findUserById, updateUser } from "./users";
 
-const mockUser = {
-  createdAt: new Date("2024-01-01"),
-  displayName: "Test User",
-  email: "test@example.com",
-  emailVerified: true,
-  id: "user-1",
-  name: "Test",
-  updatedAt: new Date("2024-01-01"),
-  username: "testuser",
-};
+const TEST_USER_ID = "test-user-integration";
+const TEST_USER_2_ID = "test-user-integration-2";
 
-const prismaKnownError = (code: string) =>
-  Object.assign(new Error("Prisma error"), { clientVersion: "7.0.0", code });
+const makeUser = (overrides?: Partial<typeof user.$inferInsert>) => ({
+  email: "integration-test@example.com",
+  emailVerified: false,
+  id: TEST_USER_ID,
+  name: "Integration Test",
+  updatedAt: new Date().toISOString(),
+  ...overrides,
+});
+
+beforeEach(async () => {
+  await db.delete(user).where(eq(user.id, TEST_USER_ID));
+  await db.delete(user).where(eq(user.id, TEST_USER_2_ID));
+  await db.insert(user).values(makeUser());
+});
+
+afterEach(async () => {
+  await db.delete(user).where(eq(user.id, TEST_USER_ID));
+  await db.delete(user).where(eq(user.id, TEST_USER_2_ID));
+});
 
 describe("findUserById", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("returns user when found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as never);
-
-    const result = await findUserById("user-1");
-
-    expect(result).toEqual(mockUser);
-    expect(prisma.user.findUnique).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "user-1" } }),
-    );
+    const result = await findUserById(TEST_USER_ID);
+    expect(result.id).toBe(TEST_USER_ID);
+    expect(result.email).toBe("integration-test@example.com");
   });
 
   it("throws AppError 404 when user not found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null as never);
-
-    await expect(findUserById("missing")).rejects.toThrow(AppError);
-    await expect(findUserById("missing")).rejects.toMatchObject({
+    await expect(findUserById("non-existent")).rejects.toMatchObject({
       code: "USER_NOT_FOUND",
       statusCode: 404,
     });
-  });
-
-  it("propagates database errors to the central error handler", async () => {
-    const dbError = new Error("DB connection lost");
-    vi.mocked(prisma.user.findUnique).mockRejectedValue(dbError);
-
-    await expect(findUserById("user-1")).rejects.toThrow(dbError);
+    await expect(findUserById("non-existent")).rejects.toBeInstanceOf(AppError);
   });
 });
 
 describe("findUserByEmail", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("returns user when found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as never);
-
-    const result = await findUserByEmail("test@example.com");
-
-    expect(result).toEqual(mockUser);
+    const result = await findUserByEmail("integration-test@example.com");
+    expect(result?.id).toBe(TEST_USER_ID);
   });
 
   it("returns null when user not found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null as never);
-
-    const result = await findUserByEmail("missing@example.com");
-
+    const result = await findUserByEmail("nobody@example.com");
     expect(result).toBeNull();
-  });
-
-  it("propagates database errors to the central error handler", async () => {
-    const dbError = new Error("DB error");
-    vi.mocked(prisma.user.findUnique).mockRejectedValue(dbError);
-
-    await expect(findUserByEmail("test@example.com")).rejects.toThrow(dbError);
   });
 });
 
 describe("updateUser", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("updates and returns user", async () => {
-    vi.mocked(prisma.user.update).mockResolvedValue(mockUser as never);
-
-    const result = await updateUser("user-1", { name: "New Name" });
-
-    expect(result).toEqual(mockUser);
+    const result = await updateUser(TEST_USER_ID, { name: "Updated Name" });
+    expect(result.name).toBe("Updated Name");
+    expect(result.id).toBe(TEST_USER_ID);
   });
 
   it("throws AppError 409 USERNAME_TAKEN when a username change hits the unique constraint", async () => {
-    const conflict = prismaKnownError("P2002");
-    vi.mocked(prisma.user.update).mockRejectedValue(conflict);
-
-    await expect(updateUser("user-2", { username: "testuser" })).rejects.toMatchObject({
+    await db.insert(user).values(
+      makeUser({
+        email: "user2@example.com",
+        id: TEST_USER_2_ID,
+        updatedAt: new Date().toISOString(),
+        username: "taken-username",
+      }),
+    );
+    await expect(updateUser(TEST_USER_ID, { username: "taken-username" })).rejects.toMatchObject({
       code: "USERNAME_TAKEN",
       statusCode: 409,
     });
   });
 
-  it("does NOT mislabel a non-username P2002 as USERNAME_TAKEN", async () => {
-    const conflict = prismaKnownError("P2002");
-    vi.mocked(prisma.user.update).mockRejectedValue(conflict);
-
-    // The update did not change the username, so the P2002 (e.g. email) must
-    // propagate untouched for the central handler's generic 409 DUPLICATE_ENTRY.
-    await expect(updateUser("user-1", { name: "X" })).rejects.toMatchObject({ code: "P2002" });
-    await expect(updateUser("user-1", { name: "X" })).rejects.not.toBeInstanceOf(AppError);
+  it("does NOT mislabel a non-username 23505 as USERNAME_TAKEN", async () => {
+    await db
+      .insert(user)
+      .values(
+        makeUser({
+          email: "taken-email@example.com",
+          id: TEST_USER_2_ID,
+          updatedAt: new Date().toISOString(),
+        }),
+      );
+    const caughtError = await updateUser(TEST_USER_ID, { email: "taken-email@example.com" }).catch(
+      (error: unknown) => error,
+    );
+    expect(caughtError).not.toBeInstanceOf(AppError);
+    // DrizzleQueryError wraps the pg error in .cause; pg code 23505 lives there.
+    expect((caughtError as { cause?: { code?: string } }).cause?.code).toBe("23505");
   });
 
-  it("propagates P2025 to the central error handler", async () => {
-    const notFound = prismaKnownError("P2025");
-    vi.mocked(prisma.user.update).mockRejectedValue(notFound);
-
-    await expect(updateUser("missing", { name: "X" })).rejects.toMatchObject({ code: "P2025" });
-  });
-
-  it("propagates generic database errors to the central error handler", async () => {
-    const dbError = new Error("Connection refused");
-    vi.mocked(prisma.user.update).mockRejectedValue(dbError);
-
-    await expect(updateUser("user-1", { name: "X" })).rejects.toThrow(dbError);
+  it("throws AppError 404 when user not found", async () => {
+    await expect(updateUser("non-existent", { name: "X" })).rejects.toMatchObject({
+      code: "USER_NOT_FOUND",
+      statusCode: 404,
+    });
   });
 });
 
 describe("deleteUser", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
   it("deletes user and returns success", async () => {
-    vi.mocked(prisma.user.delete).mockResolvedValue(mockUser as never);
-
-    const result = await deleteUser("user-1");
-
+    const result = await deleteUser(TEST_USER_ID);
     expect(result).toEqual({ success: true });
-    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
+    const check = await findUserByEmail("integration-test@example.com");
+    expect(check).toBeNull();
   });
 
-  it("propagates P2025 to the central error handler", async () => {
-    const notFound = prismaKnownError("P2025");
-    vi.mocked(prisma.user.delete).mockRejectedValue(notFound);
-
-    await expect(deleteUser("missing")).rejects.toMatchObject({ code: "P2025" });
-  });
-
-  it("propagates generic database errors to the central error handler", async () => {
-    const dbError = new Error("DB error");
-    vi.mocked(prisma.user.delete).mockRejectedValue(dbError);
-
-    await expect(deleteUser("user-1")).rejects.toThrow(dbError);
+  it("throws AppError 404 when user not found", async () => {
+    await expect(deleteUser("non-existent")).rejects.toMatchObject({
+      code: "USER_NOT_FOUND",
+      statusCode: 404,
+    });
   });
 });

@@ -1,4 +1,3 @@
-import type { Prisma } from "@repo/db";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
@@ -6,10 +5,28 @@ import { ZodError } from "zod";
 
 import { env } from "@/lib/env";
 
-const isPrismaKnownError = (
-  err: unknown,
-): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
-  err instanceof Error && "code" in err && "clientVersion" in err;
+// Drizzle wraps pg errors in DrizzleQueryError; unwrap to get the underlying cause.
+const extractPgCode = (err: unknown): string | undefined => {
+  if (typeof err !== "object" || err === null) {
+    return undefined;
+  }
+  if ("cause" in err) {
+    const cause = (err as { cause: unknown }).cause;
+    if (typeof cause === "object" && cause !== null && "code" in cause) {
+      const code = (cause as { code: unknown }).code;
+      if (typeof code === "string" && /^\d{5}$/v.test(code)) {
+        return code;
+      }
+    }
+  }
+  if ("code" in err) {
+    const code = (err as { code: unknown }).code;
+    if (typeof code === "string" && /^\d{5}$/v.test(code)) {
+      return code;
+    }
+  }
+  return undefined;
+};
 
 class AppError extends Error {
   public readonly statusCode: ContentfulStatusCode;
@@ -78,30 +95,15 @@ const errorHandler = (err: Error, c: Context) => {
     );
   }
 
-  if (isPrismaKnownError(err)) {
-    if (err.code === "P2002") {
-      return c.json(
-        {
-          error: {
-            code: "DUPLICATE_ENTRY",
-            message: "A record with this value already exists",
-          },
-        },
-        409 as const,
-      );
-    }
-
-    if (err.code === "P2025") {
-      return c.json(
-        {
-          error: {
-            code: "NOT_FOUND",
-            message: "Record not found",
-          },
-        },
-        404 as const,
-      );
-    }
+  const pgCode = extractPgCode(err);
+  if (pgCode === "23505") {
+    return c.json({ code: "DUPLICATE_ENTRY", message: "Resource already exists" }, 409);
+  }
+  if (pgCode === "23503") {
+    return c.json({ code: "FOREIGN_KEY_VIOLATION", message: "Referenced resource not found" }, 409);
+  }
+  if (pgCode === "23502") {
+    return c.json({ code: "NOT_NULL_VIOLATION", message: "Required field missing" }, 400);
   }
 
   const message = env.NODE_ENV === "production" ? "An unexpected error occurred" : err.message;

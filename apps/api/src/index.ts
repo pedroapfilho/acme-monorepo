@@ -2,10 +2,11 @@ import "dotenv/config";
 
 import { serve } from "@hono/node-server";
 import { createRoute, z } from "@hono/zod-openapi";
-import { prisma } from "@repo/db";
+import { db } from "@repo/db";
 import { createIdentify } from "@repo/observability/auth";
 import { honoEvlog, initApiLogger, log } from "@repo/observability/hono";
 import { createMarkdownFromOpenApi } from "@scalar/openapi-to-markdown";
+import { sql } from "drizzle-orm";
 import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
@@ -113,7 +114,7 @@ const readyzRoute = createRoute({
 
 app.openapi(readyzRoute, async (c) => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await db.execute(sql`SELECT 1`);
 
     return c.json(
       {
@@ -170,12 +171,12 @@ serve({
 
 process.on("SIGTERM", async () => {
   log.info("server", "SIGTERM received, shutting down gracefully");
-  await prisma.$disconnect();
+  await db.$client.end();
   process.exit(0);
 });
 
 process.on("SIGINT", async () => {
   log.info("server", "SIGINT received, shutting down gracefully");
-  await prisma.$disconnect();
+  await db.$client.end();
   process.exit(0);
 });

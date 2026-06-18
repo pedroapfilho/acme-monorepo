@@ -102,33 +102,45 @@ describe("errorHandler", () => {
     );
   });
 
-  it("handles P2002 as 409 DUPLICATE_ENTRY", async () => {
+  it("handles pg 23505 as 409 DUPLICATE_ENTRY", async () => {
     const { ctx, mocks } = createMockContext();
     const err = Object.assign(new Error("Unique constraint failed"), {
-      clientVersion: "7.0.0",
-      code: "P2002",
+      code: "23505",
     });
 
     await errorHandler(err, ctx);
 
     expect(mocks.json).toHaveBeenCalledWith(
-      { error: { code: "DUPLICATE_ENTRY", message: "A record with this value already exists" } },
+      { code: "DUPLICATE_ENTRY", message: "Resource already exists" },
       409,
     );
   });
 
-  it("handles P2025 as 404 NOT_FOUND", async () => {
+  it("handles pg 23503 as 409 FOREIGN_KEY_VIOLATION", async () => {
     const { ctx, mocks } = createMockContext();
-    const err = Object.assign(new Error("Record not found"), {
-      clientVersion: "7.0.0",
-      code: "P2025",
+    const err = Object.assign(new Error("Foreign key constraint failed"), {
+      code: "23503",
     });
 
     await errorHandler(err, ctx);
 
     expect(mocks.json).toHaveBeenCalledWith(
-      { error: { code: "NOT_FOUND", message: "Record not found" } },
-      404,
+      { code: "FOREIGN_KEY_VIOLATION", message: "Referenced resource not found" },
+      409,
+    );
+  });
+
+  it("handles pg 23502 as 400 NOT_NULL_VIOLATION", async () => {
+    const { ctx, mocks } = createMockContext();
+    const err = Object.assign(new Error("Not null constraint failed"), {
+      code: "23502",
+    });
+
+    await errorHandler(err, ctx);
+
+    expect(mocks.json).toHaveBeenCalledWith(
+      { code: "NOT_NULL_VIOLATION", message: "Required field missing" },
+      400,
     );
   });
 
