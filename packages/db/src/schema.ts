@@ -65,6 +65,7 @@ export const user = pgTable(
     id: text().primaryKey().notNull(),
     image: text(),
     name: text(),
+    // .$onUpdate fires only on db.update() — NOT on insert or onConflictDoUpdate upserts.
     updatedAt: timestamp({ mode: "string", precision: 3 })
       .notNull()
       .$onUpdate(() => new Date().toISOString()),
