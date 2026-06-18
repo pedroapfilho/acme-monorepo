@@ -1,6 +1,6 @@
 import { db, user, verification as verificationTable } from "@repo/db";
 import { signJWT } from "better-auth/crypto";
-import { and, eq, gt, like } from "drizzle-orm";
+import { and, desc, eq, gt, like } from "drizzle-orm";
 
 import { webUrl } from "../../../playwright.config";
 
@@ -95,7 +95,7 @@ const forResetPassword = async (
           eq(verificationTable.value, foundUser.id),
         ),
       )
-      .orderBy(verificationTable.createdAt)
+      .orderBy(desc(verificationTable.createdAt))
       .limit(1);
 
     if (row) {
