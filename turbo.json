@@ -40,7 +40,8 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
     "test:watch": {
       "dependsOn": ["^build"],
