@@ -9,7 +9,7 @@ Project conventions and defaults live in [`docs/CONVENTIONS.md`](docs/CONVENTION
 - **Framework:** Next.js 16 (App Router, Turbopack dev), Hono on Node 24
 - **Language:** TypeScript (strict)
 - **Styling:** Tailwind CSS v4, base-ui primitives, shadcn-style composition
-- **Database:** Prisma 7, PostgreSQL 18
+- **Database:** Drizzle ORM, PostgreSQL 18
 - **Auth:** Better Auth (email + password, secure cookies)
 - **Email:** Resend via `@repo/transactional` (React Email templates)
 - **Monorepo:** Turborepo + pnpm 11 workspaces (`apps/*`, `packages/*`)
@@ -26,7 +26,7 @@ apps/
 packages/
   ui/                  Shared React components, TanStack Form fields, base styles
   auth/                Better Auth config — exports ./server (api) and ./client (web/landing)
-  db/                  Prisma client singleton + schema (User, Session, Account, Verification)
+  db/                  Drizzle client singleton + schema (src/schema.ts)
   transactional/       React Email templates + Resend sender
   config-typescript/   Shared tsconfig bases (nextjs / server / react-library / vite)
   config-vitest/       Shared Vitest configs (react.ts, node.ts)
@@ -53,8 +53,8 @@ pnpm test                # turbo run test — Vitest in every workspace
 pnpm test:e2e            # playwright test (requires web + api running)
 pnpm test:e2e:ui         # playwright with interactive UI
 
-pnpm db:generate         # prisma generate
-pnpm db:push             # prisma db push
+pnpm db:generate         # drizzle-kit generate
+pnpm db:push             # drizzle-kit push
 pnpm db:seed             # seed sample data
 
 pnpm fallow:dead         # cross-file dead code / unused exports / cycles
@@ -95,7 +95,7 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 - Password minimum **12 characters**. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
-- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify — it does not serve the auth routes.
+- `api` consumes the auth instance from `@repo/auth/server` (Drizzle adapter from `@repo/db`) for session middleware and observability identify — it does not serve the auth routes.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env.local` — both validate sessions against it.
 - `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
 
@@ -105,10 +105,12 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 - Hono app uses `@repo/observability` (evlog) for logging + `@hono/zod-openapi`.
 - Build via **tsdown** (NOT tsc) — outputs to `dist/`.
 
-### Prisma
+### Drizzle
 
-- `prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
-- `db:generate` is declared in `turbo.json` `build.dependsOn`, so `pnpm build` will regenerate the client before app builds.
+- Schema lives in `packages/db/src/schema.ts`.
+- `drizzle.config.ts` uses `process.env.DATABASE_URL ?? ""` so `drizzle-kit generate` works in CI without database credentials.
+- `db:generate` runs `drizzle-kit generate` to produce migration SQL; it is NOT in turbo `build.dependsOn`.
+- `db:push` applies live DDL via drizzle-kit (dev convenience — use migrations in production).
 
 ### Tooling
 
@@ -149,7 +151,7 @@ Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`,
 ## Notable decisions
 
 - **acme is the template.** Sibling repos (localcine, collabtime, frow, easeia) inherit every shared standard from here. Change acme first, then propagate — see `~/dev/orchestrator/standards.md`.
-- **Prisma client field** of `prisma.config.ts` deliberately falls back to `""` to keep CI green without secrets.
+- **Drizzle config** in `drizzle.config.ts` deliberately falls back to `""` for `DATABASE_URL` to keep CI green without secrets.
 - **pnpm 11 + Node 24** are the minimums (engines).
 - **No `@repo/tailwind-config` package** — Tailwind v4 reads tokens directly from `packages/ui/src/styles/globals.css` via the `@theme` directive; shared base styles also live there.
 - **base-ui (not Radix)** is the primitive layer. Wrappers in `@repo/ui` stay free of spurious `"use client"` directives.
