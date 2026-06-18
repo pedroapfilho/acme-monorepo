@@ -17,21 +17,23 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/seed.ts",
-    "postinstall": "pnpm run db:generate"
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0"
+    "drizzle-orm": "^0.44.0",
+    "pg": "^8.16.0"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.6.2",
+    "@types/pg": "^8.11.0",
     "dotenv": "^17.4.2",
-    "prisma": "^7.8.0",
+    "drizzle-kit": "^0.31.0",
     "tsdown": "^0.22.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
