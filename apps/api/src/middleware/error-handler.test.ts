@@ -111,7 +111,7 @@ describe("errorHandler", () => {
     await errorHandler(err, ctx);
 
     expect(mocks.json).toHaveBeenCalledWith(
-      { code: "DUPLICATE_ENTRY", message: "Resource already exists" },
+      { error: { code: "DUPLICATE_ENTRY", message: "Resource already exists" } },
       409,
     );
   });
@@ -125,7 +125,7 @@ describe("errorHandler", () => {
     await errorHandler(err, ctx);
 
     expect(mocks.json).toHaveBeenCalledWith(
-      { code: "FOREIGN_KEY_VIOLATION", message: "Referenced resource not found" },
+      { error: { code: "FOREIGN_KEY_VIOLATION", message: "Referenced resource not found" } },
       409,
     );
   });
@@ -139,7 +139,7 @@ describe("errorHandler", () => {
     await errorHandler(err, ctx);
 
     expect(mocks.json).toHaveBeenCalledWith(
-      { code: "NOT_NULL_VIOLATION", message: "Required field missing" },
+      { error: { code: "NOT_NULL_VIOLATION", message: "Required field missing" } },
       400,
     );
   });
