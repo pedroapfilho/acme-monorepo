@@ -7,7 +7,7 @@ Monorepo template for all projects. Source of truth for shared patterns, tooling
 - **Framework:** Next.js 16, Hono
 - **Language:** TypeScript (strict)
 - **Styling:** Tailwind CSS v4, Radix UI, shadcn/ui patterns
-- **Database:** Prisma 7, PostgreSQL
+- **Database:** Drizzle ORM, PostgreSQL
 - **Auth:** Better Auth
 - **Monorepo:** Turborepo, pnpm workspaces
 - **Linting:** oxlint
@@ -27,7 +27,7 @@ Monorepo template for all projects. Source of truth for shared patterns, tooling
 | Package                   | Description                    |
 | ------------------------- | ------------------------------ |
 | `@repo/ui`                | Shared React component library |
-| `@repo/db`                | Prisma database client         |
+| `@repo/db`                | Drizzle database client        |
 | `@repo/auth`              | Authentication module          |
 | `@repo/typescript-config` | Shared TypeScript configs      |
 | `@repo/config-vitest`     | Shared Vitest test configs     |
@@ -95,7 +95,7 @@ The URL variables (`NEXT_PUBLIC_API_URL`, `BETTER_AUTH_URL`, `CORS_ORIGINS`, `TR
 ### 5. Initialize the database
 
 ```bash
-pnpm db:generate    # generate the Prisma client
+pnpm db:generate    # run drizzle-kit generate
 pnpm db:push        # apply the schema to your database
 pnpm db:seed        # optional: seed sample data
 ```
@@ -135,7 +135,7 @@ branch fix-styles:    https://fix-styles.acme.web.localhost
 | `pnpm format`       | Format with oxfmt             |
 | `pnpm format:check` | Check formatting              |
 | `pnpm typecheck`    | Run TypeScript checks         |
-| `pnpm db:generate`  | Generate Prisma client        |
+| `pnpm db:generate`  | Run drizzle-kit generate      |
 | `pnpm db:push`      | Push schema to database       |
 | `pnpm db:seed`      | Seed database                 |
 | `pnpm clean`        | Clean all build artifacts     |
