@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { prisma } from "@repo/db";
+import { db, user } from "@repo/db";
+import { eq as drizzleEq } from "drizzle-orm";
 
 import { webUrl } from "../../../playwright.config";
 import { verification } from "../fixtures/verification.fixture";
@@ -113,10 +114,14 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     await page.waitForURL("/dashboard");
 
     // DB now reflects the new email. The user row count is unchanged.
-    const updated = await prisma.user.findUnique({ where: { email: newEmail } });
-    expect(updated).not.toBeNull();
-    const stale = await prisma.user.findUnique({ where: { email: currentEmail } });
-    expect(stale).toBeNull();
+    const [updated] = await db.select().from(user).where(drizzleEq(user.email, newEmail)).limit(1);
+    expect(updated).not.toBeUndefined();
+    const [stale] = await db
+      .select()
+      .from(user)
+      .where(drizzleEq(user.email, currentEmail))
+      .limit(1);
+    expect(stale).toBeUndefined();
 
     // Old email no longer authenticates.
     await page.context().clearCookies();
