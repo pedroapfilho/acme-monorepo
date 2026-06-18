@@ -1,6 +1,7 @@
 import "dotenv/config";
 
-import { prisma } from "./client";
+import { db } from "./client";
+import { user } from "./schema";
 
 const DEFAULT_USERS = [
   {
@@ -8,29 +9,21 @@ const DEFAULT_USERS = [
     emailVerified: false,
     id: "1",
     name: "John Doe",
+    updatedAt: new Date().toISOString(),
   },
   {
     email: "jane@doe.com",
     emailVerified: false,
     id: "2",
     name: "Jane Doe",
+    updatedAt: new Date().toISOString(),
   },
 ];
 
 try {
   const results = await Promise.allSettled(
-    DEFAULT_USERS.map((user) =>
-      prisma.user.upsert({
-        create: {
-          ...user,
-        },
-        update: {
-          ...user,
-        },
-        where: {
-          id: user.id,
-        },
-      }),
+    DEFAULT_USERS.map((u) =>
+      db.insert(user).values(u).onConflictDoUpdate({ set: u, target: user.id }),
     ),
   );
 
@@ -44,8 +37,6 @@ try {
 } catch (error) {
   console.error(error);
   // Re-throw so the script exits non-zero with a stack trace; replaces
-  // process.exit(1) per unicorn/no-process-exit. Disconnect runs in `finally`.
+  // process.exit(1) per unicorn/no-process-exit. Pool teardown on process exit.
   throw error;
-} finally {
-  await prisma.$disconnect();
 }
