@@ -1,5 +1,11 @@
 import type { db } from "@repo/db";
-import * as schema from "@repo/db";
+import {
+  account as accountTable,
+  rateLimit as rateLimitTable,
+  session as sessionTable,
+  user as userTable,
+  verification as verificationTable,
+} from "@repo/db";
 import { log } from "@repo/observability";
 import type { MailerConfig } from "@repo/transactional";
 import { sendTransactionalEmail } from "@repo/transactional";
@@ -84,7 +90,13 @@ export const createAuth = (config: AuthConfig) => {
 
     database: drizzleAdapter(database, {
       provider: "pg",
-      schema,
+      schema: {
+        account: accountTable,
+        rateLimit: rateLimitTable,
+        session: sessionTable,
+        user: userTable,
+        verification: verificationTable,
+      },
     }),
 
     emailAndPassword: {
