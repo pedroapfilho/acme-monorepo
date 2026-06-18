@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_API_URL: apiUrl },
   reactStrictMode: true,
 
-  serverExternalPackages: ["@prisma/client", "@repo/db"],
+  serverExternalPackages: ["@repo/db", "pg"],
 
   transpilePackages: ["@repo/ui", "@repo/observability"],
 };

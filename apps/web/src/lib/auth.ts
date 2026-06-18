@@ -1,5 +1,5 @@
 import { createAuth } from "@repo/auth/server";
-import { prisma } from "@repo/db";
+import { db } from "@repo/db";
 import { nextCookies } from "better-auth/next-js";
 
 // Thin auth instance for server-side session validation only (RSC, proxy).
@@ -20,9 +20,9 @@ export const getAuth = (): Auth => {
       throw new Error("BETTER_AUTH_SECRET environment variable is required");
     }
     cachedAuth = createAuth({
+      db,
       extraPlugins: [nextCookies()],
       fromEmail: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
-      prisma,
       resendApiKey: process.env.RESEND_API_KEY,
       secret,
     });

@@ -1,7 +1,7 @@
 // Idempotent LOCAL-only seed for the e2e test user. The DATABASE_URL loopback
 // check below is the guard that keeps this from running against prod.
 
-import { prisma } from "@repo/db";
+import { account, db, user } from "@repo/db";
 
 import { getAuth } from "@/lib/auth";
 
@@ -24,36 +24,49 @@ const main = async () => {
   const ctx = await getAuth().$context;
   const hashed = await ctx.password.hash(PASSWORD);
 
+  const now = new Date().toISOString();
+
   // Existing rows keep their original id (not SLUG), so use the returned `id` for the account FK.
-  const user = await prisma.user.upsert({
-    create: {
+  const [upsertedUser] = await db
+    .insert(user)
+    .values({
       email: EMAIL,
       // requireEmailVerification blocks sign-in for unverified accounts.
       emailVerified: true,
       id: SLUG,
       name: NAME,
-    },
-    update: {
-      emailVerified: true,
-      name: NAME,
-    },
-    where: { email: EMAIL },
-  });
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      set: {
+        emailVerified: true,
+        name: NAME,
+        updatedAt: now,
+      },
+      target: user.email,
+    })
+    .returning({ id: user.id });
 
-  await prisma.account.upsert({
-    create: {
-      accountId: user.id,
+  const userId = upsertedUser?.id ?? SLUG;
+
+  await db
+    .insert(account)
+    .values({
+      accountId: userId,
+      id: `${userId}-credential`,
       password: hashed,
       providerId: "credential",
-      userId: user.id,
-    },
-    update: { password: hashed },
-    where: { providerId_accountId: { accountId: user.id, providerId: "credential" } },
-  });
+      updatedAt: now,
+      userId,
+    })
+    .onConflictDoUpdate({
+      set: { password: hashed },
+      target: [account.providerId, account.accountId],
+    });
 
   // eslint-disable-next-line no-console -- CI step output: surface the seed result.
   console.log(`✓ e2e user ${EMAIL} ready; password: ${PASSWORD}`);
-  await prisma.$disconnect();
+  await db.$client.end();
 };
 
 await main();
