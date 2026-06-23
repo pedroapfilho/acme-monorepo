@@ -1,6 +1,6 @@
 "use client";
 
-import { type ComponentProps, createContext, use, useId } from "react";
+import { type ComponentProps, createContext, use, useId, useMemo } from "react";
 
 import { cn } from "../lib/utils";
 
@@ -10,8 +10,9 @@ const useFieldContext = () => use(FieldContext);
 
 const Field = ({ className, ...props }: ComponentProps<"div">) => {
   const id = useId();
+  const fieldContextValue = useMemo(() => ({ id }), [id]);
   return (
-    <FieldContext value={{ id }}>
+    <FieldContext value={fieldContextValue}>
       <div className={cn("flex flex-col gap-2", className)} {...props} />
     </FieldContext>
   );
