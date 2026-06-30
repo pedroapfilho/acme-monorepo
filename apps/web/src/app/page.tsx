@@ -7,6 +7,13 @@ export const metadata = {
   title: "Acme",
 };
 
+/**
+ * Redirect-only route: it reads the session to choose a destination and renders
+ * no UI, so there is no shell to stream — block the navigation.
+ * @public Next.js app-router reads the `instant` route config via the module loader
+ */
+export const instant = false;
+
 const Page = async () => {
   const session = await getSession();
   redirect(session ? "/dashboard" : "/login");
