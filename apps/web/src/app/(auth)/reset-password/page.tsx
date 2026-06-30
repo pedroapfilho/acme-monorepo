@@ -13,6 +13,13 @@ const metadata: Metadata = {
   title: "Reset your password",
 };
 
+/**
+ * Entry page reached from the password-reset email link; its form is bound to
+ * the `token` search param, so block rather than stream a shell.
+ * @public Next.js app-router reads the `instant` route config via the module loader
+ */
+export const instant = false;
+
 type Props = {
   searchParams: Promise<{ token?: string }>;
 };

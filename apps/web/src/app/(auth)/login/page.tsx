@@ -19,6 +19,13 @@ const metadata: Metadata = {
   title: "Sign In",
 };
 
+/**
+ * Entry page rendered from a server redirect / cross-link; its content is bound
+ * to `from`/`message` search params, so block rather than stream a shell.
+ * @public Next.js app-router reads the `instant` route config via the module loader
+ */
+export const instant = false;
+
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
 };
