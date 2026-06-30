@@ -1,3 +1,4 @@
+import { Skeleton } from "@repo/ui/components/skeleton";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -48,17 +49,17 @@ const DashboardContent = async () => {
 const DashboardSkeleton = () => (
   <div aria-hidden className="flex flex-col gap-8">
     <header className="flex flex-col gap-2">
-      <div className="h-9 w-48 animate-pulse rounded-md bg-muted" />
-      <div className="h-5 w-32 animate-pulse rounded-md bg-muted" />
+      <Skeleton className="h-9 w-48" />
+      <Skeleton className="h-5 w-32" />
     </header>
     <dl className="grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
       <div className="flex flex-col gap-1">
-        <div className="h-4 w-16 animate-pulse rounded bg-muted" />
-        <div className="h-5 w-40 animate-pulse rounded bg-muted" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-5 w-40" />
       </div>
       <div className="flex flex-col gap-1">
-        <div className="h-4 w-16 animate-pulse rounded bg-muted" />
-        <div className="h-5 w-28 animate-pulse rounded bg-muted" />
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-5 w-28" />
       </div>
     </dl>
   </div>
