@@ -91,7 +91,12 @@ const RegisterForm = ({ from }: Props) => {
             password: value.password,
           });
           if (result.error) {
-            throw new Error(result.error.message ?? "Failed to register");
+            // Inline instead of throw-to-catch: React Compiler can't memoize
+            // components with a ThrowStatement inside try/catch yet.
+            const message = result.error.message ?? "Failed to register";
+            setFormError(message);
+            toast.error(message);
+            return;
           }
           // No token means requireEmailVerification suppressed auto-sign-in (or enumeration prevention
           // returned synthetic success); both paths show the same inline "check your email" state.

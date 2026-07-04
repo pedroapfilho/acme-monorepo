@@ -78,16 +78,24 @@ const ResetPasswordForm = ({ token }: Props) => {
     onSubmit: ({ value }) => {
       setFormError(null);
       startTransition(async () => {
+        // Inline error paths instead of throw-to-catch: React Compiler can't
+        // memoize components with a ThrowStatement inside try/catch yet.
+        if (!token) {
+          const message = "Invalid reset token. Please request a new password reset.";
+          setFormError(message);
+          toast.error(message);
+          return;
+        }
         try {
-          if (!token) {
-            throw new Error("Invalid reset token. Please request a new password reset.");
-          }
           const result = await authClient.resetPassword({
             newPassword: value.password,
             token,
           });
           if (result.error) {
-            throw new Error(result.error.message ?? "Failed to reset password");
+            const message = result.error.message ?? "Failed to reset password";
+            setFormError(message);
+            toast.error(message);
+            return;
           }
           push("/login?message=password-reset-success");
         } catch (error) {

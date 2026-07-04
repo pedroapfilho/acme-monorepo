@@ -120,7 +120,12 @@ const LoginForm = ({ from }: Props) => {
               setShowUnverifiedNotice(true);
               return;
             }
-            throw new Error(result.error.message ?? "Invalid credentials");
+            // Inline instead of throw-to-catch: React Compiler can't memoize
+            // components with a ThrowStatement inside try/catch yet.
+            const message = result.error.message ?? "Invalid credentials";
+            setFormError(message);
+            toast.error(message);
+            return;
           }
           push(from);
           refresh();
