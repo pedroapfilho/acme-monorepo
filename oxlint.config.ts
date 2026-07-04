@@ -23,5 +23,12 @@ export default defineConfig({
         "require-unicode-regexp": "off",
       },
     },
+    // Config files resolve portless URLs at load time — module scope can't await.
+    {
+      files: ["playwright.config.ts", "**/next.config.ts"],
+      rules: {
+        "node/no-sync": "off",
+      },
+    },
   ],
 });

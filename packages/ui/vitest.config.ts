@@ -1,3 +1,1 @@
-import reactConfig from "@repo/config-vitest/react";
-
-export default reactConfig;
+export { default } from "@repo/config-vitest/react";

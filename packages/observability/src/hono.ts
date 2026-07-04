@@ -1,7 +1,7 @@
 import "./fields";
 
-import { initLogger, log } from "evlog";
-import { evlog, type EvlogVariables } from "evlog/hono";
+import { initLogger } from "evlog";
+import { evlog } from "evlog/hono";
 
 import { buildConfig } from "./config";
 
@@ -15,5 +15,6 @@ const honoEvlog = () => evlog();
 
 // The API needs a module-level `log` for startup/shutdown lines without importing
 // `@repo/observability/next` (which is React-coupled). Re-exported from evlog root.
-export { honoEvlog, initApiLogger, log };
-export type { EvlogVariables };
+export { honoEvlog, initApiLogger };
+export { log } from "evlog";
+export type { EvlogVariables } from "evlog/hono";

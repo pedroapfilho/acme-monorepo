@@ -1,4 +1,4 @@
-import { mkdirSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
 
 import { expect, test as setup } from "@playwright/test";
 
@@ -15,7 +15,7 @@ const STORAGE_STATE_PATH = "tests/e2e/.auth/user.json";
 // API sign-in (not UI form) avoids the TanStack Form hydration race where
 // Playwright clicks before onSubmit attaches and falls back to a native GET.
 setup("create and authenticate test user", async ({ page, request }) => {
-  mkdirSync("tests/e2e/.auth", { recursive: true });
+  await mkdir("tests/e2e/.auth", { recursive: true });
 
   const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
     data: { email: TEST_USER.email, password: TEST_USER.password },

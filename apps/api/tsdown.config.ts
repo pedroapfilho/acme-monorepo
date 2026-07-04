@@ -3,6 +3,8 @@ import path from "node:path";
 import alias from "@rollup/plugin-alias";
 import { defineConfig } from "tsdown";
 
+const srcDir = path.resolve(process.cwd(), "src");
+
 export default defineConfig({
   clean: true,
   deps: {
@@ -23,7 +25,7 @@ export default defineConfig({
   platform: "node",
   plugins: [
     alias({
-      entries: [{ find: "@", replacement: path.resolve(process.cwd(), "src") }],
+      entries: [{ find: "@", replacement: srcDir }],
     }),
   ],
   sourcemap: true,

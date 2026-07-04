@@ -18,22 +18,22 @@
     "@repo/observability": "workspace:*",
     "@repo/ui": "workspace:*",
     "@vercel/analytics": "^2.0.1",
-    "lucide-react": "^1.14.0",
+    "lucide-react": "^1.23.0",
     "next": "^16.3.0-preview.5",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@tailwindcss/postcss": "^4.3.0",
+    "@tailwindcss/postcss": "^4.3.2",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^25.6.2",
-    "@types/react": "^19.2.14",
+    "@types/node": "^26.1.0",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "postcss": "^8.5.14",
-    "tailwindcss": "^4.3.0",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.9"
   }
 }

@@ -1,7 +1,7 @@
 import "./fields";
 
-import { createEvlog, evlogMiddleware } from "evlog/next";
-import { createInstrumentation } from "evlog/next/instrumentation";
+import { createEvlog } from "evlog/next";
+import { createInstrumentation } from "evlog/next/instrumentation/create";
 
 import { buildConfig } from "./config";
 
@@ -26,4 +26,5 @@ const createObservability = (opts: { service: string }) => {
   };
 };
 
-export { createObservability, evlogMiddleware };
+export { createObservability };
+export { evlogMiddleware } from "evlog/next";
