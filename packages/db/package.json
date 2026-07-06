@@ -29,12 +29,12 @@
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^25.6.2",
+    "@types/node": "^26.1.0",
     "dotenv": "^17.4.2",
     "prisma": "^7.8.0",
-    "tsdown": "^0.22.0",
-    "tsx": "^4.21.0",
+    "tsdown": "^0.22.3",
+    "tsx": "^4.22.5",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.9"
   }
 }

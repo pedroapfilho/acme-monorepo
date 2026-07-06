@@ -32,16 +32,24 @@ const updateUserSchema = z
   })
   .openapi("UpdateUserInput");
 
+const errorDetailSchema = z.object({ field: z.string(), message: z.string() });
+
 const errorSchema = z
   .object({
     error: z.object({
       code: z.string(),
-      details: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+      details: z.array(errorDetailSchema).optional(),
       message: z.string(),
       stack: z.string().optional(),
     }),
   })
   .openapi("Error");
+
+const userListMetaSchema = z.object({
+  page: z.number(),
+  total: z.number(),
+  totalPages: z.number(),
+});
 
 type ServiceUser = Awaited<ReturnType<typeof findUserById>>;
 
@@ -156,11 +164,7 @@ const listUsersRoute = createRoute({
         "application/json": {
           schema: z.object({
             data: z.array(userSchema),
-            meta: z.object({
-              page: z.number(),
-              total: z.number(),
-              totalPages: z.number(),
-            }),
+            meta: userListMetaSchema,
           }),
         },
       },

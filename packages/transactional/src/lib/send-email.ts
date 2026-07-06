@@ -17,21 +17,21 @@ const senderAddressSchema = z.string().refine(
   { message: "Must be a valid email or 'Display Name <email>' format" },
 );
 
+const recipientSchema = z.union([z.email(), z.array(z.email())]);
+
+const tagSchema = z.object({
+  name: z.string(),
+  value: z.string(),
+});
+
 const emailConfigSchema = z.object({
-  bcc: z.union([z.email(), z.array(z.email())]).optional(),
-  cc: z.union([z.email(), z.array(z.email())]).optional(),
+  bcc: recipientSchema.optional(),
+  cc: recipientSchema.optional(),
   from: senderAddressSchema.default("Acme <noreply@acme.com>"),
   replyTo: senderAddressSchema.optional(),
   subject: z.string(),
-  tags: z
-    .array(
-      z.object({
-        name: z.string(),
-        value: z.string(),
-      }),
-    )
-    .optional(),
-  to: z.union([z.email(), z.array(z.email())]),
+  tags: z.array(tagSchema).optional(),
+  to: recipientSchema,
 });
 
 // z.input keeps `from` optional for callers — the Zod default fills it in

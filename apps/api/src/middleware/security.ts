@@ -74,7 +74,7 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
   return async (c: Context, next: Next) => {
     const contentLength = c.req.header("content-length");
 
-    if (contentLength && Number.parseInt(contentLength, 10) > maxSize) {
+    if (contentLength && Math.trunc(Number(contentLength)) > maxSize) {
       return c.json(
         {
           error: {

@@ -84,7 +84,9 @@ const resendFetch = async (path: string): Promise<Response> => {
     // Honor server-suggested wait when present (Resend sends `retry-after`
     // in seconds — never an HTTP-date for this API). Fall back to
     // exponential backoff for 5xx or odd 429s without the header.
-    const retryAfter = Number.parseInt(response.headers.get("retry-after") ?? "", 10);
+    const retryAfterHeader = response.headers.get("retry-after");
+    // `Number("")` is 0, which would skip the backoff — keep NaN when the header is missing.
+    const retryAfter = retryAfterHeader ? Math.trunc(Number(retryAfterHeader)) : Number.NaN;
     const delayMs = Number.isFinite(retryAfter)
       ? Math.min(retryAfter, RETRY_MAX_RETRY_AFTER_SECONDS) * 1000 +
         Math.floor(Math.random() * RETRY_JITTER_MS)
