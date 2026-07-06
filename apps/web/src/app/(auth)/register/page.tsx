@@ -5,7 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import { Skeleton } from "@repo/ui/components/skeleton";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import RegisterForm from "@/app/(auth)/register/form";
 import { safeRedirectPath } from "@/lib/redirect-validation";
@@ -14,18 +16,11 @@ const metadata: Metadata = {
   title: "Create an account",
 };
 
-/**
- * Entry page bound to the `from` search param carried over from the login
- * cross-link, so block rather than stream a shell.
- * @public Next.js app-router reads the `instant` route config via the module loader
- */
-export const instant = false;
-
 type Props = {
   searchParams: Promise<{ from?: string }>;
 };
 
-const Page = async ({ searchParams }: Props) => {
+const RegisterContent = async ({ searchParams }: Props) => {
   const { from } = await searchParams;
   // Carried over from the login form's cross-link (the proxy bounces
   // logged-out visitors to /login?from=<path>). Sanitised server-side like
@@ -45,6 +40,29 @@ const Page = async ({ searchParams }: Props) => {
     </Card>
   );
 };
+
+// Static shell for the prerender: the content is bound to the `from` search
+// param, so cacheComponents needs a Suspense boundary above it.
+const RegisterSkeleton = () => (
+  <Card aria-hidden>
+    <CardHeader className="text-center">
+      <CardTitle className="text-xl">Create your account</CardTitle>
+      <CardDescription>Enter your details below to create your account</CardDescription>
+    </CardHeader>
+    <CardContent className="flex flex-col gap-4">
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+    </CardContent>
+  </Card>
+);
+
+const Page = (props: Props) => (
+  <Suspense fallback={<RegisterSkeleton />}>
+    <RegisterContent {...props} />
+  </Suspense>
+);
 
 export { metadata };
 

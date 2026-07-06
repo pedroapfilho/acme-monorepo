@@ -5,7 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import { Skeleton } from "@repo/ui/components/skeleton";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import LoginForm from "@/app/(auth)/login/form";
 import { safeRedirectPath } from "@/lib/redirect-validation";
@@ -19,18 +21,11 @@ const metadata: Metadata = {
   title: "Sign In",
 };
 
-/**
- * Entry page rendered from a server redirect / cross-link; its content is bound
- * to `from`/`message` search params, so block rather than stream a shell.
- * @public Next.js app-router reads the `instant` route config via the module loader
- */
-export const instant = false;
-
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
 };
 
-const Page = async ({ searchParams }: Props) => {
+const LoginContent = async ({ searchParams }: Props) => {
   const { from, message } = await searchParams;
   // Sanitise the redirect target server-side: safeRedirectPath is the single
   // open-redirect gate — only in-app relative paths survive (e.g.
@@ -56,6 +51,28 @@ const Page = async ({ searchParams }: Props) => {
     </Card>
   );
 };
+
+// Static shell for the prerender: the content is bound to `from`/`message`
+// search params, so cacheComponents needs a Suspense boundary above them.
+const LoginSkeleton = () => (
+  <Card aria-hidden>
+    <CardHeader className="text-center">
+      <CardTitle className="text-xl">Welcome back</CardTitle>
+      <CardDescription>Enter your details to sign in to your account</CardDescription>
+    </CardHeader>
+    <CardContent className="flex flex-col gap-4">
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+    </CardContent>
+  </Card>
+);
+
+const Page = (props: Props) => (
+  <Suspense fallback={<LoginSkeleton />}>
+    <LoginContent {...props} />
+  </Suspense>
+);
 
 export { metadata };
 
