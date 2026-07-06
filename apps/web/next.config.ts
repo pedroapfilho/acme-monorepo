@@ -28,10 +28,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
   cacheComponents: true,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
-  experimental: {
-    turbopackRustReactCompiler: true,
-  },
-  partialPrefetching: true,
   reactCompiler: true,
   reactStrictMode: true,
   serverExternalPackages: ["@prisma/client", "@repo/db"],

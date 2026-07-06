@@ -5,7 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/components/card";
+import { Skeleton } from "@repo/ui/components/skeleton";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import ResetPasswordForm from "@/app/(auth)/reset-password/form";
 
@@ -13,18 +15,11 @@ const metadata: Metadata = {
   title: "Reset your password",
 };
 
-/**
- * Entry page reached from the password-reset email link; its form is bound to
- * the `token` search param, so block rather than stream a shell.
- * @public Next.js app-router reads the `instant` route config via the module loader
- */
-export const instant = false;
-
 type Props = {
   searchParams: Promise<{ token?: string }>;
 };
 
-const Page = async ({ searchParams }: Props) => {
+const ResetPasswordContent = async ({ searchParams }: Props) => {
   const { token = null } = await searchParams;
 
   return (
@@ -39,6 +34,29 @@ const Page = async ({ searchParams }: Props) => {
     </Card>
   );
 };
+
+// Static shell for the prerender: the form is bound to the `token` search
+// param from the password-reset email link, so cacheComponents needs a
+// Suspense boundary above it.
+const ResetPasswordSkeleton = () => (
+  <Card aria-hidden>
+    <CardHeader className="text-center">
+      <CardTitle className="text-xl">Reset your password</CardTitle>
+      <CardDescription>Enter a new password for your account</CardDescription>
+    </CardHeader>
+    <CardContent className="flex flex-col gap-4">
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+      <Skeleton className="h-9 w-full" />
+    </CardContent>
+  </Card>
+);
+
+const Page = (props: Props) => (
+  <Suspense fallback={<ResetPasswordSkeleton />}>
+    <ResetPasswordContent {...props} />
+  </Suspense>
+);
 
 export { metadata };
 
