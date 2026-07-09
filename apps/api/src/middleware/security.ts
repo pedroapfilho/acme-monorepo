@@ -46,7 +46,7 @@ export const standardRateLimit = rateLimiter({
   keyGenerator: (c: Context) => getClientIp(c),
   limit: 100,
   standardHeaders: "draft-6",
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
 });
 
 export const apiRateLimit = rateLimiter({
@@ -67,7 +67,7 @@ export const apiRateLimit = rateLimiter({
   },
   limit: 30,
   standardHeaders: "draft-6",
-  windowMs: 1 * 60 * 1000, // 1 minute
+  windowMs: 1 * 60 * 1000,
 });
 
 export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {

@@ -34,7 +34,7 @@ type FieldInputProps = {
   value: string;
 };
 
-// These are proper React components so they can call useFieldContext inside <Field>.
+// useFieldContext requires a proper component, not an inline render fn.
 const EmailFieldInput = ({
   errors,
   isInvalid,
@@ -114,14 +114,12 @@ const LoginForm = ({ from }: Props) => {
             password: value.password,
           });
           if (result.error) {
-            // Better Auth 403s unverified accounts and (sendOnSignIn) re-sends
-            // the verification link — informational, not a credentials error.
+            // EMAIL_NOT_VERIFIED re-sends the link — informational, not a credentials error.
             if (result.error.code === "EMAIL_NOT_VERIFIED") {
               setShowUnverifiedNotice(true);
               return;
             }
-            // Inline instead of throw-to-catch: React Compiler can't memoize
-            // components with a ThrowStatement inside try/catch yet.
+            // Inline instead of throw-to-catch: React Compiler can't memoize try/catch throws yet.
             const message = result.error.message ?? "Invalid credentials";
             setFormError(message);
             toast.error(message);
@@ -145,7 +143,6 @@ const LoginForm = ({ from }: Props) => {
     <form
       noValidate
       onSubmit={(e) => {
-        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();
@@ -221,8 +218,6 @@ const LoginForm = ({ from }: Props) => {
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
-            {/* Carry the redirect context across the form switch so signup can
-                bake it into the verification email's callbackURL. */}
             <Link
               className="text-foreground underline underline-offset-4"
               href={

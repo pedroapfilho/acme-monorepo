@@ -41,10 +41,7 @@ export const updateUser = async (id: string, data: Prisma.UserUpdateInput) => {
       where: { id },
     });
   } catch (error) {
-    // Only a username change can raise a username-uniqueness violation. Guarding
-    // on data.username keeps an unrelated P2002 (email, displayUsername) flowing
-    // to the central handler as a generic 409 instead of a misleading
-    // USERNAME_TAKEN.
+    // Guard on data.username so unrelated P2002s surface as generic 409, not USERNAME_TAKEN.
     if (
       typeof data.username === "string" &&
       error instanceof Error &&

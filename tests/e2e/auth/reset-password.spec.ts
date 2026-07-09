@@ -25,8 +25,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("any-token-value");
     await resetPasswordPage.submit("NewPassword123!", "DifferentPassword1!");
 
-    // sr-only live region + sonner toast both render the same string —
-    // strict-mode needs `.first()`.
+    // sr-only live region + Sonner toast duplicate the string — strict-mode needs .first().
     await expect(page.getByText(/passwords do not match/i).first()).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });
@@ -47,8 +46,6 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("definitely-not-a-real-token");
     await resetPasswordPage.submit("ValidPassword123!", "ValidPassword123!");
 
-    // Better Auth rejects unknown tokens — the form surfaces the server message
-    // via a Sonner toast (toast.error from @repo/ui/components/sonner).
     await expect(page.locator('[data-sonner-toast][data-type="error"]')).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });

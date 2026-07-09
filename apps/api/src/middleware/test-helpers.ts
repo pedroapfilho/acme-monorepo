@@ -18,8 +18,7 @@ export type MockContextMocks = {
   set: ReturnType<typeof vi.fn>;
 };
 
-// One cast is unavoidable because Hono's Context surface is too large
-// to fully mock; consolidating to one helper means test files stay cast-free.
+// One unavoidable cast — Hono's Context is too large to fully mock.
 export const createMockContext = (
   opts: CreateMockContextOptions = {},
 ): { ctx: Context; mocks: MockContextMocks } => {
@@ -28,7 +27,6 @@ export const createMockContext = (
   const loggerSet = vi.fn();
   const loggerWarn = vi.fn();
 
-  // Seed evlog's request logger so `c.get("log")` resolves in tests.
   const evlogLogger = {
     error: loggerError,
     info: loggerInfo,

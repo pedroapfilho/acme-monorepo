@@ -5,11 +5,9 @@ import { createInstrumentation } from "evlog/next/instrumentation/create";
 
 import { buildConfig } from "./config";
 
-/** Per-app Next factory. Returns request-scoped helpers + instrumentation hooks. */
 const createObservability = (opts: { service: string }) => {
   const { redact, ...shared } = buildConfig(opts.service);
-  // `NextEvlogOptions` accepts the full config (incl. `redact`); `InstrumentationOptions`
-  // does not have a `redact` key, so only the shared subset is forwarded there.
+  // InstrumentationOptions lacks redact; only forward the shared subset.
   const next = createEvlog({ redact, service: opts.service, ...shared });
   const instrumentation = createInstrumentation({
     service: opts.service,

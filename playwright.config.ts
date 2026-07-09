@@ -16,9 +16,7 @@ const getPortlessUrl = (name: string) => {
   }
 };
 
-// CI servers bind to 0.0.0.0 (IPv4) but Node 18+ resolves `localhost` to ::1
-// first via getaddrinfo, and undici/fetch doesn't fall back to IPv4. Use the
-// explicit IPv4 loopback for CI probes; locally portless gives us the real URL.
+// CI binds 0.0.0.0 but Node 18+ resolves localhost to ::1 and undici won't fall back to IPv4.
 export const webUrl = getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
 export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
 export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
@@ -28,7 +26,6 @@ export default defineConfig({
   fullyParallel: true,
   globalTeardown: "./tests/e2e/teardown/cleanup.ts",
 
-  // CI: chromium only. firefox + webkit run locally / nightly.
   projects: [
     { name: "setup", testMatch: /.*\.setup\.ts/v },
     {

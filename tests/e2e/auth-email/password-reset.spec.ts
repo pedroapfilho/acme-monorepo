@@ -21,7 +21,7 @@ test.describe("Password reset", () => {
     const originalPassword = "OriginalPassword1!";
     const newPassword = "BrandNewPassword2!";
 
-    // Welcome-email delivery isn't under test here; use JWT reconstruction.
+    // Welcome email isn't under test — use JWT reconstruction.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email, name: "Reset Me", password: originalPassword, username },
     });
@@ -39,7 +39,6 @@ test.describe("Password reset", () => {
     });
     expect(reset.status()).toBe(200);
 
-    // Assert the reset email actually left Resend (200 with no send is the regression).
     const mail = await waitForEmail({
       sinceMs: since,
       subject: /reset/i,

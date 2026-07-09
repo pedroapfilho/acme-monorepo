@@ -22,10 +22,6 @@ type Props = {
 
 const RegisterContent = async ({ searchParams }: Props) => {
   const { from } = await searchParams;
-  // Carried over from the login form's cross-link (the proxy bounces
-  // logged-out visitors to /login?from=<path>). Sanitised server-side like
-  // the login page; the form bakes it into the verification email's
-  // callbackURL so the clicker lands back where they started.
   const safeTo = safeRedirectPath(from);
 
   return (
@@ -41,8 +37,6 @@ const RegisterContent = async ({ searchParams }: Props) => {
   );
 };
 
-// Static shell for the prerender: the content is bound to the `from` search
-// param, so cacheComponents needs a Suspense boundary above it.
 const RegisterSkeleton = () => (
   <Card aria-hidden>
     <CardHeader className="text-center">

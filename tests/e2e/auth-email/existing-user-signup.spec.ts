@@ -27,7 +27,6 @@ test.describe("Sign-up for an existing email (enumeration prevention)", () => {
     // Pin AFTER the first signup so its welcome mail doesn't match below.
     const since = Date.now();
 
-    // Duplicate email → synthetic success; onExistingUserSignUp fires server-side.
     const second = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: {
         email,
@@ -38,12 +37,10 @@ test.describe("Sign-up for an existing email (enumeration prevention)", () => {
     });
     expect([200, 201]).toContain(second.status());
 
-    // Side-effect ceiling: exactly one user row.
     const users = await prisma.user.findMany({ where: { email } });
     expect(users).toHaveLength(1);
     expect(users[0]?.name).toBe("Original Name");
 
-    // Side-effect floor: the notification email actually went out via Resend.
     const mail = await waitForEmail({
       sinceMs: since,
       subject: /sign[\s-]?up|attempt|tried/i,

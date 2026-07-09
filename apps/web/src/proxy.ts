@@ -10,13 +10,9 @@ const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
 
 const getSessionOrNull = async (request: NextRequest) => {
   try {
-    // try/catch instead of a promise-chain .catch(): getAuth() throws
-    // synchronously when BETTER_AUTH_SECRET is absent (e.g. preview deploys),
-    // which a .catch() attached after the call can never intercept.
+    // getAuth() throws synchronously when BETTER_AUTH_SECRET is absent — .catch() can't intercept that.
     return await getAuth().api.getSession({ headers: request.headers });
   } catch (error) {
-    // Auth service failure (DB down, misconfiguration, etc.) — log so outages
-    // are observable, then treat as unauthenticated to keep the pipeline moving.
     log.error({
       error: error instanceof Error ? error.message : String(error),
       message: "proxy: getSession failed — treating as unauthenticated",

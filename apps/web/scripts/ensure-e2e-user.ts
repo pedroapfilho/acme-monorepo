@@ -1,5 +1,4 @@
-// Idempotent LOCAL-only seed for the e2e test user. The DATABASE_URL loopback
-// check below is the guard that keeps this from running against prod.
+// LOCAL-only e2e seed; the DATABASE_URL loopback check below blocks prod runs.
 
 import { prisma } from "@repo/db";
 
@@ -28,7 +27,6 @@ const main = async () => {
   const user = await prisma.user.upsert({
     create: {
       email: EMAIL,
-      // requireEmailVerification blocks sign-in for unverified accounts.
       emailVerified: true,
       id: SLUG,
       name: NAME,

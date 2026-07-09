@@ -151,7 +151,6 @@ v1UserRoutes.openapi(deleteMeRoute, async (c) => {
 });
 
 // TODO: Add a proper role/permission system (e.g. user.role === "admin").
-// Until then, this endpoint returns only the requesting user's own data.
 const listUsersRoute = createRoute({
   description:
     "List users. Currently returns only the requesting user pending a role/permission system.",

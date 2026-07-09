@@ -29,9 +29,7 @@ const app = createOpenAPIApp();
 const identify = createIdentify(auth);
 
 app.use("*", requestId());
-// One wide event per request (method/status/duration); replaces structured-logger + manual timing.
 app.use("*", honoEvlog());
-// Resolve the session and attach identity fields to the request's wide event.
 app.use("*", async (c, next) => {
   await identify(c.get("log"), c.req.raw.headers, c.req.path);
   return next();

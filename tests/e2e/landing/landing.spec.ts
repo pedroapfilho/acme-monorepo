@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 
 import { landingUrl } from "../../../playwright.config";
 
-// Landing pages don't need auth
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("Landing Page", () => {

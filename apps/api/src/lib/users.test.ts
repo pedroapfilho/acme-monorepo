@@ -125,8 +125,6 @@ describe("updateUser", () => {
     const conflict = prismaKnownError("P2002");
     vi.mocked(prisma.user.update).mockRejectedValue(conflict);
 
-    // The update did not change the username, so the P2002 (e.g. email) must
-    // propagate untouched for the central handler's generic 409 DUPLICATE_ENTRY.
     await expect(updateUser("user-1", { name: "X" })).rejects.toMatchObject({ code: "P2002" });
     await expect(updateUser("user-1", { name: "X" })).rejects.not.toBeInstanceOf(AppError);
   });

@@ -18,8 +18,7 @@ const requireSecret = (): string => {
   return secret;
 };
 
-// Reconstructs the HS256 JWT (`{email}` signed with the auth secret) that
-// Better Auth would have emailed, so tests can skip inbox polling.
+// Reconstructs the HS256 JWT Better Auth would email, so tests can skip inbox polling.
 const forVerifyEmail = async (email: string): Promise<{ token: string; url: string }> => {
   const token = await signJWT({ email: email.toLowerCase() }, requireSecret(), 3600);
   const callbackURL = encodeURIComponent("/");
@@ -27,8 +26,7 @@ const forVerifyEmail = async (email: string): Promise<{ token: string; url: stri
   return { token, url };
 };
 
-// Two-stage change-email JWTs share email/updateTo/secret; only requestType
-// differs (confirmation → current mailbox, verification → new mailbox).
+// Change-email JWTs differ only by requestType (confirmation vs verification).
 type ChangeEmailUrls = {
   confirmationToken: string;
   confirmationUrl: string;
@@ -63,8 +61,7 @@ const forChangeEmail = async (currentEmail: string, newEmail: string): Promise<C
   };
 };
 
-// Reset uses a random token persisted in the verification table (not a JWT),
-// so this polls the DB; Better Auth writes the row synchronously.
+// Reset tokens live in the verification table (not JWTs) — poll the DB.
 const forResetPassword = async (
   email: string,
   timeoutMs = 5000,

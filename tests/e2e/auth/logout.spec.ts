@@ -5,8 +5,7 @@ import { expect, test } from "../fixtures/auth.fixture";
 
 const PASSWORD = "TestPassword123!";
 
-// Logout invalidates the DB session row; reusing the shared storageState user
-// would 401 every other spec once Better Auth's 5-minute cookie cache expires.
+// Logout invalidates the DB session — reusing storageState user would 401 other specs after Better Auth's 5-minute cookie cache expires.
 const createIsolatedUser = async (request: APIRequestContext): Promise<string> => {
   const email = `logout-test-${crypto.randomUUID()}@acme.localhost`;
   const response = await request.post(`${webUrl}/api/auth/sign-up/email`, {
@@ -16,8 +15,6 @@ const createIsolatedUser = async (request: APIRequestContext): Promise<string> =
   return email;
 };
 
-// With RESEND_API_KEY set, requireEmailVerification blocks fresh-signup → /dashboard;
-// the auth-email/* suite covers that path.
 const skipUnderResend = !!process.env.RESEND_API_KEY;
 
 test.describe("Logout", () => {

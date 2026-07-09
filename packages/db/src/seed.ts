@@ -37,14 +37,12 @@ try {
   const failures = results.filter((r) => r.status === "rejected");
   if (failures.length > 0) {
     console.error("Some seed operations failed:", failures);
-    // Surface partial failures as a non-zero exit — a green `pnpm db:seed` on a
-    // half-seeded database masks broken schema/data in dev and CI.
+    // Fail on partial upserts — green seed on half-seeded DB masks broken schema in dev/CI.
     throw new Error(`Seed failed: ${failures.length} upsert(s) rejected`);
   }
 } catch (error) {
   console.error(error);
-  // Re-throw so the script exits non-zero with a stack trace; replaces
-  // process.exit(1) per unicorn/no-process-exit. Disconnect runs in `finally`.
+  // Re-throw for non-zero exit (unicorn/no-process-exit); disconnect runs in finally.
   throw error;
 } finally {
   await prisma.$disconnect();

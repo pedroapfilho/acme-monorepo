@@ -8,8 +8,7 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
-// Clean cookie jar: this spec seeds its own user; the shared storageState
-// session would make the signup POST 400 as "already signed in".
+// Shared storageState would make the signup POST 400 as "already signed in".
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("Change email (two-stage confirmation + verification)", () => {
@@ -24,16 +23,14 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const username = makeTestUsername(currentEmail);
     const password = "ChangeEmailPwd1!";
 
-    // Welcome email isn't under test; use JWT reconstruction for the verify step.
+    // Welcome email isn't under test — use JWT reconstruction.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email: currentEmail, name: "Change Me", password, username },
     });
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(currentEmail);
     await page.goto(verify.url);
-    // autoSignInAfterVerification: true — the verify click signs in the page
-    // context and the "/" callback routes to /dashboard. Sign in via the API
-    // too: the change-email request below needs its own cookie header.
+    // autoSignInAfterVerification signs in the page; API sign-in threads cookies for change-email.
     await page.waitForURL(/\/dashboard$/v);
     const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email: currentEmail, password },
@@ -48,7 +45,6 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
       .filter(Boolean)
       .join("; ");
 
-    // Seed cookies into the browser context too, so the later page.goto() calls are authed.
     const webHost = new URL(webUrl).hostname;
     const parsedCookies = setCookie
       .split(/,(?=\s*[\w-]+=)/u)
@@ -84,8 +80,6 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     });
     expect(change.status()).toBe(200);
 
-    // Stage 1 — current-mailbox owner consents. Assert the confirmation
-    // email landed in Resend's outbox before following it.
     const stage1Mail = await waitForEmail({
       sinceMs: since,
       subject: /confirm|change/i,
@@ -94,12 +88,9 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     expect(stage1Mail.last_event).not.toBe("bounced");
     const stage1Url = extractLink(stage1Mail, /\/api\/auth\/verify-email\?token=/v);
 
-    // Stage-1 click — Better Auth's verify-email handler issues stage-2
-    // internally (sent to newEmail) and redirects to callbackURL.
     await page.goto(stage1Url);
     await page.waitForURL("/dashboard");
 
-    // Stage 2 — assert the verification mail to the NEW address actually sent.
     const stage2Mail = await waitForEmail({
       sinceMs: since,
       to: newEmail,
@@ -107,25 +98,20 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     expect(stage2Mail.last_event).not.toBe("bounced");
     const stage2Url = extractLink(stage2Mail, /\/api\/auth\/verify-email\?token=/v);
 
-    // Stage-2 click — proves new-mailbox access. This is the call that
-    // actually updates the user record.
     await page.goto(stage2Url);
     await page.waitForURL("/dashboard");
 
-    // DB now reflects the new email. The user row count is unchanged.
     const updated = await prisma.user.findUnique({ where: { email: newEmail } });
     expect(updated).not.toBeNull();
     const stale = await prisma.user.findUnique({ where: { email: currentEmail } });
     expect(stale).toBeNull();
 
-    // Old email no longer authenticates.
     await page.context().clearCookies();
     const oldLogin = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email: currentEmail, password },
     });
     expect(oldLogin.status()).toBeGreaterThanOrEqual(400);
 
-    // New email does.
     await page.goto("/login");
     await page.getByLabel("Email").fill(newEmail);
     await page.getByLabel("Password").fill(password);

@@ -1,6 +1,4 @@
-// Polls Resend's `GET /emails` so specs can assert mails actually left the API,
-// catching "JWT valid but send never happened" regressions that JWT
-// reconstruction in verification.fixture.ts can't see.
+// Poll Resend GET /emails to catch "JWT valid but send never happened" regressions.
 
 const RESEND_API = "https://api.resend.com";
 
@@ -50,8 +48,7 @@ const RETRY_FACTOR = 6;
 const RETRY_JITTER_MS = 100;
 
 const computeBackoffMs = (attempt: number): number => {
-  // 200, 1200, 7200, 43200, … capped at MAX_RETRY_AFTER. Adds ±0–100ms
-  // jitter so a stampede of clients doesn't re-synchronize.
+  // Exponential backoff with jitter so parallel clients don't re-synchronize after 429s.
   const base = Math.min(
     RETRY_BASE_MS * RETRY_FACTOR ** attempt,
     RETRY_MAX_RETRY_AFTER_SECONDS * 1000,
@@ -81,9 +78,7 @@ const resendFetch = async (path: string): Promise<Response> => {
       return response;
     }
 
-    // Honor server-suggested wait when present (Resend sends `retry-after`
-    // in seconds — never an HTTP-date for this API). Fall back to
-    // exponential backoff for 5xx or odd 429s without the header.
+    // Resend sends retry-after in seconds (not HTTP-date); fall back to exponential backoff.
     const retryAfterHeader = response.headers.get("retry-after");
     // `Number("")` is 0, which would skip the backoff — keep NaN when the header is missing.
     const retryAfter = retryAfterHeader ? Math.trunc(Number(retryAfterHeader)) : Number.NaN;
@@ -110,25 +105,17 @@ const getEmail = async (id: string): Promise<ResendEmail> => {
 };
 
 type WaitForEmailOptions = {
-  // Only match emails created at or after this Unix-ms timestamp. Pin to
-  // `Date.now()` at the start of a test so prior runs' mails don't match.
   sinceMs: number;
   subject?: RegExp;
-  // Address that must appear in `to[]`. Case-insensitive.
   to: string;
 };
 
 type WaitForOptions = {
-  // ms — Resend's index is eventually consistent; in practice mails
-  // become listable within a few seconds, but CI cold starts can stretch.
+  // Resend's email index is eventually consistent; CI cold starts can stretch list latency.
   pollMs?: number;
   timeoutMs?: number;
 };
 
-// Polls `GET /emails` until a matching message appears, then fetches its
-// HTML body via `GET /emails/:id`. Throws if the deadline elapses with no
-// match — the caller's spec should fail loudly so the email regression
-// surfaces, rather than time out into a misleading downstream error.
 const waitForEmail = async (
   match: WaitForEmailOptions,
   options: WaitForOptions = {},
@@ -171,11 +158,9 @@ const waitForEmail = async (
   );
 };
 
-// Pulls the first href matching `pattern` out of the email's HTML body.
-// Falls back to the text body if HTML is empty (some templates render text-only).
+// HTML href first; fall back to bare URL in the text body when templates are text-only.
 const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
-  // Match an href="..." attribute whose URL satisfies the pattern.
   const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/gv);
   for (const [, href] of hrefMatches) {
     const decoded = href.replaceAll("&amp;", "&");
@@ -183,7 +168,6 @@ const extractLink = (email: ResendEmail, pattern: RegExp): string => {
       return decoded;
     }
   }
-  // Plain-text fallback — look for the bare URL.
   const direct = haystack.match(pattern);
   if (direct) {
     return direct[0];

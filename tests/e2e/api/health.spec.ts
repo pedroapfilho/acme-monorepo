@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 
 import { apiUrl } from "../../../playwright.config";
 
-// Health checks don't need auth — use base test, not fixture
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("API Health Checks", () => {

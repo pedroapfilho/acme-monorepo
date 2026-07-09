@@ -24,8 +24,6 @@ export const metadata: Metadata = {
   },
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
   manifest: "/site.webmanifest",
-  // Resolves Open Graph / Twitter card image URLs against this base.
-  // Falls back to the canonical local web origin when WEB_APP_URL isn't set.
   metadataBase: new URL(process.env.WEB_APP_URL ?? "https://acme.web.localhost"),
   openGraph: {
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
@@ -84,7 +82,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         <meta content="telephone=no" name="format-detection" />
         <meta content="#000000" name="msapplication-TileColor" />
 
-        {/* Security headers (additional to Next.js config) */}
         <meta content="nosniff" httpEquiv="X-Content-Type-Options" />
         <meta content="DENY" httpEquiv="X-Frame-Options" />
         <meta content="1; mode=block" httpEquiv="X-XSS-Protection" />
