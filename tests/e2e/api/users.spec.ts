@@ -23,7 +23,6 @@ test.describe("API Users", () => {
     const body = await response.json();
     expect(body.data.name).toBe("Updated Name");
 
-    // Restore original name
     await request.patch(`${apiUrl}/api/v1/users/me`, {
       data: { name: "E2E Test User" },
     });
@@ -54,7 +53,7 @@ test.describe("API Users", () => {
       headers: { Cookie: "" },
     });
 
-    // The request context has storageState cookies; override with empty headers
+    // storageState cookies are inherited — empty Cookie header overrides them.
     expect(unauthResponse.status()).toBe(401);
   });
 });

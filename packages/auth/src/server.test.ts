@@ -42,7 +42,6 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should gate useSecureCookies on WEB_APP_URL being HTTPS", () => {
-    // Without WEB_APP_URL → false. Browsers drop Secure cookies on plain HTTP.
     expect(auth.options.advanced?.useSecureCookies).toBe(false);
     expect(auth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
     expect(auth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
@@ -130,7 +129,6 @@ describe("Auth Server Configuration", () => {
 
   it("should enable rate limiting in production", () => {
     vi.stubEnv("NODE_ENV", "production");
-    // Gate is `production && !CI`; clear CI so the prod path evaluates true.
     vi.stubEnv("CI", "");
     const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     expect(prodAuth.options.rateLimit?.enabled).toBe(true);
@@ -141,10 +139,10 @@ describe("Auth Server Configuration", () => {
 
     const envAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
     const trusted = envAuth.options.trustedOrigins;
-    expect(trusted).toContain("https://app.acme.com"); // env value
-    expect(trusted).toContain("https://api.acme.com"); // env value
-    expect(trusted).toContain("http://localhost:3000"); // loopback default
-    expect(trusted).toContain("http://127.0.0.1:3000"); // loopback default
+    expect(trusted).toContain("https://app.acme.com");
+    expect(trusted).toContain("https://api.acme.com");
+    expect(trusted).toContain("http://localhost:3000");
+    expect(trusted).toContain("http://127.0.0.1:3000");
   });
 
   it("should always define reset password handler (no-op when resendApiKey is absent)", () => {

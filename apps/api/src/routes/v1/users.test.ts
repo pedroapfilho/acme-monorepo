@@ -41,7 +41,6 @@ const serializedUser = {
 const mockSession = (user: { email: string; id: string } | null) =>
   vi.mocked(auth.api.getSession).mockResolvedValue((user ? { session: {}, user } : null) as never);
 
-// errorHandler reads c.get("log").error(...); seed a no-op logger so it resolves.
 const buildApp = () => {
   const app = new OpenAPIHono();
   app.use("*", (c, next) => {

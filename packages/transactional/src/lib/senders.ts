@@ -57,7 +57,6 @@ type EmailBuild = { subject: string; template: React.ReactElement; to: string };
 
 type TemplateBuilder<P> = (payload: P) => EmailBuild;
 
-// Adding a new transactional email = one new payload type + one entry below.
 const TEMPLATES = {
   "change-email-confirmation": ({
     changeUrl,
@@ -67,8 +66,7 @@ const TEMPLATES = {
   }: ChangeEmailPayload) => ({
     subject: "Confirm change of your Acme account email",
     template: React.createElement(ChangeEmail, { changeUrl, currentEmail, newEmail, username }),
-    // `to: currentEmail` is the consent step. Better Auth's sendVerificationEmail
-    // hook handles the mailbox-ownership step to the NEW email when clicked.
+    // Consent to current email; sendVerificationEmail handles new-email verification.
     to: currentEmail,
   }),
   "password-reset": ({
@@ -116,8 +114,6 @@ const TEMPLATES = {
 };
 
 const sendTransactionalEmail = (email: TransactionalEmail, config: MailerConfig) => {
-  // The `type` discriminator keys directly into TEMPLATES; TS narrows the payload
-  // shape per branch, but the lookup itself is structural.
   const builder = TEMPLATES[email.type] as TemplateBuilder<typeof email>;
   const { subject, template, to } = builder(email);
   return sendEmail({

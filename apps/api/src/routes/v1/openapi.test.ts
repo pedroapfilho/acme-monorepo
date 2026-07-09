@@ -22,7 +22,6 @@ describe("OpenAPI document — Error schema", () => {
 
     const errorSchema = doc.components?.schemas?.Error;
     expect(errorSchema).toBeDefined();
-    // nested: error is an object with code + message, NOT a top-level string
     const inner = (errorSchema as { properties?: Record<string, unknown> }).properties?.error as
       | { properties?: Record<string, unknown> }
       | undefined;
@@ -30,7 +29,6 @@ describe("OpenAPI document — Error schema", () => {
       code: expect.anything(),
       message: expect.anything(),
     });
-    // the old flat shape had a top-level string `error`; it must be gone
     const topLevel = (errorSchema as { properties?: Record<string, unknown> }).properties?.error as
       | { type?: string }
       | undefined;

@@ -65,8 +65,6 @@ const DashboardSkeleton = () => (
   </div>
 );
 
-// Instant navigation: the static shell streams immediately as the fallback
-// while the per-user, session-bound content renders on the server.
 const Dashboard = () => (
   <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-12">
     <Suspense fallback={<DashboardSkeleton />}>

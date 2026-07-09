@@ -78,8 +78,6 @@ const ResetPasswordForm = ({ token }: Props) => {
     onSubmit: ({ value }) => {
       setFormError(null);
       startTransition(async () => {
-        // Inline error paths instead of throw-to-catch: React Compiler can't
-        // memoize components with a ThrowStatement inside try/catch yet.
         if (!token) {
           const message = "Invalid reset token. Please request a new password reset.";
           setFormError(message);
@@ -114,7 +112,6 @@ const ResetPasswordForm = ({ token }: Props) => {
     <form
       noValidate
       onSubmit={(e) => {
-        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();

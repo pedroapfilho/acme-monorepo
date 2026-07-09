@@ -1,7 +1,5 @@
 import { test, expect } from "../fixtures/auth.fixture";
 
-// With RESEND_API_KEY set, requireEmailVerification gates signup → /dashboard;
-// the auth-email/* suite covers that path with delivery assertions.
 const skipUnderResend = !!process.env.RESEND_API_KEY;
 
 test.describe("Register", () => {
@@ -42,7 +40,7 @@ test.describe("Register", () => {
     await registerPage.goto();
     await registerPage.register("Short Pass", `short-${Date.now()}@example.com`, "short", "short");
 
-    // Both password fields render the same error; .first() avoids strict-mode 2-element violation.
+    // Both password fields show the same error — .first() avoids strict-mode violation.
     await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });
@@ -58,7 +56,7 @@ test.describe("Register", () => {
       "DifferentPassword!",
     );
 
-    // Inline error + sonner toast both render the same string; .first() picks one for strict-mode.
+    // Inline error + Sonner toast duplicate the string — .first() for strict-mode.
     await expect(page.getByText("Passwords do not match").first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });

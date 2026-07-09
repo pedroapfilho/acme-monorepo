@@ -34,7 +34,6 @@ test.describe("Login", () => {
 
 test.describe("Login (already authenticated)", () => {
   test("redirects to dashboard if already authenticated", async ({ page }) => {
-    // storageState from setup means we're already logged in
     await page.goto("/login");
 
     await page.waitForURL("/dashboard");

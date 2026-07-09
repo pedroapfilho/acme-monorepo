@@ -8,8 +8,7 @@ const srcDir = path.resolve(process.cwd(), "src");
 export default defineConfig({
   clean: true,
   deps: {
-    // Workspace packages export .ts source — Node can't import those at runtime,
-    // so tsdown must bundle them into the output instead of leaving them as external imports.
+    // Workspace packages export .ts source — Node can't import those at runtime.
     alwaysBundle: [
       "@repo/auth",
       "@repo/auth/server",

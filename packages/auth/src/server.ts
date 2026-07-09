@@ -57,21 +57,16 @@ export const createAuth = (config: AuthConfig) => {
         httpOnly: true,
         sameSite: "lax" as const,
       },
-      // `protocol: "auto"` doesn't reliably detect HTTPS through portless/Vercel reverse proxies;
-      // WEB_APP_URL is the explicit signal. Unset in CI keeps cookies on plain HTTP.
+      // WEB_APP_URL gates Secure cookies; protocol: "auto" fails through portless/Vercel proxies.
       useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
     },
 
-    // Matches the Next.js route handler mount at /api/auth/[...all].
     basePath: "/api/auth",
 
-    // allowedHosts auto-extends trustedOrigins; loopback list below covers
-    // origins arriving without a matching host header.
-    // https://better-auth.com/docs/reference/options#dynamic-base-url
+    // allowedHosts extends trustedOrigins; loopback list covers origins without matching host.
     baseURL: {
       allowedHosts: [
-        // portless `acme.{web,api,landing}.localhost` is two labels under
-        // `.localhost`, so `**` not `*`.
+        // Portless *.localhost needs ** not * (two labels under .localhost).
         "**.localhost",
         "localhost:*",
         "127.0.0.1:*",
@@ -89,8 +84,7 @@ export const createAuth = (config: AuthConfig) => {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
-      // Notifies the real account holder when a duplicate signup is silently
-      // swallowed by Better Auth's enumeration-prevention path.
+      // Notify real account holder on duplicate signup (enumeration-prevention swallows it).
       onExistingUserSignUp: mailer
         ? async ({ user }, request) => {
             const origin = request?.headers.get("origin") ?? "";
@@ -114,10 +108,8 @@ export const createAuth = (config: AuthConfig) => {
             }
           }
         : undefined,
-      // Gated on Resend availability: without an API key we can't deliver,
-      // so requiring verification would lock every new user out.
+      // Require verification only when mailer exists — otherwise new users lock out.
       requireEmailVerification: Boolean(mailer),
-      // Always wired so the endpoint accepts the request; send is gated on mailer.
       sendResetPassword: async ({ url, user }) => {
         if (!mailer) {
           return;
@@ -139,16 +131,10 @@ export const createAuth = (config: AuthConfig) => {
     },
 
     emailVerification: {
-      // The link is the login: clicking it verifies the address AND signs in
-      // the clicking device. Tradeoff accepted (2026-06-12 fleet decision) —
-      // simpler than the retired pending-screen flow, at the cost of the
-      // session landing on whichever device opens the link.
+      // Verification link signs in the clicking device (session lands on whoever opens it).
       autoSignInAfterVerification: true,
-      // Where Better Auth's verify-email handler redirects after token
-      // exchange — the app root routes signed-in users into the app.
       callbackURL: "/",
-      // Unverified sign-in attempts still 403, but get a fresh verification
-      // link alongside it so the login form can say "we just sent a new one".
+      // Unverified sign-in 403s include a fresh verification link for the login form.
       sendOnSignIn: true,
       sendVerificationEmail: async ({ url, user }) => {
         if (!mailer) {
@@ -185,14 +171,13 @@ export const createAuth = (config: AuthConfig) => {
     session: {
       cookieCache: {
         enabled: true,
-        maxAge: 5 * 60, // 5 minutes
+        maxAge: 5 * 60,
       },
-      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      expiresIn: 60 * 60 * 24 * 7,
       storeSessionInDatabase: true,
-      updateAge: 60 * 60 * 24, // Update session if older than 1 day
+      updateAge: 60 * 60 * 24,
     },
-    // Exact-string match list for plain http://localhost:PORT origins that
-    // wouldn't match an allowedHosts pattern.
+    // Plain http://localhost:PORT origins won't match allowedHosts patterns.
     trustedOrigins: [
       "http://localhost:3000",
       "http://localhost:3001",
@@ -212,8 +197,7 @@ export const createAuth = (config: AuthConfig) => {
       },
       changeEmail: {
         enabled: true,
-        // Stage 1 of the two-step change flow: confirmation to the CURRENT email.
-        // Stage 2 (verification to the NEW email) reuses sendVerificationEmail above.
+        // Stage 1: confirm on current email; stage 2 reuses sendVerificationEmail.
         sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
           if (!mailer) {
             return;

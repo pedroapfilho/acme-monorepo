@@ -12,7 +12,6 @@ test.describe("Protected Routes", () => {
   });
 
   test("redirects authenticated users from auth routes to dashboard", async ({ page }) => {
-    // storageState from setup means we're authenticated
     await page.goto("/login");
 
     await page.waitForURL("/dashboard");

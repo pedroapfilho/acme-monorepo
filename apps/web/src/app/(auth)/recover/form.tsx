@@ -76,8 +76,6 @@ const RecoverForm = () => {
             redirectTo: `${window.location.origin}/reset-password`,
           });
           if (result.error) {
-            // Inline instead of throw-to-catch: React Compiler can't memoize
-            // components with a ThrowStatement inside try/catch yet.
             const message = result.error.message ?? "Failed to send password reset email";
             setFormError(message);
             toast.error(message);
@@ -119,7 +117,6 @@ const RecoverForm = () => {
     <form
       noValidate
       onSubmit={(e) => {
-        // TanStack Form drives submit; progressive-enhancement N/A
         e.preventDefault();
         e.stopPropagation();
         void form.handleSubmit();

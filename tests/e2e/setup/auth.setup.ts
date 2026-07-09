@@ -12,8 +12,7 @@ const TEST_USER = {
 
 const STORAGE_STATE_PATH = "tests/e2e/.auth/user.json";
 
-// API sign-in (not UI form) avoids the TanStack Form hydration race where
-// Playwright clicks before onSubmit attaches and falls back to a native GET.
+// API sign-in avoids TanStack Form hydration race (Playwright clicks before onSubmit attaches).
 setup("create and authenticate test user", async ({ page, request }) => {
   await mkdir("tests/e2e/.auth", { recursive: true });
 
@@ -22,8 +21,7 @@ setup("create and authenticate test user", async ({ page, request }) => {
   });
   expect(signIn.status()).toBe(200);
 
-  // headersArray() preserves multiple Set-Cookie entries; headers()["set-cookie"]
-  // flattens them and the dot in the cookie name makes re-splitting fragile.
+  // headersArray() preserves multiple Set-Cookie entries; headers()["set-cookie"] flattens them.
   const setCookieHeaders = signIn
     .headersArray()
     .filter((h) => h.name.toLowerCase() === "set-cookie")

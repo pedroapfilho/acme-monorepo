@@ -1,8 +1,6 @@
 import "evlog";
 
-// evlog augments app-specific top-level wide-event fields via `BaseWideEvent`
-// (there is no `LogFields` interface in evlog 2.18.1). Augmenting it makes these
-// keys type-checked on `log.set(...)` / `useLogger().set(...)` across the fleet.
+// Augment evlog's BaseWideEvent (no LogFields in 2.18.1) for typed log.set() across apps.
 declare module "evlog" {
   // oxlint-disable-next-line typescript/consistent-type-definitions -- module augmentation requires `interface`, not `type`
   interface BaseWideEvent {

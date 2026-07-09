@@ -3,11 +3,7 @@ import { render } from "react-email";
 import { Resend } from "resend";
 import { z } from "zod";
 
-// Resend accepts either a bare email or RFC 5322 "Display Name <email>" form
-// for from / reply-to. `z.email()` only matches bare addresses, so
-// extract the bracketed address when present and validate that. The default
-// for `from` also uses the wrapped form to surface a friendly display name
-// in inboxes, so the validator has to accept it.
+// Resend allows RFC 5322 "Name <email>" for from/reply-to; z.email() is bare-only so extract the bracketed address.
 const senderAddressSchema = z.string().refine(
   (val) => {
     const wrapped = val.match(/^.+<(?<address>[^<>\s]+)>$/v);
@@ -34,9 +30,7 @@ const emailConfigSchema = z.object({
   to: recipientSchema,
 });
 
-// z.input keeps `from` optional for callers — the Zod default fills it in
-// during parse. Using z.infer (the output type) would require every caller
-// to pass `from`, defeating the default.
+// z.input keeps from optional; z.infer would force every caller to pass it.
 type EmailConfig = z.input<typeof emailConfigSchema>;
 
 type SendEmailOptions = EmailConfig & {

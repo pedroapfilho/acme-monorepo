@@ -82,8 +82,6 @@ const RegisterForm = ({ from }: Props) => {
       setFormError(null);
       startTransition(async () => {
         try {
-          // Better Auth bakes callbackURL into the verification link, so the
-          // email clicker lands back on the page that sent them to auth.
           const result = await authClient.signUp.email({
             callbackURL: from,
             email: value.email,
@@ -91,16 +89,12 @@ const RegisterForm = ({ from }: Props) => {
             password: value.password,
           });
           if (result.error) {
-            // Inline instead of throw-to-catch: React Compiler can't memoize
-            // components with a ThrowStatement inside try/catch yet.
             const message = result.error.message ?? "Failed to register";
             setFormError(message);
             toast.error(message);
             return;
           }
-          // No token means requireEmailVerification suppressed auto-sign-in (or enumeration prevention
-          // returned synthetic success); both paths show the same inline "check your email" state.
-          // Clicking the emailed link verifies AND signs in the clicking device.
+          // No token: requireEmailVerification or enumeration prevention — show "check your email".
           if (!result.data?.token) {
             setSentToEmail(value.email);
             return;
@@ -249,8 +243,6 @@ const RegisterForm = ({ from }: Props) => {
           </Button>
           <FieldDescription className="text-center">
             Already have an account?{" "}
-            {/* Carry the redirect context across the form switch so login can
-                push it after sign-in. */}
             <Link
               className="text-foreground underline underline-offset-4"
               href={from === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(from)}`}

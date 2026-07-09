@@ -7,8 +7,7 @@ export default defineConfig({
     seed: "tsx src/seed.ts",
   },
   schema: "prisma/schema.prisma",
-  // CLI commands (db push, migrate) need the database URL
-  // Falls back gracefully for prisma generate which doesn't need a connection
+  // Migrate needs DATABASE_URL; empty string is fine for prisma generate.
   datasource: {
     url: process.env.DATABASE_URL ?? "",
   },

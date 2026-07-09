@@ -28,15 +28,13 @@ test.describe("Sign-up email verification", () => {
     });
     expect([200, 201]).toContain(signUp.status());
 
-    // Pre-verification: signIn fails (Better Auth blocks unverified users)
-    // and returns no session cookie.
+    // Better Auth blocks unverified users — no session cookie before verify.
     const preSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email, password },
       failOnStatusCode: false,
     });
     expect(preSignIn.status()).not.toBe(200);
 
-    // Assert the verification email actually left Resend (not just that the JWT was valid).
     const mail = await waitForEmail({
       sinceMs: since,
       subject: /verify/i,
@@ -44,10 +42,7 @@ test.describe("Sign-up email verification", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    // Follow the link in a fresh BrowserContext. The link IS the login:
-    // autoSignInAfterVerification mints a session on the clicking device and
-    // the callback lands on the app root (which routes signed-in users to
-    // /dashboard).
+    // Fresh context: the verify link mints a session on the clicking device (autoSignInAfterVerification).
     const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
@@ -57,7 +52,6 @@ test.describe("Sign-up email verification", () => {
     expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeDefined();
     await clickerContext.close();
 
-    // The email is now verified, so a plain credentials sign-in succeeds too.
     const postSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email, password },
     });

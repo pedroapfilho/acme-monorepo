@@ -35,9 +35,6 @@ const ResetPasswordContent = async ({ searchParams }: Props) => {
   );
 };
 
-// Static shell for the prerender: the form is bound to the `token` search
-// param from the password-reset email link, so cacheComponents needs a
-// Suspense boundary above it.
 const ResetPasswordSkeleton = () => (
   <Card aria-hidden>
     <CardHeader className="text-center">
