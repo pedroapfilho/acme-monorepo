@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { getAuth } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { log } from "@/lib/observability";
 
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
@@ -10,8 +10,9 @@ const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
 
 const getSessionOrNull = async (request: NextRequest) => {
   try {
-    // getAuth() throws synchronously when BETTER_AUTH_SECRET is absent — .catch() can't intercept that.
-    return await getAuth().api.getSession({ headers: request.headers });
+    // Touching `auth` instantiates it and throws synchronously when BETTER_AUTH_SECRET is absent —
+    // .catch() can't intercept that.
+    return await auth.api.getSession({ headers: request.headers });
   } catch (error) {
     log.error({
       error: error instanceof Error ? error.message : String(error),

@@ -1,14 +1,14 @@
 import { headers } from "next/headers";
 import { cache } from "react";
 
-import { getAuth } from "./auth";
+import { auth } from "./auth";
 import { log } from "./observability";
 
 export const getSession = cache(async () => {
   const headersList = await headers();
 
   try {
-    const session = await getAuth().api.getSession({
+    const session = await auth.api.getSession({
       headers: headersList,
     });
 
