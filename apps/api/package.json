@@ -20,10 +20,10 @@
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/observability": "workspace:*",
-    "@scalar/hono-api-reference": "^0.11.8",
-    "@scalar/openapi-to-markdown": "^0.5.30",
+    "@scalar/hono-api-reference": "^0.11.9",
+    "@scalar/openapi-to-markdown": "^0.5.32",
     "dotenv": "^17.4.2",
-    "hono": "^4.12.27",
+    "hono": "^4.12.28",
     "hono-rate-limiter": "^0.5.3",
     "zod": "^4.4.3"
   },
@@ -32,9 +32,9 @@
     "@repo/typescript-config": "workspace:*",
     "@rollup/plugin-alias": "^6.0.0",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^26.1.0",
-    "tsdown": "^0.22.3",
+    "@types/node": "^26.1.1",
+    "tsdown": "^0.22.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   }
 }
