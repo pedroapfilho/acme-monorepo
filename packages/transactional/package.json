@@ -20,21 +20,21 @@
     "preview": "portless run --force --name acme.email -- bash -c 'email dev --port $PORT --dir ./src'"
   },
   "dependencies": {
-    "resend": "^6.16.0",
+    "resend": "^6.17.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@react-email/ui": "^6.6.6",
+    "@react-email/ui": "^6.6.9",
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-email": "^6.6.6",
-    "tsdown": "^0.22.3",
+    "react-email": "^6.6.9",
+    "tsdown": "^0.22.4",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "react": "^18.3.1 || ^19.0.0",
