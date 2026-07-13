@@ -1,4 +1,4 @@
-import { buttonVariants } from "@repo/ui/components/button";
+import { buttonVariants } from "@repo/ui/components/button-variants";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
 
