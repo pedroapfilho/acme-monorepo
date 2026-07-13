@@ -7,7 +7,7 @@ import { nextCookies } from "better-auth/next-js";
 type Auth = ReturnType<typeof createAuth>;
 let cachedAuth: Auth | undefined;
 
-export const getAuth = (): Auth => {
+const getAuth = (): Auth => {
   if (!cachedAuth) {
     const secret = process.env.BETTER_AUTH_SECRET;
     if (!secret || secret.length < 32) {
@@ -25,3 +25,18 @@ export const getAuth = (): Auth => {
   }
   return cachedAuth;
 };
+
+// Proxy for ergonomic imports: `import { auth } from "@/lib/auth"` and use like a singleton,
+// but defer instantiation until first use (so build-time env checks don't trip).
+const auth = new Proxy({} as Auth, {
+  get(_, prop) {
+    const instance = getAuth();
+    const value = instance[prop as keyof Auth];
+    if (typeof value === "function") {
+      return (value as (...args: Array<unknown>) => unknown).bind(instance);
+    }
+    return value;
+  },
+});
+
+export { auth, getAuth };
