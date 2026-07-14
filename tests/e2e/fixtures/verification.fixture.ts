@@ -61,7 +61,7 @@ const forChangeEmail = async (currentEmail: string, newEmail: string): Promise<C
   };
 };
 
-// Reset tokens live in the verification table (not JWTs) — poll the DB.
+// Reset tokens live in the verification table (not JWTs); poll the DB.
 const forResetPassword = async (
   email: string,
   timeoutMs = 5000,

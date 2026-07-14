@@ -80,7 +80,7 @@ const resendFetch = async (path: string): Promise<Response> => {
 
     // Resend sends retry-after in seconds (not HTTP-date); fall back to exponential backoff.
     const retryAfterHeader = response.headers.get("retry-after");
-    // `Number("")` is 0, which would skip the backoff — keep NaN when the header is missing.
+    // `Number("")` is 0, which would skip the backoff; keep NaN when the header is missing.
     const retryAfter = retryAfterHeader ? Math.trunc(Number(retryAfterHeader)) : Number.NaN;
     const delayMs = Number.isFinite(retryAfter)
       ? Math.min(retryAfter, RETRY_MAX_RETRY_AFTER_SECONDS) * 1000 +

@@ -8,7 +8,7 @@ const srcDir = path.resolve(process.cwd(), "src");
 export default defineConfig({
   clean: true,
   deps: {
-    // Workspace packages export .ts source — Node can't import those at runtime.
+    // Workspace packages export .ts source; Node can't import those at runtime.
     alwaysBundle: [
       "@repo/auth",
       "@repo/auth/server",

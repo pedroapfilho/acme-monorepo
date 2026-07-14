@@ -108,7 +108,7 @@ export const createAuth = (config: AuthConfig) => {
             }
           }
         : undefined,
-      // Require verification only when mailer exists — otherwise new users lock out.
+      // Require verification only when mailer exists; otherwise new users lock out.
       requireEmailVerification: Boolean(mailer),
       sendResetPassword: async ({ url, user }) => {
         if (!mailer) {

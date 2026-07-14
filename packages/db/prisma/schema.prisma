@@ -76,7 +76,7 @@ model Verification {
   @@index([identifier])
 }
 
-// Better Auth database rate limiting — required when rateLimit.storage is "database".
+// Better Auth database rate limiting; required when rateLimit.storage is "database".
 model RateLimit {
   id          String @id @default(cuid())
   key         String @unique

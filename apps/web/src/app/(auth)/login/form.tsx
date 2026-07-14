@@ -114,7 +114,7 @@ const LoginForm = ({ from }: Props) => {
             password: value.password,
           });
           if (result.error) {
-            // EMAIL_NOT_VERIFIED re-sends the link — informational, not a credentials error.
+            // EMAIL_NOT_VERIFIED re-sends the link; informational, not a credentials error.
             if (result.error.code === "EMAIL_NOT_VERIFIED") {
               setShowUnverifiedNotice(true);
               return;

@@ -16,7 +16,7 @@ const resolveApiUrl = (): string => {
         return url;
       }
     } catch {
-      // portless not installed — fall through to localhost default
+      // portless not installed; fall through to localhost default
     }
   }
   return "http://localhost:4000";

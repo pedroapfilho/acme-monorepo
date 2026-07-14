@@ -28,7 +28,7 @@ test.describe("Sign-up email verification", () => {
     });
     expect([200, 201]).toContain(signUp.status());
 
-    // Better Auth blocks unverified users — no session cookie before verify.
+    // Better Auth blocks unverified users: no session cookie before verify.
     const preSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email, password },
       failOnStatusCode: false,
