@@ -25,7 +25,7 @@ jobs:
       # Gates the tests/e2e/auth-email/* suite. When unset (forks,
       # contributors without secret access), those specs `test.skip()`
       # themselves and the rest of the suite still runs. When set, the
-      # auth server flips on requireEmailVerification — the seed script
+      # auth server flips on requireEmailVerification; the seed script
       # bypasses that for the canonical e2e-test user by writing
       # emailVerified: true directly to Prisma.
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -56,7 +56,7 @@ jobs:
         run: pnpm --filter web exec tsx scripts/ensure-e2e-user.ts
       # Canonical Playwright CI pattern (playwright.dev/docs/ci): browser
       # download + apt system deps in one step. Caching is explicitly
-      # *not* recommended by the docs — restore time is comparable to a
+      # *not* recommended by the docs; restore time is comparable to a
       # fresh download. The chromium pin matches playwright.config.ts
       # which filters firefox/webkit out under CI.
       - name: Install Playwright browsers and system deps

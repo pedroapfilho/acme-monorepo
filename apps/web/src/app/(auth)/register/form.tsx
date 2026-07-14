@@ -94,7 +94,7 @@ const RegisterForm = ({ from }: Props) => {
             toast.error(message);
             return;
           }
-          // No token: requireEmailVerification or enumeration prevention — show "check your email".
+          // No token (requireEmailVerification or enumeration prevention): show "check your email".
           if (!result.data?.token) {
             setSentToEmail(value.email);
             return;

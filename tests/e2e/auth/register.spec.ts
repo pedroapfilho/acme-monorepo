@@ -40,7 +40,7 @@ test.describe("Register", () => {
     await registerPage.goto();
     await registerPage.register("Short Pass", `short-${Date.now()}@example.com`, "short", "short");
 
-    // Both password fields show the same error — .first() avoids strict-mode violation.
+    // Both password fields show the same error; .first() avoids strict-mode violation.
     await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });
@@ -56,7 +56,7 @@ test.describe("Register", () => {
       "DifferentPassword!",
     );
 
-    // Inline error + Sonner toast duplicate the string — .first() for strict-mode.
+    // Inline error + Sonner toast duplicate the string; .first() for strict-mode.
     await expect(page.getByText("Passwords do not match").first()).toBeVisible();
     expect(page.url()).toContain("/register");
   });

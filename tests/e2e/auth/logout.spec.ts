@@ -5,7 +5,7 @@ import { expect, test } from "../fixtures/auth.fixture";
 
 const PASSWORD = "TestPassword123!";
 
-// Logout invalidates the DB session — reusing storageState user would 401 other specs after Better Auth's 5-minute cookie cache expires.
+// Logout invalidates the DB session; reusing storageState user would 401 other specs after Better Auth's 5-minute cookie cache expires.
 const createIsolatedUser = async (request: APIRequestContext): Promise<string> => {
   const email = `logout-test-${crypto.randomUUID()}@acme.localhost`;
   const response = await request.post(`${webUrl}/api/auth/sign-up/email`, {

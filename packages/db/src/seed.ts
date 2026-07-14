@@ -37,7 +37,7 @@ try {
   const failures = results.filter((r) => r.status === "rejected");
   if (failures.length > 0) {
     console.error("Some seed operations failed:", failures);
-    // Fail on partial upserts — green seed on half-seeded DB masks broken schema in dev/CI.
+    // Fail on partial upserts; green seed on half-seeded DB masks broken schema in dev/CI.
     throw new Error(`Seed failed: ${failures.length} upsert(s) rejected`);
   }
 } catch (error) {

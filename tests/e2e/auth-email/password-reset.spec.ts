@@ -21,7 +21,7 @@ test.describe("Password reset", () => {
     const originalPassword = "OriginalPassword1!";
     const newPassword = "BrandNewPassword2!";
 
-    // Welcome email isn't under test — use JWT reconstruction.
+    // Welcome email isn't under test; use JWT reconstruction.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email, name: "Reset Me", password: originalPassword, username },
     });

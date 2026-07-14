@@ -53,7 +53,7 @@ test.describe("API Users", () => {
       headers: { Cookie: "" },
     });
 
-    // storageState cookies are inherited — empty Cookie header overrides them.
+    // storageState cookies are inherited; empty Cookie header overrides them.
     expect(unauthResponse.status()).toBe(401);
   });
 });

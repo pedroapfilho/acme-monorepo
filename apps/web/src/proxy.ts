@@ -10,7 +10,7 @@ const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
 
 const getSessionOrNull = async (request: NextRequest) => {
   try {
-    // Touching `auth` instantiates it and throws synchronously when BETTER_AUTH_SECRET is absent —
+    // Touching `auth` instantiates it and throws synchronously when BETTER_AUTH_SECRET is absent;
     // .catch() can't intercept that.
     return await auth.api.getSession({ headers: request.headers });
   } catch (error) {

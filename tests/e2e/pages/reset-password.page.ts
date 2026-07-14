@@ -9,7 +9,7 @@ export class ResetPasswordPage {
   private readonly rootError: Locator;
 
   constructor(private readonly page: Page) {
-    // CardTitle renders as <div>, not a semantic heading — match by text.
+    // CardTitle renders as <div>, not a semantic heading; match by text.
     this.heading = page.getByText("Reset your password", { exact: true });
     this.passwordInput = page.getByLabel("New password", { exact: true });
     this.confirmPasswordInput = page.getByLabel(/confirm password/i);
