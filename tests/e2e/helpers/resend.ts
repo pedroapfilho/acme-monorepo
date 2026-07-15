@@ -154,7 +154,7 @@ const waitForEmail = async (
 
   const subjectClause = match.subject ? ` matching ${match.subject}` : "";
   throw new Error(
-    `waitForEmail: no email to ${match.to}${subjectClause} within ${timeoutMs}ms — check the auth send-hook actually executed.`,
+    `waitForEmail: no email to ${match.to}${subjectClause} within ${timeoutMs}ms; check the auth send-hook actually executed.`,
   );
 };
 

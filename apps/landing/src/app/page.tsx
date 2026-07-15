@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { webAppUrl } from "@/lib/urls";
 
 export const metadata: Metadata = {
-  description: "Welcome to Acme — the one template to rule them all.",
-  title: { absolute: "Acme — The one template to rule them all" },
+  description: "Welcome to Acme, the one template to rule them all.",
+  title: { absolute: "Acme: The one template to rule them all" },
 };
 
 const Page = () => {

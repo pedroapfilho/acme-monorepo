@@ -38,7 +38,7 @@ Monorepo template for all projects. Source of truth for shared patterns, tooling
 
 - **Node.js 24** (use `nvm install 24 && nvm use 24`)
 - **pnpm 11** (`npm install -g pnpm@11`)
-- **PostgreSQL** running locally on `:5432` (or use Docker — see below)
+- **PostgreSQL** running locally on `:5432` (or use Docker, see below)
 - **portless** for stable HTTPS dev URLs (see step 2)
 
 ### 1. Install dependencies
@@ -49,7 +49,7 @@ pnpm install
 
 ### 2. Install portless and start the HTTPS proxy
 
-Dev servers run behind [portless](https://www.npmjs.com/package/portless), which gives each app a stable `https://*.localhost` URL instead of a random port. This is required — the dev scripts wrap each app in `portless run …`, and Better Auth's secure cookies + CORS allowlists assume the portless hostnames.
+Dev servers run behind [portless](https://www.npmjs.com/package/portless), which gives each app a stable `https://*.localhost` URL instead of a random port. This is required: the dev scripts wrap each app in `portless run …`, and Better Auth's secure cookies + CORS allowlists assume the portless hostnames.
 
 One-time per machine:
 
@@ -87,8 +87,8 @@ cp packages/db/.env.example packages/db/.env
 
 Then edit each file and set:
 
-- `BETTER_AUTH_SECRET` — any 32+ char random string, **identical** across `apps/api/.env` and `apps/web/.env.local` (both validate sessions against it). Generate with `openssl rand -base64 32`.
-- `DATABASE_URL` — Replace the name and password placeholders.
+- `BETTER_AUTH_SECRET`: any 32+ char random string, **identical** across `apps/api/.env` and `apps/web/.env.local` (both validate sessions against it). Generate with `openssl rand -base64 32`.
+- `DATABASE_URL`: replace the name and password placeholders.
 
 The URL variables (`NEXT_PUBLIC_API_URL`, `BETTER_AUTH_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`) are pre-set to the portless URLs and don't need changes for local dev.
 
@@ -116,7 +116,7 @@ Open:
 
 ### Worktrees
 
-Branch name auto-prefixes the subdomain — concurrent worktrees don't collide:
+Branch name auto-prefixes the subdomain, so concurrent worktrees don't collide:
 
 ```
 main worktree:        https://acme.web.localhost

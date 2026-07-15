@@ -202,7 +202,7 @@ const LoginForm = ({ from }: Props) => {
 
         {showUnverifiedNotice && (
           <output aria-live="polite" className="block text-center text-sm">
-            This email isn&apos;t verified yet — we just sent you a new link.
+            This email isn&apos;t verified yet. We just sent you a new link.
           </output>
         )}
 

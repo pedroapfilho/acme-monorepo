@@ -16,7 +16,7 @@ const getSessionOrNull = async (request: NextRequest) => {
   } catch (error) {
     log.error({
       error: error instanceof Error ? error.message : String(error),
-      message: "proxy: getSession failed — treating as unauthenticated",
+      message: "proxy: getSession failed; treating as unauthenticated",
       pathname: request.nextUrl.pathname,
     });
     return null;
