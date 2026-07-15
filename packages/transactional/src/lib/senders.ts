@@ -55,67 +55,68 @@ type TransactionalEmail =
 
 type EmailBuild = { subject: string; template: React.ReactElement; to: string };
 
-type TemplateBuilder<P> = (payload: P) => EmailBuild;
-
-const TEMPLATES = {
-  "change-email-confirmation": ({
-    changeUrl,
-    currentEmail,
-    newEmail,
-    username,
-  }: ChangeEmailPayload) => ({
-    subject: "Confirm change of your Acme account email",
-    template: React.createElement(ChangeEmail, { changeUrl, currentEmail, newEmail, username }),
-    // Consent to current email; sendVerificationEmail handles new-email verification.
-    to: currentEmail,
-  }),
-  "password-reset": ({
-    browserInfo,
-    ipAddress,
-    resetUrl,
-    userEmail,
-    username,
-  }: PasswordResetPayload) => ({
-    subject: "Reset your Acme password",
-    template: React.createElement(PasswordResetEmail, {
-      browserInfo,
-      ipAddress,
-      resetUrl,
-      userEmail,
-      username,
-    }),
-    to: userEmail,
-  }),
-  "sign-up-attempt": ({
-    resetPasswordUrl,
-    signInUrl,
-    userEmail,
-    username,
-  }: SignUpAttemptPayload) => ({
-    subject: "Sign-up attempt with your Acme account",
-    template: React.createElement(SignUpAttemptEmail, {
-      resetPasswordUrl,
-      signInUrl,
-      userEmail,
-      username,
-    }),
-    to: userEmail,
-  }),
-  welcome: ({ userEmail, username, verificationUrl }: WelcomePayload) => ({
-    subject: `Welcome to Acme${username ? `, ${username}` : ""}! Please verify your email`,
-    template: React.createElement(WelcomeEmail, { userEmail, username, verificationUrl }),
-    to: userEmail,
-  }),
-} satisfies {
-  "change-email-confirmation": TemplateBuilder<ChangeEmailPayload>;
-  "password-reset": TemplateBuilder<PasswordResetPayload>;
-  "sign-up-attempt": TemplateBuilder<SignUpAttemptPayload>;
-  welcome: TemplateBuilder<WelcomePayload>;
+// Switch dispatch narrows each case to its payload, so no per-branch cast is needed.
+const buildEmail = (email: TransactionalEmail): EmailBuild => {
+  switch (email.type) {
+    case "welcome": {
+      return {
+        subject: `Welcome to Acme${email.username ? `, ${email.username}` : ""}! Please verify your email`,
+        template: React.createElement(WelcomeEmail, {
+          userEmail: email.userEmail,
+          username: email.username,
+          verificationUrl: email.verificationUrl,
+        }),
+        to: email.userEmail,
+      };
+    }
+    case "sign-up-attempt": {
+      return {
+        subject: "Sign-up attempt with your Acme account",
+        template: React.createElement(SignUpAttemptEmail, {
+          resetPasswordUrl: email.resetPasswordUrl,
+          signInUrl: email.signInUrl,
+          userEmail: email.userEmail,
+          username: email.username,
+        }),
+        to: email.userEmail,
+      };
+    }
+    case "password-reset": {
+      return {
+        subject: "Reset your Acme password",
+        template: React.createElement(PasswordResetEmail, {
+          browserInfo: email.browserInfo,
+          ipAddress: email.ipAddress,
+          resetUrl: email.resetUrl,
+          userEmail: email.userEmail,
+          username: email.username,
+        }),
+        to: email.userEmail,
+      };
+    }
+    case "change-email-confirmation": {
+      return {
+        subject: "Confirm change of your Acme account email",
+        template: React.createElement(ChangeEmail, {
+          changeUrl: email.changeUrl,
+          currentEmail: email.currentEmail,
+          newEmail: email.newEmail,
+          username: email.username,
+        }),
+        // Consent to current email; sendVerificationEmail handles new-email verification.
+        to: email.currentEmail,
+      };
+    }
+    default: {
+      // Compile-time exhaustiveness: a new email type not handled above fails this assignment.
+      const unhandled: never = email;
+      throw new Error(`Unhandled transactional email: ${String(unhandled)}`);
+    }
+  }
 };
 
 const sendTransactionalEmail = (email: TransactionalEmail, config: MailerConfig) => {
-  const builder = TEMPLATES[email.type] as TemplateBuilder<typeof email>;
-  const { subject, template, to } = builder(email);
+  const { subject, template, to } = buildEmail(email);
   return sendEmail({
     apiKey: config.apiKey,
     defaultReplyTo: config.defaultReplyTo,
