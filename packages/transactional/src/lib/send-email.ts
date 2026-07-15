@@ -51,31 +51,43 @@ type PreparedEmailPayload = {
   to: EmailConfig["to"];
 };
 
-const sendEmail = async ({ apiKey, defaultReplyTo, template, ...config }: SendEmailOptions) => {
-  if (!apiKey) {
+const renderTemplate = async (template: ReactElement) => {
+  const [html, text] = await Promise.all([render(template), render(template, { plainText: true })]);
+  return { html, text };
+};
+
+// Validate + render into the wire payload. Shared by single and batch sends; apiKey is ignored here.
+const prepareEmailPayload = async ({
+  defaultReplyTo,
+  template,
+  ...config
+}: SendEmailOptions): Promise<PreparedEmailPayload> => {
+  const validatedConfig = emailConfigSchema.parse(config);
+  const { html, text } = await renderTemplate(template);
+
+  return {
+    bcc: validatedConfig.bcc,
+    cc: validatedConfig.cc,
+    from: validatedConfig.from,
+    html,
+    replyTo: validatedConfig.replyTo || defaultReplyTo,
+    subject: validatedConfig.subject,
+    tags: validatedConfig.tags,
+    text,
+    to: validatedConfig.to,
+  };
+};
+
+const sendEmail = async (options: SendEmailOptions) => {
+  if (!options.apiKey) {
     throw new Error("API key is required for sending emails");
   }
 
   try {
-    const validatedConfig = emailConfigSchema.parse(config);
-    const resend = new Resend(apiKey);
+    const payload = await prepareEmailPayload(options);
+    const resend = new Resend(options.apiKey);
 
-    const [html, text] = await Promise.all([
-      render(template),
-      render(template, { plainText: true }),
-    ]);
-
-    const result = await resend.emails.send({
-      bcc: validatedConfig.bcc,
-      cc: validatedConfig.cc,
-      from: validatedConfig.from,
-      html,
-      replyTo: validatedConfig.replyTo || defaultReplyTo,
-      subject: validatedConfig.subject,
-      tags: validatedConfig.tags,
-      text,
-      to: validatedConfig.to,
-    });
+    const result = await resend.emails.send(payload);
 
     if (result.error) {
       throw new Error(
@@ -111,28 +123,9 @@ const sendBatchEmails = async (
   }
 
   try {
-    const resend = new Resend(apiKey);
-
+    // Batch-level defaultReplyTo wins over any per-email value.
     const settledBatchData = await Promise.allSettled(
-      emails.map(async ({ template, ...config }) => {
-        const validatedConfig = emailConfigSchema.parse(config);
-        const [html, text] = await Promise.all([
-          render(template),
-          render(template, { plainText: true }),
-        ]);
-
-        return {
-          bcc: validatedConfig.bcc,
-          cc: validatedConfig.cc,
-          from: validatedConfig.from,
-          html,
-          replyTo: validatedConfig.replyTo || defaultReplyTo,
-          subject: validatedConfig.subject,
-          tags: validatedConfig.tags,
-          text,
-          to: validatedConfig.to,
-        };
-      }),
+      emails.map((email) => prepareEmailPayload({ ...email, defaultReplyTo })),
     );
 
     const batchData: Array<PreparedEmailPayload> = [];
@@ -158,6 +151,7 @@ const sendBatchEmails = async (
       );
     }
 
+    const resend = new Resend(apiKey);
     const result = await resend.batch.send(batchData);
 
     if (result.error) {
@@ -180,13 +174,6 @@ const sendBatchEmails = async (
   }
 };
 
-const previewEmail = async (template: ReactElement) => {
-  const [html, text] = await Promise.all([render(template), render(template, { plainText: true })]);
-
-  return {
-    html,
-    text,
-  };
-};
+const previewEmail = (template: ReactElement) => renderTemplate(template);
 
 export { sendEmail, sendBatchEmails, previewEmail };
