@@ -11,7 +11,7 @@ vi.mock("@/lib/auth", () => ({
 
 import { v1UserRoutes } from "./users";
 
-describe("OpenAPI document — Error schema", () => {
+describe("OpenAPI document: Error schema", () => {
   it("declares the nested { error: { code, message } } shape", () => {
     const app = new OpenAPIHono();
     app.route("/api/v1/users", v1UserRoutes);

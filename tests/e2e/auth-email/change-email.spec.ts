@@ -12,7 +12,7 @@ test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("Change email (two-stage confirmation + verification)", () => {
-  test("user changes email — both stage-1 and stage-2 mails leave Resend, new email signs in", async ({
+  test("user changes email: both stage-1 and stage-2 mails leave Resend, new email signs in", async ({
     page,
     request,
   }, testInfo) => {
