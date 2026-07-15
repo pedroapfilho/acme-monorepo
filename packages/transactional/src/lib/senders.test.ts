@@ -19,7 +19,15 @@ describe("sendTransactionalEmail dispatch", () => {
     sendMock.mockResolvedValue({ data: { id: "test" }, error: null });
   });
 
-  const cases: Array<{ email: TransactionalEmail; subject: string; to: string }> = [
+  // htmlMarker is a test-controlled CTA URL that only the correct template renders into
+  // its href, so a case that keeps the right subject/recipient but renders the wrong
+  // component fails. URLs (not headings) are used so the check survives copy edits.
+  const cases: Array<{
+    email: TransactionalEmail;
+    htmlMarker: string;
+    subject: string;
+    to: string;
+  }> = [
     {
       email: {
         type: "welcome",
@@ -28,6 +36,7 @@ describe("sendTransactionalEmail dispatch", () => {
         username: "Ada",
         verificationUrl: "https://acme.com/verify",
       },
+      htmlMarker: "https://acme.com/verify",
       subject: "Welcome to Acme, Ada! Please verify your email",
       to: "new@acme.com",
     },
@@ -39,6 +48,7 @@ describe("sendTransactionalEmail dispatch", () => {
         userEmail: "existing@acme.com",
         userId: "user_2",
       },
+      htmlMarker: "https://acme.com/login",
       subject: "Sign-up attempt with your Acme account",
       to: "existing@acme.com",
     },
@@ -49,6 +59,7 @@ describe("sendTransactionalEmail dispatch", () => {
         userEmail: "reset@acme.com",
         userId: "user_3",
       },
+      htmlMarker: "https://acme.com/reset",
       subject: "Reset your Acme password",
       to: "reset@acme.com",
     },
@@ -60,6 +71,7 @@ describe("sendTransactionalEmail dispatch", () => {
         type: "change-email-confirmation",
         userId: "user_4",
       },
+      htmlMarker: "https://acme.com/change",
       subject: "Confirm change of your Acme account email",
       // Confirmation goes to the current address, not the new one.
       to: "current@acme.com",
@@ -67,8 +79,8 @@ describe("sendTransactionalEmail dispatch", () => {
   ];
 
   it.each(cases)(
-    "routes $email.type to subject, recipient, and tags",
-    async ({ email, subject, to }) => {
+    "routes $email.type to subject, recipient, tags, and rendered template",
+    async ({ email, htmlMarker, subject, to }) => {
       const result = await sendTransactionalEmail(email, config);
 
       expect(result.success).toBe(true);
@@ -81,7 +93,7 @@ describe("sendTransactionalEmail dispatch", () => {
         { name: "userId", value: email.userId },
       ]);
       expect(typeof payload.html).toBe("string");
-      expect(payload.html.length).toBeGreaterThan(0);
+      expect(payload.html).toContain(htmlMarker);
     },
   );
 
