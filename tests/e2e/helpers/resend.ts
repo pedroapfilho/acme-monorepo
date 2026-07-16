@@ -1,11 +1,8 @@
 // Poll Resend GET /emails to catch "JWT valid but send never happened" regressions.
 
-const RESEND_API = "https://api.resend.com";
+import { sleep } from "./sleep";
 
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
+const RESEND_API = "https://api.resend.com";
 
 type ResendListItem = {
   bcc: string | null;
@@ -64,7 +61,6 @@ const resendFetch = async (path: string): Promise<Response> => {
   const headers = { Authorization: `Bearer ${requireApiKey()}` };
 
   let attempt = 0;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     // eslint-disable-next-line no-await-in-loop
     const response = await fetch(url, { headers });
