@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@repo/db";
 import { log } from "@repo/observability";
-import type { MailerConfig } from "@repo/transactional";
+import type { MailerConfig, TransactionalEmail } from "@repo/transactional";
 import { sendTransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -30,7 +30,7 @@ type AuthConfig = {
   secret: string;
 };
 
-export const createAuth = (config: AuthConfig) => {
+const createAuth = (config: AuthConfig) => {
   const {
     extraPlugins = [],
     fromEmail = "noreply@acme.com",
@@ -42,6 +42,18 @@ export const createAuth = (config: AuthConfig) => {
   const mailer: MailerConfig | null = resendApiKey
     ? { apiKey: resendApiKey, from: fromEmail }
     : null;
+
+  // Shared by the throwing mail callbacks only; onExistingUserSignUp must swallow
+  // failures (enumeration prevention), so it stays separate.
+  const deliver = async (email: TransactionalEmail, failureMessage: string) => {
+    if (!mailer) {
+      return;
+    }
+    const result = await sendTransactionalEmail(email, mailer);
+    if (!result.success) {
+      throw new Error(`${failureMessage}: ${result.error}`);
+    }
+  };
 
   return betterAuth({
     account: {
@@ -111,10 +123,7 @@ export const createAuth = (config: AuthConfig) => {
       // Require verification only when mailer exists; otherwise new users lock out.
       requireEmailVerification: Boolean(mailer),
       sendResetPassword: async ({ url, user }) => {
-        if (!mailer) {
-          return;
-        }
-        const result = await sendTransactionalEmail(
+        await deliver(
           {
             resetUrl: url,
             type: "password-reset",
@@ -122,11 +131,8 @@ export const createAuth = (config: AuthConfig) => {
             userId: user.id,
             username: user.name,
           },
-          mailer,
+          "Failed to send password reset email",
         );
-        if (!result.success) {
-          throw new Error(`Failed to send password reset email: ${result.error}`);
-        }
       },
     },
 
@@ -137,10 +143,7 @@ export const createAuth = (config: AuthConfig) => {
       // Unverified sign-in 403s include a fresh verification link for the login form.
       sendOnSignIn: true,
       sendVerificationEmail: async ({ url, user }) => {
-        if (!mailer) {
-          return;
-        }
-        const result = await sendTransactionalEmail(
+        await deliver(
           {
             type: "welcome",
             userEmail: user.email,
@@ -148,11 +151,8 @@ export const createAuth = (config: AuthConfig) => {
             username: user.name,
             verificationUrl: url,
           },
-          mailer,
+          "Failed to send verification email",
         );
-        if (!result.success) {
-          throw new Error(`Failed to send verification email: ${result.error}`);
-        }
       },
     },
 
@@ -199,10 +199,7 @@ export const createAuth = (config: AuthConfig) => {
         enabled: true,
         // Stage 1: confirm on current email; stage 2 reuses sendVerificationEmail.
         sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
-          if (!mailer) {
-            return;
-          }
-          const result = await sendTransactionalEmail(
+          await deliver(
             {
               changeUrl: url,
               currentEmail: user.email,
@@ -211,16 +208,15 @@ export const createAuth = (config: AuthConfig) => {
               userId: user.id,
               username: user.name,
             },
-            mailer,
+            "Failed to send change-email confirmation",
           );
-          if (!result.success) {
-            throw new Error(`Failed to send change-email confirmation: ${result.error}`);
-          }
         },
       },
     },
   });
 };
 
-export type Auth = ReturnType<typeof createAuth>;
-export type { AuthConfig };
+type Auth = ReturnType<typeof createAuth>;
+
+export { createAuth };
+export type { Auth, AuthConfig };

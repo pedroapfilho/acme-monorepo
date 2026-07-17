@@ -2,11 +2,7 @@ import { prisma } from "@repo/db";
 import { signJWT } from "better-auth/crypto";
 
 import { webUrl } from "../../../playwright.config";
-
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
-    setTimeout(resolve, ms);
-  });
+import { sleep } from "../helpers/sleep";
 
 const requireSecret = (): string => {
   const secret = process.env.BETTER_AUTH_SECRET;
