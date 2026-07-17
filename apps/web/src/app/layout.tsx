@@ -15,8 +15,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Acme Team" }],
   category: "technology",
   creator: "Acme",
-  description:
-    "A modern, secure authentication platform built with Better Auth and Next.js. Fast, reliable, and developer-friendly.",
+  description: "A modern, secure authentication platform built with Better Auth and Next.js.",
   icons: {
     apple: "/apple-touch-icon.png",
     icon: "/favicon.ico",
