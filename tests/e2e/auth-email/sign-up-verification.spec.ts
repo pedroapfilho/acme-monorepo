@@ -43,11 +43,11 @@ test.describe("Sign-up email verification", () => {
     expect(mail.last_event).not.toBe("bounced");
 
     // Fresh context: the verify link mints a session on the clicking device (autoSignInAfterVerification).
-    const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
+    const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
     await clickerPage.goto(verifyUrl);
-    await expect(clickerPage).toHaveURL(/\/dashboard$/v);
+    await expect(clickerPage).toHaveURL(/\/dashboard$/);
     const clickerCookies = await clickerContext.cookies(webUrl);
     expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeDefined();
     await clickerContext.close();

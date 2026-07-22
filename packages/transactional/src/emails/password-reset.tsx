@@ -28,7 +28,7 @@ const PasswordResetEmail = ({
       </Heading>
 
       <Text className="m-0 mb-2 text-base text-pretty break-words text-muted-foreground">
-        Hi{username ? ` ${username}` : ""},
+        Hi{username !== undefined && username !== "" ? ` ${username}` : ""},
       </Text>
 
       <Text className="m-0 mb-6 text-base text-pretty break-words text-muted-foreground">
@@ -47,8 +47,12 @@ const PasswordResetEmail = ({
       <Card accent title="Request details">
         <ul className="m-0 list-none p-0 text-base text-muted-foreground">
           <li className="py-1">Email: {userEmail}</li>
-          {ipAddress && <li className="py-1">IP address: {ipAddress}</li>}
-          {browserInfo && <li className="py-1">Browser: {browserInfo}</li>}
+          {ipAddress !== undefined && ipAddress !== "" && (
+            <li className="py-1">IP address: {ipAddress}</li>
+          )}
+          {browserInfo !== undefined && browserInfo !== "" && (
+            <li className="py-1">Browser: {browserInfo}</li>
+          )}
         </ul>
         <Text className="m-0 mt-3 mb-2 text-base font-semibold text-foreground">Important</Text>
         <ul className="m-0 list-inside list-disc text-base text-muted-foreground">

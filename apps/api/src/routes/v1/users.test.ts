@@ -60,7 +60,7 @@ describe("v1 user routes", () => {
   describe("GET /me", () => {
     it("returns the serialized user with ISO date strings", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(findUserById).mockResolvedValue(mockUser as never);
+      vi.mocked(findUserById).mockResolvedValue(mockUser);
 
       const res = await v1UserRoutes.request("/me", { headers: { Cookie: "session=x" } });
 
@@ -87,7 +87,7 @@ describe("v1 user routes", () => {
   describe("PATCH /me", () => {
     it("returns the updated serialized user", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(updateUser).mockResolvedValue({ ...mockUser, name: "New Name" } as never);
+      vi.mocked(updateUser).mockResolvedValue({ ...mockUser, name: "New Name" });
 
       const res = await v1UserRoutes.request("/me", {
         body: JSON.stringify({ name: "New Name" }),
@@ -105,7 +105,7 @@ describe("v1 user routes", () => {
   describe("DELETE /me", () => {
     it("returns 204 with no body", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(deleteUser).mockResolvedValue({ success: true } as never);
+      vi.mocked(deleteUser).mockResolvedValue({ success: true });
 
       const res = await v1UserRoutes.request("/me", {
         headers: { Cookie: "session=x" },
@@ -120,7 +120,7 @@ describe("v1 user routes", () => {
   describe("GET /", () => {
     it("returns the list envelope with data and meta", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(findUserById).mockResolvedValue(mockUser as never);
+      vi.mocked(findUserById).mockResolvedValue(mockUser);
 
       const res = await v1UserRoutes.request("/", { headers: { Cookie: "session=x" } });
 

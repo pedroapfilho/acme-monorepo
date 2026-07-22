@@ -58,7 +58,9 @@ const PasswordFieldInput = ({
         id={id}
         name={name}
         onBlur={onBlur}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
         required
         type="password"
         value={value}
@@ -78,7 +80,7 @@ const ResetPasswordForm = ({ token }: Props) => {
     onSubmit: ({ value }) => {
       setFormError(null);
       startTransition(async () => {
-        if (!token) {
+        if (token === null || token === "") {
           const message = "Invalid reset token. Please request a new password reset.";
           setFormError(message);
           toast.error(message);

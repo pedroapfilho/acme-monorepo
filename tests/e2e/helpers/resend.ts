@@ -140,8 +140,7 @@ const waitForEmail = async (
     });
 
     if (candidate) {
-      // eslint-disable-next-line no-await-in-loop
-      return await getEmail(candidate.id);
+      return getEmail(candidate.id);
     }
 
     // eslint-disable-next-line no-await-in-loop
@@ -157,7 +156,7 @@ const waitForEmail = async (
 // HTML href first; fall back to bare URL in the text body when templates are text-only.
 const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
-  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/gv);
+  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/g);
   for (const [, href] of hrefMatches) {
     const decoded = href.replaceAll("&amp;", "&");
     if (pattern.test(decoded)) {

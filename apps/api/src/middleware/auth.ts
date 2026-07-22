@@ -15,12 +15,12 @@ const extractAuthHeaders = (c: Context): Headers => {
   const headers = new Headers();
 
   const authHeader = c.req.header("Authorization");
-  if (authHeader) {
+  if (authHeader !== undefined && authHeader !== "") {
     headers.set("Authorization", authHeader);
   }
 
   const cookie = c.req.header("Cookie");
-  if (cookie) {
+  if (cookie !== undefined && cookie !== "") {
     headers.set("Cookie", cookie);
   }
 
@@ -43,15 +43,16 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
       throw new HTTPException(503, { message: "Authentication service unavailable" });
     }
 
-    if (!session || !session.user) {
+    const user = session?.user;
+    if (user === undefined || user === null) {
       throw new HTTPException(401, {
         message: "Authentication required",
       });
     }
 
     c.set("user", {
-      email: session.user.email,
-      id: session.user.id,
+      email: user.email,
+      id: user.id,
     });
 
     return next();
@@ -66,10 +67,11 @@ export const optionalAuthMiddleware = createMiddleware<{
   try {
     const session = await auth.api.getSession({ headers });
 
-    if (session && session.user) {
+    const user = session?.user;
+    if (user !== undefined && user !== null) {
       c.set("user", {
-        email: session.user.email,
-        id: session.user.id,
+        email: user.email,
+        id: user.id,
       });
     }
   } catch (error) {

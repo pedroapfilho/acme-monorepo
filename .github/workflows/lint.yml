@@ -14,4 +14,6 @@ jobs:
         with:
           runtime: node@24
           cache: true
+      # Type-aware linting resolves generated Prisma client types.
+      - run: pnpm turbo db:generate
       - run: pnpm oxlint --format=github .

@@ -59,8 +59,10 @@ type EmailBuild = { subject: string; template: React.ReactElement; to: string };
 const buildEmail = (email: TransactionalEmail): EmailBuild => {
   switch (email.type) {
     case "welcome": {
+      const greetingName =
+        email.username !== undefined && email.username !== "" ? `, ${email.username}` : "";
       return {
-        subject: `Welcome to Acme${email.username ? `, ${email.username}` : ""}! Please verify your email`,
+        subject: `Welcome to Acme${greetingName}! Please verify your email`,
         template: React.createElement(WelcomeEmail, {
           userEmail: email.userEmail,
           username: email.username,
@@ -115,12 +117,13 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
   }
 };
 
-const sendTransactionalEmail = (email: TransactionalEmail, config: MailerConfig) => {
+const sendTransactionalEmail = async (email: TransactionalEmail, config: MailerConfig) => {
   const { subject, template, to } = buildEmail(email);
-  return sendEmail({
+  const from = config.from !== undefined && config.from !== "" ? config.from : DEFAULT_FROM;
+  const result = await sendEmail({
     apiKey: config.apiKey,
     defaultReplyTo: config.defaultReplyTo,
-    from: config.from || DEFAULT_FROM,
+    from,
     subject,
     tags: [
       { name: "type", value: email.type },
@@ -129,6 +132,7 @@ const sendTransactionalEmail = (email: TransactionalEmail, config: MailerConfig)
     template,
     to,
   });
+  return result;
 };
 
 export type { MailerConfig, TransactionalEmail };

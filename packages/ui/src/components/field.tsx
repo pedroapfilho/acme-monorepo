@@ -54,18 +54,19 @@ const FieldError = ({
     return null;
   }
   const messages = errors.reduce<Array<string>>((acc, e) => {
-    if (!e) {
+    const isPresent = Boolean(e);
+    if (!isPresent) {
       return acc;
     }
     if (typeof e === "string") {
       acc.push(e);
       return acc;
     }
-    if (typeof e === "object" && "message" in e) {
-      acc.push((e as { message: string }).message);
+    if (typeof e === "object" && e !== null && "message" in e && typeof e.message === "string") {
+      acc.push(e.message);
       return acc;
     }
-    acc.push(String(e));
+    acc.push(JSON.stringify(e));
     return acc;
   }, []);
   if (messages.length === 0) {

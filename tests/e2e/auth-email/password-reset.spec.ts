@@ -47,7 +47,7 @@ test.describe("Password reset", () => {
     expect(mail.last_event).not.toBe("bounced");
 
     // Better Auth builds `/reset-password/<token>?callbackURL=...` (token is a path segment).
-    const resetUrl = extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/v);
+    const resetUrl = extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/);
     await page.goto(resetUrl);
 
     await page.getByLabel("New password", { exact: true }).fill(newPassword);
