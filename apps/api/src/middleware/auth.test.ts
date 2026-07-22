@@ -68,7 +68,7 @@ describe("authMiddleware", () => {
   });
 
   it("throws 401 when session is null", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(null as never);
+    vi.mocked(auth.api.getSession).mockResolvedValue(null);
     const { ctx } = createMockContext();
 
     await expect(authMiddleware(ctx, next)).rejects.toThrow(HTTPException);
@@ -117,7 +117,7 @@ describe("optionalAuthMiddleware", () => {
   });
 
   it("calls next without setting user when session is null", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(null as never);
+    vi.mocked(auth.api.getSession).mockResolvedValue(null);
     const { ctx, mocks } = createMockContext();
 
     await optionalAuthMiddleware(ctx, next);

@@ -60,7 +60,9 @@ const RegisterFieldInput = ({
         id={id}
         name={name}
         onBlur={onBlur}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
         required
         type={type}
         value={value}
@@ -95,7 +97,8 @@ const RegisterForm = ({ from }: Props) => {
             return;
           }
           // No token (requireEmailVerification or enumeration prevention): show "check your email".
-          if (!result.data?.token) {
+          const token = result.data?.token;
+          if (token === undefined || token === null || token === "") {
             setSentToEmail(value.email);
             return;
           }
@@ -112,7 +115,7 @@ const RegisterForm = ({ from }: Props) => {
     validators: { onSubmit: registerSchema },
   });
 
-  if (sentToEmail) {
+  if (sentToEmail !== null) {
     return (
       <output aria-live="polite" className="block space-y-1 text-center">
         <span className="block font-medium">Check your email</span>

@@ -9,7 +9,7 @@ import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
 const parseEnvList = (value: string | undefined): Array<string> => {
-  if (!value) {
+  if (value === undefined || value === "") {
     return [];
   }
   const result: Array<string> = [];
@@ -39,9 +39,10 @@ export const createAuth = (config: AuthConfig) => {
     secret,
   } = config;
 
-  const mailer: MailerConfig | null = resendApiKey
-    ? { apiKey: resendApiKey, from: fromEmail }
-    : null;
+  const mailer: MailerConfig | null =
+    resendApiKey !== undefined && resendApiKey !== ""
+      ? { apiKey: resendApiKey, from: fromEmail }
+      : null;
 
   return betterAuth({
     account: {
@@ -160,7 +161,9 @@ export const createAuth = (config: AuthConfig) => {
 
     // Disabled in CI: e2e suite hammers auth endpoints and would trip 429s.
     rateLimit: {
-      enabled: process.env.NODE_ENV === "production" && !process.env.CI,
+      enabled:
+        process.env.NODE_ENV === "production" &&
+        (process.env.CI === undefined || process.env.CI === ""),
       max: 100,
       storage: "database",
       window: 60,

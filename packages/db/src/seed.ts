@@ -19,8 +19,8 @@ const DEFAULT_USERS = [
 
 try {
   const results = await Promise.allSettled(
-    DEFAULT_USERS.map((user) =>
-      prisma.user.upsert({
+    DEFAULT_USERS.map(async (user) => {
+      const upserted = await prisma.user.upsert({
         create: {
           ...user,
         },
@@ -30,8 +30,9 @@ try {
         where: {
           id: user.id,
         },
-      }),
-    ),
+      });
+      return upserted;
+    }),
   );
 
   const failures = results.filter((r) => r.status === "rejected");

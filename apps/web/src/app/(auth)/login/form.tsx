@@ -55,7 +55,9 @@ const EmailFieldInput = ({
         id="email"
         name={name}
         onBlur={onBlur}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
         placeholder="m@example.com"
         required
         type="email"
@@ -86,7 +88,9 @@ const PasswordFieldInput = ({
         id="password"
         name={name}
         onBlur={onBlur}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
         required
         type="password"
         value={value}

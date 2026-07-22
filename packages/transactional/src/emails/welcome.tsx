@@ -38,7 +38,7 @@ const WelcomeEmail = ({ userEmail, username, verificationUrl }: WelcomeEmailProp
       <Text className="m-0 mb-4 text-sm text-muted-foreground">
         <strong>Account details</strong>
         <br />
-        {username ? (
+        {username !== undefined && username !== "" ? (
           <>
             Username: {username}
             <br />

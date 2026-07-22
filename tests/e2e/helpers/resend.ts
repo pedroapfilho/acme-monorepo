@@ -2,10 +2,11 @@
 
 const RESEND_API = "https://api.resend.com";
 
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
+const sleep = async (ms: number) => {
+  await new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
+};
 
 type ResendListItem = {
   bcc: string | null;
@@ -144,8 +145,7 @@ const waitForEmail = async (
     });
 
     if (candidate) {
-      // eslint-disable-next-line no-await-in-loop
-      return await getEmail(candidate.id);
+      return getEmail(candidate.id);
     }
 
     // eslint-disable-next-line no-await-in-loop
@@ -161,7 +161,7 @@ const waitForEmail = async (
 // HTML href first; fall back to bare URL in the text body when templates are text-only.
 const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
-  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/gv);
+  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/g);
   for (const [, href] of hrefMatches) {
     const decoded = href.replaceAll("&amp;", "&");
     if (pattern.test(decoded)) {

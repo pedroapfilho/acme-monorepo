@@ -31,7 +31,7 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const verify = await verification.forVerifyEmail(currentEmail);
     await page.goto(verify.url);
     // autoSignInAfterVerification signs in the page; API sign-in threads cookies for change-email.
-    await page.waitForURL(/\/dashboard$/v);
+    await page.waitForURL(/\/dashboard$/);
     const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email: currentEmail, password },
     });
@@ -86,7 +86,7 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
       to: currentEmail,
     });
     expect(stage1Mail.last_event).not.toBe("bounced");
-    const stage1Url = extractLink(stage1Mail, /\/api\/auth\/verify-email\?token=/v);
+    const stage1Url = extractLink(stage1Mail, /\/api\/auth\/verify-email\?token=/);
 
     await page.goto(stage1Url);
     await page.waitForURL("/dashboard");
@@ -96,7 +96,7 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
       to: newEmail,
     });
     expect(stage2Mail.last_event).not.toBe("bounced");
-    const stage2Url = extractLink(stage2Mail, /\/api\/auth\/verify-email\?token=/v);
+    const stage2Url = extractLink(stage2Mail, /\/api\/auth\/verify-email\?token=/);
 
     await page.goto(stage2Url);
     await page.waitForURL("/dashboard");

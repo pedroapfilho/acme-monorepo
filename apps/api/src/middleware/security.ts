@@ -1,9 +1,23 @@
 import type { Context, Next } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
+import { z } from "zod";
 
-const getClientIp = (c: Context): string =>
-  c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || c.env?.remoteAddr || "unknown";
+const remoteAddrEnvSchema = z.object({ remoteAddr: z.string().min(1) });
+const userVariableSchema = z.object({ id: z.string().min(1) });
+
+const getClientIp = (c: Context): string => {
+  const forwarded = c.req.header("x-forwarded-for");
+  if (forwarded !== undefined && forwarded !== "") {
+    return forwarded;
+  }
+  const realIp = c.req.header("x-real-ip");
+  if (realIp !== undefined && realIp !== "") {
+    return realIp;
+  }
+  const env = remoteAddrEnvSchema.safeParse(c.env);
+  return env.success ? env.data.remoteAddr : "unknown";
+};
 
 export const securityHeaders = secureHeaders({
   contentSecurityPolicy: {
@@ -32,8 +46,9 @@ export const securityHeaders = secureHeaders({
 });
 
 export const standardRateLimit = rateLimiter({
+  // The handler type is void; assigning c.res is how a void middleware finalizes the response.
   handler: (c: Context) => {
-    return c.json(
+    c.res = c.json(
       {
         error: {
           code: "RATE_LIMIT_EXCEEDED",
@@ -51,7 +66,7 @@ export const standardRateLimit = rateLimiter({
 
 export const apiRateLimit = rateLimiter({
   handler: (c: Context) => {
-    return c.json(
+    c.res = c.json(
       {
         error: {
           code: "API_RATE_LIMIT_EXCEEDED",
@@ -62,8 +77,8 @@ export const apiRateLimit = rateLimiter({
     );
   },
   keyGenerator: (c: Context) => {
-    const user = c.get("user");
-    return user?.id ? `user:${user.id}` : `ip:${getClientIp(c)}`;
+    const user = userVariableSchema.safeParse(c.get("user"));
+    return user.success ? `user:${user.data.id}` : `ip:${getClientIp(c)}`;
   },
   limit: 30,
   standardHeaders: "draft-6",
@@ -71,11 +86,15 @@ export const apiRateLimit = rateLimiter({
 });
 
 export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
-  return async (c: Context, next: Next) => {
+  return async (c: Context, nextHandler: Next) => {
     const contentLength = c.req.header("content-length");
 
-    if (contentLength && Math.trunc(Number(contentLength)) > maxSize) {
-      return c.json(
+    if (
+      contentLength !== undefined &&
+      contentLength !== "" &&
+      Math.trunc(Number(contentLength)) > maxSize
+    ) {
+      c.res = c.json(
         {
           error: {
             code: "PAYLOAD_TOO_LARGE",
@@ -84,8 +103,9 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
         },
         413,
       );
+      return;
     }
 
-    return await next();
+    await nextHandler();
   };
 };

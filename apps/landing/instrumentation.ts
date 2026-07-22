@@ -1,5 +1,6 @@
 import { defineNodeInstrumentation } from "@repo/observability/next/instrumentation";
 
-export const { onRequestError, register } = defineNodeInstrumentation(
-  () => import("./src/lib/observability"),
-);
+export const { onRequestError, register } = defineNodeInstrumentation(async () => {
+  const observability = await import("./src/lib/observability");
+  return observability;
+});

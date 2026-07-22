@@ -52,7 +52,7 @@ describe("findUserById", () => {
   });
 
   it("throws AppError 404 when user not found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null as never);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
     await expect(findUserById("missing")).rejects.toThrow(AppError);
     await expect(findUserById("missing")).rejects.toMatchObject({
@@ -83,7 +83,7 @@ describe("findUserByEmail", () => {
   });
 
   it("returns null when user not found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null as never);
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
     const result = await findUserByEmail("missing@example.com");
 

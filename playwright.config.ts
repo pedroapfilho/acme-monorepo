@@ -27,7 +27,7 @@ export default defineConfig({
   globalTeardown: "./tests/e2e/teardown/cleanup.ts",
 
   projects: [
-    { name: "setup", testMatch: /.*\.setup\.ts/v },
+    { name: "setup", testMatch: /.*\.setup\.ts/ },
     {
       dependencies: ["setup"],
       name: "chromium",

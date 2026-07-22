@@ -99,13 +99,13 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should have bearer token plugin enabled", () => {
-    const plugins = auth.options.plugins || [];
+    const plugins = auth.options.plugins ?? [];
     const hasBearerToken = plugins.some((plugin) => plugin.id === "bearer");
     expect(hasBearerToken).toBe(true);
   });
 
   it("should have username plugin enabled", () => {
-    const plugins = auth.options.plugins || [];
+    const plugins = auth.options.plugins ?? [];
     const hasUsername = plugins.some((plugin) => plugin.id === "username");
     expect(hasUsername).toBe(true);
   });

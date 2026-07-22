@@ -4,7 +4,9 @@ import { createJobLogger, initWorkerLogger } from "./worker";
 
 describe("worker surface", () => {
   it("initWorkerLogger runs without throwing", () => {
-    expect(() => initWorkerLogger({ service: "worker" })).not.toThrow();
+    expect(() => {
+      initWorkerLogger({ service: "worker" });
+    }).not.toThrow();
   });
   it("createJobLogger returns a logger with set/emit", () => {
     initWorkerLogger({ service: "worker" });

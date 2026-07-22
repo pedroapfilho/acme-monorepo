@@ -11,7 +11,7 @@ const Card = ({ accent = false, children, title }: CardProps) => {
 
   return (
     <Section className={`rounded-lg border border-border bg-card p-5 break-words ${accentClasses}`}>
-      {title && (
+      {title !== undefined && title !== "" && (
         <Text className="m-0 mb-2 text-base font-semibold break-words text-foreground">
           {title}
         </Text>

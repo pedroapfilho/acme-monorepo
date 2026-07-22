@@ -8,6 +8,8 @@ describe("hono surface", () => {
     expect(typeof honoEvlog()).toBe("function");
   });
   it("initApiLogger runs without throwing", () => {
-    expect(() => initApiLogger({ service: "api" })).not.toThrow();
+    expect(() => {
+      initApiLogger({ service: "api" });
+    }).not.toThrow();
   });
 });

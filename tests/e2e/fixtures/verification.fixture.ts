@@ -3,10 +3,11 @@ import { signJWT } from "better-auth/crypto";
 
 import { webUrl } from "../../../playwright.config";
 
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => {
+const sleep = async (ms: number) => {
+  await new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
+};
 
 const requireSecret = (): string => {
   const secret = process.env.BETTER_AUTH_SECRET;
