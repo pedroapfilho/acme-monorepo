@@ -42,3 +42,4 @@ minimumReleaseAgeExclude:
   - "@oxlint/binding-win32-x64-msvc@1.75.0"
   - oxlint-tsgolint@7.0.2001
   - oxlint@1.75.0
+  - oxlint-config-awesomeness@3.2.0
