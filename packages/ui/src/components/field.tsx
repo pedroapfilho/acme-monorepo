@@ -54,8 +54,7 @@ const FieldError = ({
     return null;
   }
   const messages = errors.reduce<Array<string>>((acc, e) => {
-    const isPresent = Boolean(e);
-    if (!isPresent) {
+    if (e === undefined || e === null) {
       return acc;
     }
     if (typeof e === "string") {
@@ -66,7 +65,10 @@ const FieldError = ({
       acc.push(e.message);
       return acc;
     }
-    acc.push(JSON.stringify(e));
+    // String() is deliberate here. JSON.stringify returns undefined for functions and symbols
+    // (rendering the literal text "undefined") and throws on BigInt, crashing the field.
+    // oxlint-disable-next-line typescript/no-base-to-string -- last-resort fallback for a value with no message
+    acc.push(String(e));
     return acc;
   }, []);
   if (messages.length === 0) {
