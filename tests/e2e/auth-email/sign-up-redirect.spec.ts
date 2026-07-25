@@ -42,7 +42,7 @@ test.describe("Sign-up with redirect context", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/v);
+    const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/);
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
     await clickerPage.goto(verifyUrl);

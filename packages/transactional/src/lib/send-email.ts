@@ -6,7 +6,7 @@ import { z } from "zod";
 // Resend allows RFC 5322 "Name <email>" for from/reply-to; z.email() is bare-only so extract the bracketed address.
 const senderAddressSchema = z.string().refine(
   (val) => {
-    const wrapped = val.match(/^.+<(?<address>[^<>\s]+)>$/v);
+    const wrapped = /^.+<(?<address>[^<>\s]+)>$/v.exec(val);
     const email = wrapped?.groups?.address ?? val;
     return z.email().safeParse(email).success;
   },
@@ -59,7 +59,7 @@ const sendEmail = async ({ apiKey, defaultReplyTo, template, ...config }: SendEm
       cc: validatedConfig.cc,
       from: validatedConfig.from,
       html,
-      replyTo: validatedConfig.replyTo || defaultReplyTo,
+      replyTo: validatedConfig.replyTo ?? defaultReplyTo,
       subject: validatedConfig.subject,
       tags: validatedConfig.tags,
       text,

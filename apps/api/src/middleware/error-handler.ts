@@ -31,8 +31,10 @@ class AppError extends Error {
 }
 
 const errorHandler = (err: Error, c: Context) => {
+  const forwardedFor = c.req.header("x-forwarded-for");
   c.get("log").error(err, {
-    ip: c.req.header("x-forwarded-for") || c.req.header("x-real-ip"),
+    ip:
+      forwardedFor !== undefined && forwardedFor !== "" ? forwardedFor : c.req.header("x-real-ip"),
     method: c.req.method,
     url: c.req.url,
     userAgent: c.req.header("user-agent"),
@@ -70,7 +72,7 @@ const errorHandler = (err: Error, c: Context) => {
     return c.json(
       {
         error: {
-          code: err.code || "APP_ERROR",
+          code: err.code !== undefined && err.code !== "" ? err.code : "APP_ERROR",
           message: err.message,
         },
       },

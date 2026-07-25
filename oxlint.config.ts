@@ -3,6 +3,10 @@ import awesomeness from "oxlint-config-awesomeness";
 
 export default defineConfig({
   extends: [awesomeness],
+  options: {
+    typeAware: true,
+    typeCheck: true,
+  },
   overrides: [
     // PascalCase factories from next/font/google (Inter) and @scalar/hono-api-reference (Scalar).
     {

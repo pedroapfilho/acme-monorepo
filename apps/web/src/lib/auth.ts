@@ -10,7 +10,7 @@ let cachedAuth: Auth | undefined;
 const getAuth = (): Auth => {
   if (!cachedAuth) {
     const secret = process.env.BETTER_AUTH_SECRET;
-    if (!secret || secret.length < 32) {
+    if (secret === undefined || secret.length < 32) {
       throw new Error(
         "BETTER_AUTH_SECRET must be set to at least 32 characters (generate with: openssl rand -base64 32)",
       );
@@ -28,8 +28,9 @@ const getAuth = (): Auth => {
 
 // Proxy for ergonomic imports: `import { auth } from "@/lib/auth"` and use like a singleton,
 // but defer instantiation until first use (so build-time env checks don't trip).
+// oxlint-disable no-unsafe-type-assertion -- the Proxy impersonates Auth by design; its target is an empty stand-in and property access is forwarded dynamically.
 const auth = new Proxy({} as Auth, {
-  get(_, prop) {
+  get(_, prop): unknown {
     const instance = getAuth();
     const value = instance[prop as keyof Auth];
     if (typeof value === "function") {
@@ -38,5 +39,6 @@ const auth = new Proxy({} as Auth, {
     return value;
   },
 });
+// oxlint-enable no-unsafe-type-assertion
 
 export { auth, getAuth };

@@ -49,7 +49,9 @@ const EmailFieldInput = ({
         id="email"
         name={name}
         onBlur={onBlur}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          onChange(e.target.value);
+        }}
         placeholder="m@example.com"
         required
         type="email"
@@ -93,7 +95,7 @@ const RecoverForm = () => {
     validators: { onSubmit: recoverSchema },
   });
 
-  if (submittedEmail) {
+  if (submittedEmail !== null) {
     return (
       <div className="flex flex-col items-center gap-2 text-center">
         <p className="font-semibold">Check your email</p>

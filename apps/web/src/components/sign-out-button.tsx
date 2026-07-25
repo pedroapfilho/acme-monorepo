@@ -36,7 +36,11 @@ const SignOutButton = () => {
         {isPending && <Loader2 className="size-4 animate-spin" />}
         {isPending ? "Signing out…" : "Sign out"}
       </Button>
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error !== null && (
+        <p className="text-sm text-destructive" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

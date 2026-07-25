@@ -26,7 +26,7 @@ const SignUpAttemptEmail = ({
       </Heading>
 
       <Text className="m-0 mb-2 text-base text-pretty break-words text-muted-foreground">
-        Hi{username ? ` ${username}` : ""},
+        Hi{username !== undefined && username !== "" ? ` ${username}` : ""},
       </Text>
 
       <Text className="m-0 mb-2 text-base text-pretty break-words text-muted-foreground">

@@ -53,6 +53,7 @@ export const createMockContext = (
     }),
   };
 
+  // oxlint-disable-next-line no-unsafe-type-assertion -- Hono's Context is too large to mock structurally
   const ctx = {
     get: mocks.get,
     header: mocks.header,

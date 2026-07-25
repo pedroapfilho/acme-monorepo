@@ -166,14 +166,18 @@ serve({
   port,
 });
 
-process.on("SIGTERM", async () => {
-  log.info("server", "SIGTERM received, shutting down gracefully");
-  await prisma.$disconnect();
-  process.exit(0);
+process.on("SIGTERM", () => {
+  void (async () => {
+    log.info("server", "SIGTERM received, shutting down gracefully");
+    await prisma.$disconnect();
+    process.exit(0);
+  })();
 });
 
-process.on("SIGINT", async () => {
-  log.info("server", "SIGINT received, shutting down gracefully");
-  await prisma.$disconnect();
-  process.exit(0);
+process.on("SIGINT", () => {
+  void (async () => {
+    log.info("server", "SIGINT received, shutting down gracefully");
+    await prisma.$disconnect();
+    process.exit(0);
+  })();
 });
