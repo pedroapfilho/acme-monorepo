@@ -15,13 +15,14 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { Suspense, use, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
+import { safeRedirectPath } from "@/lib/redirect-validation";
 
 type Props = {
-  from: string;
+  searchParams: Promise<{ from?: string }>;
 };
 
 type FieldInputProps = {
@@ -35,6 +36,53 @@ type FieldInputProps = {
   onChange: (v: string) => void;
   type?: string;
   value: string;
+};
+
+type FormActionsProps = {
+  isPending: boolean;
+  searchParams: Props["searchParams"];
+};
+
+const RegisterFormActionsFallback = () => (
+  <>
+    <Button disabled type="submit">
+      Create account
+    </Button>
+    <FieldDescription className="text-center">
+      Already have an account?{" "}
+      <Link className="text-foreground underline underline-offset-4" href="/login">
+        Sign in
+      </Link>
+    </FieldDescription>
+  </>
+);
+
+const RegisterFormActions = ({ isPending, searchParams }: FormActionsProps) => {
+  const { from } = use(searchParams);
+  const safeTo = safeRedirectPath(from);
+
+  return (
+    <>
+      <Button
+        aria-busy={isPending}
+        className="aria-busy:pointer-events-none aria-busy:opacity-50"
+        disabled={isPending}
+        type="submit"
+      >
+        {isPending && <Loader2 className="size-4 animate-spin" />}
+        {isPending ? "Creating account…" : "Create account"}
+      </Button>
+      <FieldDescription className="text-center">
+        Already have an account?{" "}
+        <Link
+          className="text-foreground underline underline-offset-4"
+          href={safeTo === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(safeTo)}`}
+        >
+          Sign in
+        </Link>
+      </FieldDescription>
+    </>
+  );
 };
 
 const RegisterFieldInput = ({
@@ -72,7 +120,7 @@ const RegisterFieldInput = ({
   );
 };
 
-const RegisterForm = ({ from }: Props) => {
+const RegisterForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
@@ -84,8 +132,10 @@ const RegisterForm = ({ from }: Props) => {
       setFormError(null);
       startTransition(async () => {
         try {
+          const { from } = await searchParams;
+          const safeTo = safeRedirectPath(from);
           const result = await authClient.signUp.email({
-            callbackURL: from,
+            callbackURL: safeTo,
             email: value.email,
             name: value.name,
             password: value.password,
@@ -102,7 +152,7 @@ const RegisterForm = ({ from }: Props) => {
             setSentToEmail(value.email);
             return;
           }
-          push(from);
+          push(safeTo);
           refresh();
         } catch (error) {
           const message =
@@ -235,24 +285,9 @@ const RegisterForm = ({ from }: Props) => {
         </div>
 
         <Field>
-          <Button
-            aria-busy={isPending}
-            aria-disabled={isPending}
-            className="aria-busy:pointer-events-none aria-busy:opacity-50"
-            type="submit"
-          >
-            {isPending && <Loader2 className="size-4 animate-spin" />}
-            {isPending ? "Creating account…" : "Create account"}
-          </Button>
-          <FieldDescription className="text-center">
-            Already have an account?{" "}
-            <Link
-              className="text-foreground underline underline-offset-4"
-              href={from === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(from)}`}
-            >
-              Sign in
-            </Link>
-          </FieldDescription>
+          <Suspense fallback={<RegisterFormActionsFallback />}>
+            <RegisterFormActions isPending={isPending} searchParams={searchParams} />
+          </Suspense>
         </Field>
       </FieldGroup>
     </form>
