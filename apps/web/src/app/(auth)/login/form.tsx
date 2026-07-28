@@ -15,13 +15,14 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { Suspense, use, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
+import { safeRedirectPath } from "@/lib/redirect-validation";
 
 type Props = {
-  from: string;
+  searchParams: Promise<{ from?: string; message?: string }>;
 };
 
 type FieldInputProps = {
@@ -32,6 +33,26 @@ type FieldInputProps = {
   onBlur: () => void;
   onChange: (v: string) => void;
   value: string;
+};
+
+const SignUpLinkFallback = () => (
+  <Link className="text-foreground underline underline-offset-4" href="/register">
+    Sign up
+  </Link>
+);
+
+const SignUpLink = ({ searchParams }: Props) => {
+  const { from } = use(searchParams);
+  const safeTo = safeRedirectPath(from);
+
+  return (
+    <Link
+      className="text-foreground underline underline-offset-4"
+      href={safeTo === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(safeTo)}`}
+    >
+      Sign up
+    </Link>
+  );
 };
 
 // useFieldContext requires a proper component, not an inline render fn.
@@ -100,7 +121,7 @@ const PasswordFieldInput = ({
   );
 };
 
-const LoginForm = ({ from }: Props) => {
+const LoginForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
@@ -113,6 +134,7 @@ const LoginForm = ({ from }: Props) => {
       setShowUnverifiedNotice(false);
       startTransition(async () => {
         try {
+          const { from } = await searchParams;
           const result = await authClient.signIn.email({
             email: value.email,
             password: value.password,
@@ -129,7 +151,7 @@ const LoginForm = ({ from }: Props) => {
             toast.error(message);
             return;
           }
-          push(from);
+          push(safeRedirectPath(from));
           refresh();
         } catch (error) {
           const message =
@@ -211,25 +233,15 @@ const LoginForm = ({ from }: Props) => {
         )}
 
         <Field>
-          <Button
-            aria-busy={isPending}
-            aria-disabled={isPending}
-            className="aria-busy:pointer-events-none aria-busy:opacity-50"
-            type="submit"
-          >
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending ? "Signing in…" : "Sign in"}
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}
-            <Link
-              className="text-foreground underline underline-offset-4"
-              href={
-                from === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(from)}`
-              }
-            >
-              Sign up
-            </Link>
+            <Suspense fallback={<SignUpLinkFallback />}>
+              <SignUpLink searchParams={searchParams} />
+            </Suspense>
           </FieldDescription>
         </Field>
       </FieldGroup>
