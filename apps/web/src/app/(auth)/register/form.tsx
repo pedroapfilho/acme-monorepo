@@ -38,50 +38,23 @@ type FieldInputProps = {
   value: string;
 };
 
-type FormActionsProps = {
-  isPending: boolean;
-  searchParams: Props["searchParams"];
-};
-
-const RegisterFormActionsFallback = () => (
-  <>
-    <Button disabled type="submit">
-      Create account
-    </Button>
-    <FieldDescription className="text-center">
-      Already have an account?{" "}
-      <Link className="text-foreground underline underline-offset-4" href="/login">
-        Sign in
-      </Link>
-    </FieldDescription>
-  </>
+const SignInLinkFallback = () => (
+  <Link className="text-foreground underline underline-offset-4" href="/login">
+    Sign in
+  </Link>
 );
 
-const RegisterFormActions = ({ isPending, searchParams }: FormActionsProps) => {
+const SignInLink = ({ searchParams }: Props) => {
   const { from } = use(searchParams);
   const safeTo = safeRedirectPath(from);
 
   return (
-    <>
-      <Button
-        aria-busy={isPending}
-        className="aria-busy:pointer-events-none aria-busy:opacity-50"
-        disabled={isPending}
-        type="submit"
-      >
-        {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? "Creating account…" : "Create account"}
-      </Button>
-      <FieldDescription className="text-center">
-        Already have an account?{" "}
-        <Link
-          className="text-foreground underline underline-offset-4"
-          href={safeTo === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(safeTo)}`}
-        >
-          Sign in
-        </Link>
-      </FieldDescription>
-    </>
+    <Link
+      className="text-foreground underline underline-offset-4"
+      href={safeTo === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(safeTo)}`}
+    >
+      Sign in
+    </Link>
   );
 };
 
@@ -285,9 +258,16 @@ const RegisterForm = ({ searchParams }: Props) => {
         </div>
 
         <Field>
-          <Suspense fallback={<RegisterFormActionsFallback />}>
-            <RegisterFormActions isPending={isPending} searchParams={searchParams} />
-          </Suspense>
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
+            {isPending && <Loader2 className="size-4 animate-spin" />}
+            {isPending ? "Creating account…" : "Create account"}
+          </Button>
+          <FieldDescription className="text-center">
+            Already have an account?{" "}
+            <Suspense fallback={<SignInLinkFallback />}>
+              <SignInLink searchParams={searchParams} />
+            </Suspense>
+          </FieldDescription>
         </Field>
       </FieldGroup>
     </form>

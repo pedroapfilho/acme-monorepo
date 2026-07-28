@@ -35,52 +35,23 @@ type FieldInputProps = {
   value: string;
 };
 
-type FormActionsProps = {
-  isPending: boolean;
-  searchParams: Props["searchParams"];
-};
-
-const LoginFormActionsFallback = () => (
-  <>
-    <Button disabled type="submit">
-      Sign in
-    </Button>
-    <FieldDescription className="text-center">
-      Don&apos;t have an account?{" "}
-      <Link className="text-foreground underline underline-offset-4" href="/register">
-        Sign up
-      </Link>
-    </FieldDescription>
-  </>
+const SignUpLinkFallback = () => (
+  <Link className="text-foreground underline underline-offset-4" href="/register">
+    Sign up
+  </Link>
 );
 
-const LoginFormActions = ({ isPending, searchParams }: FormActionsProps) => {
+const SignUpLink = ({ searchParams }: Props) => {
   const { from } = use(searchParams);
   const safeTo = safeRedirectPath(from);
 
   return (
-    <>
-      <Button
-        aria-busy={isPending}
-        className="aria-busy:pointer-events-none aria-busy:opacity-50"
-        disabled={isPending}
-        type="submit"
-      >
-        {isPending && <Loader2 className="size-4 animate-spin" />}
-        {isPending ? "Signing in…" : "Sign in"}
-      </Button>
-      <FieldDescription className="text-center">
-        Don&apos;t have an account?{" "}
-        <Link
-          className="text-foreground underline underline-offset-4"
-          href={
-            safeTo === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(safeTo)}`
-          }
-        >
-          Sign up
-        </Link>
-      </FieldDescription>
-    </>
+    <Link
+      className="text-foreground underline underline-offset-4"
+      href={safeTo === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(safeTo)}`}
+    >
+      Sign up
+    </Link>
   );
 };
 
@@ -262,9 +233,16 @@ const LoginForm = ({ searchParams }: Props) => {
         )}
 
         <Field>
-          <Suspense fallback={<LoginFormActionsFallback />}>
-            <LoginFormActions isPending={isPending} searchParams={searchParams} />
-          </Suspense>
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
+            {isPending && <Loader2 className="size-4 animate-spin" />}
+            {isPending ? "Signing in…" : "Sign in"}
+          </Button>
+          <FieldDescription className="text-center">
+            Don&apos;t have an account?{" "}
+            <Suspense fallback={<SignUpLinkFallback />}>
+              <SignUpLink searchParams={searchParams} />
+            </Suspense>
+          </FieldDescription>
         </Field>
       </FieldGroup>
     </form>
