@@ -13,6 +13,11 @@ const SignOutButton = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleSignOut = () => {
+    // aria-disabled keeps the button keyboard-activatable, so a second Enter
+    // would re-enter sign-out without this.
+    if (isPending) {
+      return;
+    }
     setError(null);
     startTransition(async () => {
       try {

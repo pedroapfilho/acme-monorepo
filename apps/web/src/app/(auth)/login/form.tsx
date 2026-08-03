@@ -147,6 +147,11 @@ const LoginForm = ({ searchParams }: Props) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        // aria-disabled keeps the button keyboard-activatable, so a second Enter
+        // would re-enter submit without this.
+        if (isPending) {
+          return;
+        }
         void form.handleSubmit();
       }}
     >
