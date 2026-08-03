@@ -28,8 +28,8 @@ const SignOutButton = () => {
     <div className="flex flex-col gap-2">
       <Button
         aria-busy={isPending}
+        aria-disabled={isPending}
         className="self-start"
-        disabled={isPending}
         onClick={handleSignOut}
         variant="outline"
       >

@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
+import { errorSchema } from "@/lib/api-error";
 import { deleteUser, findUserById, updateUser } from "@/lib/users";
 import type { AuthVariables } from "@/middleware/auth";
 import { authMiddleware } from "@/middleware/auth";
@@ -31,19 +32,6 @@ const updateUserSchema = z
       .optional(),
   })
   .openapi("UpdateUserInput");
-
-const errorDetailSchema = z.object({ field: z.string(), message: z.string() });
-
-const errorSchema = z
-  .object({
-    error: z.object({
-      code: z.string(),
-      details: z.array(errorDetailSchema).optional(),
-      message: z.string(),
-      stack: z.string().optional(),
-    }),
-  })
-  .openapi("Error");
 
 const userListMetaSchema = z.object({
   page: z.number(),

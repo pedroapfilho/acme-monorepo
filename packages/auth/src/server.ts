@@ -8,35 +8,30 @@ import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
-const parseEnvList = (value: string | undefined): Array<string> => {
-  if (value === undefined || value === "") {
-    return [];
-  }
-  const result: Array<string> = [];
-  for (const entry of value.split(",")) {
-    const trimmed = entry.trim();
-    if (trimmed.length > 0) {
-      result.push(trimmed);
-    }
-  }
-  return result;
-};
-
 type AuthConfig = {
+  // Better Auth rejects an empty list, so the host patterns have to come from the caller.
+  allowedHosts: Array<string>;
   extraPlugins?: Array<BetterAuthPlugin>;
   fromEmail?: string;
   prisma: PrismaClient;
+  rateLimitEnabled?: boolean;
   resendApiKey?: string;
   secret: string;
+  trustedOrigins?: Array<string>;
+  useSecureCookies?: boolean;
 };
 
 const createAuth = (config: AuthConfig) => {
   const {
+    allowedHosts,
     extraPlugins = [],
     fromEmail = "noreply@acme.com",
     prisma,
+    rateLimitEnabled = false,
     resendApiKey,
     secret,
+    trustedOrigins = [],
+    useSecureCookies = false,
   } = config;
 
   const mailer: MailerConfig | null =
@@ -70,21 +65,15 @@ const createAuth = (config: AuthConfig) => {
         httpOnly: true,
         sameSite: "lax" as const,
       },
-      // WEB_APP_URL gates Secure cookies; protocol: "auto" fails through portless/Vercel proxies.
-      useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
+      useSecureCookies,
     },
 
     basePath: "/api/auth",
 
-    // allowedHosts extends trustedOrigins; loopback list covers origins without matching host.
+    // allowedHosts extends trustedOrigins; it matches on host, so it covers ports and
+    // wildcards that an origin list can't.
     baseURL: {
-      allowedHosts: [
-        // Portless *.localhost needs ** not * (two labels under .localhost).
-        "**.localhost",
-        "localhost:*",
-        "127.0.0.1:*",
-        ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS),
-      ],
+      allowedHosts,
       fallback: "http://localhost:4000",
       protocol: "auto",
     },
@@ -159,11 +148,8 @@ const createAuth = (config: AuthConfig) => {
 
     plugins: [username(), bearer(), ...extraPlugins],
 
-    // Disabled in CI: e2e suite hammers auth endpoints and would trip 429s.
     rateLimit: {
-      enabled:
-        process.env.NODE_ENV === "production" &&
-        (process.env.CI === undefined || process.env.CI === ""),
+      enabled: rateLimitEnabled,
       max: 100,
       storage: "database",
       window: 60,
@@ -180,16 +166,7 @@ const createAuth = (config: AuthConfig) => {
       storeSessionInDatabase: true,
       updateAge: 60 * 60 * 24,
     },
-    // Plain http://localhost:PORT origins won't match allowedHosts patterns.
-    trustedOrigins: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:4000",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-      "http://127.0.0.1:4000",
-      ...parseEnvList(process.env.TRUSTED_ORIGINS),
-    ],
+    trustedOrigins,
     user: {
       additionalFields: {
         displayName: {

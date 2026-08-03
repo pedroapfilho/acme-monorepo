@@ -258,7 +258,7 @@ const RegisterForm = ({ searchParams }: Props) => {
         </div>
 
         <Field>
-          <Button aria-busy={isPending} disabled={isPending} type="submit">
+          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending ? "Creating account…" : "Create account"}
           </Button>

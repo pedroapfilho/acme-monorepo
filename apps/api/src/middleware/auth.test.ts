@@ -16,7 +16,7 @@ vi.mock("@/lib/env", () => ({
 
 import { auth } from "@/lib/auth";
 
-import { authMiddleware, optionalAuthMiddleware } from "./auth";
+import { authMiddleware } from "./auth";
 import { createMockContext } from "./test-helpers";
 
 const mockSession = {
@@ -93,56 +93,5 @@ describe("authMiddleware", () => {
       status: 503,
     });
     expect(mocks.loggerError).toHaveBeenCalled();
-  });
-});
-
-describe("optionalAuthMiddleware", () => {
-  const next: Next = vi.fn();
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("sets user when session is valid", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as never);
-    const { ctx, mocks } = createMockContext({ headers: { Authorization: "Bearer token" } });
-
-    await optionalAuthMiddleware(ctx, next);
-
-    expect(mocks.set).toHaveBeenCalledWith("user", {
-      email: "test@example.com",
-      id: "user-1",
-    });
-    expect(next).toHaveBeenCalled();
-  });
-
-  it("calls next without setting user when session is null", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(null);
-    const { ctx, mocks } = createMockContext();
-
-    await optionalAuthMiddleware(ctx, next);
-
-    expect(mocks.set).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalled();
-  });
-
-  it("calls next without setting user when getSession throws", async () => {
-    vi.mocked(auth.api.getSession).mockRejectedValue(new Error("DB down"));
-    const { ctx, mocks } = createMockContext();
-
-    await optionalAuthMiddleware(ctx, next);
-
-    expect(mocks.set).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalled();
-  });
-
-  it("does not set user when session exists but user is null", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue({ session: {}, user: null } as never);
-    const { ctx, mocks } = createMockContext();
-
-    await optionalAuthMiddleware(ctx, next);
-
-    expect(mocks.set).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalled();
   });
 });

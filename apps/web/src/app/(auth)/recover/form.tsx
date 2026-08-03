@@ -149,12 +149,7 @@ const RecoverForm = () => {
         </form.Field>
 
         <Field>
-          <Button
-            aria-busy={isPending}
-            aria-disabled={isPending}
-            className="aria-busy:pointer-events-none aria-busy:opacity-50"
-            type="submit"
-          >
+          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending ? "Sending…" : "Send reset link"}
           </Button>

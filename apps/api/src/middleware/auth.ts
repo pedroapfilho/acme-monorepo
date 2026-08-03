@@ -58,30 +58,3 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
     return next();
   },
 );
-
-export const optionalAuthMiddleware = createMiddleware<{
-  Variables: Partial<AuthVariables>;
-}>(async (c: Context, next: Next) => {
-  const headers = extractAuthHeaders(c);
-
-  try {
-    const session = await auth.api.getSession({ headers });
-
-    const user = session?.user;
-    if (user !== undefined && user !== null) {
-      c.set("user", {
-        email: user.email,
-        id: user.id,
-      });
-    }
-  } catch (error) {
-    // Log unexpected failures; a missing user context is otherwise indistinguishable from an outage.
-    c.get("log").error("optionalAuthMiddleware: getSession threw unexpectedly", {
-      error,
-      method: c.req.method,
-      url: c.req.url,
-    });
-  }
-
-  return next();
-});

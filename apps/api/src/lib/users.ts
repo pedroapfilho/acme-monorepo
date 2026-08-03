@@ -1,7 +1,7 @@
 import { prisma } from "@repo/db";
 import type { Prisma } from "@repo/db";
 
-import { AppError } from "@/middleware/error-handler";
+import { AppError } from "@/lib/api-error";
 
 const userSelect = {
   createdAt: true,
@@ -21,17 +21,9 @@ export const findUserById = async (id: string) => {
   });
 
   if (!user) {
-    throw new AppError("User not found", 404, true, "USER_NOT_FOUND");
+    throw new AppError("User not found", "USER_NOT_FOUND", 404);
   }
 
-  return user;
-};
-
-export const findUserByEmail = async (email: string) => {
-  const user = await prisma.user.findUnique({
-    select: userSelect,
-    where: { email },
-  });
   return user;
 };
 
@@ -50,7 +42,7 @@ export const updateUser = async (id: string, data: Prisma.UserUpdateInput) => {
       "code" in error &&
       error.code === "P2002"
     ) {
-      throw new AppError("Username already taken", 409, true, "USERNAME_TAKEN");
+      throw new AppError("Username already taken", "USERNAME_TAKEN", 409);
     }
     throw error;
   }

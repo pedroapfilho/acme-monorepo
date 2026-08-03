@@ -26,12 +26,16 @@ type Props = {
 };
 
 type FieldInputProps = {
+  autoComplete: string;
   errors: Array<unknown>;
+  id: string;
   isInvalid: boolean;
   isPending: boolean;
   name: string;
   onBlur: () => void;
   onChange: (v: string) => void;
+  placeholder?: string;
+  type: string;
   value: string;
 };
 
@@ -56,64 +60,36 @@ const SignUpLink = ({ searchParams }: Props) => {
 };
 
 // useFieldContext requires a proper component, not an inline render fn.
-const EmailFieldInput = ({
+const LoginFieldInput = ({
+  autoComplete,
   errors,
+  id,
   isInvalid,
   isPending,
   name,
   onBlur,
   onChange,
+  placeholder,
+  type,
   value,
 }: FieldInputProps) => {
-  const { id } = useFieldContext();
+  const { id: fieldId } = useFieldContext();
   return (
     <>
       <Input
-        aria-describedby={isInvalid ? `${id}-error` : undefined}
+        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
         aria-invalid={isInvalid}
-        autoComplete="email"
+        autoComplete={autoComplete}
         disabled={isPending}
-        id="email"
+        id={id}
         name={name}
         onBlur={onBlur}
         onChange={(e) => {
           onChange(e.target.value);
         }}
-        placeholder="m@example.com"
+        placeholder={placeholder}
         required
-        type="email"
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
-
-const PasswordFieldInput = ({
-  errors,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  value,
-}: FieldInputProps) => {
-  const { id } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${id}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete="current-password"
-        disabled={isPending}
-        id="password"
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        required
-        type="password"
+        type={type}
         value={value}
       />
       {isInvalid && <FieldError errors={errors} />}
@@ -184,13 +160,17 @@ const LoginForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <EmailFieldInput
+                <LoginFieldInput
+                  autoComplete="email"
                   errors={field.state.meta.errors}
+                  id="email"
                   isInvalid={isInvalid}
                   isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  placeholder="m@example.com"
+                  type="email"
                   value={field.state.value}
                 />
               </Field>
@@ -212,13 +192,16 @@ const LoginForm = ({ searchParams }: Props) => {
                     Forgot your password?
                   </Link>
                 </div>
-                <PasswordFieldInput
+                <LoginFieldInput
+                  autoComplete="current-password"
                   errors={field.state.meta.errors}
+                  id="password"
                   isInvalid={isInvalid}
                   isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  type="password"
                   value={field.state.value}
                 />
               </Field>
@@ -233,7 +216,7 @@ const LoginForm = ({ searchParams }: Props) => {
         )}
 
         <Field>
-          <Button aria-busy={isPending} disabled={isPending} type="submit">
+          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending ? "Signing in…" : "Sign in"}
           </Button>

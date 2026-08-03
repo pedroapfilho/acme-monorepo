@@ -3,6 +3,8 @@ import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
 import { z } from "zod";
 
+import { errorBody } from "@/lib/api-error";
+
 const remoteAddrEnvSchema = z.object({ remoteAddr: z.string().min(1) });
 const userVariableSchema = z.object({ id: z.string().min(1) });
 
@@ -49,12 +51,7 @@ export const standardRateLimit = rateLimiter({
   // The handler type is void; assigning c.res is how a void middleware finalizes the response.
   handler: (c: Context) => {
     c.res = c.json(
-      {
-        error: {
-          code: "RATE_LIMIT_EXCEEDED",
-          message: "Too many requests, please try again later",
-        },
-      },
+      errorBody("RATE_LIMIT_EXCEEDED", "Too many requests, please try again later"),
       429,
     );
   },
@@ -67,12 +64,7 @@ export const standardRateLimit = rateLimiter({
 export const apiRateLimit = rateLimiter({
   handler: (c: Context) => {
     c.res = c.json(
-      {
-        error: {
-          code: "API_RATE_LIMIT_EXCEEDED",
-          message: "API rate limit exceeded, please slow down",
-        },
-      },
+      errorBody("API_RATE_LIMIT_EXCEEDED", "API rate limit exceeded, please slow down"),
       429,
     );
   },
@@ -94,15 +86,7 @@ export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
       contentLength !== "" &&
       Math.trunc(Number(contentLength)) > maxSize
     ) {
-      c.res = c.json(
-        {
-          error: {
-            code: "PAYLOAD_TOO_LARGE",
-            message: "Request entity too large",
-          },
-        },
-        413,
-      );
+      c.res = c.json(errorBody("PAYLOAD_TOO_LARGE", "Request entity too large"), 413);
       return;
     }
 
