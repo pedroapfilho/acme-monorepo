@@ -28,7 +28,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
   cacheComponents: true,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
-  // These only work as real HTTP headers; browsers ignore them as <meta http-equiv>.
   headers: () =>
     Promise.resolve([
       {

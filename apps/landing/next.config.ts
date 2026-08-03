@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.landing.localhost", "*.acme.landing.localhost", "*.vercel.app"],
   cacheComponents: true,
-  // These only work as real HTTP headers; browsers ignore them as <meta http-equiv>.
   headers: () =>
     Promise.resolve([
       {
