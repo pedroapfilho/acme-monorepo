@@ -28,8 +28,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
   cacheComponents: true,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
-  // Browsers ignore both of these when they arrive as <meta http-equiv>, which is
-  // where they used to live, so the app was shipping no clickjacking protection.
+  // These only work as real HTTP headers; browsers ignore them as <meta http-equiv>.
   headers: () =>
     Promise.resolve([
       {

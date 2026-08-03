@@ -31,17 +31,9 @@ export const viewport: Viewport = {
 
 const metadata = {
   description: LONG_DESCRIPTION,
-  icons: {
-    apple: "/apple-touch-icon.png",
-    icon: "/favicon.ico",
-  },
   metadataBase: new URL(SITE_URL),
   openGraph: {
     description: SHORT_DESCRIPTION,
-    images: {
-      alt: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
-      url: "/og-image.jpg",
-    },
     locale: "en-US",
     siteName: SITE_NAME,
     title: SITE_NAME,
@@ -52,12 +44,8 @@ const metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     description: SHORT_DESCRIPTION,
-    images: {
-      alt: `${SITE_NAME} Logo`,
-      url: "/og-image.jpg",
-    },
     site: `@${TWITTER_HANDLE}`,
     title: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
   },

@@ -20,14 +20,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.WEB_APP_URL ?? "https://acme.web.localhost"),
   openGraph: {
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
-    images: [
-      {
-        alt: "Acme Authentication Platform",
-        height: 630,
-        url: "/og-image.png",
-        width: 1200,
-      },
-    ],
     locale: "en_US",
     siteName: "Acme",
     title: "Acme - Secure Authentication Platform",
@@ -50,9 +42,8 @@ export const metadata: Metadata = {
     template: "%s | Acme",
   },
   twitter: {
-    card: "summary_large_image",
+    card: "summary",
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
-    images: ["/twitter-image.png"],
     title: "Acme - Secure Authentication Platform",
   },
 };
