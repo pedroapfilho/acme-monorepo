@@ -16,13 +16,7 @@ export const metadata: Metadata = {
   category: "technology",
   creator: "Acme",
   description: "A modern, secure authentication platform built with Better Auth and Next.js.",
-  icons: {
-    apple: "/apple-touch-icon.png",
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-  },
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
-  manifest: "/site.webmanifest",
   metadataBase: new URL(process.env.WEB_APP_URL ?? "https://acme.web.localhost"),
   openGraph: {
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
@@ -80,10 +74,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       <head>
         <meta content="telephone=no" name="format-detection" />
         <meta content="#000000" name="msapplication-TileColor" />
-
-        <meta content="nosniff" httpEquiv="X-Content-Type-Options" />
-        <meta content="DENY" httpEquiv="X-Frame-Options" />
-        <meta content="1; mode=block" httpEquiv="X-XSS-Protection" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <a
