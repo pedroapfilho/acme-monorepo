@@ -1,20 +1,22 @@
 import { prisma } from "@repo/db";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { createAuth } from "./server";
 import type { AuthConfig } from "./server";
 
 type Plugin = NonNullable<AuthConfig["extraPlugins"]>[number];
 
+const baseConfig = {
+  allowedHosts: ["**.localhost"],
+  prisma,
+  secret: "test-secret-minimum-32-characters-long",
+} satisfies AuthConfig;
+
 describe("Auth Server Configuration", () => {
   let auth: ReturnType<typeof createAuth>;
 
   beforeAll(() => {
-    auth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
+    auth = createAuth(baseConfig);
   });
 
   it("should have email and password authentication enabled", () => {
@@ -41,60 +43,47 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.advanced?.cookiePrefix).toBe("acme");
   });
 
-  it("should gate useSecureCookies on WEB_APP_URL being HTTPS", () => {
+  it("should leave secure cookies off unless the caller opts in", () => {
     expect(auth.options.advanced?.useSecureCookies).toBe(false);
     expect(auth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
     expect(auth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
   });
 
-  it("should set useSecureCookies when WEB_APP_URL is HTTPS", () => {
-    vi.stubEnv("WEB_APP_URL", "https://acme.web.localhost");
-    const httpsAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+  it("should set useSecureCookies from config", () => {
+    const httpsAuth = createAuth({ ...baseConfig, useSecureCookies: true });
     expect(httpsAuth.options.advanced?.useSecureCookies).toBe(true);
   });
 
-  it("should NOT set useSecureCookies when WEB_APP_URL is HTTP", () => {
-    vi.stubEnv("WEB_APP_URL", "http://localhost:3000");
-    const httpAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(httpAuth.options.advanced?.useSecureCookies).toBe(false);
-  });
-
-  it("should configure dynamic baseURL with allowedHosts + protocol auto", () => {
+  it("should configure dynamic baseURL with protocol auto", () => {
     const baseURL = auth.options.baseURL;
     if (typeof baseURL !== "object" || baseURL === null) {
       throw new Error("expected dynamic baseURL object");
     }
     expect(baseURL.protocol).toBe("auto");
-    expect(baseURL.allowedHosts).toEqual(
-      expect.arrayContaining(["**.localhost", "localhost:*", "127.0.0.1:*"]),
-    );
     expect(baseURL.fallback).toBe("http://localhost:4000");
   });
 
-  it("should extend baseURL.allowedHosts from AUTH_ALLOWED_HOSTS env", () => {
-    vi.stubEnv("AUTH_ALLOWED_HOSTS", "acme.com,*.acme.com,*.vercel.app");
-
-    const envAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    const baseURL = envAuth.options.baseURL;
+  it("should take baseURL.allowedHosts from config", () => {
+    const hostAuth = createAuth({
+      ...baseConfig,
+      allowedHosts: ["**.localhost", "acme.com", "*.vercel.app"],
+    });
+    const baseURL = hostAuth.options.baseURL;
     if (typeof baseURL !== "object" || baseURL === null) {
       throw new Error("expected dynamic baseURL object");
     }
     expect(baseURL.allowedHosts).toEqual(
-      expect.arrayContaining(["acme.com", "*.acme.com", "*.vercel.app"]),
+      expect.arrayContaining(["**.localhost", "acme.com", "*.vercel.app"]),
     );
   });
 
   it("should require email verification when Resend is configured", () => {
-    const verifyingAuth = createAuth({
-      prisma,
-      resendApiKey: "re_test_key",
-      secret: "test-secret-minimum-32-characters-long",
-    });
+    const verifyingAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
     expect(verifyingAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
   });
 
   it("should NOT require email verification when Resend is absent", () => {
-    const noResendAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
+    const noResendAuth = createAuth(baseConfig);
     expect(noResendAuth.options.emailAndPassword?.requireEmailVerification).toBe(false);
   });
 
@@ -114,8 +103,8 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.account?.accountLinking?.enabled).toBe(true);
   });
 
-  it("should trust host by default", () => {
-    expect(auth.options.trustedOrigins).toContain("http://localhost:3000");
+  it("should default to no trusted origins", () => {
+    expect(auth.options.trustedOrigins).toEqual([]);
   });
 
   it("should use database storage for rate limiting", () => {
@@ -127,22 +116,23 @@ describe("Auth Server Configuration", () => {
     expect(auth.options.rateLimit?.max).toBe(100);
   });
 
-  it("should enable rate limiting in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("CI", "");
-    const prodAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    expect(prodAuth.options.rateLimit?.enabled).toBe(true);
+  it("should leave rate limiting off unless the caller opts in", () => {
+    expect(auth.options.rateLimit?.enabled).toBe(false);
   });
 
-  it("should concat TRUSTED_ORIGINS env values with loopback defaults", () => {
-    vi.stubEnv("TRUSTED_ORIGINS", "https://app.acme.com,https://api.acme.com");
+  it("should enable rate limiting from config", () => {
+    const limitedAuth = createAuth({ ...baseConfig, rateLimitEnabled: true });
+    expect(limitedAuth.options.rateLimit?.enabled).toBe(true);
+  });
 
-    const envAuth = createAuth({ prisma, secret: "test-secret-minimum-32-characters-long" });
-    const trusted = envAuth.options.trustedOrigins;
+  it("should take trustedOrigins from config", () => {
+    const originAuth = createAuth({
+      ...baseConfig,
+      trustedOrigins: ["https://app.acme.com", "http://localhost:3000"],
+    });
+    const trusted = originAuth.options.trustedOrigins;
     expect(trusted).toContain("https://app.acme.com");
-    expect(trusted).toContain("https://api.acme.com");
     expect(trusted).toContain("http://localhost:3000");
-    expect(trusted).toContain("http://127.0.0.1:3000");
   });
 
   it("should always define reset password handler (no-op when resendApiKey is absent)", () => {
@@ -150,11 +140,7 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should configure reset password email when resendApiKey is provided", () => {
-    const emailAuth = createAuth({
-      prisma,
-      resendApiKey: "re_test_key",
-      secret: "test-secret-minimum-32-characters-long",
-    });
+    const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
     expect(emailAuth.options.emailAndPassword?.sendResetPassword).toBeDefined();
   });
 
@@ -168,11 +154,7 @@ describe("Auth Server Configuration", () => {
 
   it("should include extra plugins in the resolved plugin list", () => {
     const mockPlugin = { id: "test-plugin", init: () => ({}) } as unknown as Plugin;
-    const extendedAuth = createAuth({
-      extraPlugins: [mockPlugin],
-      prisma,
-      secret: "test-secret-minimum-32-characters-long",
-    });
+    const extendedAuth = createAuth({ ...baseConfig, extraPlugins: [mockPlugin] });
     const plugins = extendedAuth.options.plugins ?? [];
     expect(plugins.some((p) => p.id === "test-plugin")).toBe(true);
   });
@@ -182,11 +164,7 @@ describe("Auth Server Configuration", () => {
   });
 
   it("should configure verification email when resendApiKey is provided", () => {
-    const emailAuth = createAuth({
-      prisma,
-      resendApiKey: "re_test_key",
-      secret: "test-secret-minimum-32-characters-long",
-    });
+    const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 

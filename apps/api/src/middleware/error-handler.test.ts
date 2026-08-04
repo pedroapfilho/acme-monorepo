@@ -6,33 +6,28 @@ vi.mock("@/lib/env", () => ({
   env: { NODE_ENV: "development" },
 }));
 
+import { AppError } from "@/lib/api-error";
 import { env } from "@/lib/env";
 
-import { AppError, errorHandler, notFound } from "./error-handler";
+import { errorHandler, notFound } from "./error-handler";
 import { createMockContext } from "./test-helpers";
 
 describe("AppError", () => {
-  it("uses default statusCode 500 and isOperational true", () => {
-    const error = new AppError("Something broke");
+  it("defaults statusCode to 500", () => {
+    const error = new AppError("Something broke", "APP_ERROR");
     expect(error.message).toBe("Something broke");
+    expect(error.code).toBe("APP_ERROR");
     expect(error.statusCode).toBe(500);
-    expect(error.isOperational).toBe(true);
-    expect(error.code).toBeUndefined();
   });
 
-  it("accepts custom statusCode and isOperational", () => {
-    const error = new AppError("Not found", 404, false);
-    expect(error.statusCode).toBe(404);
-    expect(error.isOperational).toBe(false);
-  });
-
-  it("accepts optional error code", () => {
-    const error = new AppError("Bad", 400, true, "VALIDATION_FAILED");
+  it("accepts a custom statusCode", () => {
+    const error = new AppError("Bad", "VALIDATION_FAILED", 400);
     expect(error.code).toBe("VALIDATION_FAILED");
+    expect(error.statusCode).toBe(400);
   });
 
   it("has a stack trace", () => {
-    const error = new AppError("Test");
+    const error = new AppError("Test", "APP_ERROR");
     expect(error.stack).toBeDefined();
   });
 });
@@ -80,7 +75,7 @@ describe("errorHandler", () => {
 
   it("handles AppError with custom code", () => {
     const { ctx, mocks } = createMockContext();
-    const err = new AppError("User not found", 404, true, "USER_NOT_FOUND");
+    const err = new AppError("User not found", "USER_NOT_FOUND", 404);
 
     errorHandler(err, ctx);
 
@@ -90,9 +85,9 @@ describe("errorHandler", () => {
     );
   });
 
-  it("handles AppError without code defaulting to APP_ERROR", () => {
+  it("handles AppError with a custom status", () => {
     const { ctx, mocks } = createMockContext();
-    const err = new AppError("Something wrong", 422);
+    const err = new AppError("Something wrong", "APP_ERROR", 422);
 
     errorHandler(err, ctx);
 

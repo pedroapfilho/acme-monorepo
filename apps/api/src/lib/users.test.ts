@@ -17,9 +17,9 @@ vi.mock("@/lib/env", () => ({
 
 import { prisma } from "@repo/db";
 
-import { AppError } from "@/middleware/error-handler";
+import { AppError } from "@/lib/api-error";
 
-import { deleteUser, findUserByEmail, findUserById, updateUser } from "./users";
+import { deleteUser, findUserById, updateUser } from "./users";
 
 const mockUser = {
   createdAt: new Date("2024-01-01"),
@@ -66,35 +66,6 @@ describe("findUserById", () => {
     vi.mocked(prisma.user.findUnique).mockRejectedValue(dbError);
 
     await expect(findUserById("user-1")).rejects.toThrow(dbError);
-  });
-});
-
-describe("findUserByEmail", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("returns user when found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as never);
-
-    const result = await findUserByEmail("test@example.com");
-
-    expect(result).toEqual(mockUser);
-  });
-
-  it("returns null when user not found", async () => {
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
-
-    const result = await findUserByEmail("missing@example.com");
-
-    expect(result).toBeNull();
-  });
-
-  it("propagates database errors to the central error handler", async () => {
-    const dbError = new Error("DB error");
-    vi.mocked(prisma.user.findUnique).mockRejectedValue(dbError);
-
-    await expect(findUserByEmail("test@example.com")).rejects.toThrow(dbError);
   });
 });
 

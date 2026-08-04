@@ -15,7 +15,7 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useState, useTransition } from "react";
+import { Suspense, use, useRef, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
@@ -98,6 +98,7 @@ const RegisterForm = ({ searchParams }: Props) => {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
+  const isSubmitLatched = useRef(false);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
@@ -132,11 +133,31 @@ const RegisterForm = ({ searchParams }: Props) => {
             error instanceof Error ? error.message : "An error occurred. Please try again.";
           setFormError(message);
           toast.error(message);
+        } finally {
+          isSubmitLatched.current = false;
         }
       });
     },
     validators: { onSubmit: registerSchema },
   });
+
+  const handleSubmit = async () => {
+    // aria-disabled keeps the button keyboard-activatable, and `isPending` is only
+    // set from handleSubmit's async continuation, so two submits in the same frame
+    // both read it as false. The ref latches synchronously instead.
+    if (isPending || isSubmitLatched.current) {
+      return;
+    }
+    isSubmitLatched.current = true;
+    try {
+      await form.handleSubmit();
+    } finally {
+      // Validation rejected the submit, so no transition will release the latch.
+      if (!form.state.isValid) {
+        isSubmitLatched.current = false;
+      }
+    }
+  };
 
   if (sentToEmail !== null) {
     return (
@@ -157,7 +178,7 @@ const RegisterForm = ({ searchParams }: Props) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void form.handleSubmit();
+        void handleSubmit();
       }}
     >
       <div aria-atomic="true" aria-live="polite" className="sr-only">
@@ -258,7 +279,7 @@ const RegisterForm = ({ searchParams }: Props) => {
         </div>
 
         <Field>
-          <Button aria-busy={isPending} disabled={isPending} type="submit">
+          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending ? "Creating account…" : "Create account"}
           </Button>

@@ -13,6 +13,11 @@ const SignOutButton = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleSignOut = () => {
+    // aria-disabled keeps the button keyboard-activatable, so a second Enter
+    // would re-enter sign-out without this.
+    if (isPending) {
+      return;
+    }
     setError(null);
     startTransition(async () => {
       try {
@@ -28,8 +33,8 @@ const SignOutButton = () => {
     <div className="flex flex-col gap-2">
       <Button
         aria-busy={isPending}
+        aria-disabled={isPending}
         className="self-start"
-        disabled={isPending}
         onClick={handleSignOut}
         variant="outline"
       >

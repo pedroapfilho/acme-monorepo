@@ -2,6 +2,33 @@ import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 import { nextCookies } from "better-auth/next-js";
 
+const parseEnvList = (value: string | undefined): Array<string> => {
+  if (value === undefined || value === "") {
+    return [];
+  }
+  const result: Array<string> = [];
+  for (const entry of value.split(",")) {
+    const trimmed = entry.trim();
+    if (trimmed.length > 0) {
+      result.push(trimmed);
+    }
+  }
+  return result;
+};
+
+// Portless *.localhost needs ** not * (two labels under .localhost).
+const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
+
+// Plain http://localhost:PORT origins won't match allowedHosts patterns.
+const LOOPBACK_TRUSTED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:4000",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+  "http://127.0.0.1:4000",
+];
+
 // nextCookies() must be last; it forwards Set-Cookie into RSC/server-action context.
 // Lazy singleton: defers init so build-time page-data workers don't throw on missing env.
 type Auth = ReturnType<typeof createAuth>;
@@ -16,11 +43,20 @@ const getAuth = (): Auth => {
       );
     }
     cachedAuth = createAuth({
+      allowedHosts: [...LOCALHOST_ALLOWED_HOSTS, ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS)],
       extraPlugins: [nextCookies()],
       fromEmail: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
       prisma,
+      // Disabled in CI: the e2e suite hammers auth endpoints and would trip 429s.
+      rateLimitEnabled:
+        process.env.NODE_ENV === "production" &&
+        (process.env.CI === undefined || process.env.CI === ""),
       resendApiKey: process.env.RESEND_API_KEY,
       secret,
+      trustedOrigins: [...LOOPBACK_TRUSTED_ORIGINS, ...parseEnvList(process.env.TRUSTED_ORIGINS)],
+      // WEB_APP_URL gates Secure cookies; the auth baseURL protocol is "auto", which
+      // can't be trusted through portless/Vercel proxies.
+      useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
     });
   }
   return cachedAuth;

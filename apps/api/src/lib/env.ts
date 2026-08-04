@@ -3,6 +3,7 @@ import { z } from "zod";
 export const envSchema = z.object({
   AUTH_ALLOWED_HOSTS: z.string().optional(),
   BETTER_AUTH_SECRET: z.string().min(32),
+  CI: z.string().optional(),
   CORS_ORIGINS: z.string().default("https://acme.web.localhost,https://acme.landing.localhost"),
   DATABASE_URL: z.string().min(1),
   FROM_EMAIL: z.string().default("onboarding@resend.dev"),
@@ -11,7 +12,35 @@ export const envSchema = z.object({
   PORT: z.string().default("4000"),
   RESEND_API_KEY: z.string().optional(),
   TRUSTED_ORIGINS: z.string().optional(),
+  WEB_APP_URL: z.string().optional(),
 });
+
+const parseEnvList = (value: string | undefined): Array<string> => {
+  if (value === undefined || value === "") {
+    return [];
+  }
+  const result: Array<string> = [];
+  for (const entry of value.split(",")) {
+    const trimmed = entry.trim();
+    if (trimmed.length > 0) {
+      result.push(trimmed);
+    }
+  }
+  return result;
+};
+
+// Portless *.localhost needs ** not * (two labels under .localhost).
+const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
+
+// Plain http://localhost:PORT origins won't match allowedHosts patterns.
+const LOOPBACK_TRUSTED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:4000",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3001",
+  "http://127.0.0.1:4000",
+];
 
 const parsedEnv = envSchema.safeParse(process.env);
 
@@ -22,3 +51,13 @@ if (!parsedEnv.success) {
 }
 
 export const env = parsedEnv.data;
+
+export const authAllowedHosts = [
+  ...LOCALHOST_ALLOWED_HOSTS,
+  ...parseEnvList(env.AUTH_ALLOWED_HOSTS),
+];
+
+export const authTrustedOrigins = [
+  ...LOOPBACK_TRUSTED_ORIGINS,
+  ...parseEnvList(env.TRUSTED_ORIGINS),
+];
