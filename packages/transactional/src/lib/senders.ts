@@ -9,11 +9,8 @@ import { sendEmail } from "./send-email";
 
 type MailerConfig = {
   apiKey: string;
-  defaultReplyTo?: string;
-  from?: string;
+  from: string;
 };
-
-const DEFAULT_FROM = "Acme <noreply@acme.com>";
 
 type WelcomePayload = {
   userEmail: string;
@@ -119,11 +116,9 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
 
 const sendTransactionalEmail = async (email: TransactionalEmail, config: MailerConfig) => {
   const { subject, template, to } = buildEmail(email);
-  const from = config.from !== undefined && config.from !== "" ? config.from : DEFAULT_FROM;
   const result = await sendEmail({
     apiKey: config.apiKey,
-    defaultReplyTo: config.defaultReplyTo,
-    from,
+    from: config.from,
     subject,
     tags: [
       { name: "type", value: email.type },

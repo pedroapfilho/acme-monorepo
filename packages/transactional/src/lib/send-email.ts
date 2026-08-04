@@ -23,19 +23,17 @@ const tagSchema = z.object({
 const emailConfigSchema = z.object({
   bcc: recipientSchema.optional(),
   cc: recipientSchema.optional(),
-  from: senderAddressSchema.default("Acme <noreply@acme.com>"),
+  from: senderAddressSchema,
   replyTo: senderAddressSchema.optional(),
   subject: z.string(),
   tags: z.array(tagSchema).optional(),
   to: recipientSchema,
 });
 
-// z.input keeps from optional; z.infer would force every caller to pass it.
-type EmailConfig = z.input<typeof emailConfigSchema>;
+type EmailConfig = z.infer<typeof emailConfigSchema>;
 
 type SendEmailOptions = EmailConfig & {
   apiKey: string;
-  defaultReplyTo?: string;
   template: ReactElement;
 };
 
@@ -44,7 +42,7 @@ const renderTemplate = async (template: ReactElement) => {
   return { html, text };
 };
 
-const sendEmail = async ({ apiKey, defaultReplyTo, template, ...config }: SendEmailOptions) => {
+const sendEmail = async ({ apiKey, template, ...config }: SendEmailOptions) => {
   if (!apiKey) {
     throw new Error("API key is required for sending emails");
   }
@@ -59,7 +57,7 @@ const sendEmail = async ({ apiKey, defaultReplyTo, template, ...config }: SendEm
       cc: validatedConfig.cc,
       from: validatedConfig.from,
       html,
-      replyTo: validatedConfig.replyTo ?? defaultReplyTo,
+      replyTo: validatedConfig.replyTo,
       subject: validatedConfig.subject,
       tags: validatedConfig.tags,
       text,

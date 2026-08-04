@@ -11,7 +11,7 @@ vi.mock("resend", () => ({
 
 const { sendTransactionalEmail } = await import("./senders");
 
-const config = { apiKey: "re_test" };
+const config = { apiKey: "re_test", from: "Acme <noreply@acme.com>" };
 
 describe("sendTransactionalEmail dispatch", () => {
   beforeEach(() => {

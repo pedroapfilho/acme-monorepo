@@ -2,6 +2,8 @@ import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 import { nextCookies } from "better-auth/next-js";
 
+import { getEnv } from "./env";
+
 const parseEnvList = (value: string | undefined): Array<string> => {
   if (value === undefined || value === "") {
     return [];
@@ -36,23 +38,18 @@ let cachedAuth: Auth | undefined;
 
 const getAuth = (): Auth => {
   if (!cachedAuth) {
-    const secret = process.env.BETTER_AUTH_SECRET;
-    if (secret === undefined || secret.length < 32) {
-      throw new Error(
-        "BETTER_AUTH_SECRET must be set to at least 32 characters (generate with: openssl rand -base64 32)",
-      );
-    }
+    const env = getEnv();
     cachedAuth = createAuth({
       allowedHosts: [...LOCALHOST_ALLOWED_HOSTS, ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS)],
       extraPlugins: [nextCookies()],
-      fromEmail: process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev",
+      fromEmail: env.FROM_EMAIL,
       prisma,
       // Disabled in CI: the e2e suite hammers auth endpoints and would trip 429s.
       rateLimitEnabled:
         process.env.NODE_ENV === "production" &&
         (process.env.CI === undefined || process.env.CI === ""),
-      resendApiKey: process.env.RESEND_API_KEY,
-      secret,
+      resendApiKey: env.RESEND_API_KEY,
+      secret: env.BETTER_AUTH_SECRET,
       trustedOrigins: [...LOOPBACK_TRUSTED_ORIGINS, ...parseEnvList(process.env.TRUSTED_ORIGINS)],
       // WEB_APP_URL gates Secure cookies; the auth baseURL protocol is "auto", which
       // can't be trusted through portless/Vercel proxies.

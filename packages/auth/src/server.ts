@@ -12,7 +12,9 @@ type AuthConfig = {
   // Better Auth rejects an empty list, so the host patterns have to come from the caller.
   allowedHosts: Array<string>;
   extraPlugins?: Array<BetterAuthPlugin>;
-  fromEmail?: string;
+  // Required: a default here would silently send auth mail from the wrong domain
+  // when a deploy forgets FROM_EMAIL.
+  fromEmail: string;
   prisma: PrismaClient;
   rateLimitEnabled?: boolean;
   resendApiKey?: string;
@@ -25,7 +27,7 @@ const createAuth = (config: AuthConfig) => {
   const {
     allowedHosts,
     extraPlugins = [],
-    fromEmail = "noreply@acme.com",
+    fromEmail,
     prisma,
     rateLimitEnabled = false,
     resendApiKey,
