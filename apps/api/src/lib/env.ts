@@ -1,3 +1,4 @@
+import { senderAddressSchema } from "@repo/transactional/sender-address";
 import { z } from "zod";
 
 export const envSchema = z.object({
@@ -6,7 +7,8 @@ export const envSchema = z.object({
   CI: z.string().optional(),
   CORS_ORIGINS: z.string().default("https://acme.web.localhost,https://acme.landing.localhost"),
   DATABASE_URL: z.string().min(1),
-  FROM_EMAIL: z.string().min(1),
+  // Same schema the mailer enforces, so a typo fails at boot rather than on every send.
+  FROM_EMAIL: senderAddressSchema,
   HOST: z.string().default("0.0.0.0"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.string().default("4000"),

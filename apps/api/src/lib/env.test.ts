@@ -79,6 +79,18 @@ describe("envSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("should reject a FROM_EMAIL that is not an address", () => {
+    for (const fromEmail of ["noreply@acme", "noreply", "noreply@", "@acme.com"]) {
+      const result = envSchema.safeParse({ ...validEnv, FROM_EMAIL: fromEmail });
+      expect(result.success).toBe(false);
+    }
+  });
+
+  it("should accept the display-name sender form the mailer allows", () => {
+    const result = envSchema.safeParse({ ...validEnv, FROM_EMAIL: "Acme <noreply@acme.com>" });
+    expect(result.success).toBe(true);
+  });
+
   it("should reject invalid NODE_ENV values", () => {
     const result = envSchema.safeParse({
       ...validEnv,

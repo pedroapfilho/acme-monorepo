@@ -1,10 +1,12 @@
+import { senderAddressSchema } from "@repo/transactional/sender-address";
 import { z } from "zod";
 
 const envSchema = z.object({
   BETTER_AUTH_SECRET: z
     .string()
     .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
-  FROM_EMAIL: z.string().min(1),
+  // Same schema the mailer enforces, so a typo fails on parse rather than on every send.
+  FROM_EMAIL: senderAddressSchema,
   RESEND_API_KEY: z.string().optional(),
 });
 
