@@ -29,6 +29,9 @@ const Page = () => {
   );
 };
 
+/** @public Next.js app-router reads the instant segment config via the module loader */
+export const instant = true;
+
 export { metadata };
 
 export default Page;

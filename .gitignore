@@ -18,6 +18,10 @@ test-results/
 out/
 build
 next-env.d.ts
+# `next dev` writes an agent-rules block to <app>/AGENTS.md plus a CLAUDE.md that
+# points at it. Per-app copies would shadow the repo-root pair, so keep them untracked.
+apps/*/AGENTS.md
+apps/*/CLAUDE.md
 
 # build
 dist/

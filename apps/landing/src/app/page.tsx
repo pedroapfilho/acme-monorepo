@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: { absolute: "Acme: The one template to rule them all" },
 };
 
+/** @public Next.js app-router reads the instant segment config via the module loader */
+export const instant = true;
+
 const Page = () => {
   return (
     <div className="mx-auto flex max-w-(--breakpoint-xl) flex-col gap-16 px-6 py-20 md:px-8 md:py-28">

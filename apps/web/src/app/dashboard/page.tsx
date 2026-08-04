@@ -8,6 +8,9 @@ import { getSession } from "@/lib/auth-helpers";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
+/** @public Next.js app-router reads the instant segment config via the module loader */
+export const instant = true;
+
 const DashboardContent = async () => {
   const session = await getSession();
 

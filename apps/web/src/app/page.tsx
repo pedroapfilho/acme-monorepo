@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
 
 import { getSession } from "@/lib/auth-helpers";
 
@@ -8,16 +7,12 @@ export const metadata = {
   title: "Acme",
 };
 
-// cacheComponents needs a Suspense boundary above the uncached session read.
-const RedirectToDestination = async () => {
+/** @public Next.js reads this segment config; the route only redirects, so it may block. */
+export const instant = false;
+
+const Page = async () => {
   const session = await getSession();
   redirect(session ? "/dashboard" : "/login");
 };
-
-const Page = () => (
-  <Suspense fallback={null}>
-    <RedirectToDestination />
-  </Suspense>
-);
 
 export default Page;
