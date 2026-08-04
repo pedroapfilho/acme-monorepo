@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const envSchema = z.object({
+const envSchema = z.object({
   BETTER_AUTH_SECRET: z
     .string()
     .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
@@ -14,7 +14,7 @@ let cachedEnv: Env | undefined;
 
 // Parsed on first read, not at import: Next's build-time page-data workers import
 // this module without runtime env set, and a module-scope throw would fail the build.
-export const getEnv = (): Env => {
+const getEnv = (): Env => {
   if (!cachedEnv) {
     const parsedEnv = envSchema.safeParse(process.env);
 
@@ -29,3 +29,5 @@ export const getEnv = (): Env => {
 
   return cachedEnv;
 };
+
+export { getEnv };
