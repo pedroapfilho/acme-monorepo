@@ -8,6 +8,7 @@ type Plugin = NonNullable<AuthConfig["extraPlugins"]>[number];
 
 const baseConfig = {
   allowedHosts: ["**.localhost"],
+  fromEmail: "noreply@acme.com",
   prisma,
   secret: "test-secret-minimum-32-characters-long",
 } satisfies AuthConfig;

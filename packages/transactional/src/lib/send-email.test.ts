@@ -46,18 +46,17 @@ describe("sendEmail from validation", () => {
     expect(result.success).toBe(true);
   });
 
-  it("falls back to default wrapped sender when from is omitted", async () => {
+  it("rejects an empty from instead of substituting a default sender", async () => {
     const result = await sendEmail({
       apiKey: "re_test",
+      from: "",
       subject: "x",
       template,
       to: "delivered+test@resend.dev",
     });
 
-    expect(result.success).toBe(true);
-    expect(sendMock.mock.calls[0][0]).toMatchObject({
-      from: "Acme <noreply@acme.com>",
-    });
+    expect(result.success).toBe(false);
+    expect(sendMock).not.toHaveBeenCalled();
   });
 
   it("rejects from values that are neither bare email nor wrapped form", async () => {
