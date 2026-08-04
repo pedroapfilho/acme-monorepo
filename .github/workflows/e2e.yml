@@ -29,6 +29,7 @@ jobs:
       # bypasses that for the canonical e2e-test user by writing
       # emailVerified: true directly to Prisma.
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      FROM_EMAIL: noreply@acme.com
     services:
       postgres:
         image: postgres:18-alpine
