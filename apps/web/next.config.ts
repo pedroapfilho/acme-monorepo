@@ -28,6 +28,16 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
   cacheComponents: true,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
+  headers: () =>
+    Promise.resolve([
+      {
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+        source: "/:path*",
+      },
+    ]),
   reactCompiler: true,
   reactStrictMode: true,
   serverExternalPackages: ["@prisma/client", "@repo/db"],
