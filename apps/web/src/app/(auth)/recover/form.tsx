@@ -14,7 +14,7 @@ import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
@@ -66,6 +66,7 @@ const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const isSubmitLatched = useRef(false);
 
   const form = useForm({
     defaultValues: { email: "" },
@@ -89,11 +90,31 @@ const RecoverForm = () => {
             error instanceof Error ? error.message : "An error occurred. Please try again.";
           setFormError(message);
           toast.error(message);
+        } finally {
+          isSubmitLatched.current = false;
         }
       });
     },
     validators: { onSubmit: recoverSchema },
   });
+
+  const handleSubmit = async () => {
+    // aria-disabled keeps the button keyboard-activatable, and `isPending` is only
+    // set from handleSubmit's async continuation, so two submits in the same frame
+    // both read it as false. The ref latches synchronously instead.
+    if (isPending || isSubmitLatched.current) {
+      return;
+    }
+    isSubmitLatched.current = true;
+    try {
+      await form.handleSubmit();
+    } finally {
+      // Validation rejected the submit, so no transition will release the latch.
+      if (!form.state.isValid) {
+        isSubmitLatched.current = false;
+      }
+    }
+  };
 
   if (submittedEmail !== null) {
     return (
@@ -121,12 +142,7 @@ const RecoverForm = () => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        // aria-disabled keeps the button keyboard-activatable, so a second Enter
-        // would re-enter submit without this.
-        if (isPending) {
-          return;
-        }
-        void form.handleSubmit();
+        void handleSubmit();
       }}
     >
       <div aria-atomic="true" aria-live="polite" className="sr-only">

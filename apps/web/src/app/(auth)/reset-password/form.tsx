@@ -15,7 +15,7 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
@@ -74,19 +74,20 @@ const ResetPasswordForm = ({ token }: Props) => {
   const { push } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
+  const isSubmitLatched = useRef(false);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", password: "" },
     onSubmit: ({ value }) => {
       setFormError(null);
       startTransition(async () => {
-        if (token === null || token === "") {
-          const message = "Invalid reset token. Please request a new password reset.";
-          setFormError(message);
-          toast.error(message);
-          return;
-        }
         try {
+          if (token === null || token === "") {
+            const message = "Invalid reset token. Please request a new password reset.";
+            setFormError(message);
+            toast.error(message);
+            return;
+          }
           const result = await authClient.resetPassword({
             newPassword: value.password,
             token,
@@ -103,11 +104,31 @@ const ResetPasswordForm = ({ token }: Props) => {
             error instanceof Error ? error.message : "An error occurred. Please try again.";
           setFormError(message);
           toast.error(message);
+        } finally {
+          isSubmitLatched.current = false;
         }
       });
     },
     validators: { onSubmit: resetPasswordSchema },
   });
+
+  const handleSubmit = async () => {
+    // aria-disabled keeps the button keyboard-activatable, and `isPending` is only
+    // set from handleSubmit's async continuation, so two submits in the same frame
+    // both read it as false. The ref latches synchronously instead.
+    if (isPending || isSubmitLatched.current) {
+      return;
+    }
+    isSubmitLatched.current = true;
+    try {
+      await form.handleSubmit();
+    } finally {
+      // Validation rejected the submit, so no transition will release the latch.
+      if (!form.state.isValid) {
+        isSubmitLatched.current = false;
+      }
+    }
+  };
 
   return (
     // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
@@ -116,12 +137,7 @@ const ResetPasswordForm = ({ token }: Props) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        // aria-disabled keeps the button keyboard-activatable, so a second Enter
-        // would re-enter submit without this.
-        if (isPending) {
-          return;
-        }
-        void form.handleSubmit();
+        void handleSubmit();
       }}
     >
       <div aria-atomic="true" aria-live="polite" className="sr-only">
