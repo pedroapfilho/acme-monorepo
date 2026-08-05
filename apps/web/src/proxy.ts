@@ -1,3 +1,5 @@
+import { COOKIE_PREFIX } from "@repo/auth/server";
+import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -25,6 +27,17 @@ const getSessionOrNull = async (request: NextRequest) => {
 
 export const proxy = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
+
+  // "/" only ever redirects, so decide it here from the cookie's presence alone:
+  // rendering a page to call redirect() costs a server round trip and a session
+  // lookup. Presence is deliberately not validity. A stale cookie sends the
+  // visitor to /dashboard, which does the authoritative check below and bounces
+  // them to /login.
+  if (pathname === "/") {
+    const destination =
+      getSessionCookie(request, { cookiePrefix: COOKIE_PREFIX }) === null ? "/login" : "/dashboard";
+    return NextResponse.redirect(new URL(destination, request.url));
+  }
 
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 

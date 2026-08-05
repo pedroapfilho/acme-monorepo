@@ -12,6 +12,10 @@ import { Suspense } from "react";
 import ResetPasswordForm from "@/app/(auth)/reset-password/form";
 
 const metadata: Metadata = {
+  robots: {
+    follow: false,
+    index: false,
+  },
   title: "Reset your password",
 };
 
