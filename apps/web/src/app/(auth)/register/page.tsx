@@ -10,6 +10,10 @@ import type { Metadata } from "next";
 import RegisterForm from "@/app/(auth)/register/form";
 
 const metadata: Metadata = {
+  robots: {
+    follow: false,
+    index: false,
+  },
   title: "Create an account",
 };
 

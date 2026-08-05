@@ -8,6 +8,11 @@ import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
+// Exported so proxy/middleware can look the session cookie up by name without
+// instantiating Better Auth. Drift between the two would silently break the
+// cookie-only redirects.
+const COOKIE_PREFIX = "acme";
+
 type AuthConfig = {
   // Better Auth rejects an empty list, so the host patterns have to come from the caller.
   allowedHosts: Array<string>;
@@ -62,7 +67,7 @@ const createAuth = (config: AuthConfig) => {
     },
 
     advanced: {
-      cookiePrefix: "acme",
+      cookiePrefix: COOKIE_PREFIX,
       defaultCookieAttributes: {
         httpOnly: true,
         sameSite: "lax" as const,
@@ -200,5 +205,5 @@ const createAuth = (config: AuthConfig) => {
 
 type Auth = ReturnType<typeof createAuth>;
 
-export { createAuth };
+export { COOKIE_PREFIX, createAuth };
 export type { Auth, AuthConfig };
