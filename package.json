@@ -33,7 +33,7 @@
     "lint-staged": "^17.3.0",
     "oxfmt": "^0.62.0",
     "oxlint": "^1.77.0",
-    "oxlint-config-awesomeness": "^3.2.0",
+    "oxlint-config-awesomeness": "^3.3.0",
     "oxlint-tsgolint": "^7.0.2001",
     "turbo": "^2.10.8"
   },
