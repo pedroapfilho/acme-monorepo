@@ -34,5 +34,5 @@ minimumReleaseAgeExclude:
   - "@next/swc-win32-x64-msvc@16.3.0"
   - next@16.3.0
   - oxlint-plugin-react-doctor@0.9.6
-  - '@react-email/ui@6.9.2'
+  - "@react-email/ui@6.9.2"
   - react-email@6.9.2
