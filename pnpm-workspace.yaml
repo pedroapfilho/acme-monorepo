@@ -2,6 +2,12 @@ packages:
   - apps/*
   - packages/*
 
+overrides:
+  # 1.5.2 dropped the "types" conditions from its exports map, so the type
+  # declarations resolve to a broken sibling .d.mts and every OpenAPI route
+  # helper degrades to the error type (575 type-aware lint errors in apps/api).
+  "@hono/zod-openapi": "1.5.1"
+
 nodeLinker: hoisted
 
 allowBuilds:

@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@hono/zod-openapi': 1.5.1
+
 importers:
 
   .:
@@ -48,7 +51,7 @@ importers:
         specifier: ^2.0.8
         version: 2.1.0(hono@4.13.1)
       '@hono/zod-openapi':
-        specifier: ^1.4.0
+        specifier: 1.5.1
         version: 1.5.1(hono@4.13.1)(zod@4.4.3)
       '@repo/auth':
         specifier: workspace:*
