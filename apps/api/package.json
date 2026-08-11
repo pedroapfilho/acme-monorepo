@@ -16,15 +16,15 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.0.8",
-    "@hono/zod-openapi": "^1.4.0",
+    "@hono/zod-openapi": "^1.5.1",
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/transactional": "workspace:*",
-    "@scalar/hono-api-reference": "^0.11.9",
-    "@scalar/openapi-to-markdown": "^0.5.32",
+    "@scalar/hono-api-reference": "^0.11.13",
+    "@scalar/openapi-to-markdown": "^0.5.38",
     "dotenv": "^17.4.2",
-    "hono": "^4.12.28",
+    "hono": "^4.13.1",
     "hono-rate-limiter": "^0.5.3",
     "zod": "^4.4.3"
   },
@@ -33,7 +33,7 @@
     "@repo/typescript-config": "workspace:*",
     "@rollup/plugin-alias": "^6.0.0",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^26.1.1",
+    "@types/node": "^26.2.0",
     "tsdown": "^0.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
