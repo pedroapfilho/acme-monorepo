@@ -18,7 +18,6 @@ test.describe("Password Recovery", () => {
     await recoverPage.goto();
     await recoverPage.requestReset("not-an-email");
 
-    // Validation error renders in an alert slot, not Sonner.
     await expect(page.getByText(/valid email/i).first()).toBeVisible();
     expect(page.url()).toContain("/recover");
   });

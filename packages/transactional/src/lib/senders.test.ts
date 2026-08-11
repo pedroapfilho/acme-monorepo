@@ -19,9 +19,6 @@ describe("sendTransactionalEmail dispatch", () => {
     sendMock.mockResolvedValue({ data: { id: "test" }, error: null });
   });
 
-  // htmlMarker is a test-controlled CTA URL that only the correct template renders into
-  // its href, so a case that keeps the right subject/recipient but renders the wrong
-  // component fails. URLs (not headings) are used so the check survives copy edits.
   const cases: Array<{
     email: TransactionalEmail;
     htmlMarker: string;
@@ -73,7 +70,6 @@ describe("sendTransactionalEmail dispatch", () => {
       },
       htmlMarker: "https://acme.com/change",
       subject: "Confirm change of your Acme account email",
-      // Confirmation goes to the current address, not the new one.
       to: "current@acme.com",
     },
   ];

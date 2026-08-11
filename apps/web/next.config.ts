@@ -28,7 +28,6 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
   cacheComponents: true,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
-  // turbopackRustReactCompiler only selects the implementation, so reactCompiler has to stay on.
   experimental: { turbopackRustReactCompiler: true },
   headers: () =>
     Promise.resolve([

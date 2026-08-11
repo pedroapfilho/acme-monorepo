@@ -24,7 +24,6 @@ test.describe("Sign-up for an existing email (enumeration prevention)", () => {
     });
     expect([200, 201]).toContain(first.status());
 
-    // Pin AFTER the first signup so its welcome mail doesn't match below.
     const since = Date.now();
 
     const second = await request.post(`${webUrl}/api/auth/sign-up/email`, {

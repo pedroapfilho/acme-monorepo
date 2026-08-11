@@ -9,7 +9,6 @@ export class RecoverPage {
   constructor(private readonly page: Page) {
     this.emailInput = page.getByLabel(/email/i);
     this.submitButton = page.getByRole("button", { name: /send reset link/i });
-    // Root errors render in a <p class="text-destructive"> sibling, not Sonner.
     this.rootError = page.locator("p.text-destructive");
   }
 

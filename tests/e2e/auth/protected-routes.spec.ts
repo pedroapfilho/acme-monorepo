@@ -18,8 +18,6 @@ test.describe("Root redirect", () => {
     expect(page.url()).toContain("/dashboard");
   });
 
-  // The proxy routes "/" on cookie presence, not validity, so a stale cookie has to
-  // fall through the real session check on /dashboard instead of ping-ponging.
   test("sends visitors holding a stale session cookie to login", async ({ page }) => {
     await page.context().clearCookies();
     await page.context().addCookies([

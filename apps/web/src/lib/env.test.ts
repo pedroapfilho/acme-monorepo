@@ -6,7 +6,6 @@ const VALID_ENV = {
   RESEND_API_KEY: "re_test",
 };
 
-// The module caches on first read, so every case needs a fresh import.
 const loadGetEnv = async (overrides: Record<string, string | undefined> = {}) => {
   vi.resetModules();
   for (const [key, value] of Object.entries({ ...VALID_ENV, ...overrides })) {

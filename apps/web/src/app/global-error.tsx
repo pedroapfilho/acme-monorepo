@@ -9,8 +9,6 @@ type GlobalErrorProps = {
   reset: () => void;
 };
 
-// global-error replaces the root layout, so globals.css never loads here and Tailwind
-// classes would resolve to nothing. Every rule below has to be inline.
 const styles = {
   body: {
     alignItems: "center",

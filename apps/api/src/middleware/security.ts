@@ -48,7 +48,6 @@ export const securityHeaders = secureHeaders({
 });
 
 export const standardRateLimit = rateLimiter({
-  // The handler type is void; assigning c.res is how a void middleware finalizes the response.
   handler: (c: Context) => {
     c.res = c.json(
       errorBody("RATE_LIMIT_EXCEEDED", "Too many requests, please try again later"),

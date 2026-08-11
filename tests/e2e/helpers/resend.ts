@@ -1,5 +1,3 @@
-// Poll Resend GET /emails to catch "JWT valid but send never happened" regressions.
-
 import { sleep } from "./sleep";
 
 const RESEND_API = "https://api.resend.com";
@@ -36,8 +34,6 @@ const requireApiKey = (): string => {
   return key;
 };
 
-// Resend caps the team at 5 req/s; parallel specs polling at 1Hz trip 429s.
-// Defaults mirror vercel/fetch-retry (factor 6, 5 retries, retry-after cap 20s).
 const RETRY_MAX_ATTEMPTS = 5;
 const RETRY_MAX_RETRY_AFTER_SECONDS = 20;
 const RETRY_BASE_MS = 200;
@@ -45,7 +41,6 @@ const RETRY_FACTOR = 6;
 const RETRY_JITTER_MS = 100;
 
 const computeBackoffMs = (attempt: number): number => {
-  // Exponential backoff with jitter so parallel clients don't re-synchronize after 429s.
   const base = Math.min(
     RETRY_BASE_MS * RETRY_FACTOR ** attempt,
     RETRY_MAX_RETRY_AFTER_SECONDS * 1000,
@@ -74,9 +69,7 @@ const resendFetch = async (path: string): Promise<Response> => {
       return response;
     }
 
-    // Resend sends retry-after in seconds (not HTTP-date); fall back to exponential backoff.
     const retryAfterHeader = response.headers.get("retry-after");
-    // `Number("")` is 0, which would skip the backoff; keep NaN when the header is missing.
     const retryAfter = retryAfterHeader ? Math.trunc(Number(retryAfterHeader)) : Number.NaN;
     const delayMs = Number.isFinite(retryAfter)
       ? Math.min(retryAfter, RETRY_MAX_RETRY_AFTER_SECONDS) * 1000 +
@@ -107,7 +100,6 @@ type WaitForEmailOptions = {
 };
 
 type WaitForOptions = {
-  // Resend's email index is eventually consistent; CI cold starts can stretch list latency.
   pollMs?: number;
   timeoutMs?: number;
 };
@@ -153,7 +145,6 @@ const waitForEmail = async (
   );
 };
 
-// HTML href first; fall back to bare URL in the text body when templates are text-only.
 const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
   const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/g);

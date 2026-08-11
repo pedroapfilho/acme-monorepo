@@ -7,7 +7,6 @@ export const envSchema = z.object({
   CI: z.string().optional(),
   CORS_ORIGINS: z.string().default("https://acme.web.localhost,https://acme.landing.localhost"),
   DATABASE_URL: z.string().min(1),
-  // Same schema the mailer enforces, so a typo fails at boot rather than on every send.
   FROM_EMAIL: senderAddressSchema,
   HOST: z.string().default("0.0.0.0"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -31,7 +30,6 @@ const parseEnvList = (value: string | undefined): Array<string> => {
   return result;
 };
 
-// Portless *.localhost needs ** not * (two labels under .localhost).
 const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
 
 // Plain http://localhost:PORT origins won't match allowedHosts patterns.

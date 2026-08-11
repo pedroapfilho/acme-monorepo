@@ -35,7 +35,6 @@ export const updateUser = async (id: string, data: Prisma.UserUpdateInput) => {
       where: { id },
     });
   } catch (error) {
-    // Guard on data.username so unrelated P2002s surface as generic 409, not USERNAME_TAKEN.
     if (
       typeof data.username === "string" &&
       error instanceof Error &&

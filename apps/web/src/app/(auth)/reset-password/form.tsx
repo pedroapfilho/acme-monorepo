@@ -113,9 +113,6 @@ const ResetPasswordForm = ({ token }: Props) => {
   });
 
   const handleSubmit = async () => {
-    // aria-disabled keeps the button keyboard-activatable, and `isPending` is only
-    // set from handleSubmit's async continuation, so two submits in the same frame
-    // both read it as false. The ref latches synchronously instead.
     if (isPending || isSubmitLatched.current) {
       return;
     }
@@ -123,7 +120,6 @@ const ResetPasswordForm = ({ token }: Props) => {
     try {
       await form.handleSubmit();
     } finally {
-      // Validation rejected the submit, so no transition will release the latch.
       if (!form.state.isValid) {
         isSubmitLatched.current = false;
       }

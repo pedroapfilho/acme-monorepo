@@ -16,7 +16,6 @@ const getPortlessUrl = (name: string) => {
   }
 };
 
-// CI binds 0.0.0.0 but Node 18+ resolves localhost to ::1 and undici won't fall back to IPv4.
 export const webUrl = getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
 export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
 export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
@@ -69,8 +68,6 @@ export default defineConfig({
     video: "retain-on-failure",
   },
 
-  // Spawn binaries directly: `pnpm --filter` would serialize the three webServers
-  // on pnpm's workspace lock and the losers hang silently.
   webServer: process.env.CI
     ? [
         {
@@ -78,7 +75,6 @@ export default defineConfig({
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
-          // Web has no `/` route; probe /login so readiness detection lands a 200.
           url: `${webUrl}/login`,
         },
         {

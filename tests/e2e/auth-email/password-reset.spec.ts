@@ -21,7 +21,6 @@ test.describe("Password reset", () => {
     const originalPassword = "OriginalPassword1!";
     const newPassword = "BrandNewPassword2!";
 
-    // Welcome email isn't under test; use JWT reconstruction.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email, name: "Reset Me", password: originalPassword, username },
     });
@@ -30,10 +29,8 @@ test.describe("Password reset", () => {
     await page.goto(verify.url);
     await page.context().clearCookies();
 
-    // Pin cutoff AFTER the welcome email so the reset-mail search doesn't match it.
     const since = Date.now();
 
-    // Always 200 (enumeration prevention) regardless of whether the email exists.
     const reset = await request.post(`${webUrl}/api/auth/request-password-reset`, {
       data: { email, redirectTo: "/reset-password" },
     });
@@ -46,7 +43,6 @@ test.describe("Password reset", () => {
     });
     expect(mail.last_event).not.toBe("bounced");
 
-    // Better Auth builds `/reset-password/<token>?callbackURL=...` (token is a path segment).
     const resetUrl = extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/);
     await page.goto(resetUrl);
 

@@ -9,7 +9,6 @@ const makeTestEmail = (info: TestInfo): string => {
   return `delivered+${run}-${slug}@resend.dev`;
 };
 
-// username() requires /^[a-zA-Z0-9_.]+$/ and max 30; hash the email to stay unique and under the limit.
 const makeTestUsername = (email: string): string => {
   const hash = crypto.createHash("sha256").update(email).digest("hex").slice(0, 16);
   return `e2e_${hash}`;

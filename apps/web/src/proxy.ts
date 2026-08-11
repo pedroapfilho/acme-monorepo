@@ -12,8 +12,6 @@ const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
 
 const getSessionOrNull = async (request: NextRequest) => {
   try {
-    // Touching `auth` instantiates it and throws synchronously when BETTER_AUTH_SECRET is absent;
-    // .catch() can't intercept that.
     return await auth.api.getSession({ headers: request.headers });
   } catch (error) {
     log.error({
@@ -28,11 +26,6 @@ const getSessionOrNull = async (request: NextRequest) => {
 export const proxy = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
 
-  // "/" only ever redirects, so decide it here from the cookie's presence alone:
-  // rendering a page to call redirect() costs a server round trip and a session
-  // lookup. Presence is deliberately not validity. A stale cookie sends the
-  // visitor to /dashboard, which does the authoritative check below and bounces
-  // them to /login.
   if (pathname === "/") {
     const destination =
       getSessionCookie(request, { cookiePrefix: COOKIE_PREFIX }) === null ? "/login" : "/dashboard";
