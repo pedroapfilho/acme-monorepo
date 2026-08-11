@@ -21,7 +21,7 @@ import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
 
 type Props = {
-  token: string | null;
+  searchParams: Promise<{ token?: string }>;
 };
 
 type PasswordFieldInputProps = {
@@ -70,7 +70,7 @@ const PasswordFieldInput = ({
   );
 };
 
-const ResetPasswordForm = ({ token }: Props) => {
+const ResetPasswordForm = ({ searchParams }: Props) => {
   const { push } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
@@ -82,6 +82,7 @@ const ResetPasswordForm = ({ token }: Props) => {
       setFormError(null);
       startTransition(async () => {
         try {
+          const { token = null } = await searchParams;
           if (token === null || token === "") {
             const message = "Invalid reset token. Please request a new password reset.";
             setFormError(message);
