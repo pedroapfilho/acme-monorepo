@@ -8,17 +8,11 @@ import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin } from "better-auth/types";
 
-// Exported so proxy/middleware can look the session cookie up by name without
-// instantiating Better Auth. Drift between the two would silently break the
-// cookie-only redirects.
 const COOKIE_PREFIX = "acme";
 
 type AuthConfig = {
-  // Better Auth rejects an empty list, so the host patterns have to come from the caller.
   allowedHosts: Array<string>;
   extraPlugins?: Array<BetterAuthPlugin>;
-  // Required: a default here would silently send auth mail from the wrong domain
-  // when a deploy forgets FROM_EMAIL.
   fromEmail: string;
   prisma: PrismaClient;
   rateLimitEnabled?: boolean;
@@ -46,8 +40,6 @@ const createAuth = (config: AuthConfig) => {
       ? { apiKey: resendApiKey, from: fromEmail }
       : null;
 
-  // Shared by the throwing mail callbacks only; onExistingUserSignUp must swallow
-  // failures (enumeration prevention), so it stays separate.
   const deliver = async (email: TransactionalEmail, failureMessage: string) => {
     if (!mailer) {
       return;
@@ -77,8 +69,6 @@ const createAuth = (config: AuthConfig) => {
 
     basePath: "/api/auth",
 
-    // allowedHosts extends trustedOrigins; it matches on host, so it covers ports and
-    // wildcards that an origin list can't.
     baseURL: {
       allowedHosts,
       fallback: "http://localhost:4000",
@@ -93,7 +83,6 @@ const createAuth = (config: AuthConfig) => {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
-      // Notify real account holder on duplicate signup (enumeration-prevention swallows it).
       onExistingUserSignUp: mailer
         ? async ({ user }, request) => {
             const origin = request?.headers.get("origin") ?? "";
@@ -109,7 +98,6 @@ const createAuth = (config: AuthConfig) => {
               mailer,
             );
             if (!result.success) {
-              // Don't throw: enumeration-prevention must return success regardless.
               log.error({
                 error: result.error,
                 message: "Auth: failed to send sign-up attempt email",
@@ -117,7 +105,6 @@ const createAuth = (config: AuthConfig) => {
             }
           }
         : undefined,
-      // Require verification only when mailer exists; otherwise new users lock out.
       requireEmailVerification: Boolean(mailer),
       sendResetPassword: async ({ url, user }) => {
         await deliver(
@@ -134,10 +121,8 @@ const createAuth = (config: AuthConfig) => {
     },
 
     emailVerification: {
-      // Verification link signs in the clicking device (session lands on whoever opens it).
       autoSignInAfterVerification: true,
       callbackURL: "/",
-      // Unverified sign-in 403s include a fresh verification link for the login form.
       sendOnSignIn: true,
       sendVerificationEmail: async ({ url, user }) => {
         await deliver(
@@ -184,7 +169,6 @@ const createAuth = (config: AuthConfig) => {
       },
       changeEmail: {
         enabled: true,
-        // Stage 1: confirm on current email; stage 2 reuses sendVerificationEmail.
         sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
           await deliver(
             {

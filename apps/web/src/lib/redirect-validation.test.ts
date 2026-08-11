@@ -30,8 +30,6 @@ describe("safeRedirectPath", () => {
   });
 
   it("rejects backslash tricks", () => {
-    // Browsers normalize "\" to "/" during URL parsing, so "/\evil.com"
-    // would navigate to evil.com if let through.
     expect(safeRedirectPath(String.raw`/\evil.com`)).toBe("/dashboard");
     expect(safeRedirectPath(String.raw`\/evil.com`)).toBe("/dashboard");
     expect(safeRedirectPath(String.raw`/path\..\evil`)).toBe("/dashboard");
@@ -43,7 +41,6 @@ describe("safeRedirectPath", () => {
   });
 
   it("rejects scheme-prefixed values", () => {
-    // Built dynamically so lint's no-script-url doesn't flag a literal.
     expect(safeRedirectPath(["javascript", "alert(1)"].join(":"))).toBe("/dashboard");
     expect(safeRedirectPath("data:text/html,<script>1</script>")).toBe("/dashboard");
   });

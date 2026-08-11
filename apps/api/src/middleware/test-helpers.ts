@@ -18,7 +18,6 @@ export type MockContextMocks = {
   set: ReturnType<typeof vi.fn>;
 };
 
-// One unavoidable cast: Hono's Context is too large to fully mock.
 export const createMockContext = (
   opts: CreateMockContextOptions = {},
 ): { ctx: Context; mocks: MockContextMocks } => {

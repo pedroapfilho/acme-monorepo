@@ -39,7 +39,6 @@ const emailTheme = {
   },
 };
 
-// Mirror @repo/ui shadcn tokens; emails have no CSS variables so hex is resolved at build time.
 const tailwindConfig = {
   presets: [pixelBasedPreset],
   theme: {

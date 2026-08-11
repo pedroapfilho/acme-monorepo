@@ -8,7 +8,6 @@ export default defineConfig({
     typeCheck: true,
   },
   overrides: [
-    // PascalCase factories from next/font/google (Inter) and @scalar/hono-api-reference (Scalar).
     {
       files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       rules: {
@@ -20,14 +19,12 @@ export default defineConfig({
         ],
       },
     },
-    // Playwright's selector engine rejects /v-flagged regex literals at runtime.
     {
       files: ["tests/**", "playwright.config.ts"],
       rules: {
         "require-unicode-regexp": "off",
       },
     },
-    // Config files resolve portless URLs at load time; module scope can't await.
     {
       files: ["playwright.config.ts", "**/next.config.ts"],
       rules: {

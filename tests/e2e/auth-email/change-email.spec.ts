@@ -8,7 +8,6 @@ import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
 
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
-// Shared storageState would make the signup POST 400 as "already signed in".
 test.use({ storageState: { cookies: [], origins: [] } });
 
 test.describe("Change email (two-stage confirmation + verification)", () => {
@@ -23,21 +22,18 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const username = makeTestUsername(currentEmail);
     const password = "ChangeEmailPwd1!";
 
-    // Welcome email isn't under test; use JWT reconstruction.
     const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
       data: { email: currentEmail, name: "Change Me", password, username },
     });
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(currentEmail);
     await page.goto(verify.url);
-    // autoSignInAfterVerification signs in the page; API sign-in threads cookies for change-email.
     await page.waitForURL(/\/dashboard$/);
     const signIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
       data: { email: currentEmail, password },
     });
     expect(signIn.status()).toBe(200);
 
-    // Playwright's APIRequestContext doesn't persist API-set cookies, so thread Set-Cookie manually.
     const setCookie = signIn.headers()["set-cookie"] ?? "";
     const cookieHeader = setCookie
       .split(/,(?=\s*[\w-]+=)/u)

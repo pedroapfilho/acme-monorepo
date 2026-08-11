@@ -1,5 +1,3 @@
-// LOCAL-only e2e seed; the DATABASE_URL loopback check below blocks prod runs.
-
 import { prisma } from "@repo/db";
 
 import { getAuth } from "@/lib/auth";
@@ -23,7 +21,6 @@ const main = async () => {
   const ctx = await getAuth().$context;
   const hashed = await ctx.password.hash(PASSWORD);
 
-  // Existing rows keep their original id (not SLUG), so use the returned `id` for the account FK.
   const user = await prisma.user.upsert({
     create: {
       email: EMAIL,

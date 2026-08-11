@@ -29,8 +29,6 @@ const tick = () =>
 
 const renderForm = async () => {
   const searchParams = Promise.resolve({});
-  // The sign-up link reads searchParams with `use()`, so the first render suspends
-  // and has to settle inside an awaited act scope.
   const { container } = await act(async () => {
     const rendered = render(<LoginForm searchParams={searchParams} />);
     await searchParams;
@@ -63,8 +61,6 @@ const submitOnce = async (form: HTMLFormElement) => {
 };
 
 const submitTwiceInOneFrame = async (form: HTMLFormElement) => {
-  // No microtask runs between the two dispatches, which is what a double Enter on
-  // the aria-disabled submit button does: `isPending` cannot have flipped yet.
   await act(async () => {
     form.dispatchEvent(submitEvent());
     form.dispatchEvent(submitEvent());

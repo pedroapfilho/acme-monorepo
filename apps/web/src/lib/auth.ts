@@ -18,7 +18,6 @@ const parseEnvList = (value: string | undefined): Array<string> => {
   return result;
 };
 
-// Portless *.localhost needs ** not * (two labels under .localhost).
 const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
 
 // Plain http://localhost:PORT origins won't match allowedHosts patterns.
@@ -31,8 +30,6 @@ const LOOPBACK_TRUSTED_ORIGINS = [
   "http://127.0.0.1:4000",
 ];
 
-// nextCookies() must be last; it forwards Set-Cookie into RSC/server-action context.
-// Lazy singleton: defers init so build-time page-data workers don't throw on missing env.
 type Auth = ReturnType<typeof createAuth>;
 let cachedAuth: Auth | undefined;
 
@@ -44,15 +41,12 @@ const getAuth = (): Auth => {
       extraPlugins: [nextCookies()],
       fromEmail: env.FROM_EMAIL,
       prisma,
-      // Disabled in CI: the e2e suite hammers auth endpoints and would trip 429s.
       rateLimitEnabled:
         process.env.NODE_ENV === "production" &&
         (process.env.CI === undefined || process.env.CI === ""),
       resendApiKey: env.RESEND_API_KEY,
       secret: env.BETTER_AUTH_SECRET,
       trustedOrigins: [...LOOPBACK_TRUSTED_ORIGINS, ...parseEnvList(process.env.TRUSTED_ORIGINS)],
-      // WEB_APP_URL gates Secure cookies; the auth baseURL protocol is "auto", which
-      // can't be trusted through portless/Vercel proxies.
       useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
     });
   }

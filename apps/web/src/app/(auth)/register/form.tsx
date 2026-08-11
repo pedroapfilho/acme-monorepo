@@ -120,7 +120,6 @@ const RegisterForm = ({ searchParams }: Props) => {
             toast.error(message);
             return;
           }
-          // No token (requireEmailVerification or enumeration prevention): show "check your email".
           const token = result.data?.token;
           if (token === undefined || token === null || token === "") {
             setSentToEmail(value.email);
@@ -142,9 +141,6 @@ const RegisterForm = ({ searchParams }: Props) => {
   });
 
   const handleSubmit = async () => {
-    // aria-disabled keeps the button keyboard-activatable, and `isPending` is only
-    // set from handleSubmit's async continuation, so two submits in the same frame
-    // both read it as false. The ref latches synchronously instead.
     if (isPending || isSubmitLatched.current) {
       return;
     }
@@ -152,7 +148,6 @@ const RegisterForm = ({ searchParams }: Props) => {
     try {
       await form.handleSubmit();
     } finally {
-      // Validation rejected the submit, so no transition will release the latch.
       if (!form.state.isValid) {
         isSubmitLatched.current = false;
       }

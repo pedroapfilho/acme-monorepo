@@ -11,7 +11,6 @@ const initApiLogger = (opts: { service: string }): void => {
 
 const honoEvlog = () => evlog();
 
-// API re-exports evlog's log to avoid importing React-coupled @repo/observability/next.
 export { honoEvlog, initApiLogger };
 export { log } from "evlog";
 export type { EvlogVariables } from "evlog/hono";

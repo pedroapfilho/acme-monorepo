@@ -14,7 +14,6 @@ const requireSecret = (): string => {
   return secret;
 };
 
-// Reconstructs the HS256 JWT Better Auth would email, so tests can skip inbox polling.
 const forVerifyEmail = async (email: string): Promise<{ token: string; url: string }> => {
   const token = await signJWT({ email: email.toLowerCase() }, requireSecret(), 3600);
   const callbackURL = encodeURIComponent("/");
@@ -22,7 +21,6 @@ const forVerifyEmail = async (email: string): Promise<{ token: string; url: stri
   return { token, url };
 };
 
-// Change-email JWTs differ only by requestType (confirmation vs verification).
 type ChangeEmailUrls = {
   confirmationToken: string;
   confirmationUrl: string;
@@ -57,7 +55,6 @@ const forChangeEmail = async (currentEmail: string, newEmail: string): Promise<C
   };
 };
 
-// Reset tokens live in the verification table (not JWTs); poll the DB.
 const forResetPassword = async (
   email: string,
   timeoutMs = 5000,

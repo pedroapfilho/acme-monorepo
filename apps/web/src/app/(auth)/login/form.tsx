@@ -59,7 +59,6 @@ const SignUpLink = ({ searchParams }: Props) => {
   );
 };
 
-// useFieldContext requires a proper component, not an inline render fn.
 const LoginFieldInput = ({
   autoComplete,
   errors,
@@ -117,12 +116,10 @@ const LoginForm = ({ searchParams }: Props) => {
             password: value.password,
           });
           if (result.error) {
-            // EMAIL_NOT_VERIFIED re-sends the link; informational, not a credentials error.
             if (result.error.code === "EMAIL_NOT_VERIFIED") {
               setShowUnverifiedNotice(true);
               return;
             }
-            // Inline instead of throw-to-catch: React Compiler can't memoize try/catch throws yet.
             const message = result.error.message ?? "Invalid credentials";
             setFormError(message);
             toast.error(message);
@@ -144,9 +141,6 @@ const LoginForm = ({ searchParams }: Props) => {
   });
 
   const handleSubmit = async () => {
-    // aria-disabled keeps the button keyboard-activatable, and `isPending` is only
-    // set from handleSubmit's async continuation, so two submits in the same frame
-    // both read it as false. The ref latches synchronously instead.
     if (isPending || isSubmitLatched.current) {
       return;
     }
@@ -154,7 +148,6 @@ const LoginForm = ({ searchParams }: Props) => {
     try {
       await form.handleSubmit();
     } finally {
-      // Validation rejected the submit, so no transition will release the latch.
       if (!form.state.isValid) {
         isSubmitLatched.current = false;
       }

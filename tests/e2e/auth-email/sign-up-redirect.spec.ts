@@ -4,7 +4,6 @@ import { webUrl } from "../../../playwright.config";
 import { extractLink, waitForEmail } from "../helpers/resend";
 import { makeTestEmail } from "../helpers/test-email";
 
-// Without RESEND_API_KEY, requireEmailVerification is off; these tests would hit the wrong code path.
 test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -16,10 +15,8 @@ test.describe("Sign-up with redirect context", () => {
   }, testInfo) => {
     const since = Date.now();
     const email = makeTestEmail(testInfo);
-    // Query marker proves ?from= carried through; bare /dashboard is the validator fallback.
     const redirectPath = "/dashboard?welcome=e2e-redirect";
 
-    // Form wiring passes callbackURL; the API would accept any value.
     await page.goto(`${webUrl}/register?from=${encodeURIComponent(redirectPath)}`);
 
     await expect(page.getByRole("link", { name: /sign in/i })).toHaveAttribute(
