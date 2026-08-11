@@ -1,0 +1,28 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Placeholders and example/doc/test fixtures that are not real secrets"
+
+# Path allowlists are matched against every commit in history, so a fixture that
+# only ever held a placeholder stays allowlisted even after it is renamed or deleted.
+paths = [
+  '''.*\.env\.example$''',
+  '''.*README\.md$''',
+  '''docs/.*\.md$''',
+  '''.*\.test\.ts$''',
+  '''.*\.spec\.ts$''',
+  '''tests/.*''',
+]
+
+# gitleaks matches the secret value, not the variable name, so each documented
+# placeholder string has to be listed here by its literal form.
+regexes = [
+  '''YOUR_[A-Z0-9_]*''',
+  '''[A-Za-z0-9_]*placeholder[A-Za-z0-9_]*''',
+  '''onboarding@resend\.dev''',
+  '''your[-_][A-Za-z0-9-]*(token|key|secret)''',
+  '''your_jwt_token''',
+  '''min-32-character-secret-key''',
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.\.\.''',
+]
