@@ -45,10 +45,12 @@ const isPrismaKnownError = (
 ): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
   err instanceof Error && "code" in err && "clientVersion" in err;
 
-const resolveError = (
-  err: unknown,
-  isProd: boolean,
-): { body: ErrorBody; status: ContentfulStatusCode } => {
+type ResolvedError = {
+  body: ErrorBody;
+  status: ContentfulStatusCode;
+};
+
+const resolveError = (err: unknown, isProd: boolean): ResolvedError => {
   if (err instanceof HTTPException) {
     return { body: errorBody("HTTP_EXCEPTION", err.message), status: err.status };
   }

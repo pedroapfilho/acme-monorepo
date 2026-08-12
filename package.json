@@ -32,8 +32,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
     "oxfmt": "^0.62.0",
-    "oxlint": "^1.77.0",
-    "oxlint-config-awesomeness": "^3.3.0",
+    "oxlint": "^1.78.0",
+    "oxlint-config-awesomeness": "^3.4.1",
     "oxlint-tsgolint": "^7.0.2001",
     "turbo": "^2.10.9"
   },

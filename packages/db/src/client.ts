@@ -2,7 +2,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "./generated/prisma/client";
 
-// oxlint-disable-next-line no-unsafe-type-assertion -- canonical Prisma singleton: globalThis carries no typed slot for the cached client
+// oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- canonical Prisma singleton: globalThis carries no typed slot for the cached client
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
