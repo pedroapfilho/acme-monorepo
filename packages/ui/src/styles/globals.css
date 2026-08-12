@@ -12,6 +12,10 @@
     cursor: pointer;
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
   }
