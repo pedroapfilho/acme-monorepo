@@ -3,7 +3,6 @@ import { vi } from "vitest";
 
 type CreateMockContextOptions = {
   headers?: Record<string, string>;
-  variables?: Record<string, unknown>;
 };
 
 export type MockContextMocks = {
@@ -18,9 +17,12 @@ export type MockContextMocks = {
   set: ReturnType<typeof vi.fn>;
 };
 
-export const createMockContext = (
-  opts: CreateMockContextOptions = {},
-): { ctx: Context; mocks: MockContextMocks } => {
+export type MockContext = {
+  ctx: Context;
+  mocks: MockContextMocks;
+};
+
+export const createMockContext = (opts: CreateMockContextOptions = {}): MockContext => {
   const loggerError = vi.fn();
   const loggerInfo = vi.fn();
   const loggerSet = vi.fn();
@@ -33,10 +35,7 @@ export const createMockContext = (
     warn: loggerWarn,
   };
 
-  const variables = new Map<string, unknown>([
-    ["log", evlogLogger],
-    ...Object.entries(opts.variables ?? {}),
-  ]);
+  const variables = new Map<string, unknown>([["log", evlogLogger]]);
 
   const mocks: MockContextMocks = {
     get: vi.fn((key: string) => variables.get(key)),
@@ -52,7 +51,7 @@ export const createMockContext = (
     }),
   };
 
-  // oxlint-disable-next-line no-unsafe-type-assertion -- Hono's Context is too large to mock structurally
+  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- Hono's Context is too large to mock structurally
   const ctx = {
     get: mocks.get,
     header: mocks.header,
