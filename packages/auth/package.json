@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./server": "./src/server.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./env-config": "./src/env-config.ts"
   },
   "scripts": {
     "lint": "oxlint src",
@@ -18,7 +19,7 @@
     "@repo/db": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/transactional": "workspace:*",
-    "better-auth": "^1.6.23"
+    "better-auth": "^1.6.27"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",

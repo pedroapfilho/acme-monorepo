@@ -16,32 +16,6 @@ export const envSchema = z.object({
   WEB_APP_URL: z.string().optional(),
 });
 
-const parseEnvList = (value: string | undefined): Array<string> => {
-  if (value === undefined || value === "") {
-    return [];
-  }
-  const result: Array<string> = [];
-  for (const entry of value.split(",")) {
-    const trimmed = entry.trim();
-    if (trimmed.length > 0) {
-      result.push(trimmed);
-    }
-  }
-  return result;
-};
-
-const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
-
-// Plain http://localhost:PORT origins won't match allowedHosts patterns.
-const LOOPBACK_TRUSTED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:4000",
-  "http://127.0.0.1:3000",
-  "http://127.0.0.1:3001",
-  "http://127.0.0.1:4000",
-];
-
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
@@ -51,13 +25,3 @@ if (!parsedEnv.success) {
 }
 
 export const env = parsedEnv.data;
-
-export const authAllowedHosts = [
-  ...LOCALHOST_ALLOWED_HOSTS,
-  ...parseEnvList(env.AUTH_ALLOWED_HOSTS),
-];
-
-export const authTrustedOrigins = [
-  ...LOOPBACK_TRUSTED_ORIGINS,
-  ...parseEnvList(env.TRUSTED_ORIGINS),
-];

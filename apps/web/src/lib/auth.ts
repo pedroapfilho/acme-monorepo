@@ -1,34 +1,9 @@
+import { envAuthConfig } from "@repo/auth/env-config";
 import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 import { nextCookies } from "better-auth/next-js";
 
 import { getEnv } from "./env";
-
-const parseEnvList = (value: string | undefined): Array<string> => {
-  if (value === undefined || value === "") {
-    return [];
-  }
-  const result: Array<string> = [];
-  for (const entry of value.split(",")) {
-    const trimmed = entry.trim();
-    if (trimmed.length > 0) {
-      result.push(trimmed);
-    }
-  }
-  return result;
-};
-
-const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
-
-// Plain http://localhost:PORT origins won't match allowedHosts patterns.
-const LOOPBACK_TRUSTED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:4000",
-  "http://127.0.0.1:3000",
-  "http://127.0.0.1:3001",
-  "http://127.0.0.1:4000",
-];
 
 type Auth = ReturnType<typeof createAuth>;
 let cachedAuth: Auth | undefined;
@@ -37,35 +12,15 @@ const getAuth = (): Auth => {
   if (!cachedAuth) {
     const env = getEnv();
     cachedAuth = createAuth({
-      allowedHosts: [...LOCALHOST_ALLOWED_HOSTS, ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS)],
+      ...envAuthConfig(),
       extraPlugins: [nextCookies()],
       fromEmail: env.FROM_EMAIL,
       prisma,
-      rateLimitEnabled:
-        process.env.NODE_ENV === "production" &&
-        (process.env.CI === undefined || process.env.CI === ""),
       resendApiKey: env.RESEND_API_KEY,
       secret: env.BETTER_AUTH_SECRET,
-      trustedOrigins: [...LOOPBACK_TRUSTED_ORIGINS, ...parseEnvList(process.env.TRUSTED_ORIGINS)],
-      useSecureCookies: process.env.WEB_APP_URL?.startsWith("https://") === true,
     });
   }
   return cachedAuth;
 };
 
-// Proxy for ergonomic imports: `import { auth } from "@/lib/auth"` and use like a singleton,
-// but defer instantiation until first use (so build-time env checks don't trip).
-// oxlint-disable no-unsafe-type-assertion -- the Proxy impersonates Auth by design; its target is an empty stand-in and property access is forwarded dynamically.
-const auth = new Proxy({} as Auth, {
-  get(_, prop): unknown {
-    const instance = getAuth();
-    const value = instance[prop as keyof Auth];
-    if (typeof value === "function") {
-      return (value as (...args: Array<unknown>) => unknown).bind(instance);
-    }
-    return value;
-  },
-});
-// oxlint-enable no-unsafe-type-assertion
-
-export { auth, getAuth };
+export { getAuth };

@@ -1,11 +1,8 @@
 import type { NextRequest } from "next/server";
 
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 
-const handler = async (request: NextRequest) => {
-  const response = await auth.handler(request);
-  return response;
-};
+const handler = (request: NextRequest) => getAuth().handler(request);
 
 export const GET = handler;
 export const POST = handler;

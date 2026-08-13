@@ -3,7 +3,7 @@ import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { auth } from "@/lib/auth";
+import { getAuth } from "@/lib/auth";
 import { log } from "@/lib/observability";
 
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
@@ -12,7 +12,7 @@ const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
 
 const getSessionOrNull = async (request: NextRequest) => {
   try {
-    return await auth.api.getSession({ headers: request.headers });
+    return await getAuth().api.getSession({ headers: request.headers });
   } catch (error) {
     log.error({
       error: error instanceof Error ? error.message : String(error),
