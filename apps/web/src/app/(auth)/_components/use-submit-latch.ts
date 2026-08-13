@@ -34,4 +34,3 @@ const useSubmitLatch = () => {
 };
 
 export { useSubmitLatch };
-export type { SubmitLatchOptions };
