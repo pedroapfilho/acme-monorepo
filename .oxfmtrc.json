@@ -33,7 +33,6 @@
     "node_modules/**",
     "build/**",
     "coverage/**",
-    "pnpm-lock.yaml",
-    ".github/workflows/pullfrog.yml"
+    "pnpm-lock.yaml"
   ]
 }
