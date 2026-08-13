@@ -67,6 +67,16 @@ describe("authMiddleware", () => {
     expect(calledHeaders?.get("Cookie")).toBe("session=abc123");
   });
 
+  it("forwards request metadata needed by auth plugins", async () => {
+    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as never);
+    const { ctx } = createMockContext({ headers: { "User-Agent": "Acme test" } });
+
+    await authMiddleware(ctx, next);
+
+    const calledHeaders = vi.mocked(auth.api.getSession).mock.calls[0]?.[0]?.headers;
+    expect(calledHeaders?.get("User-Agent")).toBe("Acme test");
+  });
+
   it("throws 401 when session is null", async () => {
     vi.mocked(auth.api.getSession).mockResolvedValue(null);
     const { ctx } = createMockContext();

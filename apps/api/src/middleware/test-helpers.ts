@@ -36,6 +36,7 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
   };
 
   const variables = new Map<string, unknown>([["log", evlogLogger]]);
+  const request = new Request("http://localhost/test", { headers: opts.headers });
 
   const mocks: MockContextMocks = {
     get: vi.fn((key: string) => variables.get(key)),
@@ -60,6 +61,7 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
       header: mocks.reqHeader,
       method: "GET",
       path: "/test",
+      raw: request,
       url: "http://localhost/test",
     },
     set: mocks.set,
