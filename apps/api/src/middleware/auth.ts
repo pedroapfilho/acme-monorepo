@@ -11,29 +11,11 @@ export type AuthVariables = {
   };
 };
 
-const extractAuthHeaders = (c: Context): Headers => {
-  const headers = new Headers();
-
-  const authHeader = c.req.header("Authorization");
-  if (authHeader !== undefined && authHeader !== "") {
-    headers.set("Authorization", authHeader);
-  }
-
-  const cookie = c.req.header("Cookie");
-  if (cookie !== undefined && cookie !== "") {
-    headers.set("Cookie", cookie);
-  }
-
-  return headers;
-};
-
 export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
   async (c: Context, next: Next) => {
-    const headers = extractAuthHeaders(c);
-
     let session;
     try {
-      session = await auth.api.getSession({ headers });
+      session = await auth.api.getSession({ headers: c.req.raw.headers });
     } catch (error) {
       c.get("log").error("authMiddleware: getSession threw; auth service unavailable", {
         error,
