@@ -1,42 +1,23 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  useFieldContext,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useRef, useState, useTransition } from "react";
+import { Suspense, use, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
 
+import { AuthFieldInput } from "../_components/auth-field-input";
+import { useSubmitLatch } from "../_components/use-submit-latch";
+
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
-};
-
-type FieldInputProps = {
-  autoComplete: string;
-  errors: Array<unknown>;
-  id: string;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  type: string;
-  value: string;
 };
 
 const SignUpLinkFallback = () => (
@@ -59,49 +40,12 @@ const SignUpLink = ({ searchParams }: Props) => {
   );
 };
 
-const LoginFieldInput = ({
-  autoComplete,
-  errors,
-  id,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  placeholder,
-  type,
-  value,
-}: FieldInputProps) => {
-  const { id: fieldId } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete={autoComplete}
-        disabled={isPending}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        placeholder={placeholder}
-        required
-        type={type}
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
-
 const LoginForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [showUnverifiedNotice, setShowUnverifiedNotice] = useState(false);
-  const isSubmitLatched = useRef(false);
+  const { release, run } = useSubmitLatch();
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
@@ -133,26 +77,15 @@ const LoginForm = ({ searchParams }: Props) => {
           setFormError(message);
           toast.error(message);
         } finally {
-          isSubmitLatched.current = false;
+          release();
         }
       });
     },
     validators: { onSubmit: loginSchema },
   });
 
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
+  const handleSubmit = () =>
+    run({ isPending, isValid: () => form.state.isValid, submit: form.handleSubmit });
 
   return (
     // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
@@ -174,7 +107,7 @@ const LoginForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <LoginFieldInput
+                <AuthFieldInput
                   autoComplete="email"
                   errors={field.state.meta.errors}
                   id="email"
@@ -206,7 +139,7 @@ const LoginForm = ({ searchParams }: Props) => {
                     Forgot your password?
                   </Link>
                 </div>
-                <LoginFieldInput
+                <AuthFieldInput
                   autoComplete="current-password"
                   errors={field.state.meta.errors}
                   id="password"

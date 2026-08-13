@@ -1,41 +1,23 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  useFieldContext,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useRef, useState, useTransition } from "react";
+import { Suspense, use, useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
 
+import { AuthFieldInput } from "../_components/auth-field-input";
+import { useSubmitLatch } from "../_components/use-submit-latch";
+
 type Props = {
   searchParams: Promise<{ from?: string }>;
-};
-
-type FieldInputProps = {
-  autoComplete: string;
-  errors: Array<unknown>;
-  id: string;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  type?: string;
-  value: string;
 };
 
 const SignInLinkFallback = () => (
@@ -58,47 +40,12 @@ const SignInLink = ({ searchParams }: Props) => {
   );
 };
 
-const RegisterFieldInput = ({
-  autoComplete,
-  errors,
-  id,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  type = "text",
-  value,
-}: FieldInputProps) => {
-  const { id: fieldId } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete={autoComplete}
-        disabled={isPending}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        required
-        type={type}
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
-
 const RegisterForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
-  const isSubmitLatched = useRef(false);
+  const { release, run } = useSubmitLatch();
 
   const form = useForm({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
@@ -133,26 +80,15 @@ const RegisterForm = ({ searchParams }: Props) => {
           setFormError(message);
           toast.error(message);
         } finally {
-          isSubmitLatched.current = false;
+          release();
         }
       });
     },
     validators: { onSubmit: registerSchema },
   });
 
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
+  const handleSubmit = () =>
+    run({ isPending, isValid: () => form.state.isValid, submit: form.handleSubmit });
 
   if (sentToEmail !== null) {
     return (
@@ -186,7 +122,7 @@ const RegisterForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <RegisterFieldInput
+                <AuthFieldInput
                   autoComplete="name"
                   errors={field.state.meta.errors}
                   id="name"
@@ -208,7 +144,7 @@ const RegisterForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <RegisterFieldInput
+                <AuthFieldInput
                   autoComplete="email"
                   errors={field.state.meta.errors}
                   id="email"
@@ -232,7 +168,7 @@ const RegisterForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <RegisterFieldInput
+                  <AuthFieldInput
                     autoComplete="new-password"
                     errors={field.state.meta.errors}
                     id="password"
@@ -255,7 +191,7 @@ const RegisterForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                  <RegisterFieldInput
+                  <AuthFieldInput
                     autoComplete="new-password"
                     errors={field.state.meta.errors}
                     id="confirmPassword"

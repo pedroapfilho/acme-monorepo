@@ -1,72 +1,24 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  useFieldContext,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 
-type EmailFieldInputProps = {
-  errors: Array<unknown>;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  value: string;
-};
-
-const EmailFieldInput = ({
-  errors,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  value,
-}: EmailFieldInputProps) => {
-  const { id } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${id}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete="email"
-        disabled={isPending}
-        id="email"
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        placeholder="m@example.com"
-        required
-        type="email"
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
+import { AuthFieldInput } from "../_components/auth-field-input";
+import { useSubmitLatch } from "../_components/use-submit-latch";
 
 const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
-  const isSubmitLatched = useRef(false);
+  const { release, run } = useSubmitLatch();
 
   const form = useForm({
     defaultValues: { email: "" },
@@ -91,26 +43,15 @@ const RecoverForm = () => {
           setFormError(message);
           toast.error(message);
         } finally {
-          isSubmitLatched.current = false;
+          release();
         }
       });
     },
     validators: { onSubmit: recoverSchema },
   });
 
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
+  const handleSubmit = () =>
+    run({ isPending, isValid: () => form.state.isValid, submit: form.handleSubmit });
 
   if (submittedEmail !== null) {
     return (
@@ -151,13 +92,17 @@ const RecoverForm = () => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <EmailFieldInput
+                <AuthFieldInput
+                  autoComplete="email"
                   errors={field.state.meta.errors}
+                  id="email"
                   isInvalid={isInvalid}
                   isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
                   onChange={field.handleChange}
+                  placeholder="m@example.com"
+                  type="email"
                   value={field.state.value}
                 />
               </Field>

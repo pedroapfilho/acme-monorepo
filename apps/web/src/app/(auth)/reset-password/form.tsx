@@ -1,80 +1,29 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  useFieldContext,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
 
+import { AuthFieldInput } from "../_components/auth-field-input";
+import { useSubmitLatch } from "../_components/use-submit-latch";
+
 type Props = {
   searchParams: Promise<{ token?: string }>;
-};
-
-type PasswordFieldInputProps = {
-  autoComplete: string;
-  errors: Array<unknown>;
-  id: string;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  value: string;
-};
-
-const PasswordFieldInput = ({
-  autoComplete,
-  errors,
-  id,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  value,
-}: PasswordFieldInputProps) => {
-  const { id: fieldId } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete={autoComplete}
-        disabled={isPending}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        required
-        type="password"
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
 };
 
 const ResetPasswordForm = ({ searchParams }: Props) => {
   const { push } = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
-  const isSubmitLatched = useRef(false);
+  const { release, run } = useSubmitLatch();
 
   const form = useForm({
     defaultValues: { confirmPassword: "", password: "" },
@@ -106,26 +55,15 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
           setFormError(message);
           toast.error(message);
         } finally {
-          isSubmitLatched.current = false;
+          release();
         }
       });
     },
     validators: { onSubmit: resetPasswordSchema },
   });
 
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
+  const handleSubmit = () =>
+    run({ isPending, isValid: () => form.state.isValid, submit: form.handleSubmit });
 
   return (
     // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
@@ -148,7 +86,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="password">New password</FieldLabel>
-                  <PasswordFieldInput
+                  <AuthFieldInput
                     autoComplete="new-password"
                     errors={field.state.meta.errors}
                     id="password"
@@ -157,6 +95,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
                     name={field.name}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
+                    type="password"
                     value={field.state.value}
                   />
                 </Field>
@@ -170,7 +109,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-                  <PasswordFieldInput
+                  <AuthFieldInput
                     autoComplete="new-password"
                     errors={field.state.meta.errors}
                     id="confirmPassword"
@@ -179,6 +118,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
                     name={field.name}
                     onBlur={field.handleBlur}
                     onChange={field.handleChange}
+                    type="password"
                     value={field.state.value}
                   />
                 </Field>
