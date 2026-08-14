@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 
 import { cn } from "@repo/ui/lib/utils";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Geist as geistFont } from "next/font/google";
 
 import { AnalyticsWrapper } from "@/components/analytics";
 import Footer from "@/components/footer";
@@ -51,7 +51,7 @@ const metadata = {
   },
 } satisfies Metadata;
 
-const inter = Inter({
+const geist = geistFont({
   display: "swap",
   subsets: ["latin"],
   variable: "--font-sans",
@@ -59,11 +59,11 @@ const inter = Inter({
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html className="scroll-smooth" lang="en-US" suppressHydrationWarning>
+    <html lang="en-US" suppressHydrationWarning>
       <body
         className={cn(
           "relative flex min-h-dvh flex-col font-sans text-foreground antialiased",
-          inter.variable,
+          geist.variable,
         )}
       >
         <a

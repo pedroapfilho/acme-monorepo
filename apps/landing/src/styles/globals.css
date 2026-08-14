@@ -1,1 +1,14 @@
 @import "@repo/ui/globals.css";
+
+.blueprint-grid {
+  background-color: var(--background);
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--border) 48%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--border) 48%, transparent) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
