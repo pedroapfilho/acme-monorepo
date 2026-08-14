@@ -2,7 +2,7 @@ import "@/styles/globals.css";
 
 import { cn } from "@repo/ui/lib/utils";
 import type { Metadata, Viewport } from "next";
-import { Geist as geistFont } from "next/font/google";
+import { Geist as geistFont, Geist_Mono as geistMonoFont } from "next/font/google";
 
 import { AnalyticsWrapper } from "@/components/analytics";
 import Footer from "@/components/footer";
@@ -57,6 +57,12 @@ const geist = geistFont({
   variable: "--font-sans",
 });
 
+const geistMono = geistMonoFont({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
+
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en-US" suppressHydrationWarning>
@@ -64,6 +70,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         className={cn(
           "relative flex min-h-dvh flex-col font-sans text-foreground antialiased",
           geist.variable,
+          geistMono.variable,
         )}
       >
         <a
