@@ -10,7 +10,8 @@ const metadata: Metadata = {
   title: { absolute: "Acme: Start with the foundation already solved" },
 };
 
-const instant = true;
+/** @public Next.js App Router consumes this route config through the module loader. */
+export const instant = true;
 
 const STACK = ["Next.js 16", "Better Auth", "Prisma", "shadcn/ui", "Vitest", "Playwright"];
 
@@ -170,6 +171,6 @@ const Page = () => {
   );
 };
 
-export { instant, metadata };
+export { metadata };
 
 export default Page;
