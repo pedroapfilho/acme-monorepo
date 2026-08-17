@@ -54,4 +54,4 @@ const Footer = async () => {
   );
 };
 
-export default Footer;
+export { Footer };
