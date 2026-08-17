@@ -10,33 +10,35 @@ declare module "hono" {
   }
 }
 
+const apiDocumentMetadata = {
+  info: {
+    contact: {
+      email: "support@acme.com",
+      name: "API Support",
+    },
+    description: "Acme backend API.",
+    title: "Acme API",
+    version: "1.0.0",
+  },
+  servers: [
+    { description: "Local development server", url: "http://localhost:4000" },
+    { description: "Production server", url: "https://api.acme.com" },
+  ],
+  tags: [
+    { description: "Service health and readiness", name: "System" },
+    { description: "User profile and management", name: "Users" },
+  ],
+};
+
 const createOpenAPIApp = () => {
   const app = new OpenAPIHono<{ Variables: EvlogVariables["Variables"] }>();
 
-  app.doc("/openapi.json", {
-    info: {
-      contact: {
-        email: "support@acme.com",
-        name: "API Support",
-      },
-      description: "Acme backend API.",
-      title: "Acme API",
-      version: "1.0.0",
-    },
-    openapi: "3.0.0",
-    servers: [
-      { description: "Local development server", url: "http://localhost:4000" },
-      { description: "Production server", url: "https://api.acme.com" },
-    ],
-    tags: [
-      { description: "Service health and readiness", name: "System" },
-      { description: "User profile and management", name: "Users" },
-    ],
-  });
+  // 3.0.0, not 3.1.0: external generators still reject 3.1's nullable/examples encoding.
+  app.doc("/openapi.json", { ...apiDocumentMetadata, openapi: "3.0.0" });
 
   app.get("/docs", Scalar({ url: "/openapi.json" }));
 
   return app;
 };
 
-export { createOpenAPIApp };
+export { apiDocumentMetadata, createOpenAPIApp };

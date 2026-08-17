@@ -17,14 +17,7 @@ const errorSchema = z
   })
   .openapi("Error");
 
-type ErrorBody = {
-  error: {
-    code: string;
-    details?: Array<{ field: string; message: string }>;
-    message: string;
-    stack?: string;
-  };
-};
+type ErrorBody = z.infer<typeof errorSchema>;
 
 class AppError extends Error {
   public readonly code: string;

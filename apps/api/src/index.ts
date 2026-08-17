@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import { serve } from "@hono/node-server";
+import { parseEnvList } from "@repo/auth/env-config";
 import { prisma } from "@repo/db";
 import { createIdentify } from "@repo/observability/auth";
 import { honoEvlog, initApiLogger, log } from "@repo/observability/hono";
@@ -11,7 +12,7 @@ import { requestId } from "hono/request-id";
 
 import { auth } from "./lib/auth";
 import { env } from "./lib/env";
-import { createOpenAPIApp } from "./lib/openapi";
+import { apiDocumentMetadata, createOpenAPIApp } from "./lib/openapi";
 import { errorHandler, notFound } from "./middleware/error-handler";
 import {
   apiRateLimit,
@@ -43,7 +44,7 @@ app.use(
     allowHeaders: ["Content-Type", "Authorization", "X-Request-Id"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     credentials: true,
-    origin: env.CORS_ORIGINS.split(","),
+    origin: parseEnvList(env.CORS_ORIGINS),
   }),
 );
 
@@ -54,7 +55,7 @@ app.route("/", healthRoutes);
 app.route("/api/v1/users", v1UserRoutes);
 
 const openApiContent = app.getOpenAPI31Document({
-  info: { title: "Acme API", version: "v1" },
+  ...apiDocumentMetadata,
   openapi: "3.1.0",
 });
 

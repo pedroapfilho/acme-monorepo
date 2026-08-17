@@ -7,7 +7,6 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  useFieldContext,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
@@ -15,72 +14,26 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
+import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
   searchParams: Promise<{ token?: string }>;
 };
 
-type PasswordFieldInputProps = {
-  autoComplete: string;
-  errors: Array<unknown>;
-  id: string;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  value: string;
-};
-
-const PasswordFieldInput = ({
-  autoComplete,
-  errors,
-  id,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  value,
-}: PasswordFieldInputProps) => {
-  const { id: fieldId } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete={autoComplete}
-        disabled={isPending}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        required
-        type="password"
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
-
 const ResetPasswordForm = ({ searchParams }: Props) => {
   const { push } = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, run, submit } = useAuthSubmit();
   const [formError, setFormError] = useState<string | null>(null);
-  const isSubmitLatched = useRef(false);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", password: "" },
     onSubmit: ({ value }) => {
       setFormError(null);
-      startTransition(async () => {
+      run(async () => {
         try {
           const { token = null } = await searchParams;
           if (token === null || token === "") {
@@ -105,27 +58,11 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
             error instanceof Error ? error.message : "An error occurred. Please try again.";
           setFormError(message);
           toast.error(message);
-        } finally {
-          isSubmitLatched.current = false;
         }
       });
     },
     validators: { onSubmit: resetPasswordSchema },
   });
-
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
 
   return (
     // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
@@ -134,7 +71,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void handleSubmit();
+        void submit(form);
       }}
     >
       <div aria-atomic="true" aria-live="polite" className="sr-only">
@@ -148,17 +85,21 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="password">New password</FieldLabel>
-                  <PasswordFieldInput
+                  <Input
+                    aria-invalid={isInvalid}
                     autoComplete="new-password"
-                    errors={field.state.meta.errors}
+                    disabled={isPending}
                     id="password"
-                    isInvalid={isInvalid}
-                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={field.handleChange}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    required
+                    type="password"
                     value={field.state.value}
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -170,17 +111,21 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-                  <PasswordFieldInput
+                  <Input
+                    aria-invalid={isInvalid}
                     autoComplete="new-password"
-                    errors={field.state.meta.errors}
+                    disabled={isPending}
                     id="confirmPassword"
-                    isInvalid={isInvalid}
-                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={field.handleChange}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    required
+                    type="password"
                     value={field.state.value}
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}

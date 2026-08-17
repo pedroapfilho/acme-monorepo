@@ -7,7 +7,6 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  useFieldContext,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
@@ -15,27 +14,15 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useRef, useState, useTransition } from "react";
+import { Suspense, use, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
+import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
   searchParams: Promise<{ from?: string }>;
-};
-
-type FieldInputProps = {
-  autoComplete: string;
-  errors: Array<unknown>;
-  id: string;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  type?: string;
-  value: string;
 };
 
 const SignInLinkFallback = () => (
@@ -58,53 +45,17 @@ const SignInLink = ({ searchParams }: Props) => {
   );
 };
 
-const RegisterFieldInput = ({
-  autoComplete,
-  errors,
-  id,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  type = "text",
-  value,
-}: FieldInputProps) => {
-  const { id: fieldId } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete={autoComplete}
-        disabled={isPending}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        required
-        type={type}
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
-
 const RegisterForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, run, submit } = useAuthSubmit();
   const [formError, setFormError] = useState<string | null>(null);
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
-  const isSubmitLatched = useRef(false);
 
   const form = useForm({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
     onSubmit: ({ value }) => {
       setFormError(null);
-      startTransition(async () => {
+      run(async () => {
         try {
           const { from } = await searchParams;
           const safeTo = safeRedirectPath(from);
@@ -132,27 +83,11 @@ const RegisterForm = ({ searchParams }: Props) => {
             error instanceof Error ? error.message : "An error occurred. Please try again.";
           setFormError(message);
           toast.error(message);
-        } finally {
-          isSubmitLatched.current = false;
         }
       });
     },
     validators: { onSubmit: registerSchema },
   });
-
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
 
   if (sentToEmail !== null) {
     return (
@@ -173,7 +108,7 @@ const RegisterForm = ({ searchParams }: Props) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void handleSubmit();
+        void submit(form);
       }}
     >
       <div aria-atomic="true" aria-live="polite" className="sr-only">
@@ -186,17 +121,20 @@ const RegisterForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <RegisterFieldInput
+                <Input
+                  aria-invalid={isInvalid}
                   autoComplete="name"
-                  errors={field.state.meta.errors}
+                  disabled={isPending}
                   id="name"
-                  isInvalid={isInvalid}
-                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={field.handleChange}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
+                  required
                   value={field.state.value}
                 />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
@@ -208,18 +146,21 @@ const RegisterForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <RegisterFieldInput
+                <Input
+                  aria-invalid={isInvalid}
                   autoComplete="email"
-                  errors={field.state.meta.errors}
+                  disabled={isPending}
                   id="email"
-                  isInvalid={isInvalid}
-                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={field.handleChange}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
+                  required
                   type="email"
                   value={field.state.value}
                 />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
@@ -232,18 +173,21 @@ const RegisterForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <RegisterFieldInput
+                  <Input
+                    aria-invalid={isInvalid}
                     autoComplete="new-password"
-                    errors={field.state.meta.errors}
+                    disabled={isPending}
                     id="password"
-                    isInvalid={isInvalid}
-                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={field.handleChange}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    required
                     type="password"
                     value={field.state.value}
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -255,18 +199,21 @@ const RegisterForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                  <RegisterFieldInput
+                  <Input
+                    aria-invalid={isInvalid}
                     autoComplete="new-password"
-                    errors={field.state.meta.errors}
+                    disabled={isPending}
                     id="confirmPassword"
-                    isInvalid={isInvalid}
-                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={field.handleChange}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    required
                     type="password"
                     value={field.state.value}
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}

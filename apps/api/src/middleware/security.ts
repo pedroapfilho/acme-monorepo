@@ -1,12 +1,8 @@
 import type { Context, Next } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { secureHeaders } from "hono/secure-headers";
-import { z } from "zod";
 
 import { errorBody } from "@/lib/api-error";
-
-const remoteAddrEnvSchema = z.object({ remoteAddr: z.string().min(1) });
-const userVariableSchema = z.object({ id: z.string().min(1) });
 
 const getClientIp = (c: Context): string => {
   const forwarded = c.req.header("x-forwarded-for");
@@ -17,9 +13,10 @@ const getClientIp = (c: Context): string => {
   if (realIp !== undefined && realIp !== "") {
     return realIp;
   }
-  const env = remoteAddrEnvSchema.safeParse(c.env);
-  return env.success ? env.data.remoteAddr : "unknown";
+  return "unknown";
 };
+
+export { getClientIp };
 
 export const securityHeaders = secureHeaders({
   contentSecurityPolicy: {
@@ -54,12 +51,14 @@ export const standardRateLimit = rateLimiter({
       429,
     );
   },
-  keyGenerator: (c: Context) => getClientIp(c),
+  keyGenerator: getClientIp,
   limit: 100,
   standardHeaders: "draft-6",
   windowMs: 15 * 60 * 1000,
 });
 
+// Keyed by IP, not by user: both limiters are registered app-level in index.ts and run before the
+// route-level authMiddleware, so no user is on the context yet when the key is computed.
 export const apiRateLimit = rateLimiter({
   handler: (c: Context) => {
     c.res = c.json(
@@ -67,10 +66,7 @@ export const apiRateLimit = rateLimiter({
       429,
     );
   },
-  keyGenerator: (c: Context) => {
-    const user = userVariableSchema.safeParse(c.get("user"));
-    return user.success ? `user:${user.data.id}` : `ip:${getClientIp(c)}`;
-  },
+  keyGenerator: getClientIp,
   limit: 30,
   standardHeaders: "draft-6",
   windowMs: 1 * 60 * 1000,

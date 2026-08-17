@@ -27,7 +27,7 @@ describe("sendEmail from validation", () => {
       to: "delivered+test@resend.dev",
     });
 
-    expect(result.success).toBe(true);
+    expect(result.ok).toBe(true);
     expect(sendMock).toHaveBeenCalledOnce();
     expect(sendMock.mock.calls[0][0]).toMatchObject({
       from: "Acme <noreply@acme.com>",
@@ -43,32 +43,49 @@ describe("sendEmail from validation", () => {
       to: "delivered+test@resend.dev",
     });
 
-    expect(result.success).toBe(true);
+    expect(result.ok).toBe(true);
   });
 
   it("rejects an empty from instead of substituting a default sender", async () => {
-    const result = await sendEmail({
-      apiKey: "re_test",
-      from: "",
-      subject: "x",
-      template,
-      to: "delivered+test@resend.dev",
-    });
+    await expect(
+      sendEmail({
+        apiKey: "re_test",
+        from: "",
+        subject: "x",
+        template,
+        to: "delivered+test@resend.dev",
+      }),
+    ).rejects.toThrow();
 
-    expect(result.success).toBe(false);
     expect(sendMock).not.toHaveBeenCalled();
   });
 
   it("rejects from values that are neither bare email nor wrapped form", async () => {
+    await expect(
+      sendEmail({
+        apiKey: "re_test",
+        from: "not-an-email",
+        subject: "x",
+        template,
+        to: "delivered+test@resend.dev",
+      }),
+    ).rejects.toThrow();
+
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it("returns a failure result when Resend rejects the send", async () => {
+    sendMock.mockResolvedValue({ data: null, error: { message: "quota", name: "rate_limit" } });
+
     const result = await sendEmail({
       apiKey: "re_test",
-      from: "not-an-email",
+      from: "noreply@acme.com",
       subject: "x",
       template,
       to: "delivered+test@resend.dev",
     });
 
-    expect(result.success).toBe(false);
-    expect(sendMock).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ ok: false });
+    expect(result.ok ? "" : result.error).toContain("rate_limit");
   });
 });

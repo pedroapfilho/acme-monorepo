@@ -8,7 +8,9 @@ import { log } from "@/lib/observability";
 
 const protectedRoutes = ["/dashboard", "/profile", "/settings"];
 
-const authRoutes = ["/login", "/register", "/recover", "/reset-password"];
+// /reset-password is deliberately absent: bouncing an authenticated visitor to the dashboard would
+// make a reset link unusable for anyone still holding a session.
+const authRoutes = ["/login", "/register", "/recover"];
 
 const getSessionOrNull = async (request: NextRequest) => {
   try {

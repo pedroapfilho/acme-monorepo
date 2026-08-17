@@ -46,7 +46,7 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
     loggerInfo,
     loggerSet,
     loggerWarn,
-    reqHeader: vi.fn((name: string) => opts.headers?.[name]),
+    reqHeader: vi.fn((name: string) => request.headers.get(name) ?? undefined),
     set: vi.fn((key: string, value: unknown) => {
       variables.set(key, value);
     }),
@@ -65,7 +65,6 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
       url: "http://localhost/test",
     },
     set: mocks.set,
-    var: { log: evlogLogger },
   } as unknown as Context;
 
   return { ctx, mocks };

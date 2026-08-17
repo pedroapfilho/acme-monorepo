@@ -1,6 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import { errorSchema } from "@/lib/api-error";
+import type { UpdateUserInput } from "@/lib/users";
 import { deleteUser, findUserById, updateUser } from "@/lib/users";
 import type { AuthVariables } from "@/middleware/auth";
 import { authMiddleware } from "@/middleware/auth";
@@ -109,7 +110,7 @@ const updateMeRoute = createRoute({
 
 v1UserRoutes.openapi(updateMeRoute, async (c) => {
   const user = c.get("user");
-  const data = c.req.valid("json");
+  const data: UpdateUserInput = c.req.valid("json");
   const updatedUser = await updateUser(user.id, data);
   return c.json({ data: serializeUser(updatedUser) }, 200);
 });

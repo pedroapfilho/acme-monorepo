@@ -7,7 +7,6 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  useFieldContext,
 } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
@@ -15,28 +14,15 @@ import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useRef, useState, useTransition } from "react";
+import { Suspense, use, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
+import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
-};
-
-type FieldInputProps = {
-  autoComplete: string;
-  errors: Array<unknown>;
-  id: string;
-  isInvalid: boolean;
-  isPending: boolean;
-  name: string;
-  onBlur: () => void;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  type: string;
-  value: string;
 };
 
 const SignUpLinkFallback = () => (
@@ -59,56 +45,18 @@ const SignUpLink = ({ searchParams }: Props) => {
   );
 };
 
-const LoginFieldInput = ({
-  autoComplete,
-  errors,
-  id,
-  isInvalid,
-  isPending,
-  name,
-  onBlur,
-  onChange,
-  placeholder,
-  type,
-  value,
-}: FieldInputProps) => {
-  const { id: fieldId } = useFieldContext();
-  return (
-    <>
-      <Input
-        aria-describedby={isInvalid ? `${fieldId}-error` : undefined}
-        aria-invalid={isInvalid}
-        autoComplete={autoComplete}
-        disabled={isPending}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        placeholder={placeholder}
-        required
-        type={type}
-        value={value}
-      />
-      {isInvalid && <FieldError errors={errors} />}
-    </>
-  );
-};
-
 const LoginForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, run, submit } = useAuthSubmit();
   const [formError, setFormError] = useState<string | null>(null);
   const [showUnverifiedNotice, setShowUnverifiedNotice] = useState(false);
-  const isSubmitLatched = useRef(false);
 
   const form = useForm({
     defaultValues: { email: "", password: "" },
     onSubmit: ({ value }) => {
       setFormError(null);
       setShowUnverifiedNotice(false);
-      startTransition(async () => {
+      run(async () => {
         try {
           const { from } = await searchParams;
           const result = await authClient.signIn.email({
@@ -132,27 +80,11 @@ const LoginForm = ({ searchParams }: Props) => {
             error instanceof Error ? error.message : "An error occurred. Please try again.";
           setFormError(message);
           toast.error(message);
-        } finally {
-          isSubmitLatched.current = false;
         }
       });
     },
     validators: { onSubmit: loginSchema },
   });
-
-  const handleSubmit = async () => {
-    if (isPending || isSubmitLatched.current) {
-      return;
-    }
-    isSubmitLatched.current = true;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!form.state.isValid) {
-        isSubmitLatched.current = false;
-      }
-    }
-  };
 
   return (
     // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
@@ -161,7 +93,7 @@ const LoginForm = ({ searchParams }: Props) => {
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        void handleSubmit();
+        void submit(form);
       }}
     >
       <div aria-atomic="true" aria-live="polite" className="sr-only">
@@ -174,19 +106,22 @@ const LoginForm = ({ searchParams }: Props) => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <LoginFieldInput
+                <Input
+                  aria-invalid={isInvalid}
                   autoComplete="email"
-                  errors={field.state.meta.errors}
+                  disabled={isPending}
                   id="email"
-                  isInvalid={isInvalid}
-                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={field.handleChange}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
                   placeholder="m@example.com"
+                  required
                   type="email"
                   value={field.state.value}
                 />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}
@@ -206,18 +141,21 @@ const LoginForm = ({ searchParams }: Props) => {
                     Forgot your password?
                   </Link>
                 </div>
-                <LoginFieldInput
+                <Input
+                  aria-invalid={isInvalid}
                   autoComplete="current-password"
-                  errors={field.state.meta.errors}
+                  disabled={isPending}
                   id="password"
-                  isInvalid={isInvalid}
-                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={field.handleChange}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
+                  required
                   type="password"
                   value={field.state.value}
                 />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}

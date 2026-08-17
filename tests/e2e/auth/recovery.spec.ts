@@ -1,14 +1,15 @@
 import { test, expect } from "../fixtures/auth.fixture";
+import { TEST_USER } from "../fixtures/test-user";
 
 test.describe("Password Recovery", () => {
   test("submits recovery form and shows inline success state", async ({ page, recoverPage }) => {
     await page.context().clearCookies();
 
     await recoverPage.goto();
-    await recoverPage.requestReset("e2e-test@acme.localhost");
+    await recoverPage.requestReset(TEST_USER.email);
 
     await expect(page.getByText("Check your email")).toBeVisible();
-    await expect(page.getByText("e2e-test@acme.localhost")).toBeVisible();
+    await expect(page.getByText(TEST_USER.email)).toBeVisible();
     expect(page.url()).toContain("/recover");
   });
 
