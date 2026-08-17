@@ -4,9 +4,9 @@ import { cn } from "@repo/ui/lib/utils";
 import type { Metadata, Viewport } from "next";
 import { Geist as geistFont, Geist_Mono as geistMonoFont } from "next/font/google";
 
-import { AnalyticsWrapper } from "@/components/analytics";
-import Footer from "@/components/footer";
-import Header from "@/components/header";
+import { Analytics } from "@/components/analytics";
+import { Footer } from "@/components/footer";
+import { Header } from "@/components/header";
 
 const SITE_NAME = "Acme";
 
@@ -85,7 +85,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </main>
         <Footer />
 
-        <AnalyticsWrapper />
+        <Analytics />
       </body>
     </html>
   );
