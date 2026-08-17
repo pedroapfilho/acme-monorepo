@@ -68,7 +68,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     <html lang="en-US" suppressHydrationWarning>
       <body
         className={cn(
-          "relative flex min-h-dvh flex-col font-sans text-foreground antialiased",
+          "relative isolate flex min-h-dvh flex-col font-sans text-foreground antialiased",
           geist.variable,
           geistMono.variable,
         )}
