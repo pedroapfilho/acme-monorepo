@@ -1,14 +1,20 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@repo/ui/components/field";
+import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-import { AuthFieldInput } from "@/components/auth-field-input";
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 import { useAuthSubmit } from "@/lib/use-auth-submit";
@@ -85,19 +91,22 @@ const RecoverForm = () => {
             return (
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <AuthFieldInput
+                <Input
+                  aria-invalid={isInvalid}
                   autoComplete="email"
-                  errors={field.state.meta.errors}
+                  disabled={isPending}
                   id="email"
-                  isInvalid={isInvalid}
-                  isPending={isPending}
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onChange={field.handleChange}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                  }}
                   placeholder="m@example.com"
+                  required
                   type="email"
                   value={field.state.value}
                 />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
             );
           }}

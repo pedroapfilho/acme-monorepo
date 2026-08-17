@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@repo/ui/components/field";
+import { Input } from "@repo/ui/components/input";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
@@ -9,7 +16,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { AuthFieldInput } from "@/components/auth-field-input";
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
 import { useAuthSubmit } from "@/lib/use-auth-submit";
@@ -79,18 +85,21 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="password">New password</FieldLabel>
-                  <AuthFieldInput
+                  <Input
+                    aria-invalid={isInvalid}
                     autoComplete="new-password"
-                    errors={field.state.meta.errors}
+                    disabled={isPending}
                     id="password"
-                    isInvalid={isInvalid}
-                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={field.handleChange}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    required
                     type="password"
                     value={field.state.value}
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
@@ -102,18 +111,21 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
               return (
                 <Field data-invalid={isInvalid || undefined}>
                   <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-                  <AuthFieldInput
+                  <Input
+                    aria-invalid={isInvalid}
                     autoComplete="new-password"
-                    errors={field.state.meta.errors}
+                    disabled={isPending}
                     id="confirmPassword"
-                    isInvalid={isInvalid}
-                    isPending={isPending}
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onChange={field.handleChange}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                    }}
+                    required
                     type="password"
                     value={field.state.value}
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
