@@ -2,12 +2,11 @@ import type { Context } from "hono";
 
 import { errorBody, resolveError } from "@/lib/api-error";
 import { env } from "@/lib/env";
+import { getClientIp } from "@/middleware/security";
 
 const errorHandler = (err: Error, c: Context) => {
-  const forwardedFor = c.req.header("x-forwarded-for");
   c.get("log").error(err, {
-    ip:
-      forwardedFor !== undefined && forwardedFor !== "" ? forwardedFor : c.req.header("x-real-ip"),
+    ip: getClientIp(c),
     method: c.req.method,
     url: c.req.url,
     userAgent: c.req.header("user-agent"),

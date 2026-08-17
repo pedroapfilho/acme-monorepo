@@ -40,14 +40,23 @@ const createAuth = (config: AuthConfig) => {
       ? { apiKey: resendApiKey, from: fromEmail }
       : null;
 
-  const deliver = async (email: TransactionalEmail, failureMessage: string) => {
+  // "log" is load-bearing for onExistingUserSignUp: Better Auth runs that hook on a background path
+  // where a throw escapes into the sign-up response instead of failing the send.
+  const deliver = async (
+    email: TransactionalEmail,
+    onFailure: { message: string; mode: "log" | "throw" },
+  ) => {
     if (!mailer) {
       return;
     }
     const result = await sendTransactionalEmail(email, mailer);
-    if (!result.success) {
-      throw new Error(`${failureMessage}: ${result.error}`);
+    if (result.ok) {
+      return;
     }
+    if (onFailure.mode === "throw") {
+      throw new Error(`${onFailure.message}: ${result.error}`);
+    }
+    log.error({ error: result.error, message: onFailure.message });
   };
 
   return betterAuth({
@@ -83,28 +92,20 @@ const createAuth = (config: AuthConfig) => {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
-      onExistingUserSignUp: mailer
-        ? async ({ user }, request) => {
-            const origin = request?.headers.get("origin") ?? "";
-            const result = await sendTransactionalEmail(
-              {
-                resetPasswordUrl: `${origin}/recover`,
-                signInUrl: `${origin}/login`,
-                type: "sign-up-attempt",
-                userEmail: user.email,
-                userId: user.id,
-                username: user.name,
-              },
-              mailer,
-            );
-            if (!result.success) {
-              log.error({
-                error: result.error,
-                message: "Auth: failed to send sign-up attempt email",
-              });
-            }
-          }
-        : undefined,
+      onExistingUserSignUp: async ({ user }, request) => {
+        const origin = request?.headers.get("origin") ?? "";
+        await deliver(
+          {
+            resetPasswordUrl: `${origin}/recover`,
+            signInUrl: `${origin}/login`,
+            type: "sign-up-attempt",
+            userEmail: user.email,
+            userId: user.id,
+            username: user.name,
+          },
+          { message: "Auth: failed to send sign-up attempt email", mode: "log" },
+        );
+      },
       requireEmailVerification: Boolean(mailer),
       sendResetPassword: async ({ url, user }) => {
         await deliver(
@@ -115,7 +116,7 @@ const createAuth = (config: AuthConfig) => {
             userId: user.id,
             username: user.name,
           },
-          "Failed to send password reset email",
+          { message: "Failed to send password reset email", mode: "throw" },
         );
       },
     },
@@ -133,7 +134,7 @@ const createAuth = (config: AuthConfig) => {
             username: user.name,
             verificationUrl: url,
           },
-          "Failed to send verification email",
+          { message: "Failed to send verification email", mode: "throw" },
         );
       },
     },
@@ -179,7 +180,7 @@ const createAuth = (config: AuthConfig) => {
               userId: user.id,
               username: user.name,
             },
-            "Failed to send change-email confirmation",
+            { message: "Failed to send change-email confirmation", mode: "throw" },
           );
         },
       },

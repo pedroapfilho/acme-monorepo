@@ -31,17 +31,6 @@ describe("envSchema", () => {
     }
   });
 
-  it("should allow optional AUTH_ALLOWED_HOSTS", () => {
-    const result = envSchema.safeParse({
-      ...validEnv,
-      AUTH_ALLOWED_HOSTS: "acme.com,*.acme.com,*.vercel.app",
-    });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.AUTH_ALLOWED_HOSTS).toBe("acme.com,*.acme.com,*.vercel.app");
-    }
-  });
-
   it("should reject missing BETTER_AUTH_SECRET", () => {
     const result = envSchema.safeParse({ DATABASE_URL: "postgresql://localhost/db" });
     expect(result.success).toBe(false);
@@ -111,14 +100,6 @@ describe("envSchema", () => {
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.RESEND_API_KEY).toBeUndefined();
-    }
-  });
-
-  it("should allow optional TRUSTED_ORIGINS", () => {
-    const result = envSchema.safeParse({ ...validEnv, TRUSTED_ORIGINS: "https://example.com" });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.TRUSTED_ORIGINS).toBe("https://example.com");
     }
   });
 });

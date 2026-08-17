@@ -27,7 +27,12 @@ export const findUserById = async (id: string) => {
   return user;
 };
 
-export const updateUser = async (id: string, data: Prisma.UserUpdateInput) => {
+export type UpdateUserInput = {
+  name?: string;
+  username?: string;
+};
+
+export const updateUser = async (id: string, data: UpdateUserInput) => {
   try {
     return await prisma.user.update({
       data,

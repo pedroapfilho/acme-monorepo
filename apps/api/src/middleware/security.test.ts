@@ -46,6 +46,18 @@ describe("requestSizeLimit", () => {
     expect(next).toHaveBeenCalled();
   });
 
+  it("reads content-length regardless of the header casing the client sent", async () => {
+    const middleware = requestSizeLimit(1024);
+    const { ctx, mocks } = createMockContext({ headers: { "Content-Length": "2048" } });
+
+    await middleware(ctx, next);
+
+    expect(mocks.json).toHaveBeenCalledWith(
+      { error: { code: "PAYLOAD_TOO_LARGE", message: "Request entity too large" } },
+      413,
+    );
+  });
+
   it("rejects when exceeding default 10MB limit", async () => {
     const middleware = requestSizeLimit();
     const { ctx, mocks } = createMockContext({ headers: { "content-length": "20000000" } });

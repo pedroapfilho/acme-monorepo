@@ -9,16 +9,27 @@ vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: vi.fn() } },
 }));
 
+import { apiDocumentMetadata } from "@/lib/openapi";
+
 import { v1UserRoutes } from "./users";
 
-describe("OpenAPI document: Error schema", () => {
+const buildDocument = () => {
+  const app = new OpenAPIHono();
+  app.route("/api/v1/users", v1UserRoutes);
+  return app.getOpenAPI31Document({ ...apiDocumentMetadata, openapi: "3.1.0" });
+};
+
+describe("OpenAPI document", () => {
+  it("carries the same identity, servers, and tags on every artifact", () => {
+    const doc = buildDocument();
+
+    expect(doc.info).toMatchObject({ title: "Acme API", version: "1.0.0" });
+    expect(doc.servers).toEqual(apiDocumentMetadata.servers);
+    expect(doc.tags).toEqual(apiDocumentMetadata.tags);
+  });
+
   it("declares the nested { error: { code, message } } shape", () => {
-    const app = new OpenAPIHono();
-    app.route("/api/v1/users", v1UserRoutes);
-    const doc = app.getOpenAPI31Document({
-      info: { title: "Acme API", version: "v1" },
-      openapi: "3.1.0",
-    });
+    const doc = buildDocument();
 
     const errorSchema = doc.components?.schemas?.Error;
     expect(errorSchema).toBeDefined();

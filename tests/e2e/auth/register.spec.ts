@@ -1,4 +1,5 @@
 import { test, expect } from "../fixtures/auth.fixture";
+import { TEST_USER } from "../fixtures/test-user";
 
 const skipUnderResend = !!process.env.RESEND_API_KEY;
 
@@ -25,7 +26,7 @@ test.describe("Register", () => {
     await registerPage.goto();
     await registerPage.register(
       "Duplicate User",
-      "e2e-test@acme.localhost",
+      TEST_USER.email,
       "SecurePassword1!",
       "SecurePassword1!",
     );

@@ -3,12 +3,7 @@ import { mkdir } from "node:fs/promises";
 import { expect, test as setup } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
-
-const TEST_USER = {
-  email: "e2e-test@acme.localhost",
-  name: "E2E Test User",
-  password: "TestPassword123!",
-};
+import { TEST_USER } from "../fixtures/test-user";
 
 const STORAGE_STATE_PATH = "tests/e2e/.auth/user.json";
 
@@ -46,5 +41,3 @@ setup("create and authenticate test user", async ({ page, request }) => {
 
   await page.context().storageState({ path: STORAGE_STATE_PATH });
 });
-
-export { TEST_USER };

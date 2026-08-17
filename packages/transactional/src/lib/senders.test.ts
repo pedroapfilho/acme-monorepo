@@ -79,7 +79,7 @@ describe("sendTransactionalEmail dispatch", () => {
     async ({ email, htmlMarker, subject, to }) => {
       const result = await sendTransactionalEmail(email, config);
 
-      expect(result.success).toBe(true);
+      expect(result.ok).toBe(true);
       expect(sendMock).toHaveBeenCalledOnce();
       const payload = sendMock.mock.calls[0][0];
       expect(payload.subject).toBe(subject);

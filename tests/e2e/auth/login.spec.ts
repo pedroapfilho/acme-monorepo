@@ -1,9 +1,5 @@
 import { test, expect } from "../fixtures/auth.fixture";
-
-const TEST_USER = {
-  email: "e2e-test@acme.localhost",
-  password: "TestPassword123!",
-};
+import { TEST_USER } from "../fixtures/test-user";
 
 test.describe("Login", () => {
   test.use({ storageState: { cookies: [], origins: [] } });

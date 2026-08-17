@@ -1,5 +1,6 @@
 import { apiUrl } from "../../../playwright.config";
 import { test, expect } from "../fixtures/auth.fixture";
+import { TEST_USER } from "../fixtures/test-user";
 
 test.describe("API Users", () => {
   test("GET /api/v1/users/me returns authenticated user", async ({ request }) => {
@@ -8,8 +9,8 @@ test.describe("API Users", () => {
     expect(response.status()).toBe(200);
 
     const body = await response.json();
-    expect(body.data.email).toBe("e2e-test@acme.localhost");
-    expect(body.data.name).toBe("E2E Test User");
+    expect(body.data.email).toBe(TEST_USER.email);
+    expect(body.data.name).toBe(TEST_USER.name);
     expect(body.data.id).toBeTruthy();
   });
 

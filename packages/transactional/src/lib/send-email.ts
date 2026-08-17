@@ -34,13 +34,26 @@ const renderTemplate = async (template: ReactElement) => {
   return { html, text };
 };
 
-const sendEmail = async ({ apiKey, template, ...config }: SendEmailOptions) => {
+type ResendSendResponse = Awaited<ReturnType<Resend["emails"]["send"]>>;
+
+type SendEmailResult =
+  | { data: ResendSendResponse["data"]; ok: true }
+  | { error: string; ok: false };
+
+// Config validation stays outside the try: a malformed sender or payload is a programmer error and
+// must throw, not come back as a delivery failure the caller would retry or log as an outage.
+const sendEmail = async ({
+  apiKey,
+  template,
+  ...config
+}: SendEmailOptions): Promise<SendEmailResult> => {
   if (!apiKey) {
     throw new Error("API key is required for sending emails");
   }
 
+  const validatedConfig = emailConfigSchema.parse(config);
+
   try {
-    const validatedConfig = emailConfigSchema.parse(config);
     const { html, text } = await renderTemplate(template);
 
     const resend = new Resend(apiKey);
@@ -57,23 +70,20 @@ const sendEmail = async ({ apiKey, template, ...config }: SendEmailOptions) => {
     });
 
     if (result.error) {
-      throw new Error(
-        `Resend failed to queue email: ${result.error.name ?? "unknown_error"} - ${result.error.message ?? "No message"}`,
-      );
+      return {
+        error: `Resend failed to queue email: ${result.error.name ?? "unknown_error"} - ${result.error.message ?? "No message"}`,
+        ok: false,
+      };
     }
 
-    return {
-      data: result.data,
-      error: null,
-      success: true,
-    };
+    return { data: result.data, ok: true };
   } catch (error) {
     return {
-      data: null,
       error: error instanceof Error ? error.message : "Failed to send email",
-      success: false,
+      ok: false,
     };
   }
 };
 
 export { sendEmail };
+export type { SendEmailResult };

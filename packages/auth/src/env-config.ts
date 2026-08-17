@@ -9,6 +9,10 @@ const LOOPBACK_TRUSTED_ORIGINS = [
   "http://127.0.0.1:4000",
 ];
 
+// Also the fallback for the api's CORS allowlist; a zod `.default()` there would be invisible here,
+// leaving Hono and Better Auth disagreeing about which origins are allowed.
+const DEFAULT_CORS_ORIGINS = ["https://acme.web.localhost", "https://acme.landing.localhost"];
+
 type EnvAuthConfigOptions = {
   additionalAllowedHosts?: Array<string>;
   additionalTrustedOrigins?: Array<string>;
@@ -17,7 +21,6 @@ type EnvAuthConfigOptions = {
 
 type EnvAuthConfig = {
   allowedHosts: Array<string>;
-  cookieDomain?: string;
   rateLimitEnabled: boolean;
   trustedOrigins: Array<string>;
   useSecureCookies: boolean;
@@ -35,10 +38,10 @@ const parseEnvList = (value: string | undefined): Array<string> => {
 };
 
 const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
-  const cookieDomain = process.env.COOKIE_DOMAIN?.trim();
-  const corsTrustedOrigins = parseEnvList(process.env.CORS_ORIGINS).filter(
-    (origin) => origin !== "*",
-  );
+  const corsTrustedOrigins =
+    process.env.CORS_ORIGINS === undefined
+      ? DEFAULT_CORS_ORIGINS
+      : parseEnvList(process.env.CORS_ORIGINS).filter((origin) => origin !== "*");
 
   return {
     allowedHosts: [
@@ -46,7 +49,6 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
       ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS),
       ...(options.additionalAllowedHosts ?? []),
     ],
-    cookieDomain: cookieDomain === "" ? undefined : cookieDomain,
     rateLimitEnabled:
       process.env.NODE_ENV === "production" &&
       (process.env.CI === undefined || process.env.CI === ""),
@@ -61,5 +63,5 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
   };
 };
 
-export { envAuthConfig, parseEnvList };
+export { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList };
 export type { EnvAuthConfig, EnvAuthConfigOptions };

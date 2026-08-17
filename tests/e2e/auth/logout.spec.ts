@@ -2,13 +2,12 @@ import type { APIRequestContext } from "@playwright/test";
 
 import { webUrl } from "../../../playwright.config";
 import { expect, test } from "../fixtures/auth.fixture";
-
-const PASSWORD = "TestPassword123!";
+import { TEST_USER } from "../fixtures/test-user";
 
 const createIsolatedUser = async (request: APIRequestContext): Promise<string> => {
   const email = `logout-test-${crypto.randomUUID()}@acme.localhost`;
   const response = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-    data: { email, name: "Logout Test User", password: PASSWORD },
+    data: { email, name: "Logout Test User", password: TEST_USER.password },
   });
   expect([200, 201]).toContain(response.status());
   return email;
@@ -24,7 +23,7 @@ test.describe("Logout", () => {
 
     const email = await createIsolatedUser(request);
     await loginPage.goto();
-    await loginPage.login(email, PASSWORD);
+    await loginPage.login(email, TEST_USER.password);
     await page.waitForURL("/dashboard");
     await dashboardPage.expectHeadingVisible();
 
@@ -44,7 +43,7 @@ test.describe("Logout", () => {
 
     const email = await createIsolatedUser(request);
     await loginPage.goto();
-    await loginPage.login(email, PASSWORD);
+    await loginPage.login(email, TEST_USER.password);
     await page.waitForURL("/dashboard");
 
     await dashboardPage.signOut();

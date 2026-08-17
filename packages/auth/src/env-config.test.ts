@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { envAuthConfig, parseEnvList } from "./env-config";
+import { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList } from "./env-config";
 
 describe("parseEnvList", () => {
   it("returns an empty list for missing input", () => {
@@ -50,13 +50,15 @@ describe("envAuthConfig", () => {
     expect(config.trustedOrigins).toContain("example-app:/");
   });
 
-  it("derives cookie security and domain from configuration", () => {
-    vi.stubEnv("COOKIE_DOMAIN", " .example.com ");
-    expect(envAuthConfig({ secureUrl: "https://web.example.com" })).toMatchObject({
-      cookieDomain: ".example.com",
-      useSecureCookies: true,
-    });
+  it("derives cookie security from configuration", () => {
+    expect(envAuthConfig({ secureUrl: "https://web.example.com" }).useSecureCookies).toBe(true);
     expect(envAuthConfig({ secureUrl: "http://localhost:3000" }).useSecureCookies).toBe(false);
+  });
+
+  it("falls back to the shared default origins when CORS_ORIGINS is unset", () => {
+    expect(envAuthConfig().trustedOrigins).toEqual(
+      expect.arrayContaining([...DEFAULT_CORS_ORIGINS]),
+    );
   });
 
   it("enables rate limiting only in production outside CI", () => {

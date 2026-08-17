@@ -2,9 +2,9 @@ import { prisma } from "@repo/db";
 
 import { getAuth } from "@/lib/auth";
 
-const EMAIL = "e2e-test@acme.localhost";
-const NAME = "E2E Test User";
-const PASSWORD = "TestPassword123!";
+import { TEST_USER } from "../../../tests/e2e/fixtures/test-user";
+
+const { email: EMAIL, name: NAME, password: PASSWORD } = TEST_USER;
 const SLUG = "e2e-test-user";
 
 const main = async () => {
