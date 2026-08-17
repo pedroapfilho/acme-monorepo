@@ -1,1 +1,6 @@
 @import "@repo/ui/globals.css";
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
