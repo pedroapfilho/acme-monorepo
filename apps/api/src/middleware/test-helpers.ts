@@ -52,7 +52,8 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
     }),
   };
 
-  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- Hono's Context is too large to mock structurally
+  // SAFETY: Every Context field read by these middleware tests is supplied below.
+  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
   const ctx = {
     get: mocks.get,
     header: mocks.header,

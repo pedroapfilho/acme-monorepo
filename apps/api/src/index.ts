@@ -13,21 +13,36 @@ import { requestId } from "hono/request-id";
 import { auth } from "./lib/auth";
 import { env } from "./lib/env";
 import { apiDocumentMetadata, createOpenAPIApp } from "./lib/openapi";
-import { errorHandler, notFound } from "./middleware/error-handler";
+import { createUserService } from "./lib/users";
+import { createAuthMiddleware } from "./middleware/auth";
+import { createErrorHandler, notFound } from "./middleware/error-handler";
 import {
   apiRateLimit,
   requestSizeLimit,
   securityHeaders,
   standardRateLimit,
 } from "./middleware/security";
-import { healthRoutes } from "./routes/health";
-import { v1UserRoutes } from "./routes/v1/users";
+import { createHealthRoutes } from "./routes/health";
+import { createV1UserRoutes } from "./routes/v1/users";
 
 initApiLogger({ service: "api" });
 
 const app = createOpenAPIApp();
 
 const identify = createIdentify(auth);
+const authMiddleware = createAuthMiddleware(auth.api.getSession);
+const healthRoutes = createHealthRoutes(async () => {
+  await prisma.$queryRaw`SELECT 1`;
+});
+const userService = createUserService({
+  delete: async (input) => {
+    await prisma.user.delete(input);
+  },
+  findUnique: (input) => prisma.user.findUnique(input),
+  update: (input) => prisma.user.update(input),
+});
+const v1UserRoutes = createV1UserRoutes({ authMiddleware, ...userService });
+const errorHandler = createErrorHandler(env.NODE_ENV === "production");
 
 app.use("*", requestId());
 app.use("*", honoEvlog());

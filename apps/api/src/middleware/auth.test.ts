@@ -2,22 +2,12 @@ import type { Next } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/auth", () => ({
-  auth: {
-    api: {
-      getSession: vi.fn(),
-    },
-  },
-}));
-
-vi.mock("@/lib/env", () => ({
-  env: { NODE_ENV: "test" },
-}));
-
-import { auth } from "@/lib/auth";
-
-import { authMiddleware } from "./auth";
+import { createAuthMiddleware } from "./auth";
+import type { GetSession } from "./auth";
 import { createMockContext } from "./test-helpers";
+
+const getSession = vi.fn<GetSession>();
+const authMiddleware = createAuthMiddleware(getSession);
 
 const mockSession = {
   session: { id: "session-1" },
@@ -35,7 +25,7 @@ describe("authMiddleware", () => {
   });
 
   it("sets user on context when session is valid", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as never);
+    getSession.mockResolvedValue(mockSession);
     const { ctx, mocks } = createMockContext({ headers: { Authorization: "Bearer token123" } });
 
     await authMiddleware(ctx, next);
@@ -48,37 +38,37 @@ describe("authMiddleware", () => {
   });
 
   it("forwards Authorization header to getSession", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as never);
+    getSession.mockResolvedValue(mockSession);
     const { ctx } = createMockContext({ headers: { Authorization: "Bearer abc" } });
 
     await authMiddleware(ctx, next);
 
-    const calledHeaders = vi.mocked(auth.api.getSession).mock.calls[0]?.[0]?.headers;
+    const calledHeaders = getSession.mock.calls[0]?.[0]?.headers;
     expect(calledHeaders?.get("Authorization")).toBe("Bearer abc");
   });
 
   it("forwards Cookie header to getSession", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as never);
+    getSession.mockResolvedValue(mockSession);
     const { ctx } = createMockContext({ headers: { Cookie: "session=abc123" } });
 
     await authMiddleware(ctx, next);
 
-    const calledHeaders = vi.mocked(auth.api.getSession).mock.calls[0]?.[0]?.headers;
+    const calledHeaders = getSession.mock.calls[0]?.[0]?.headers;
     expect(calledHeaders?.get("Cookie")).toBe("session=abc123");
   });
 
   it("forwards request metadata needed by auth plugins", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(mockSession as never);
+    getSession.mockResolvedValue(mockSession);
     const { ctx } = createMockContext({ headers: { "User-Agent": "Acme test" } });
 
     await authMiddleware(ctx, next);
 
-    const calledHeaders = vi.mocked(auth.api.getSession).mock.calls[0]?.[0]?.headers;
+    const calledHeaders = getSession.mock.calls[0]?.[0]?.headers;
     expect(calledHeaders?.get("User-Agent")).toBe("Acme test");
   });
 
   it("throws 401 when session is null", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue(null);
+    getSession.mockResolvedValue(null);
     const { ctx } = createMockContext();
 
     await expect(authMiddleware(ctx, next)).rejects.toThrow(HTTPException);
@@ -88,14 +78,14 @@ describe("authMiddleware", () => {
   });
 
   it("throws 401 when session has no user", async () => {
-    vi.mocked(auth.api.getSession).mockResolvedValue({ session: {}, user: null } as never);
+    getSession.mockResolvedValue({ user: null });
     const { ctx } = createMockContext();
 
     await expect(authMiddleware(ctx, next)).rejects.toThrow(HTTPException);
   });
 
   it("throws 503 when getSession throws", async () => {
-    vi.mocked(auth.api.getSession).mockRejectedValue(new Error("DB down"));
+    getSession.mockRejectedValue(new Error("DB down"));
     const { ctx, mocks } = createMockContext();
 
     await expect(authMiddleware(ctx, next)).rejects.toThrow(HTTPException);

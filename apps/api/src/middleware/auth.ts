@@ -2,20 +2,25 @@ import type { Context, Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
-import { auth } from "../lib/auth";
-
-export type AuthVariables = {
+type AuthVariables = {
   user: {
     email: string;
     id: string;
   };
 };
 
-export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
-  async (c: Context, next: Next) => {
+type GetSession = (input: { headers: Headers }) => Promise<{
+  user?: {
+    email: string;
+    id: string;
+  } | null;
+} | null>;
+
+const createAuthMiddleware = (getSession: GetSession) =>
+  createMiddleware<{ Variables: AuthVariables }>(async (c: Context, next: Next) => {
     let session;
     try {
-      session = await auth.api.getSession({ headers: c.req.raw.headers });
+      session = await getSession({ headers: c.req.raw.headers });
     } catch (error) {
       c.get("log").error("authMiddleware: getSession threw; auth service unavailable", {
         error,
@@ -27,16 +32,12 @@ export const authMiddleware = createMiddleware<{ Variables: AuthVariables }>(
 
     const user = session?.user;
     if (user === undefined || user === null) {
-      throw new HTTPException(401, {
-        message: "Authentication required",
-      });
+      throw new HTTPException(401, { message: "Authentication required" });
     }
 
-    c.set("user", {
-      email: user.email,
-      id: user.id,
-    });
-
+    c.set("user", { email: user.email, id: user.id });
     return next();
-  },
-);
+  });
+
+export { createAuthMiddleware };
+export type { AuthVariables, GetSession };

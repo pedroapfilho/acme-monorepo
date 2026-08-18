@@ -1,21 +1,23 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { createMiddleware } from "hono/factory";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/env", () => ({
-  env: { NODE_ENV: "test" },
-}));
-
-vi.mock("@/lib/auth", () => ({
-  auth: { api: { getSession: vi.fn() } },
-}));
-
 import { apiDocumentMetadata } from "@/lib/openapi";
+import type { AuthVariables } from "@/middleware/auth";
 
-import { v1UserRoutes } from "./users";
+import { createV1UserRoutes } from "./users";
+import type { UserRouteDependencies } from "./users";
+
+const dependencies: UserRouteDependencies = {
+  authMiddleware: createMiddleware<{ Variables: AuthVariables }>((_, next) => next()),
+  deleteUser: vi.fn<UserRouteDependencies["deleteUser"]>(),
+  findUserById: vi.fn<UserRouteDependencies["findUserById"]>(),
+  updateUser: vi.fn<UserRouteDependencies["updateUser"]>(),
+};
 
 const buildDocument = () => {
   const app = new OpenAPIHono();
-  app.route("/api/v1/users", v1UserRoutes);
+  app.route("/api/v1/users", createV1UserRoutes(dependencies));
   return app.getOpenAPI31Document({ ...apiDocumentMetadata, openapi: "3.1.0" });
 };
 

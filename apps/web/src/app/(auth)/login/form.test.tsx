@@ -1,26 +1,31 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { push, refresh, signInEmail, toastError } = vi.hoisted(() => ({
-  push: vi.fn(),
-  refresh: vi.fn(),
-  signInEmail: vi.fn(),
-  toastError: vi.fn(),
-}));
+import { createLoginForm } from "./form";
 
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push, refresh }),
-}));
-
-vi.mock("@repo/ui/components/sonner", () => ({
-  toast: { error: toastError },
-}));
-
-vi.mock("@/lib/auth-client", () => ({
-  authClient: { signIn: { email: signInEmail } },
-}));
-
-import LoginForm from "./form";
+const push = vi.fn();
+const refresh = vi.fn();
+const signInEmail = vi.fn();
+const toastError = vi.fn();
+const LoginForm = createLoginForm({
+  showError: (message) => {
+    toastError(message);
+  },
+  signInEmail,
+  useAppRouter: () => ({
+    back: () => {},
+    bfcacheId: "test",
+    forward: () => {},
+    prefetch: () => {},
+    push: (href) => {
+      push(href);
+    },
+    refresh: () => {
+      refresh();
+    },
+    replace: () => {},
+  }),
+});
 
 const tick = () =>
   new Promise<void>((resolve) => {

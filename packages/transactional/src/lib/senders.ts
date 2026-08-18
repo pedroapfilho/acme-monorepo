@@ -111,21 +111,23 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
   }
 };
 
-const sendTransactionalEmail = async (email: TransactionalEmail, config: MailerConfig) => {
-  const { subject, template, to } = buildEmail(email);
-  const result = await sendEmail({
-    apiKey: config.apiKey,
-    from: config.from,
-    subject,
-    tags: [
-      { name: "type", value: email.type },
-      { name: "userId", value: email.userId },
-    ],
-    template,
-    to,
-  });
-  return result;
-};
+const createTransactionalEmailSender =
+  (deliver: typeof sendEmail) => (email: TransactionalEmail, config: MailerConfig) => {
+    const { subject, template, to } = buildEmail(email);
+    return deliver({
+      apiKey: config.apiKey,
+      from: config.from,
+      subject,
+      tags: [
+        { name: "type", value: email.type },
+        { name: "userId", value: email.userId },
+      ],
+      template,
+      to,
+    });
+  };
+
+const sendTransactionalEmail = createTransactionalEmailSender(sendEmail);
 
 export type { MailerConfig, TransactionalEmail };
-export { sendTransactionalEmail };
+export { createTransactionalEmailSender, sendTransactionalEmail };
