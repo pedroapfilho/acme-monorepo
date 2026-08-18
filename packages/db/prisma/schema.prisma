@@ -41,6 +41,7 @@ model Session {
 model Account {
   id           String @id @default(cuid())
   accountId    String
+  issuer       String @default("local:credential")
   providerId   String
   userId       String
   user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -57,7 +58,7 @@ model Account {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([providerId, accountId])
+  @@unique([issuer, accountId])
 }
 
 model Verification {
