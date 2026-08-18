@@ -47,9 +47,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     rules: {
       "*.{ts,tsx}": {
-        // Turbopack rejects Unicode RegExp flags.
-        // oxlint-disable-next-line eslint/require-unicode-regexp
-        condition: { all: [{ not: "foreign" }, { content: /[Zz]od/ }] },
+        condition: {
+          all: [
+            { not: "foreign" },
+            // oxlint-disable-next-line eslint/require-unicode-regexp -- Turbopack rejects RegExp flags.
+            { content: /[Zz]od/ },
+          ],
+        },
         loaders: ["zod-compiler/turbopack"],
       },
     },
