@@ -1,0 +1,4 @@
+{
+  "extends": "../../packages/config-typescript/base.json",
+  "include": ["**/*.ts"]
+}

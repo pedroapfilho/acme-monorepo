@@ -11,8 +11,8 @@ export class ResetPasswordPage {
   constructor(private readonly page: Page) {
     this.heading = page.getByText("Reset your password", { exact: true });
     this.passwordInput = page.getByLabel("New password", { exact: true });
-    this.confirmPasswordInput = page.getByLabel(/confirm password/i);
-    this.submitButton = page.getByRole("button", { name: /reset password/i });
+    this.confirmPasswordInput = page.getByLabel(/confirm password/iv);
+    this.submitButton = page.getByRole("button", { name: /reset password/iv });
     this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
   }
 

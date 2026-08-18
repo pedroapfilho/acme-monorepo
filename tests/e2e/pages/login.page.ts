@@ -8,9 +8,9 @@ export class LoginPage {
   private readonly rootError: Locator;
 
   constructor(private readonly page: Page) {
-    this.emailInput = page.getByLabel(/email/i);
-    this.passwordInput = page.getByLabel(/password/i);
-    this.submitButton = page.getByRole("button", { name: /sign in|log in/i });
+    this.emailInput = page.getByLabel(/email/iv);
+    this.passwordInput = page.getByLabel(/password/iv);
+    this.submitButton = page.getByRole("button", { name: /sign in|log in/iv });
     this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
   }
 

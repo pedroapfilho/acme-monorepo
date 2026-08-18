@@ -11,13 +11,19 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
+const metadataBase = process.env.WEB_APP_URL ?? "https://acme.web.localhost";
+if (!URL.canParse(metadataBase)) {
+  throw new Error("WEB_APP_URL must be a valid URL");
+}
+const metadataBaseUrl = new URL(metadataBase);
+
 export const metadata: Metadata = {
   authors: [{ name: "Acme Team" }],
   category: "technology",
   creator: "Acme",
   description: "A modern, secure authentication platform built with Better Auth and Next.js.",
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
-  metadataBase: new URL(process.env.WEB_APP_URL ?? "https://acme.web.localhost"),
+  metadataBase: metadataBaseUrl,
   openGraph: {
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
     locale: "en_US",
@@ -73,7 +79,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         >
           Skip to content
         </a>
-        {children}
+        <div id="main-content">{children}</div>
         <Toaster />
       </body>
     </html>

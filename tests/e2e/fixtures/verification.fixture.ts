@@ -70,7 +70,6 @@ const forResetPassword = async (
   let lastError: string | undefined;
 
   while (Date.now() < deadline) {
-    // eslint-disable-next-line no-await-in-loop
     const row = await prisma.verification.findFirst({
       orderBy: { createdAt: "desc" },
       where: {
@@ -81,13 +80,12 @@ const forResetPassword = async (
     });
 
     if (row) {
-      const token = row.identifier.replace(/^reset-password:/, "");
+      const token = row.identifier.replace(/^reset-password:/v, "");
       const url = `${webUrl}/reset-password?token=${token}`;
       return { token, url };
     }
 
     lastError = `no row yet at ${new Date().toISOString()}`;
-    // eslint-disable-next-line no-await-in-loop
     await sleep(100);
   }
 

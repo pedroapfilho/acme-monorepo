@@ -5,6 +5,24 @@ type CreateMockContextOptions = {
   headers?: Record<string, string>;
 };
 
+type MockContextValue =
+  | { email: string; id: string }
+  | {
+      error: ReturnType<typeof vi.fn>;
+      info: ReturnType<typeof vi.fn>;
+      set: ReturnType<typeof vi.fn>;
+      warn: ReturnType<typeof vi.fn>;
+    };
+
+type MockJsonBody = {
+  error: {
+    code: string;
+    details?: Array<{ field: string; message: string }>;
+    message: string;
+    stack?: string;
+  };
+};
+
 export type MockContextMocks = {
   get: ReturnType<typeof vi.fn>;
   header: ReturnType<typeof vi.fn>;
@@ -35,19 +53,19 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
     warn: loggerWarn,
   };
 
-  const variables = new Map<string, unknown>([["log", evlogLogger]]);
+  const variables = new Map<string, MockContextValue>([["log", evlogLogger]]);
   const request = new Request("http://localhost/test", { headers: opts.headers });
 
   const mocks: MockContextMocks = {
     get: vi.fn((key: string) => variables.get(key)),
     header: vi.fn(),
-    json: vi.fn((body: unknown, status?: number) => ({ body, status })),
+    json: vi.fn((body: MockJsonBody, status?: number) => ({ body, status })),
     loggerError,
     loggerInfo,
     loggerSet,
     loggerWarn,
     reqHeader: vi.fn((name: string) => request.headers.get(name) ?? undefined),
-    set: vi.fn((key: string, value: unknown) => {
+    set: vi.fn((key: string, value: MockContextValue) => {
       variables.set(key, value);
     }),
   };

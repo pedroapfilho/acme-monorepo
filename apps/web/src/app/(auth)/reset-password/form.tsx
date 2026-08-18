@@ -134,7 +134,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
 
         <Field>
           <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
-            {isPending && <Loader2 className="size-4 animate-spin" />}
+            {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Resetting…" : "Reset password"}
           </Button>
           <FieldDescription className="text-center">

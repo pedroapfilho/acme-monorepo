@@ -20,10 +20,7 @@ const RouteError = ({ error, reset }: RouteErrorProps) => {
   }, [error]);
 
   return (
-    <main
-      className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 text-center"
-      id="main-content"
-    >
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background px-6 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
         <AlertCircle className="size-5 text-destructive" />
       </div>

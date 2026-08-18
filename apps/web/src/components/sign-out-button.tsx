@@ -36,7 +36,7 @@ const SignOutButton = () => {
         onClick={handleSignOut}
         variant="outline"
       >
-        {isPending && <Loader2 className="size-4 animate-spin" />}
+        {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
         {isPending ? "Signing out…" : "Sign out"}
       </Button>
       {error !== null && (

@@ -34,16 +34,16 @@ class AppError extends Error {
 const errorBody = (code: string, message: string): ErrorBody => ({ error: { code, message } });
 
 const isPrismaKnownError = (
-  err: unknown,
+  err: Error,
 ): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
-  err instanceof Error && "code" in err && "clientVersion" in err;
+  "code" in err && "clientVersion" in err;
 
 type ResolvedError = {
   body: ErrorBody;
   status: ContentfulStatusCode;
 };
 
-const resolveError = (err: unknown, isProd: boolean): ResolvedError => {
+const resolveError = (err: Error, isProd: boolean): ResolvedError => {
   if (err instanceof HTTPException) {
     return { body: errorBody("HTTP_EXCEPTION", err.message), status: err.status };
   }
@@ -81,15 +81,14 @@ const resolveError = (err: unknown, isProd: boolean): ResolvedError => {
     }
   }
 
-  const isError = err instanceof Error;
-  const message = isProd || !isError ? "An unexpected error occurred" : err.message;
+  const message = isProd ? "An unexpected error occurred" : err.message;
 
   return {
     body: {
       error: {
         code: "INTERNAL_SERVER_ERROR",
         message,
-        ...(!isProd && { stack: isError ? err.stack : undefined }),
+        ...(!isProd && { stack: err.stack }),
       },
     },
     status: 500,
