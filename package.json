@@ -25,8 +25,10 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@next/playwright": "^16.3.1",
     "@playwright/test": "^1.62.1",
     "@repo/db": "workspace:*",
+    "@types/node": "^26.2.0",
     "better-auth": "^1.7.1",
     "fallow": "^3.14.0",
     "husky": "^9.1.7",
