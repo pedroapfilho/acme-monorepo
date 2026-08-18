@@ -36,8 +36,8 @@ importers:
         specifier: ^1.78.0
         version: 1.78.0(oxlint-tsgolint@7.0.2001)
       oxlint-config-awesomeness:
-        specifier: ^3.5.0
-        version: 3.5.0(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@6.0.3))(eslint-plugin-react-hooks@7.1.1(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.11)(oxlint@1.78.0(oxlint-tsgolint@7.0.2001))
+        specifier: ^3.5.1
+        version: 3.5.1(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@6.0.3))(eslint-plugin-react-hooks@7.1.1(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.11)(oxlint@1.78.0(oxlint-tsgolint@7.0.2001))
       oxlint-tsgolint:
         specifier: ^7.0.2001
         version: 7.0.2001
@@ -4984,8 +4984,8 @@ packages:
       vite-plus:
         optional: true
 
-  oxlint-config-awesomeness@3.5.0:
-    resolution: {integrity: sha512-cLCRxeX/5rmhKcCABhmI9kKbbaEZWX+mgex8FaEImQV8yx1Am73RhocFcjbYSJtpq/9+FA+7UT18h7i6xtdtHQ==}
+  oxlint-config-awesomeness@3.5.1:
+    resolution: {integrity: sha512-Vx23ZGkwthC0ME8HvfpjPW+oACpNb/cQUlOgnc+tYdgX+yOtHC0F1ytuGdsYnzD+w7XLGTv3m/XVycUOBWvPag==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
@@ -10483,7 +10483,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.62.0
       '@oxfmt/binding-win32-x64-msvc': 0.62.0
 
-  oxlint-config-awesomeness@3.5.0(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@6.0.3))(eslint-plugin-react-hooks@7.1.1(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.11)(oxlint@1.78.0(oxlint-tsgolint@7.0.2001)):
+  oxlint-config-awesomeness@3.5.1(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@6.0.3))(eslint-plugin-react-hooks@7.1.1(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.11)(oxlint@1.78.0(oxlint-tsgolint@7.0.2001)):
     dependencies:
       '@oxlint/plugins': 1.78.0
       eslint-plugin-no-only-tests: 3.4.0
