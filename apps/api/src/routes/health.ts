@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { prisma } from "@repo/db";
 import type { EvlogVariables } from "@repo/observability/hono";
 
 const healthRoute = createRoute({
@@ -49,43 +48,50 @@ const readyzRoute = createRoute({
   tags: ["System"],
 });
 
-const healthRoutes = new OpenAPIHono<{ Variables: EvlogVariables["Variables"] }>();
+type CheckDatabase = () => Promise<void>;
 
-healthRoutes.openapi(healthRoute, (c) =>
-  c.json(
-    {
-      service: "api",
-      status: "healthy" as const,
-      timestamp: new Date().toISOString(),
-      version: "1.0.0",
-    },
-    200,
-  ),
-);
+const createHealthRoutes = (checkDatabase: CheckDatabase) => {
+  const healthRoutes = new OpenAPIHono<{ Variables: EvlogVariables["Variables"] }>();
 
-healthRoutes.openapi(readyzRoute, async (c) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-
-    return c.json(
+  healthRoutes.openapi(healthRoute, (c) =>
+    c.json(
       {
-        checks: { database: "healthy" as const },
-        status: "ready" as const,
+        service: "api",
+        status: "healthy" as const,
         timestamp: new Date().toISOString(),
+        version: "1.0.0",
       },
       200,
-    );
-  } catch (error) {
-    c.get("log").error("Readiness check failed", { error });
-    return c.json(
-      {
-        checks: { database: "unhealthy" as const },
-        status: "not ready" as const,
-        timestamp: new Date().toISOString(),
-      },
-      503,
-    );
-  }
-});
+    ),
+  );
 
-export { healthRoutes };
+  healthRoutes.openapi(readyzRoute, async (c) => {
+    try {
+      await checkDatabase();
+
+      return c.json(
+        {
+          checks: { database: "healthy" as const },
+          status: "ready" as const,
+          timestamp: new Date().toISOString(),
+        },
+        200,
+      );
+    } catch (error) {
+      c.get("log").error("Readiness check failed", { error });
+      return c.json(
+        {
+          checks: { database: "unhealthy" as const },
+          status: "not ready" as const,
+          timestamp: new Date().toISOString(),
+        },
+        503,
+      );
+    }
+  });
+
+  return healthRoutes;
+};
+
+export { createHealthRoutes };
+export type { CheckDatabase };

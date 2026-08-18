@@ -1,22 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createSendEmail } from "./send-email";
+import type { SendEmailTransport } from "./send-email";
+import { createTransactionalEmailSender } from "./senders";
 import type { TransactionalEmail } from "./senders";
 
-const sendMock = vi.fn();
-vi.mock("resend", () => ({
-  Resend: class {
-    emails = { send: sendMock };
-  },
-}));
-
-const { sendTransactionalEmail } = await import("./senders");
+const sendMock = vi.fn<SendEmailTransport>();
+const sendTransactionalEmail = createTransactionalEmailSender(createSendEmail(sendMock));
 
 const config = { apiKey: "re_test", from: "Acme <noreply@acme.com>" };
 
 describe("sendTransactionalEmail dispatch", () => {
   beforeEach(() => {
     sendMock.mockReset();
-    sendMock.mockResolvedValue({ data: { id: "test" }, error: null });
+    sendMock.mockResolvedValue({ data: { id: "test" }, error: null, headers: null });
   });
 
   const cases: Array<{
@@ -81,7 +78,11 @@ describe("sendTransactionalEmail dispatch", () => {
 
       expect(result.ok).toBe(true);
       expect(sendMock).toHaveBeenCalledOnce();
-      const payload = sendMock.mock.calls[0][0];
+      const payload = sendMock.mock.calls[0]?.[1];
+      expect(payload).toBeDefined();
+      if (payload === undefined) {
+        throw new Error("Email payload was not recorded");
+      }
       expect(payload.subject).toBe(subject);
       expect(payload.to).toBe(to);
       expect(payload.tags).toEqual([
@@ -104,6 +105,6 @@ describe("sendTransactionalEmail dispatch", () => {
       config,
     );
 
-    expect(sendMock.mock.calls[0][0].subject).toBe("Welcome to Acme! Please verify your email");
+    expect(sendMock.mock.calls[0]?.[1]?.subject).toBe("Welcome to Acme! Please verify your email");
   });
 });

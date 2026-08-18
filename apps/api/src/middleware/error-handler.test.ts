@@ -1,16 +1,13 @@
 import { HTTPException } from "hono/http-exception";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ZodError } from "zod";
 
-vi.mock("@/lib/env", () => ({
-  env: { NODE_ENV: "development" },
-}));
-
 import { AppError } from "@/lib/api-error";
-import { env } from "@/lib/env";
 
-import { errorHandler, notFound } from "./error-handler";
+import { createErrorHandler, notFound } from "./error-handler";
 import { createMockContext } from "./test-helpers";
+
+const errorHandler = createErrorHandler(false);
 
 describe("AppError", () => {
   it("defaults statusCode to 500", () => {
@@ -140,19 +137,14 @@ describe("errorHandler", () => {
   });
 
   it("hides error message in production", () => {
-    const mutableEnv = env as { NODE_ENV: string };
-    mutableEnv.NODE_ENV = "production";
-
     const { ctx, mocks } = createMockContext();
     const err = new Error("secret detail");
 
-    errorHandler(err, ctx);
+    createErrorHandler(true)(err, ctx);
 
     const call = mocks.json.mock.calls[0];
     expect(call?.[0]?.error?.message).toBe("An unexpected error occurred");
     expect(call?.[0]?.error?.stack).toBeUndefined();
-
-    mutableEnv.NODE_ENV = "development";
   });
 });
 

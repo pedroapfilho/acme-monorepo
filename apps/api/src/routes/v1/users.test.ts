@@ -1,25 +1,34 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { createMiddleware } from "hono/factory";
+import { HTTPException } from "hono/http-exception";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/env", () => ({
-  env: { NODE_ENV: "test" },
-}));
+import type { AuthVariables } from "@/middleware/auth";
+import { createErrorHandler } from "@/middleware/error-handler";
 
-vi.mock("@/lib/auth", () => ({
-  auth: { api: { getSession: vi.fn() } },
-}));
+import { createV1UserRoutes } from "./users";
+import type { UserRouteDependencies } from "./users";
 
-vi.mock("@/lib/users", () => ({
-  deleteUser: vi.fn(),
-  findUserById: vi.fn(),
-  updateUser: vi.fn(),
-}));
+const deleteUser = vi.fn<UserRouteDependencies["deleteUser"]>();
+const findUserById = vi.fn<UserRouteDependencies["findUserById"]>();
+const updateUser = vi.fn<UserRouteDependencies["updateUser"]>();
+let sessionUser: AuthVariables["user"] | null = null;
 
-import { auth } from "@/lib/auth";
-import { deleteUser, findUserById, updateUser } from "@/lib/users";
-import { errorHandler } from "@/middleware/error-handler";
+const authMiddleware = createMiddleware<{ Variables: AuthVariables }>((c, next) => {
+  if (sessionUser === null) {
+    throw new HTTPException(401, { message: "Authentication required" });
+  }
+  c.set("user", sessionUser);
+  return next();
+});
 
-import { v1UserRoutes } from "./users";
+const v1UserRoutes = createV1UserRoutes({
+  authMiddleware,
+  deleteUser,
+  findUserById,
+  updateUser,
+});
+const errorHandler = createErrorHandler(false);
 
 const mockUser = {
   createdAt: new Date("2024-01-01"),
@@ -38,8 +47,9 @@ const serializedUser = {
   updatedAt: mockUser.updatedAt.toISOString(),
 };
 
-const mockSession = (user: { email: string; id: string } | null) =>
-  vi.mocked(auth.api.getSession).mockResolvedValue((user ? { session: {}, user } : null) as never);
+const mockSession = (user: AuthVariables["user"] | null) => {
+  sessionUser = user;
+};
 
 const buildApp = () => {
   const app = new OpenAPIHono();
@@ -55,12 +65,13 @@ const buildApp = () => {
 describe("v1 user routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sessionUser = null;
   });
 
   describe("GET /me", () => {
     it("returns the serialized user with ISO date strings", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(findUserById).mockResolvedValue(mockUser);
+      findUserById.mockResolvedValue(mockUser);
 
       const res = await v1UserRoutes.request("/me", { headers: { Cookie: "session=x" } });
 
@@ -87,7 +98,7 @@ describe("v1 user routes", () => {
   describe("PATCH /me", () => {
     it("returns the updated serialized user", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(updateUser).mockResolvedValue({ ...mockUser, name: "New Name" });
+      updateUser.mockResolvedValue({ ...mockUser, name: "New Name" });
 
       const res = await v1UserRoutes.request("/me", {
         body: JSON.stringify({ name: "New Name" }),
@@ -105,7 +116,7 @@ describe("v1 user routes", () => {
   describe("DELETE /me", () => {
     it("returns 204 with no body", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(deleteUser).mockResolvedValue({ success: true });
+      deleteUser.mockResolvedValue({ success: true });
 
       const res = await v1UserRoutes.request("/me", {
         headers: { Cookie: "session=x" },
@@ -120,7 +131,7 @@ describe("v1 user routes", () => {
   describe("GET /", () => {
     it("returns the list envelope with data and meta", async () => {
       mockSession({ email: "test@example.com", id: "user-1" });
-      vi.mocked(findUserById).mockResolvedValue(mockUser);
+      findUserById.mockResolvedValue(mockUser);
 
       const res = await v1UserRoutes.request("/", { headers: { Cookie: "session=x" } });
 

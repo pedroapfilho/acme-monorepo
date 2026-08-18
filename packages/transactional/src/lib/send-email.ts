@@ -35,6 +35,11 @@ const renderTemplate = async (template: ReactElement) => {
 };
 
 type ResendSendResponse = Awaited<ReturnType<Resend["emails"]["send"]>>;
+type ResendSendOptions = Parameters<Resend["emails"]["send"]>[0];
+type SendEmailTransport = (
+  apiKey: string,
+  options: ResendSendOptions,
+) => Promise<ResendSendResponse>;
 
 type SendEmailResult =
   | { data: ResendSendResponse["data"]; ok: true }
@@ -42,48 +47,52 @@ type SendEmailResult =
 
 // Config validation stays outside the try: a malformed sender or payload is a programmer error and
 // must throw, not come back as a delivery failure the caller would retry or log as an outage.
-const sendEmail = async ({
-  apiKey,
-  template,
-  ...config
-}: SendEmailOptions): Promise<SendEmailResult> => {
-  if (!apiKey) {
-    throw new Error("API key is required for sending emails");
-  }
+const resendTransport: SendEmailTransport = (apiKey, options) => {
+  const resend = new Resend(apiKey);
+  return resend.emails.send(options);
+};
 
-  const validatedConfig = emailConfigSchema.parse(config);
+const createSendEmail =
+  (send: SendEmailTransport) =>
+  async ({ apiKey, template, ...config }: SendEmailOptions): Promise<SendEmailResult> => {
+    if (!apiKey) {
+      throw new Error("API key is required for sending emails");
+    }
 
-  try {
-    const { html, text } = await renderTemplate(template);
+    const validatedConfig = emailConfigSchema.parse(config);
 
-    const resend = new Resend(apiKey);
-    const result = await resend.emails.send({
-      bcc: validatedConfig.bcc,
-      cc: validatedConfig.cc,
-      from: validatedConfig.from,
-      html,
-      replyTo: validatedConfig.replyTo,
-      subject: validatedConfig.subject,
-      tags: validatedConfig.tags,
-      text,
-      to: validatedConfig.to,
-    });
+    try {
+      const { html, text } = await renderTemplate(template);
 
-    if (result.error) {
+      const result = await send(apiKey, {
+        bcc: validatedConfig.bcc,
+        cc: validatedConfig.cc,
+        from: validatedConfig.from,
+        html,
+        replyTo: validatedConfig.replyTo,
+        subject: validatedConfig.subject,
+        tags: validatedConfig.tags,
+        text,
+        to: validatedConfig.to,
+      });
+
+      if (result.error) {
+        return {
+          error: `Resend failed to queue email: ${result.error.name ?? "unknown_error"} - ${result.error.message ?? "No message"}`,
+          ok: false,
+        };
+      }
+
+      return { data: result.data, ok: true };
+    } catch (error) {
       return {
-        error: `Resend failed to queue email: ${result.error.name ?? "unknown_error"} - ${result.error.message ?? "No message"}`,
+        error: error instanceof Error ? error.message : "Failed to send email",
         ok: false,
       };
     }
+  };
 
-    return { data: result.data, ok: true };
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : "Failed to send email",
-      ok: false,
-    };
-  }
-};
+const sendEmail = createSendEmail(resendTransport);
 
-export { sendEmail };
-export type { SendEmailResult };
+export { createSendEmail, sendEmail };
+export type { SendEmailTransport };

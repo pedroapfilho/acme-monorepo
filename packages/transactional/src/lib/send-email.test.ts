@@ -1,19 +1,16 @@
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const sendMock = vi.fn();
-vi.mock("resend", () => ({
-  Resend: class {
-    emails = { send: sendMock };
-  },
-}));
+import { createSendEmail } from "./send-email";
+import type { SendEmailTransport } from "./send-email";
 
-const { sendEmail } = await import("./send-email");
+const sendMock = vi.fn<SendEmailTransport>();
+const sendEmail = createSendEmail(sendMock);
 
 describe("sendEmail from validation", () => {
   beforeEach(() => {
     sendMock.mockReset();
-    sendMock.mockResolvedValue({ data: { id: "test" }, error: null });
+    sendMock.mockResolvedValue({ data: { id: "test" }, error: null, headers: null });
   });
 
   const template = createElement("div", null, "hi");
@@ -29,7 +26,7 @@ describe("sendEmail from validation", () => {
 
     expect(result.ok).toBe(true);
     expect(sendMock).toHaveBeenCalledOnce();
-    expect(sendMock.mock.calls[0][0]).toMatchObject({
+    expect(sendMock.mock.calls[0]?.[1]).toMatchObject({
       from: "Acme <noreply@acme.com>",
     });
   });
@@ -75,7 +72,11 @@ describe("sendEmail from validation", () => {
   });
 
   it("returns a failure result when Resend rejects the send", async () => {
-    sendMock.mockResolvedValue({ data: null, error: { message: "quota", name: "rate_limit" } });
+    sendMock.mockResolvedValue({
+      data: null,
+      error: { message: "quota", name: "rate_limit_exceeded", statusCode: 429 },
+      headers: null,
+    });
 
     const result = await sendEmail({
       apiKey: "re_test",

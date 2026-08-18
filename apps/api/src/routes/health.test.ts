@@ -1,13 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@repo/db", () => ({
-  prisma: { $queryRaw: vi.fn() },
-}));
+import { createHealthRoutes } from "./health";
+import type { CheckDatabase } from "./health";
 
-import { prisma } from "@repo/db";
-
-import { healthRoutes } from "./health";
+const checkDatabase = vi.fn<CheckDatabase>();
 
 const buildApp = () => {
   const app = new OpenAPIHono();
@@ -15,14 +12,14 @@ const buildApp = () => {
     c.set("log", { error: () => {}, info: () => {} } as never);
     return next();
   });
-  app.route("/", healthRoutes);
+  app.route("/", createHealthRoutes(checkDatabase));
   return app;
 };
 
 describe("health routes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(prisma.$queryRaw).mockResolvedValue([{ "?column?": 1 }]);
+    checkDatabase.mockResolvedValue();
   });
 
   it("publishes /healthz and /readyz in the OpenAPI document", () => {
@@ -59,7 +56,7 @@ describe("health routes", () => {
   });
 
   it("answers /readyz with 503 when the database is unreachable", async () => {
-    vi.mocked(prisma.$queryRaw).mockRejectedValue(new Error("connection refused"));
+    checkDatabase.mockRejectedValue(new Error("connection refused"));
 
     const res = await buildApp().request("/readyz");
 
