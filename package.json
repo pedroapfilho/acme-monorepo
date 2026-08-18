@@ -36,7 +36,8 @@
     "oxlint-config-awesomeness": "^4.2.0",
     "oxlint-plugin-react-doctor": "^0.9.12",
     "oxlint-tsgolint": "^7.0.2001",
-    "turbo": "^2.10.9"
+    "turbo": "^2.10.9",
+    "zod-compiler": "^1.27.0"
   },
   "lint-staged": {
     "!(*.d).{ts,tsx,mts,cts,js,jsx,mjs,cjs}": [
