@@ -44,6 +44,20 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   serverExternalPackages: ["@prisma/client", "@repo/db"],
   transpilePackages: ["@repo/ui", "@repo/observability"],
+  turbopack: {
+    rules: {
+      "*.{ts,tsx}": {
+        condition: {
+          all: [
+            { not: "foreign" },
+            // oxlint-disable-next-line eslint/require-unicode-regexp -- Turbopack rejects RegExp flags.
+            { content: /[Zz]od/ },
+          ],
+        },
+        loaders: ["zod-compiler/turbopack"],
+      },
+    },
+  },
 };
 
 export default nextConfig;
