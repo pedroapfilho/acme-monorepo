@@ -10,11 +10,11 @@ export class RegisterPage {
   private readonly rootError: Locator;
 
   constructor(private readonly page: Page) {
-    this.nameInput = page.getByLabel(/name/i);
-    this.emailInput = page.getByLabel(/email/i);
+    this.nameInput = page.getByLabel(/name/iv);
+    this.emailInput = page.getByLabel(/email/iv);
     this.passwordInput = page.getByLabel("Password", { exact: true });
-    this.confirmPasswordInput = page.getByLabel(/confirm password/i);
-    this.submitButton = page.getByRole("button", { name: /create account/i });
+    this.confirmPasswordInput = page.getByLabel(/confirm password/iv);
+    this.submitButton = page.getByRole("button", { name: /create account/iv });
     this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
   }
 

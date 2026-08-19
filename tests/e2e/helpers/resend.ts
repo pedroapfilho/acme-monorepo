@@ -57,12 +57,10 @@ const resendFetch = async (path: string): Promise<Response> => {
 
   let attempt = 0;
   while (true) {
-    // eslint-disable-next-line no-await-in-loop
     const response = await fetch(url, { headers });
 
     if (!isRetryableStatus(response.status) || attempt >= RETRY_MAX_ATTEMPTS) {
       if (!response.ok) {
-        // eslint-disable-next-line no-await-in-loop
         const body = await response.text().catch(() => "<unreadable>");
         throw new Error(`Resend ${path} → ${response.status}: ${body}`);
       }
@@ -76,7 +74,6 @@ const resendFetch = async (path: string): Promise<Response> => {
         Math.floor(Math.random() * RETRY_JITTER_MS)
       : computeBackoffMs(attempt);
 
-    // eslint-disable-next-line no-await-in-loop
     await sleep(delayMs);
     attempt += 1;
   }
@@ -114,7 +111,6 @@ const waitForEmail = async (
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
-    // eslint-disable-next-line no-await-in-loop
     const recent = await listEmails(100);
 
     const candidate = recent.find((mail) => {
@@ -135,7 +131,6 @@ const waitForEmail = async (
       return getEmail(candidate.id);
     }
 
-    // eslint-disable-next-line no-await-in-loop
     await sleep(pollMs);
   }
 
@@ -147,7 +142,7 @@ const waitForEmail = async (
 
 const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
-  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/g);
+  const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/gv);
   for (const [, href] of hrefMatches) {
     const decoded = href.replaceAll("&amp;", "&");
     if (pattern.test(decoded)) {

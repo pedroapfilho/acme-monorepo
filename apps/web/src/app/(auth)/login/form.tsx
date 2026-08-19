@@ -176,7 +176,7 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
 
           <Field>
             <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
-              {isPending && <Loader2 className="size-4 animate-spin" />}
+              {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
               {isPending ? "Signing in…" : "Sign in"}
             </Button>
             <FieldDescription className="text-center">
