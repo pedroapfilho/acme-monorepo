@@ -38,12 +38,13 @@ const main = async () => {
   await prisma.account.upsert({
     create: {
       accountId: user.id,
+      issuer: "local:credential",
       password: hashed,
       providerId: "credential",
       userId: user.id,
     },
     update: { password: hashed },
-    where: { providerId_accountId: { accountId: user.id, providerId: "credential" } },
+    where: { issuer_accountId: { accountId: user.id, issuer: "local:credential" } },
   });
 
   // eslint-disable-next-line no-console -- CI step output: surface the seed result.
