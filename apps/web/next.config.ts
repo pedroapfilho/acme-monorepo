@@ -28,7 +28,11 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
   cacheComponents: true,
   env: { NEXT_PUBLIC_API_URL: apiUrl },
-  experimental: { turbopackRustReactCompiler: true },
+  experimental: {
+    exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === "1",
+    instantInsights: { validationLevel: "manual-warning" },
+    turbopackRustReactCompiler: true,
+  },
   headers: () =>
     Promise.resolve([
       {

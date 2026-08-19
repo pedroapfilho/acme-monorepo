@@ -1,3 +1,5 @@
+import { instant } from "@next/playwright";
+
 import { test, expect } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
 
@@ -25,6 +27,29 @@ test.describe("Login", () => {
     await loginPage.login("not-an-email", TEST_USER.password);
 
     await expect(page.getByText(/invalid email/i)).toBeVisible();
+  });
+
+  test("shows the login shell on an initial load", async ({ baseURL, page }) => {
+    await instant(
+      page,
+      async () => {
+        await page.goto("/login");
+        await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+        await expect(page.getByLabel("Email")).toBeVisible();
+      },
+      { baseURL },
+    );
+  });
+
+  test("shows the destination shell during client navigation", async ({ page }) => {
+    await page.goto("/recover");
+
+    await instant(page, async () => {
+      await page.getByRole("link", { name: "Sign in" }).click();
+      await page.waitForURL("/login");
+      await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+      await expect(page.getByLabel("Email")).toBeVisible();
+    });
   });
 });
 

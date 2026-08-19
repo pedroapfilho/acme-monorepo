@@ -16,6 +16,7 @@ jobs:
       CI: true
       DATABASE_URL: postgresql://test:test@localhost:5432/test
       BETTER_AUTH_SECRET: test-secret-minimum-32-characters-long-for-e2e
+      EXPOSE_TESTING_API: 1
       # Use 127.0.0.1 (not localhost) to match playwright.config.ts baseURL.
       # Mismatched hosts split cookie scope: sign-in sets cookies on
       # 127.0.0.1 but cross-origin fetches to localhost don't send them,

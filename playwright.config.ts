@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { execFileSync } from "node:child_process";
 
 import { defineConfig, devices } from "@playwright/test";
@@ -16,7 +18,8 @@ const getPortlessUrl = (name: string) => {
   }
 };
 
-export const webUrl = getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
+export const webUrl =
+  process.env.PLAYWRIGHT_WEB_URL ?? getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
 export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
 export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
 
