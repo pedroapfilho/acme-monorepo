@@ -66,10 +66,6 @@ const createAuth = (config: AuthConfig) => {
     callbackURL: "/",
     sendOnSignIn: true,
   };
-  const changeEmail: NonNullable<NonNullable<BetterAuthOptions["user"]>["changeEmail"]> = {
-    enabled: Boolean(mailer),
-  };
-
   if (mailer) {
     emailVerification.sendVerificationEmail = async ({ url, user }) => {
       await deliver(
@@ -81,19 +77,6 @@ const createAuth = (config: AuthConfig) => {
           verificationUrl: url,
         },
         { message: "Failed to send verification email", mode: "throw" },
-      );
-    };
-    changeEmail.sendChangeEmailConfirmation = async ({ newEmail, url, user }) => {
-      await deliver(
-        {
-          changeUrl: url,
-          currentEmail: user.email,
-          newEmail,
-          type: "change-email-confirmation",
-          userId: user.id,
-          username: user.name,
-        },
-        { message: "Failed to send change-email confirmation", mode: "throw" },
       );
     };
   }
@@ -191,7 +174,22 @@ const createAuth = (config: AuthConfig) => {
           type: "string",
         },
       },
-      changeEmail,
+      changeEmail: {
+        enabled: true,
+        sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
+          await deliver(
+            {
+              changeUrl: url,
+              currentEmail: user.email,
+              newEmail,
+              type: "change-email-confirmation",
+              userId: user.id,
+              username: user.name,
+            },
+            { message: "Failed to send change-email confirmation", mode: "throw" },
+          );
+        },
+      },
       deleteUser: {
         enabled: true,
       },

@@ -169,9 +169,9 @@ describe("Auth Server Configuration", () => {
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
   });
 
-  it("should disable email changes when Resend is absent", () => {
-    expect(auth.options.user?.changeEmail?.enabled).toBe(false);
-    expect(auth.options.user?.changeEmail?.sendChangeEmailConfirmation).toBeUndefined();
+  it("should always enable email changes (confirmation no-ops when resendApiKey is absent)", () => {
+    expect(auth.options.user?.changeEmail?.enabled).toBe(true);
+    expect(auth.options.user?.changeEmail?.sendChangeEmailConfirmation).toBeDefined();
   });
 
   it("should enable verified email changes when Resend is configured", () => {
