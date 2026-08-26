@@ -6,7 +6,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
-import type { BetterAuthPlugin } from "better-auth/types";
+import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth/types";
 
 const COOKIE_PREFIX = "acme";
 
@@ -58,6 +58,45 @@ const createAuth = (config: AuthConfig) => {
     }
     log.error({ error: result.error, message: onFailure.message });
   };
+
+  const emailVerification: NonNullable<BetterAuthOptions["emailVerification"]> & {
+    callbackURL: string;
+  } = {
+    autoSignInAfterVerification: true,
+    callbackURL: "/",
+    sendOnSignIn: true,
+  };
+  const changeEmail: NonNullable<NonNullable<BetterAuthOptions["user"]>["changeEmail"]> = {
+    enabled: Boolean(mailer),
+  };
+
+  if (mailer) {
+    emailVerification.sendVerificationEmail = async ({ url, user }) => {
+      await deliver(
+        {
+          type: "welcome",
+          userEmail: user.email,
+          userId: user.id,
+          username: user.name,
+          verificationUrl: url,
+        },
+        { message: "Failed to send verification email", mode: "throw" },
+      );
+    };
+    changeEmail.sendChangeEmailConfirmation = async ({ newEmail, url, user }) => {
+      await deliver(
+        {
+          changeUrl: url,
+          currentEmail: user.email,
+          newEmail,
+          type: "change-email-confirmation",
+          userId: user.id,
+          username: user.name,
+        },
+        { message: "Failed to send change-email confirmation", mode: "throw" },
+      );
+    };
+  }
 
   return betterAuth({
     account: {
@@ -121,23 +160,7 @@ const createAuth = (config: AuthConfig) => {
       },
     },
 
-    emailVerification: {
-      autoSignInAfterVerification: true,
-      callbackURL: "/",
-      sendOnSignIn: true,
-      sendVerificationEmail: async ({ url, user }) => {
-        await deliver(
-          {
-            type: "welcome",
-            userEmail: user.email,
-            userId: user.id,
-            username: user.name,
-            verificationUrl: url,
-          },
-          { message: "Failed to send verification email", mode: "throw" },
-        );
-      },
-    },
+    emailVerification,
 
     plugins: [username(), bearer(), ...extraPlugins],
 
@@ -168,21 +191,9 @@ const createAuth = (config: AuthConfig) => {
           type: "string",
         },
       },
-      changeEmail: {
+      changeEmail,
+      deleteUser: {
         enabled: true,
-        sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {
-          await deliver(
-            {
-              changeUrl: url,
-              currentEmail: user.email,
-              newEmail,
-              type: "change-email-confirmation",
-              userId: user.id,
-              username: user.name,
-            },
-            { message: "Failed to send change-email confirmation", mode: "throw" },
-          );
-        },
       },
     },
   });

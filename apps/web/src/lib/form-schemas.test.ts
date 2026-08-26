@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { loginSchema, recoverSchema, registerSchema, resetPasswordSchema } from "./form-schemas";
+import {
+  changeEmailSchema,
+  changePasswordSchema,
+  deleteAccountSchema,
+  loginSchema,
+  profileSchema,
+  recoverSchema,
+  registerSchema,
+  resetPasswordSchema,
+} from "./form-schemas";
 
 describe("loginSchema", () => {
   it("should accept valid credentials", () => {
@@ -196,5 +205,99 @@ describe("resetPasswordSchema", () => {
       password: "newpassword12",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("profileSchema", () => {
+  it("should accept a valid name", () => {
+    const result = profileSchema.safeParse({ name: "John Doe" });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject name shorter than 3 characters", () => {
+    const result = profileSchema.safeParse({ name: "AB" });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject name longer than 32 characters", () => {
+    const result = profileSchema.safeParse({ name: "A".repeat(33) });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("changeEmailSchema", () => {
+  it("should accept a valid email", () => {
+    const result = changeEmailSchema.safeParse({ email: "new@example.com" });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject invalid email", () => {
+    const result = changeEmailSchema.safeParse({ email: "not-an-email" });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject empty email", () => {
+    const result = changeEmailSchema.safeParse({ email: "" });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("changePasswordSchema", () => {
+  const validData = {
+    confirmPassword: "newpassword12",
+    currentPassword: "oldpassword12",
+    newPassword: "newpassword12",
+  };
+
+  it("should accept valid data", () => {
+    const result = changePasswordSchema.safeParse(validData);
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject short current password", () => {
+    const result = changePasswordSchema.safeParse({ ...validData, currentPassword: "short" });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject short new password", () => {
+    const result = changePasswordSchema.safeParse({
+      ...validData,
+      confirmPassword: "short",
+      newPassword: "short",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject when new passwords do not match, with the issue on confirmPassword", () => {
+    const result = changePasswordSchema.safeParse({
+      ...validData,
+      confirmPassword: "differentpass12",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          message: "Passwords do not match",
+          path: ["confirmPassword"],
+        }),
+      );
+    }
+  });
+});
+
+describe("deleteAccountSchema", () => {
+  it("should accept a password of at least 12 characters", () => {
+    const result = deleteAccountSchema.safeParse({ password: "securepassword" });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a short password", () => {
+    const result = deleteAccountSchema.safeParse({ password: "short" });
+    expect(result.success).toBe(false);
+  });
+
+  it("should reject a missing password", () => {
+    const result = deleteAccountSchema.safeParse({});
+    expect(result.success).toBe(false);
   });
 });

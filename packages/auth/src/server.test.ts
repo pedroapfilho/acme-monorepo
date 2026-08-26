@@ -160,13 +160,24 @@ describe("Auth Server Configuration", () => {
     expect(plugins.some((p) => p.id === "test-plugin")).toBe(true);
   });
 
-  it("should always define verification email handler (no-op when resendApiKey is absent)", () => {
-    expect(auth.options.emailVerification?.sendVerificationEmail).toBeDefined();
+  it("should omit verification email handling when Resend is absent", () => {
+    expect(auth.options.emailVerification?.sendVerificationEmail).toBeUndefined();
   });
 
   it("should configure verification email when resendApiKey is provided", () => {
     const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
     expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
+  });
+
+  it("should disable email changes when Resend is absent", () => {
+    expect(auth.options.user?.changeEmail?.enabled).toBe(false);
+    expect(auth.options.user?.changeEmail?.sendChangeEmailConfirmation).toBeUndefined();
+  });
+
+  it("should enable verified email changes when Resend is configured", () => {
+    const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
+    expect(emailAuth.options.user?.changeEmail?.enabled).toBe(true);
+    expect(emailAuth.options.user?.changeEmail?.sendChangeEmailConfirmation).toBeDefined();
   });
 
   it("sets emailVerification.callbackURL to the app root", () => {
@@ -179,6 +190,10 @@ describe("Auth Server Configuration", () => {
 
   it("re-sends the verification email on unverified sign-in attempts", () => {
     expect(auth.options.emailVerification?.sendOnSignIn).toBe(true);
+  });
+
+  it("should allow users to delete their account", () => {
+    expect(auth.options.user?.deleteUser?.enabled).toBe(true);
   });
 
   it("should have displayName as optional additional user field", () => {

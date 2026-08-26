@@ -30,3 +30,26 @@ export const resetPasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const profileSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters").max(32),
+});
+
+export const changeEmailSchema = z.object({
+  email: z.email("Invalid email address"),
+});
+
+export const changePasswordSchema = z
+  .object({
+    confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
+    currentPassword: z.string().min(12, "Password must be at least 12 characters"),
+    newPassword: z.string().min(12, "Password must be at least 12 characters"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const deleteAccountSchema = z.object({
+  password: z.string().min(12, "Password must be at least 12 characters"),
+});

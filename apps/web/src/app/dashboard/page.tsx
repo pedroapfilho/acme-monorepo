@@ -1,5 +1,6 @@
 import { Skeleton } from "@repo/ui/components/skeleton";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -20,11 +21,19 @@ const DashboardContent = async () => {
 
   return (
     <>
-      <header className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Welcome back{session.user.name ? `, ${session.user.name}` : ""}
-        </p>
+      <header className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Welcome back{session.user.name ? `, ${session.user.name}` : ""}
+          </p>
+        </div>
+        <Link
+          className="text-sm text-foreground underline underline-offset-4"
+          href="/dashboard/settings"
+        >
+          Settings
+        </Link>
       </header>
 
       <dl className="grid gap-4 border-t border-border pt-6 sm:grid-cols-2">
