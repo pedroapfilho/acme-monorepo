@@ -42,8 +42,8 @@ importers:
         specifier: ^1.79.0
         version: 1.79.0(oxlint-tsgolint@7.0.2001)
       oxlint-config-awesomeness:
-        specifier: ^4.2.0
-        version: 4.2.0(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.12)(oxlint-tsgolint@7.0.2001)(oxlint@1.79.0(oxlint-tsgolint@7.0.2001))(typescript@7.0.2)
+        specifier: ^4.3.0
+        version: 4.3.0(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.12)(oxlint-tsgolint@7.0.2001)(oxlint@1.79.0(oxlint-tsgolint@7.0.2001))(typescript@7.0.2)
       oxlint-plugin-react-doctor:
         specifier: ^0.9.12
         version: 0.9.12
@@ -4974,8 +4974,8 @@ packages:
       vite-plus:
         optional: true
 
-  oxlint-config-awesomeness@4.2.0:
-    resolution: {integrity: sha512-pAqU6dSzwnmxxJQ8RRc6B6Qp2dvOsXcthKH2ohz3LiEZlUhnYA/Jp5whDdNyuHusiFWsVSIeCdGkgJCVEfIVTA==}
+  oxlint-config-awesomeness@4.3.0:
+    resolution: {integrity: sha512-LhI7q+YQEeT4wt1QuiW4Su1c+H1DgEuQSTxs9cM/BcS76mmfRretcWiaqU2n97QBhvzng4sbpKcErr9MALgo4g==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
@@ -10465,7 +10465,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.62.0
       '@oxfmt/binding-win32-x64-msvc': 0.62.0
 
-  oxlint-config-awesomeness@4.2.0(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.12)(oxlint-tsgolint@7.0.2001)(oxlint@1.79.0(oxlint-tsgolint@7.0.2001))(typescript@7.0.2):
+  oxlint-config-awesomeness@4.3.0(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint-plugin-unused-imports@4.4.1(eslint@10.8.0(jiti@2.7.0)))(oxlint-plugin-react-doctor@0.9.12)(oxlint-tsgolint@7.0.2001)(oxlint@1.79.0(oxlint-tsgolint@7.0.2001))(typescript@7.0.2):
     dependencies:
       '@oxlint/plugins': 1.79.0
       eslint-plugin-no-only-tests: 3.4.0
