@@ -5,8 +5,8 @@ import { Scalar } from "@scalar/hono-api-reference";
 declare module "hono" {
   // oxlint-disable-next-line consistent-type-definitions -- declaration merging requires interface, not type
   interface ContextVariableMap {
-    requestId: string;
     log: EvlogVariables["Variables"]["log"];
+    requestId: string;
   }
 }
 
