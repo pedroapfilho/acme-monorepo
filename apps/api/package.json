@@ -15,16 +15,16 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@hono/node-server": "^2.0.8",
-    "@hono/zod-openapi": "^1.5.1",
+    "@hono/node-server": "^2.1.1",
+    "@hono/zod-openapi": "^1.6.1",
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/transactional": "workspace:*",
-    "@scalar/hono-api-reference": "^0.11.13",
-    "@scalar/openapi-to-markdown": "^0.5.38",
+    "@scalar/hono-api-reference": "^0.11.16",
+    "@scalar/openapi-to-markdown": "^0.5.42",
     "dotenv": "^17.4.2",
-    "hono": "^4.13.1",
+    "hono": "^4.13.4",
     "hono-rate-limiter": "^0.5.3",
     "zod": "^4.4.3"
   },
@@ -36,7 +36,7 @@
     "@types/node": "^26.2.0",
     "tsdown": "^0.22.4",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10",
-    "zod-compiler": "^1.27.0"
+    "vitest": "^4.1.11",
+    "zod-compiler": "^1.28.0"
   }
 }
