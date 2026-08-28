@@ -79,11 +79,14 @@ Each package loads env vars from its **own** directory. Copy each example and ed
 
 ```bash
 cp apps/api/.env.example apps/api/.env
+cp apps/landing/.env.example apps/landing/.env
 cp apps/web/.env.example apps/web/.env
 cp packages/db/.env.example packages/db/.env
 ```
 
-(`apps/landing` reads no env vars at runtime, so it doesn't need a file.)
+(`apps/landing` needs its file only at build time: `NEXT_PUBLIC_WEB_APP_URL` is
+inlined into the client bundle by `next build` and read nowhere at runtime. Its
+default already points at the local web app, so `pnpm dev` works without it.)
 
 Then edit each file and set:
 
