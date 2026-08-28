@@ -79,7 +79,7 @@ Each package loads env vars from its **own** directory. Copy each example and ed
 
 ```bash
 cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env.local
+cp apps/web/.env.example apps/web/.env
 cp packages/db/.env.example packages/db/.env
 ```
 
@@ -87,7 +87,7 @@ cp packages/db/.env.example packages/db/.env
 
 Then edit each file and set:
 
-- `BETTER_AUTH_SECRET`: any 32+ char random string, **identical** across `apps/api/.env` and `apps/web/.env.local` (both validate sessions against it). Generate with `openssl rand -base64 32`.
+- `BETTER_AUTH_SECRET`: any 32+ char random string, **identical** across `apps/api/.env` and `apps/web/.env` (both validate sessions against it). Generate with `openssl rand -base64 32`.
 - `DATABASE_URL`: replace the name and password placeholders.
 
 The URL variables (`NEXT_PUBLIC_API_URL`, `BETTER_AUTH_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`) are pre-set to the portless URLs and don't need changes for local dev.
