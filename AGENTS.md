@@ -96,7 +96,7 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
 - `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify; it does not serve the auth routes.
-- `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env.local`; both validate sessions against it.
+- `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
 - `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
 
 ### API
@@ -128,7 +128,7 @@ Each package loads env vars from **its own** directory; there is no root `.env`.
 
 ```bash
 cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env.local
+cp apps/web/.env.example apps/web/.env
 cp packages/db/.env.example packages/db/.env
 ```
 
