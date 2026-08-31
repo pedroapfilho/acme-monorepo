@@ -8,6 +8,10 @@
     "./node": "./node.ts",
     "./setup-react": "./setup-react.ts"
   },
+  "scripts": {
+    "lint": "oxlint",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
@@ -17,7 +21,9 @@
     "vitest": "^4.1.11"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^26.4.0",
+    "typescript": "^7.0.2",
     "zod-compiler": "^1.28.0"
   }
 }
