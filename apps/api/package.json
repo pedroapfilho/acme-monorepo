@@ -24,7 +24,7 @@
     "@scalar/hono-api-reference": "^0.11.16",
     "@scalar/openapi-to-markdown": "^0.5.42",
     "dotenv": "^17.4.2",
-    "hono": "^4.13.4",
+    "hono": "^4.13.5",
     "hono-rate-limiter": "^0.5.3",
     "zod": "^4.4.3"
   },
@@ -33,7 +33,7 @@
     "@repo/typescript-config": "workspace:*",
     "@rollup/plugin-alias": "^6.0.0",
     "@total-typescript/ts-reset": "^0.6.1",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.4.0",
     "tsdown": "^0.22.4",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11",

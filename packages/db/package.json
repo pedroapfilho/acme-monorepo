@@ -23,15 +23,15 @@
     "postinstall": "pnpm run db:generate"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0"
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.4.0",
     "dotenv": "^17.4.2",
-    "prisma": "^7.8.0",
+    "prisma": "^7.10.0",
     "tsdown": "^0.22.4",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2",
