@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "resend": "^6.24.0",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@react-email/ui": "^6.9.3",
