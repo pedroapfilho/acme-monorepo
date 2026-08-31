@@ -120,7 +120,7 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 
 ### Turbo cache keys
 
-`build.env` is sensitive to: `API_URL`, `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `NEXT_PUBLIC_API_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
+`build.env` is sensitive to: `API_URL`, `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_APP_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
 
 ## Environment
 
@@ -128,11 +128,12 @@ Each package loads env vars from **its own** directory; there is no root `.env`.
 
 ```bash
 cp apps/api/.env.example apps/api/.env
+cp apps/landing/.env.example apps/landing/.env
 cp apps/web/.env.example apps/web/.env
 cp packages/db/.env.example packages/db/.env
 ```
 
-`apps/landing` reads no runtime env vars. Key variables:
+`apps/landing` reads one build-time variable, `NEXT_PUBLIC_WEB_APP_URL`, and nothing at runtime. Key variables:
 
 - `DATABASE_URL`: PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`)
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
