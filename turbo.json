@@ -13,6 +13,7 @@
         "BETTER_AUTH_SECRET",
         "CORS_ORIGINS",
         "DATABASE_URL",
+        "EXPOSE_TESTING_API",
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_WEB_APP_URL",
         "TRUSTED_ORIGINS",
