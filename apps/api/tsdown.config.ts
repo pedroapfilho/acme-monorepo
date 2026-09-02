@@ -1,8 +1,14 @@
 import path from "node:path";
 
+import { applyPortlessUrls } from "@repo/portless-env";
 import alias from "@rollup/plugin-alias";
 import { defineConfig } from "tsdown";
 import zodCompiler from "zod-compiler/rolldown";
+
+applyPortlessUrls({
+  CORS_ORIGINS: ["acme.web", "acme.landing"],
+  WEB_APP_URL: ["acme.web"],
+});
 
 const srcDir = path.resolve(process.cwd(), "src");
 

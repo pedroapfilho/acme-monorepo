@@ -1,4 +1,7 @@
+import { applyPortlessUrls } from "@repo/portless-env";
 import type { NextConfig } from "next";
+
+applyPortlessUrls({ NEXT_PUBLIC_WEB_APP_URL: ["acme.web"] });
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["acme.landing.localhost", "*.acme.landing.localhost", "*.vercel.app"],

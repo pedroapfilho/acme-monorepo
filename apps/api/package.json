@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
+    "@repo/portless-env": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@rollup/plugin-alias": "^6.0.0",
     "@total-typescript/ts-reset": "^0.6.1",
