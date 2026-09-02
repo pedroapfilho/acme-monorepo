@@ -82,3 +82,4 @@ minimumReleaseAgeExclude:
   - "@oxlint/binding-win32-x64-msvc@1.79.0"
   - "@oxlint/plugins@1.79.0"
   - oxlint@1.79.0
+  - cn@0.2.4
