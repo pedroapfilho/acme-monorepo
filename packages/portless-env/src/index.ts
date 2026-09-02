@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import { execFileSync } from "node:child_process";
 import { env as processEnv } from "node:process";
 
@@ -7,6 +5,7 @@ type ProcessEnvironment = Record<string, string | undefined>;
 type PortlessMapping = Record<string, ReadonlyArray<string>>;
 
 const portless = (...args: Array<string>): string =>
+  // oxlint-disable-next-line node/no-sync -- Next, Vite, and tsdown evaluate their configs synchronously, so the lookup has to block.
   execFileSync("portless", args, {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "inherit"],

@@ -1,10 +1,9 @@
 import path from "node:path";
 
+import { applyPortlessUrls } from "@repo/portless-env";
 import alias from "@rollup/plugin-alias";
 import { defineConfig } from "tsdown";
 import zodCompiler from "zod-compiler/rolldown";
-
-import { applyPortlessUrls } from "../../scripts/portless-env.ts";
 
 applyPortlessUrls({
   CORS_ORIGINS: ["acme.web", "acme.landing"],
