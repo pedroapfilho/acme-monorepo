@@ -30,6 +30,7 @@ packages/
   transactional/       React Email templates + Resend sender
   config-typescript/   Shared tsconfig bases (nextjs / server / react-library / vite)
   config-vitest/       Shared Vitest configs (react.ts, node.ts)
+  portless-env/        applyPortlessUrls: fills dev URL env vars from `portless get`
 docs/                  CONVENTIONS.md + superpowers specs
 agents/counselors/     Agent role definitions
 tests/                 Root Playwright e2e specs
@@ -80,6 +81,8 @@ sudo portless proxy start --https     # binds :443, trusts the local cert
 Worktrees auto-prefix the subdomain: `main` → `https://acme.web.localhost`, branch `fix-styles` → `https://fix-styles.acme.web.localhost`. Each gets an auto-assigned backing port; no collisions.
 
 The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt`; see `apps/api/src/lib/openapi.ts`.
+
+App configs resolve those URLs through `@repo/portless-env` rather than hardcoding them. `applyPortlessUrls({ ENV_VAR: ["<subdomain>"] })` runs at the top of each `next.config.ts` / `tsdown.config.ts` and shells out to `portless get` for every name, filling the env var only when it is unset or still holds the canonical `*.localhost` default. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Import it by bare specifier (`@repo/portless-env`): a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
 
 ## Conventions & gotchas
 
@@ -159,7 +162,7 @@ Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`,
 ## References
 
 - Conventions: [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md)
-- Orchestrator (cross-repo standards + verifiers): `~/dev/orchestrator`
+- Orchestrator (cross-repo standards + checks): `~/dev/orchestrator`
 - Portless: <https://www.npmjs.com/package/portless>
 - Better Auth: <https://www.better-auth.com>
 - Turborepo: <https://turborepo.com>
