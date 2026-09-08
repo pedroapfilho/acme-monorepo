@@ -48,4 +48,19 @@ describe("useAuthSubmit", () => {
     expect(handleSubmit).toHaveBeenCalledTimes(1);
     expect(work).toHaveBeenCalledTimes(1);
   });
+
+  it("releases the latch when validation throws before returning a promise", async () => {
+    const failure = new Error("synchronous validation failed");
+    const handleSubmit = vi.fn(() => {
+      throw failure;
+    });
+    const { result } = renderHook(() => useAuthSubmit());
+
+    await act(async () => {
+      await expect(result.current.submit({ handleSubmit })).rejects.toBe(failure);
+      await expect(result.current.submit({ handleSubmit })).rejects.toBe(failure);
+    });
+
+    expect(handleSubmit).toHaveBeenCalledTimes(2);
+  });
 });

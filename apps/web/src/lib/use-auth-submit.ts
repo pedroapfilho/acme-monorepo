@@ -6,6 +6,14 @@ type SubmittableForm = {
   handleSubmit: () => Promise<void>;
 };
 
+const runWithCleanup = async (work: () => Promise<void>, cleanup: () => void) => {
+  try {
+    await work();
+  } finally {
+    cleanup();
+  }
+};
+
 /**
  * `isPending` only starts at `startTransition`, i.e. after validation, so the ref covers the gap
  * from the click. Both exits clear it unconditionally: keying the release off form validity leaves
@@ -19,11 +27,9 @@ const useAuthSubmit = () => {
   const run = (work: () => Promise<void>) => {
     didRun.current = true;
     startTransition(async () => {
-      try {
-        await work();
-      } finally {
+      await runWithCleanup(work, () => {
         isLatched.current = false;
-      }
+      });
     });
   };
 
@@ -33,13 +39,14 @@ const useAuthSubmit = () => {
     }
     isLatched.current = true;
     didRun.current = false;
-    try {
-      await form.handleSubmit();
-    } finally {
-      if (!didRun.current) {
-        isLatched.current = false;
-      }
-    }
+    await runWithCleanup(
+      () => form.handleSubmit(),
+      () => {
+        if (!didRun.current) {
+          isLatched.current = false;
+        }
+      },
+    );
   };
 
   return { isPending, run, submit };
