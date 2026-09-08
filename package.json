@@ -35,7 +35,7 @@
     "lint-staged": "^17.4.1",
     "oxfmt": "^0.66.0",
     "oxlint": "^1.81.0",
-    "oxlint-config-awesomeness": "^4.4.0",
+    "oxlint-config-awesomeness": "^4.5.0",
     "oxlint-plugin-react-doctor": "^0.9.13",
     "oxlint-tsgolint": "^7.0.2001",
     "turbo": "^2.10.12",

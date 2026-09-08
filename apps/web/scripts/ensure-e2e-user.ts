@@ -21,6 +21,7 @@ const main = async () => {
   const ctx = await getAuth().$context;
   const hashed = await ctx.password.hash(PASSWORD);
 
+  // eslint-disable-next-line react-doctor/server-sequential-independent-await -- Hash first so a hashing failure cannot leave a partially seeded user.
   const user = await prisma.user.upsert({
     create: {
       email: EMAIL,
