@@ -14,16 +14,16 @@
   },
   "dependencies": {
     "@testing-library/jest-dom": "^7.0.1",
-    "@testing-library/react": "^16.3.2",
-    "@vitejs/plugin-react": "^6.1.0",
+    "@testing-library/react": "^16.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^4.1.11",
     "jsdom": "^30.0.1",
     "vitest": "^4.1.11"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^26.4.0",
+    "@types/node": "^26.4.1",
     "typescript": "^7.0.2",
-    "zod-compiler": "^1.28.0"
+    "zod-compiler": "^2.0.3"
   }
 }
