@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, use, useState } from "react";
 
+import { AuthPasswordField } from "@/components/auth-password-field";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
@@ -168,55 +169,12 @@ const RegisterForm = ({ searchParams }: Props) => {
 
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="password">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    autoComplete="new-password"
-                    disabled={isPending}
-                    id="password"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                    required
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
+            {(field) => <AuthPasswordField disabled={isPending} field={field} label="Password" />}
           </form.Field>
-
           <form.Field name="confirmPassword">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    autoComplete="new-password"
-                    disabled={isPending}
-                    id="confirmPassword"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                    required
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
+            {(field) => (
+              <AuthPasswordField disabled={isPending} field={field} label="Confirm Password" />
+            )}
           </form.Field>
         </div>
 

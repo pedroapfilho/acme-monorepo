@@ -1,14 +1,7 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
+import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
 import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
@@ -16,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { AuthPasswordField } from "@/components/auth-password-field";
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
 import { useAuthSubmit } from "@/lib/use-auth-submit";
@@ -80,55 +74,14 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
       <FieldGroup>
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="password">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="password">New password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    autoComplete="new-password"
-                    disabled={isPending}
-                    id="password"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                    required
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
+            {(field) => (
+              <AuthPasswordField disabled={isPending} field={field} label="New password" />
+            )}
           </form.Field>
-
           <form.Field name="confirmPassword">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="confirmPassword">Confirm password</FieldLabel>
-                  <Input
-                    aria-invalid={isInvalid}
-                    autoComplete="new-password"
-                    disabled={isPending}
-                    id="confirmPassword"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                    required
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
+            {(field) => (
+              <AuthPasswordField disabled={isPending} field={field} label="Confirm password" />
+            )}
           </form.Field>
         </div>
 
