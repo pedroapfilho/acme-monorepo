@@ -7,6 +7,10 @@ overrides:
   # declarations resolve to a broken sibling .d.mts and every OpenAPI route
   # helper degrades to the error type (575 type-aware lint errors in apps/api).
   "@hono/zod-openapi": "1.5.1"
+  # Security: force patched transitive releases to clear pnpm audit advisories.
+  # Each pin is the lowest patched version within the already-resolved major.
+  mysql2: "^3.23.1"
+  qs: "^6.16.0"
 
 nodeLinker: hoisted
 
