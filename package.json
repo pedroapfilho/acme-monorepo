@@ -39,7 +39,7 @@
     "oxlint-plugin-react-doctor": "^0.9.13",
     "oxlint-tsgolint": "^7.0.2001",
     "turbo": "^2.10.12",
-    "zod-compiler": "^1.28.0"
+    "zod-compiler": "^2.0.3"
   },
   "lint-staged": {
     "!(*.d).{ts,tsx,mts,cts,js,jsx,mjs,cjs}": [
