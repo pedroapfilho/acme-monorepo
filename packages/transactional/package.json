@@ -21,7 +21,7 @@
     "preview": "portless run --force --name acme.email -- bash -c 'email dev --port $PORT --dir ./src'"
   },
   "dependencies": {
-    "resend": "^6.24.0",
+    "resend": "^6.25.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {
