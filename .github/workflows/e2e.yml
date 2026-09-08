@@ -57,6 +57,26 @@ jobs:
         with:
           runtime: node@24
           cache: true
+      - name: Restore Turbo task cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-
+            turbo-${{ runner.os }}-e2e-push-main-
+      # Turbo restores complete build outputs on a task hit. Preserve Next's
+      # compiler cache separately so changed apps can still compile incrementally.
+      - name: Restore Next.js compiler cache
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            apps/web/.next/cache
+            apps/landing/.next/cache
+          key: next-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            next-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-
+            next-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-push-main-
       - run: pnpm db:generate
       - run: pnpm db:push
       - run: pnpm build --filter=web --filter=api --filter=landing
