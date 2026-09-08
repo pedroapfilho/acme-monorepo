@@ -54,8 +54,8 @@ importers:
         specifier: ^2.10.12
         version: 2.10.12
       zod-compiler:
-        specifier: ^1.28.0
-        version: 1.28.0(esbuild@0.28.1)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.4.3)
+        specifier: ^2.0.3
+        version: 2.0.3(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.5.4)
 
   apps/api:
     dependencies:
@@ -124,8 +124,8 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@26.4.1)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.4.0))(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
       zod-compiler:
-        specifier: ^1.28.0
-        version: 1.28.0(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.5.4)
+        specifier: ^2.0.3
+        version: 2.0.3(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.5.4)
 
   apps/landing:
     dependencies:
@@ -337,8 +337,8 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
       zod-compiler:
-        specifier: ^1.28.0
-        version: 1.28.0(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.4.3)
+        specifier: ^2.0.3
+        version: 2.0.3(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.5.4)
 
   packages/db:
     dependencies:
@@ -6538,13 +6538,13 @@ packages:
   zeptomatch@2.1.0:
     resolution: {integrity: sha512-KiGErG2J0G82LSpniV0CtIzjlJ10E04j02VOudJsPyPwNZgGnRKQy7I1R7GMyg/QswnE4l7ohSGrQbQbjXPPDA==}
 
-  zod-compiler@1.28.0:
-    resolution: {integrity: sha512-DGuTHsy9bVijt/uZCc4ElOSoT5bY3JOMIXxGN4LZYQDL5PFi+07Bo0o3YUAZleE4/QMhDA0KeZqc3pCeZAb5yA==}
+  zod-compiler@2.0.3:
+    resolution: {integrity: sha512-tI27He+22RHKddWGcU6Qs/nfz3vyMJ2CEc6oy4Oil7YzTq2LCn17PUL0feFk6XQU7VkGHawC6FLNZxaP7sEL7w==}
     hasBin: true
     peerDependencies:
       '@rsbuild/core': ^1.0.0 || ^2.0.0
       '@swc/core': '>=1.3.0'
-      zod: ^4.0.0
+      zod: ^4.5.0
     peerDependenciesMeta:
       '@rsbuild/core':
         optional: true
@@ -12073,16 +12073,6 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin@3.3.0(esbuild@0.28.1)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0)):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      picomatch: 4.0.7
-      webpack-virtual-modules: 0.6.2
-    optionalDependencies:
-      esbuild: 0.28.1
-      rolldown: 1.2.3
-      vite: 8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0)
-
   unplugin@3.3.0(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0)):
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -12315,51 +12305,7 @@ snapshots:
       grammex: 3.1.13
       graphmatch: 1.1.1
 
-  zod-compiler@1.28.0(esbuild@0.28.1)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.4.3):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      acorn: 8.18.0
-      es-module-lexer: 2.3.2
-      get-tsconfig: 4.14.3
-      jiti: 2.7.0
-      magic-string: 0.30.21
-      picomatch: 4.0.7
-      unplugin: 3.3.0(esbuild@0.28.1)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
-      zod: 4.4.3
-    transitivePeerDependencies:
-      - '@farmfe/core'
-      - '@rspack/core'
-      - bun-types-no-globals
-      - esbuild
-      - rolldown
-      - rollup
-      - unloader
-      - vite
-      - webpack
-
-  zod-compiler@1.28.0(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.4.3):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      acorn: 8.18.0
-      es-module-lexer: 2.3.2
-      get-tsconfig: 4.14.3
-      jiti: 2.7.0
-      magic-string: 0.30.21
-      picomatch: 4.0.7
-      unplugin: 3.3.0(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))
-      zod: 4.4.3
-    transitivePeerDependencies:
-      - '@farmfe/core'
-      - '@rspack/core'
-      - bun-types-no-globals
-      - esbuild
-      - rolldown
-      - rollup
-      - unloader
-      - vite
-      - webpack
-
-  zod-compiler@1.28.0(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.5.4):
+  zod-compiler@2.0.3(esbuild@0.28.2)(rolldown@1.2.3)(vite@8.2.1(@types/node@26.4.1)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.9.0))(zod@4.5.4):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       acorn: 8.18.0
