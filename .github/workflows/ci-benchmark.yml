@@ -1,0 +1,18 @@
+name: CI benchmark
+on: pull_request
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  playwright-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright@sha256:c091b21d9fae78c76e85cd4356431e9b018402f172a214fc7d7a5e9a7e29d8ac
+    steps:
+      - name: Inspect preinstalled browser and runtime
+        run: |
+          node --version
+          ls /ms-playwright
