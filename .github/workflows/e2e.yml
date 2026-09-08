@@ -11,9 +11,43 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.diff.outputs.run }}
+    steps:
+      - name: Check whether E2E inputs changed
+        id: diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != pull_request ]; then
+            echo 'run=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api "repos/$GH_REPO/pulls/$PR_NUMBER" > "$RUNNER_TEMP/e2e-pr.json"
+          gh api --paginate --slurp "repos/$GH_REPO/pulls/$PR_NUMBER/files?per_page=100" > "$RUNNER_TEMP/e2e-files.json"
+          node <<'NODE'
+          const fs = require('node:fs');
+          const pr = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/e2e-pr.json'));
+          const files = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/e2e-files.json')).flat();
+          const docsOnly = (p) => /^(?:README|CHANGELOG|CONTRIBUTING|CODE_OF_CONDUCT|AGENTS|CLAUDE)\.md$/.test(p)
+            || /^docs\/.*\.md$/.test(p) || /^\.changeset\/[^/]+\.md$/.test(p);
+          const complete = pr.head.sha === process.env.PR_HEAD && files.length === pr.changed_files && files.length < 3000;
+          const run = !complete || files.length === 0 || files.some(f => !docsOnly(f.filename) || (f.previous_filename && !docsOnly(f.previous_filename)));
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, 'run=' + run + '\n');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, run ? 'E2E inputs changed (or diff is uncertain): run the complete suite.\n' : 'Only standalone documentation changed: E2E is skipped.\n');
+          NODE
   e2e:
+    needs: changes
+    if: ${{ always() && (needs.changes.result != 'success' || needs.changes.outputs.run != 'false') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -46,10 +80,14 @@ jobs:
           - 5432:5432
         options: >-
           --health-cmd "pg_isready -U test -d test"
-          --health-interval 10s
+          --health-interval 1s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 30
     steps:
+      - name: Require a successful change check
+        env:
+          RESULT: ${{ needs.changes.result }}
+        run: test "$RESULT" = success
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -57,16 +95,34 @@ jobs:
         with:
           runtime: node@24
           cache: true
-      - run: pnpm db:generate
+      - name: Restore Turbo task cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ runner.arch }}-node24-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ runner.arch }}-node24-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-
+            turbo-${{ runner.os }}-${{ runner.arch }}-node24-e2e-push-main-
+      - name: Restore Next.js compiler cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: "apps/*/.next/cache"
+          key: next-${{ runner.os }}-${{ runner.arch }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ runner.arch }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref_name }}-
+            next-${{ runner.os }}-${{ runner.arch }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-push-main-
       - run: pnpm db:push
       - run: pnpm build --filter=web --filter=api --filter=landing
       - name: Seed E2E test user
         run: pnpm --filter web exec tsx scripts/ensure-e2e-user.ts
-      # Canonical Playwright CI pattern (playwright.dev/docs/ci): browser
-      # download + apt system deps in one step. Caching is explicitly
-      # *not* recommended by the docs; restore time is comparable to a
-      # fresh download. The chromium pin matches playwright.config.ts
-      # which filters firefox/webkit out under CI.
+      - name: Read Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | cut -d ' ' -f 2)" >> "$GITHUB_OUTPUT"
+      - name: Restore Chromium
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.playwright.outputs.version }}-chromium
       - name: Install Playwright browsers and system deps
         run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
