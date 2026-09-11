@@ -10,7 +10,8 @@ services:
       POSTGRES_PASSWORD: acme123
       POSTGRES_DB: acme
     ports:
-      - "5432:5432"
+      # Loopback-bound: an unqualified mapping publishes these dev credentials on every host interface.
+      - "127.0.0.1:5432:5432"
     volumes:
       # Postgres 18 expects the mount at /var/lib/postgresql (major-version subdir lives inside). See docker-library/postgres#1259.
       - postgres_data:/var/lib/postgresql
