@@ -9,7 +9,7 @@ const toasterStyle: CSSProperties & Record<`--${string}`, string> = {
 };
 
 const Toaster = (props: ToasterProps) => (
-  <Sonner className="toaster group" style={toasterStyle} {...props} />
+  <Sonner className="group" style={toasterStyle} {...props} />
 );
 
 export { toast } from "sonner";

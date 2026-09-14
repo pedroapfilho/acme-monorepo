@@ -158,7 +158,7 @@ const SettingsContent = async () => {
         </CardContent>
       </Card>
 
-      <Card className="border-destructive/50">
+      <Card variant="destructive">
         <CardHeader>
           <CardTitle>Delete account</CardTitle>
           <CardDescription>

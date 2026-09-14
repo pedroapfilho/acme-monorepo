@@ -168,3 +168,7 @@ Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`,
 - Turborepo: <https://turborepo.com>
 - Hono: <https://hono.dev>
 - React Email: <https://react.email>
+
+## Design-system linting
+
+Run `pnpm lint` after changes and fix every error. `oxlint.config.ts` registers `@shadcn/lint` and enforces component contracts, known Tailwind classes, and readable component class names. Shared primitives in `packages/ui/src/components` own their internal styles. Card titles allow typography while retaining their font, and card content allows spacing. Use `Card variant="destructive"` for the danger treatment. The `utils.test.ts` allowance for `foo`, `bar`, and `baz` exercises opaque class merging; those names are not production CSS. Add component variants for appearance changes and retain layout classes at call sites.
