@@ -59,10 +59,10 @@ const Page = () => {
         <div className="mx-auto flex max-w-5xl flex-col items-start gap-8 px-6 md:px-8">
           <p className="font-mono text-sm tracking-wide text-primary uppercase">Acme template</p>
           <div>
-            <h1 className="max-w-[24ch] text-5xl font-semibold tracking-tight text-balance md:text-6xl">
+            <h1 className="max-w-(--container-measure-hero) text-5xl font-semibold tracking-tight text-balance md:text-6xl">
               The one template to rule them all.
             </h1>
-            <p className="mt-6 max-w-[44ch] text-lg text-pretty text-muted-foreground md:text-xl">
+            <p className="mt-6 max-w-(--container-measure-summary) text-lg text-pretty text-muted-foreground md:text-xl">
               A Next.js monorepo baseline with Better Auth, Prisma, and shadcn/ui: configured,
               tested, and ready to fork.
             </p>
@@ -100,10 +100,10 @@ const Page = () => {
         <div className="mx-auto max-w-5xl px-6 md:px-8">
           <div>
             <p className="font-mono text-sm tracking-wide text-primary uppercase">What you get</p>
-            <h2 className="mt-4 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
+            <h2 className="mt-4 max-w-(--container-measure-heading) text-3xl font-semibold tracking-tight text-balance md:text-4xl">
               The hard parts are already connected.
             </h2>
-            <p className="mt-4 max-w-[48ch] text-lg text-pretty text-muted-foreground">
+            <p className="mt-4 max-w-(--container-measure-body) text-lg text-pretty text-muted-foreground">
               Not a pile of dependencies to assemble. The pieces every product needs are wired to
               each other and covered by tests.
             </p>
@@ -129,10 +129,10 @@ const Page = () => {
         <div className="mx-auto grid max-w-5xl gap-12 px-6 md:grid-cols-2 md:px-8">
           <div>
             <p className="font-mono text-sm tracking-wide text-primary uppercase">Structure</p>
-            <h2 className="mt-4 max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
+            <h2 className="mt-4 max-w-(--container-measure-heading) text-3xl font-semibold tracking-tight text-balance md:text-4xl">
               Apps and packages, kept apart on purpose.
             </h2>
-            <p className="mt-4 max-w-[48ch] text-lg text-pretty text-muted-foreground">
+            <p className="mt-4 max-w-(--container-measure-body) text-lg text-pretty text-muted-foreground">
               Every workspace owns one job and states what it needs from the others, so a change
               stays where you made it.
             </p>
@@ -140,7 +140,7 @@ const Page = () => {
           <dl className="divide-y divide-border">
             {WORKSPACES.map((workspace) => (
               <div
-                className="grid gap-1 py-5 first:pt-0 last:pb-0 sm:grid-cols-[9rem_1fr] sm:gap-6"
+                className="grid gap-1 py-5 first:pt-0 last:pb-0 sm:grid-cols-label-content sm:gap-6"
                 key={workspace.name}
               >
                 <dt className="font-mono text-base font-medium sm:text-sm">{workspace.name}</dt>
@@ -156,10 +156,10 @@ const Page = () => {
       <section className="border-t border-border bg-muted/40 py-20 md:py-24">
         <div className="mx-auto flex max-w-5xl flex-col items-start gap-8 px-6 md:px-8">
           <div>
-            <h2 className="max-w-[35ch] text-3xl font-semibold tracking-tight text-balance md:text-4xl">
+            <h2 className="max-w-(--container-measure-heading) text-3xl font-semibold tracking-tight text-balance md:text-4xl">
               Fork it and start on the product.
             </h2>
-            <p className="mt-4 max-w-[48ch] text-lg text-pretty text-muted-foreground">
+            <p className="mt-4 max-w-(--container-measure-body) text-lg text-pretty text-muted-foreground">
               Keep the boundaries, replace the domain, and let the checks tell you when the
               foundation drifts.
             </p>

@@ -178,3 +178,68 @@
     scroll-behavior: auto !important;
   }
 }
+
+@theme inline {
+  --radius-control-sm: min(var(--radius-md), 10px);
+}
+
+@theme inline {
+  --radius-control: min(var(--radius-md), 12px);
+}
+
+@theme {
+  --container-measure-body: 48ch;
+}
+
+@theme {
+  --container-measure-heading: 35ch;
+}
+
+@theme {
+  --container-measure-hero: 24ch;
+}
+
+@theme {
+  --container-measure-summary: 44ch;
+}
+
+@theme {
+  --text-control: 0.8rem;
+}
+
+@utility card-spacing {
+  --card-spacing: --spacing(4);
+}
+
+@utility card-spacing-sm {
+  --card-spacing: --spacing(3);
+}
+
+@utility grid-cols-content-action {
+  grid-template-columns: 1fr auto;
+}
+
+@utility grid-cols-label-content {
+  grid-template-columns: 9rem 1fr;
+}
+
+@utility grid-rows-card-header {
+  grid-template-rows: auto auto;
+}
+
+@utility size-touch-target {
+  width: max(100%, 3rem);
+  height: max(100%, 3rem);
+}
+
+@utility transition-button {
+  transition-property: color, opacity, box-shadow, transform;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+}
+
+@utility transition-input {
+  transition-property: color, box-shadow;
+  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+}

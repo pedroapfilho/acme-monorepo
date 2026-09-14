@@ -55,7 +55,7 @@ const Header = () => {
             <Menu aria-hidden="true" />
             <span
               aria-hidden="true"
-              className="absolute top-1/2 left-1/2 size-[max(100%,3rem)] -translate-1/2 pointer-fine:hidden"
+              className="absolute top-1/2 left-1/2 size-touch-target -translate-1/2 pointer-fine:hidden"
             />
             <span className="sr-only">Open navigation</span>
           </summary>

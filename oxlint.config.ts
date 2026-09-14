@@ -31,6 +31,9 @@ export default defineConfig({
     },
   ],
   rules: {
+    "shadcn/no-arbitrary-values": "error",
+    "shadcn/no-inline-styles": "error",
+    "shadcn/no-raw-colors": "error",
     "shadcn/no-restyle": [
       "error",
       {
