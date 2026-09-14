@@ -33,7 +33,7 @@
     "next": "^16.3.4",
     "react": "^19.3.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.0"
   },
   "peerDependencies": {
     "better-auth": "^1.7.3",
