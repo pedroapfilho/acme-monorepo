@@ -1,0 +1,63 @@
+.document {
+  color-scheme: light dark;
+}
+
+.body {
+  align-items: center;
+  background-color: light-dark(#ffffff, #0a0a0a);
+  color: light-dark(#0a0a0a, #fafafa);
+  display: flex;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  justify-content: center;
+  margin: 0;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.button {
+  background-color: light-dark(#0a0a0a, #fafafa);
+  border: none;
+  border-radius: 0.5rem;
+  color: light-dark(#fafafa, #0a0a0a);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-height: 2.75rem;
+  padding: 0.625rem 1.25rem;
+}
+
+.digest {
+  color: light-dark(#71717a, #a1a1aa);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.main {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 28rem;
+  text-align: center;
+}
+
+.text {
+  color: light-dark(#52525b, #a1a1aa);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin: 0;
+}

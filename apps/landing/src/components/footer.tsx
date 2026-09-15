@@ -14,7 +14,7 @@ const Footer = async () => {
 
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto grid max-w-5xl gap-12 px-6 py-12 md:grid-cols-[1fr_auto] md:px-8">
+      <div className="mx-auto grid max-w-5xl gap-12 px-6 py-12 md:grid-cols-content-action md:px-8">
         <div>
           <Link
             aria-label="Acme homepage"
@@ -24,7 +24,7 @@ const Footer = async () => {
             <Logo className="size-5 shrink-0 text-primary" />
             Acme
           </Link>
-          <p className="mt-5 max-w-[44ch] text-base text-pretty text-muted-foreground sm:text-sm">
+          <p className="mt-5 max-w-(--container-measure-summary) text-base text-pretty text-muted-foreground sm:text-sm">
             A production-ready Next.js baseline for teams that want product work to start on day
             one.
           </p>

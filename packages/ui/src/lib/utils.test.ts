@@ -4,12 +4,12 @@ import { cn } from "./utils";
 
 describe("cn", () => {
   it("should merge multiple class names", () => {
-    expect(cn("foo", "bar")).toBe("foo bar");
+    expect(cn("block", "relative")).toBe("block relative");
   });
 
   it("should handle conditional classes", () => {
     const condition = false;
-    expect(cn("foo", condition && "bar", "baz")).toBe("foo baz");
+    expect(cn("block", condition && "relative", "isolate")).toBe("block isolate");
   });
 
   it("should resolve tailwind conflicts by keeping the last one", () => {
@@ -21,14 +21,14 @@ describe("cn", () => {
   });
 
   it("should handle array inputs", () => {
-    expect(cn(["foo", "bar"])).toBe("foo bar");
+    expect(cn(["block", "relative"])).toBe("block relative");
   });
 
   it("should handle object inputs", () => {
-    expect(cn({ bar: false, foo: true })).toBe("foo");
+    expect(cn({ block: true, relative: false })).toBe("block");
   });
 
   it("should handle mixed inputs", () => {
-    expect(cn("foo", ["bar"], { baz: true })).toBe("foo bar baz");
+    expect(cn("block", ["relative"], { isolate: true })).toBe("block relative isolate");
   });
 });
