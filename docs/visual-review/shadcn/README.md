@@ -24,7 +24,9 @@ Mobile
 | ---------------------------------- | -------------------------------- |
 | ![Before](login-mobile-before.png) | ![After](login-mobile-after.png) |
 
-## Empty login form — dark
+## Login with dark system preference
+
+The base commit has dark CSS tokens but no theme provider, so it stays light under a dark system preference. The after version follows that preference and renders the neutral dark theme. Both captures use the same browser preference; no theme classes were injected.
 
 App: `web`. Route: `/login`. Same route and state on both commits.
 
