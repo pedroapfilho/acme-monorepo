@@ -1,20 +1,15 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { toast } from "@repo/ui/components/sonner";
+import { FormFieldError } from "@repo/ui/compositions/form-field-error";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, use, useState } from "react";
+import { toast } from "sonner";
 
 import { AuthPasswordField } from "@/components/auth-password-field";
 import { authClient } from "@/lib/auth-client";
@@ -123,6 +118,7 @@ const RegisterForm = ({ searchParams }: Props) => {
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
                 <Input
+                  aria-describedby={isInvalid ? "name-error" : undefined}
                   aria-invalid={isInvalid}
                   autoComplete="name"
                   disabled={isPending}
@@ -135,7 +131,7 @@ const RegisterForm = ({ searchParams }: Props) => {
                   required
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                {isInvalid && <FormFieldError errors={field.state.meta.errors} id="name-error" />}
               </Field>
             );
           }}
@@ -148,6 +144,7 @@ const RegisterForm = ({ searchParams }: Props) => {
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  aria-describedby={isInvalid ? "email-error" : undefined}
                   aria-invalid={isInvalid}
                   autoComplete="email"
                   disabled={isPending}
@@ -161,7 +158,7 @@ const RegisterForm = ({ searchParams }: Props) => {
                   type="email"
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                {isInvalid && <FormFieldError errors={field.state.meta.errors} id="email-error" />}
               </Field>
             );
           }}
@@ -179,7 +176,7 @@ const RegisterForm = ({ searchParams }: Props) => {
         </div>
 
         <Field>
-          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Creating account…" : "Create account"}
           </Button>

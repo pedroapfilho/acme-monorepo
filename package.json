@@ -22,7 +22,8 @@
     "fallow:dupes": "fallow dupes",
     "fallow:health": "fallow health --score",
     "fallow:audit": "fallow audit --base main",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:shadcn": "node scripts/check-shadcn.mjs"
   },
   "devDependencies": {
     "@next/playwright": "^16.3.4",

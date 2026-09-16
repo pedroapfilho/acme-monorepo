@@ -33,6 +33,7 @@ jobs:
         id: fallow
         continue-on-error: true
         run: pnpm fallow:dead
+      - run: pnpm check:shadcn
       - run: pnpm oxlint --format=github .
   oxfmt:
     needs: oxlint

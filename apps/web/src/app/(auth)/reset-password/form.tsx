@@ -2,12 +2,12 @@
 
 import { Button } from "@repo/ui/components/button";
 import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
-import { toast } from "@repo/ui/components/sonner";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { AuthPasswordField } from "@/components/auth-password-field";
 import { authClient } from "@/lib/auth-client";
@@ -86,7 +86,7 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
         </div>
 
         <Field>
-          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Resetting…" : "Reset password"}
           </Button>

@@ -74,7 +74,9 @@ const SettingsContent = async () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Profile</CardTitle>
+          <CardTitle>
+            <h2>Profile</h2>
+          </CardTitle>
           <CardDescription>How your name appears across the app.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,7 +86,9 @@ const SettingsContent = async () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Email</CardTitle>
+          <CardTitle>
+            <h2>Email</h2>
+          </CardTitle>
           <CardDescription>
             Signed in as <span className="font-medium">{session.user.email}</span>.
           </CardDescription>
@@ -100,7 +104,9 @@ const SettingsContent = async () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Password</CardTitle>
+          <CardTitle>
+            <h2>Password</h2>
+          </CardTitle>
           <CardDescription>Changing your password signs out your other sessions.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -110,7 +116,9 @@ const SettingsContent = async () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Active sessions</CardTitle>
+          <CardTitle>
+            <h2>Active sessions</h2>
+          </CardTitle>
           <CardDescription>Devices currently signed in to your account.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -158,17 +166,21 @@ const SettingsContent = async () => {
         </CardContent>
       </Card>
 
-      <Card variant="destructive">
-        <CardHeader>
-          <CardTitle>Delete account</CardTitle>
-          <CardDescription>
-            Permanently removes your account and all sessions. This cannot be undone.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DeleteAccountForm />
-        </CardContent>
-      </Card>
+      <section aria-label="Danger zone" className="rounded-xl ring-1 ring-destructive/50">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              <h2>Delete account</h2>
+            </CardTitle>
+            <CardDescription>
+              Permanently removes your account and all sessions. This cannot be undone.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DeleteAccountForm />
+          </CardContent>
+        </Card>
+      </section>
     </>
   );
 };

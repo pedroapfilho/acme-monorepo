@@ -24,7 +24,9 @@ type Props = {
 const Page = ({ searchParams }: Props) => (
   <Card>
     <CardHeader className="text-center">
-      <CardTitle className="text-xl">Reset your password</CardTitle>
+      <CardTitle className="text-xl">
+        <h2>Reset your password</h2>
+      </CardTitle>
       <CardDescription>Enter a new password for your account</CardDescription>
     </CardHeader>
     <CardContent>

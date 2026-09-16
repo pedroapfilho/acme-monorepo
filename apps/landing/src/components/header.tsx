@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonVariants } from "@repo/ui/components/button-variants";
+import { buttonVariants } from "@repo/ui/components/button";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";

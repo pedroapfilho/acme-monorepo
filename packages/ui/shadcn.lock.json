@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "upstreamCommit": "2b3e6d4f8d9161fe5c19340dc383aade392012dd",
+  "registryBase": "https://ui.shadcn.com/r/styles/base-nova",
+  "style": "base-nova",
+  "componentsDirectory": "src/components",
+  "normalizations": [
+    "Repository formatting, import paths, declaration ordering, and RSC boundaries.",
+    "Arbitrary values replaced with equivalent named theme tokens or utilities.",
+    "Registry markers resolved to installed styling and Sonner CSS variables moved to its utility.",
+    "Strictly typed conditions and theme values, with reduced-motion support.",
+    "Composite internals render at the primitive layer when no-restyle prohibits the upstream call; public APIs and DOM composition are retained."
+  ],
+  "files": {
+    "src/components/button.tsx": {
+      "registry": "button",
+      "registrySha256": "9ba7e870178813f0552b818a913a2792fb500c779e36395740b4973e3025d427",
+      "sha256": "b78018fbb870dcae0cdd1d2d4d7ebbd70742ade1bc69c7f3dd0f7af429c4c52b"
+    },
+    "src/components/card.tsx": {
+      "registry": "card",
+      "registrySha256": "e73e3fe00ab2e14c4db1dccb1ff5c67041a94c0926ac3216c1dc6dd6dee9d7e0",
+      "sha256": "b9fb8d4a85ad45ab819b95a1adf56b40fc50e35c5cfb32668d78b4a47f112ac3"
+    },
+    "src/components/field.tsx": {
+      "registry": "field",
+      "registrySha256": "586110f5563cbb5dc0929207ee34361f1349cf2f816465799c60b98821e4cedc",
+      "sha256": "f8896b9925e7b199ed73b77fd4b3964e7c2a2776569f371e1c2d8d35951b82c5"
+    },
+    "src/components/input.tsx": {
+      "registry": "input",
+      "registrySha256": "bbad1bba130ac9750a61844eeb8f043e8a710846e07689fa85398b80a46c2741",
+      "sha256": "d25707203e870873fb105596afcf7adcf642a2f824b59a34c8063643526de49c"
+    },
+    "src/components/label.tsx": {
+      "registry": "label",
+      "registrySha256": "89b01e14fd39dceece9fa421e71e78ea83286bd43a2ca1c2f55d2e8d3958fff2",
+      "sha256": "efd1a70bfaa327dcaa775603615206a6b4bc7231e36bb9e94063a7da7fe29d80"
+    },
+    "src/components/separator.tsx": {
+      "registry": "separator",
+      "registrySha256": "3ad65962485f464592201cb90017b3d52a5c9fe272ce41ee049485b4c42e0d76",
+      "sha256": "8fb33b270fb4f4f9cb6d583ff2f476ff485adf022d6c14c55a150285b50475b5"
+    },
+    "src/components/skeleton.tsx": {
+      "registry": "skeleton",
+      "registrySha256": "85692a09912f518ffd64c540dfcf098fe748a807baf288c107cf8126496cf886",
+      "sha256": "55d659662f00299161830eee84a8a469f8b87340cd0ea489fa7e3946ae700050"
+    },
+    "src/components/sonner.tsx": {
+      "registry": "sonner",
+      "registrySha256": "831967f80f645ac3908b356a44748698a9ceed1c6a51b232dd5e87c52a54d7c3",
+      "sha256": "44059c798297cc9a276aeaa7eb5135f3b799aabb82420ffc229d5da72b76d6df"
+    }
+  },
+  "stylesheets": [
+    {
+      "file": "src/styles/globals.css",
+      "required": [
+        "@import \"shadcn/tailwind.css\";",
+        "--radius-control-sm: min(var(--radius-md), 10px);",
+        "--radius-control: min(var(--radius-md), 12px);",
+        "--text-control: 0.8rem;",
+        "--color-secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);",
+        "@utility card-spacing {\n  --card-spacing: --spacing(4);\n}",
+        "@utility card-spacing-sm {\n  --card-spacing: --spacing(3);\n}",
+        "@utility grid-cols-content-action {\n  grid-template-columns: 1fr auto;\n}",
+        "@utility grid-rows-card-header {\n  grid-template-rows: auto auto;\n}",
+        "@utility toaster {\n  --normal-bg: var(--popover);\n  --normal-text: var(--popover-foreground);\n  --normal-border: var(--border);\n  --border-radius: var(--radius);\n}",
+        "@utility transition-input {\n  transition-property: color, box-shadow;\n  transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));\n  transition-duration: var(--tw-duration, var(--default-transition-duration));\n}"
+      ]
+    }
+  ]
+}
