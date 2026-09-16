@@ -1,6 +1,7 @@
 "use client";
 
 import { buttonVariants } from "@repo/ui/components/button";
+import { cn } from "@repo/ui/lib/utils";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
@@ -44,7 +45,7 @@ const Header = () => {
             Sign in
           </a>
           <a
-            className={buttonVariants({ size: "sm", variant: "outline" })}
+            className={cn(buttonVariants({ size: "sm", variant: "outline" }))}
             href={webAppUrl("/register")}
           >
             Get started

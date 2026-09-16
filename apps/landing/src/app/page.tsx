@@ -1,4 +1,5 @@
 import { buttonVariants } from "@repo/ui/components/button";
+import { cn } from "@repo/ui/lib/utils";
 import { ArrowUpRight, Database, KeyRound, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -68,11 +69,11 @@ const Page = () => {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <a className={buttonVariants({ size: "lg" })} href={webAppUrl("/register")}>
+            <a className={cn(buttonVariants({ size: "lg" }))} href={webAppUrl("/register")}>
               Get started
             </a>
             <a
-              className={buttonVariants({ size: "lg", variant: "outline" })}
+              className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
               href={webAppUrl("/login")}
             >
               Sign in
@@ -165,7 +166,7 @@ const Page = () => {
             </p>
           </div>
           <a
-            className={buttonVariants({ size: "lg", variant: "outline" })}
+            className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
             href={webAppUrl("/register")}
           >
             Open the app
