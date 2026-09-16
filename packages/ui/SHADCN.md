@@ -4,7 +4,7 @@
 
 Put product-specific compositions and adapters in `src/compositions`, helpers in `src/lib`, and hooks in `src/hooks`. For example, `FormFieldError` converts arbitrary TanStack validator values to the upstream `FieldError` message shape. Use normal headings inside `CardTitle`; its upstream element is a generic div. Import `toast` from `sonner`.
 
-The product's theme and brand tokens remain in `src/styles/globals.css`. Load `shadcn/tailwind.css`: the registry depends on its data-state/orientation variants and utilities.
+The template uses the [shadcn neutral palette](https://ui.shadcn.com/r/colors/neutral.json) in `src/styles/globals.css` for light and dark modes, including grayscale charts. Sidebar primary colors follow the neutral primary/foreground pair in both modes. Destructive/error states retain shadcn's semantic red; do not add a brand accent to this template. Load `shadcn/tailwind.css`: the registry depends on its data-state/orientation variants and utilities.
 
 All six design-system lint rules remain enabled. The reviewed source normalizations preserve the upstream contract:
 
