@@ -1,13 +1,14 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { toast } from "@repo/ui/components/sonner";
+import { FormFieldError } from "@repo/ui/compositions/form-field-error";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { deleteAccountSchema } from "@/lib/form-schemas";
@@ -65,6 +66,7 @@ const DeleteAccountForm = () => {
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="deletePassword">Confirm with your password</FieldLabel>
                 <Input
+                  aria-describedby={isInvalid ? "deletePassword-error" : undefined}
                   aria-invalid={isInvalid}
                   autoComplete="current-password"
                   disabled={isPending}
@@ -78,7 +80,9 @@ const DeleteAccountForm = () => {
                   type="password"
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                {isInvalid && (
+                  <FormFieldError errors={field.state.meta.errors} id="deletePassword-error" />
+                )}
               </Field>
             );
           }}
@@ -87,8 +91,8 @@ const DeleteAccountForm = () => {
         <Field>
           <Button
             aria-busy={isPending}
-            aria-disabled={isPending}
             className="w-fit"
+            disabled={isPending}
             type="submit"
             variant="destructive"
           >

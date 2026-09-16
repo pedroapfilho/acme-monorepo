@@ -21,7 +21,9 @@ const Page = () => {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">Recover your account</CardTitle>
+        <CardTitle className="text-xl">
+          <h2>Recover your account</h2>
+        </CardTitle>
         <CardDescription>
           Enter your email and we&apos;ll send you a link to reset your password
         </CardDescription>

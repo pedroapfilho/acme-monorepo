@@ -18,12 +18,10 @@ const emailTheme = {
     primaryDark: "#0a0a0a",
     secondary: "#f5f5f5",
     secondaryDark: "#e5e5e5",
-    success: "#10b981",
     text: "#0a0a0a",
     textDark: "#fafafa",
     textLight: "#737373",
     textMuted: "#a1a1a1",
-    warning: "#f59e0b",
   },
   fonts: {
     mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", "Fira Mono", "Roboto Mono", "Courier New", monospace',

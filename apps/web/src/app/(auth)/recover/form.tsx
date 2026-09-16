@@ -1,19 +1,14 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@repo/ui/components/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
-import { toast } from "@repo/ui/components/sonner";
+import { FormFieldError } from "@repo/ui/compositions/form-field-error";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
@@ -92,6 +87,7 @@ const RecoverForm = () => {
               <Field data-invalid={isInvalid || undefined}>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
+                  aria-describedby={isInvalid ? "email-error" : undefined}
                   aria-invalid={isInvalid}
                   autoComplete="email"
                   disabled={isPending}
@@ -106,14 +102,14 @@ const RecoverForm = () => {
                   type="email"
                   value={field.state.value}
                 />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                {isInvalid && <FormFieldError errors={field.state.meta.errors} id="email-error" />}
               </Field>
             );
           }}
         </form.Field>
 
         <Field>
-          <Button aria-busy={isPending} aria-disabled={isPending} type="submit">
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Sending…" : "Send reset link"}
           </Button>

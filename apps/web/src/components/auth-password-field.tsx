@@ -1,5 +1,6 @@
-import { Field, FieldError, FieldLabel } from "@repo/ui/components/field";
+import { Field, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { FormFieldError } from "@repo/ui/compositions/form-field-error";
 
 type Props = {
   disabled: boolean;
@@ -37,7 +38,7 @@ const AuthPasswordField = ({ disabled, field, label }: Props) => {
         type="password"
         value={field.state.value}
       />
-      {isInvalid && <FieldError errors={field.state.meta.errors} id={errorId} />}
+      {isInvalid && <FormFieldError errors={field.state.meta.errors} id={errorId} />}
     </Field>
   );
 };

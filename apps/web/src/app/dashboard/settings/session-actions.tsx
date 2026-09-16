@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import { toast } from "@repo/ui/components/sonner";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -33,7 +33,7 @@ const RevokeSessionButton = ({ token }: { token: string }) => {
   return (
     <Button
       aria-busy={isPending}
-      aria-disabled={isPending}
+      disabled={isPending}
       onClick={handleRevoke}
       size="sm"
       variant="outline"
@@ -70,8 +70,8 @@ const RevokeOtherSessionsButton = () => {
   return (
     <Button
       aria-busy={isPending}
-      aria-disabled={isPending}
       className="w-fit"
+      disabled={isPending}
       onClick={handleRevokeOthers}
       variant="outline"
     >
@@ -107,8 +107,8 @@ const ReauthenticateButton = () => {
   return (
     <Button
       aria-busy={isPending}
-      aria-disabled={isPending}
       className="w-fit"
+      disabled={isPending}
       onClick={handleReauthenticate}
       variant="outline"
     >

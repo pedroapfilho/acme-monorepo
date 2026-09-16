@@ -35,7 +35,9 @@ const LoginDescription = async ({ searchParams }: Props) => {
 const Page = ({ searchParams }: Props) => (
   <Card>
     <CardHeader className="text-center">
-      <CardTitle className="text-xl">Welcome back</CardTitle>
+      <CardTitle className="text-xl">
+        <h2>Welcome back</h2>
+      </CardTitle>
       <CardDescription>
         <Suspense fallback="Enter your details to sign in to your account">
           <LoginDescription searchParams={searchParams} />
