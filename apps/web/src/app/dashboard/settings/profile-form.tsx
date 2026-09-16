@@ -89,7 +89,7 @@ const ProfileForm = ({ initialName }: Props) => {
           }}
         </form.Field>
 
-        <Field>
+        <Field orientation="horizontal">
           <Button aria-busy={isPending} className="w-fit" disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Saving…" : "Save"}
