@@ -53,6 +53,7 @@ jobs:
     env:
       CI: true
       DATABASE_URL: postgresql://test:test@localhost:5432/test
+      PGAPPNAME: acme:ci:e2e
       BETTER_AUTH_SECRET: test-secret-minimum-32-characters-long-for-e2e
       EXPOSE_TESTING_API: 1
       # Use 127.0.0.1 (not localhost) to match playwright.config.ts baseURL.

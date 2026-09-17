@@ -3,6 +3,7 @@
   "ui": "tui",
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": ["NODE_ENV"],
+  "globalPassThroughEnv": ["PGAPPNAME"],
   "tasks": {
     "build": {
       "dependsOn": ["^build", "db:generate"],

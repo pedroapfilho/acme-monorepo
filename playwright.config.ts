@@ -75,6 +75,7 @@ export default defineConfig({
     ? [
         {
           command: "node_modules/.bin/next start apps/web --port 3000",
+          env: { PGAPPNAME: "acme:ci:web" },
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
@@ -82,6 +83,7 @@ export default defineConfig({
         },
         {
           command: "node apps/api/dist/index.mjs",
+          env: { PGAPPNAME: "acme:ci:api" },
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
@@ -89,6 +91,7 @@ export default defineConfig({
         },
         {
           command: "node_modules/.bin/next start apps/landing --port 3001",
+          env: { PGAPPNAME: "acme:ci:landing" },
           stderr: "pipe",
           stdout: "pipe",
           timeout: 120_000,
