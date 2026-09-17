@@ -1,5 +1,5 @@
 {
   "version": 1,
   "profile": "saas",
-  "mode": "shadow"
+  "mode": "affected"
 }
