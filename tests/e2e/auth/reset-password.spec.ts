@@ -9,13 +9,24 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.expectHeadingVisible();
   });
 
-  test("shows error when submitted without a token", async ({ page, resetPasswordPage }) => {
+  test("offers a new link when the URL has no token", async ({ page, resetPasswordPage }) => {
     await page.context().clearCookies();
 
     await resetPasswordPage.goto();
-    await resetPasswordPage.submit("NewPassword123!", "NewPassword123!");
 
-    await resetPasswordPage.expectErrorText(/invalid reset token/i);
+    await resetPasswordPage.expectInvalidLinkVisible();
+    expect(page.url()).toContain("/reset-password");
+  });
+
+  test("offers a new link when the auth server rejected the token", async ({
+    page,
+    resetPasswordPage,
+  }) => {
+    await page.context().clearCookies();
+
+    await resetPasswordPage.gotoRejected();
+
+    await resetPasswordPage.expectInvalidLinkVisible();
     expect(page.url()).toContain("/reset-password");
   });
 

@@ -97,7 +97,7 @@ const RecoverForm = () => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                   }}
-                  placeholder="m@example.com"
+                  placeholder="you@example.com"
                   required
                   type="email"
                   value={field.state.value}

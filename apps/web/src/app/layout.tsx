@@ -34,15 +34,8 @@ export const metadata: Metadata = {
   },
   publisher: "Acme",
   robots: {
-    follow: true,
-    googleBot: {
-      follow: true,
-      index: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
-    index: true,
+    follow: false,
+    index: false,
   },
   title: {
     default: "Acme | Secure Authentication Platform",
