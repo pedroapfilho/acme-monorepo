@@ -1,12 +1,14 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
+import { Button, buttonVariants } from "@repo/ui/components/button";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
+import { cn } from "@repo/ui/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { use, useState } from "react";
 import { toast } from "sonner";
 
 import { AuthPasswordField } from "@/components/auth-password-field";
@@ -15,10 +17,26 @@ import { resetPasswordSchema } from "@/lib/form-schemas";
 import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ error?: string; token?: string }>;
 };
 
-const ResetPasswordForm = ({ searchParams }: Props) => {
+const InvalidResetLink = () => (
+  <>
+    <CardHeader className="text-center">
+      <CardTitle className="text-xl">
+        <h2>Reset link invalid</h2>
+      </CardTitle>
+      <CardDescription>This password reset link is invalid or has expired.</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <Link className={cn(buttonVariants(), "w-full")} href="/recover">
+        Request a new link
+      </Link>
+    </CardContent>
+  </>
+);
+
+const NewPasswordForm = ({ token }: { token: string }) => {
   const { push } = useRouter();
   const { isPending, run, submit } = useAuthSubmit();
   const [formError, setFormError] = useState<string | null>(null);
@@ -29,13 +47,6 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
       setFormError(null);
       run(async () => {
         try {
-          const { token = null } = await searchParams;
-          if (token === null || token === "") {
-            const message = "Invalid reset token. Please request a new password reset.";
-            setFormError(message);
-            toast.error(message);
-            return;
-          }
           const result = await authClient.resetPassword({
             newPassword: value.password,
             token,
@@ -99,6 +110,28 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
         </Field>
       </FieldGroup>
     </form>
+  );
+};
+
+const ResetPasswordForm = ({ searchParams }: Props) => {
+  const { error, token } = use(searchParams);
+
+  if (error === "INVALID_TOKEN" || token === undefined || token === "") {
+    return <InvalidResetLink />;
+  }
+
+  return (
+    <>
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl">
+          <h2>Reset your password</h2>
+        </CardTitle>
+        <CardDescription>Enter a new password for your account</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <NewPasswordForm token={token} />
+      </CardContent>
+    </>
   );
 };
 

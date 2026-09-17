@@ -12,10 +12,6 @@ import LoginForm from "@/app/(auth)/login/form";
 
 const metadata: Metadata = {
   description: "Sign in to your Acme account to access your dashboard and manage your profile.",
-  robots: {
-    follow: false,
-    index: false,
-  },
   title: "Sign In",
 };
 

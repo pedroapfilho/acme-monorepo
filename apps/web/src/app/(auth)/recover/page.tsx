@@ -10,10 +10,6 @@ import type { Metadata } from "next";
 import RecoverForm from "@/app/(auth)/recover/form";
 
 const metadata: Metadata = {
-  robots: {
-    follow: false,
-    index: false,
-  },
   title: "Recover your account",
 };
 
