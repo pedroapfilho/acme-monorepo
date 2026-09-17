@@ -3,6 +3,8 @@ import awesomeness from "oxlint-config-awesomeness";
 
 export default defineConfig({
   extends: [awesomeness],
+  // Generated runtime is byte-verified and tested in the control plane.
+  ignorePatterns: [".github/ci/*.mjs"],
   jsPlugins: ["@shadcn/lint"],
   overrides: [
     {
