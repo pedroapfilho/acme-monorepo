@@ -88,7 +88,7 @@ const DeleteAccountForm = () => {
           }}
         </form.Field>
 
-        <Field>
+        <Field orientation="horizontal">
           <Button
             aria-busy={isPending}
             className="w-fit"
