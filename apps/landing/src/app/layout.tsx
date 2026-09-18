@@ -38,7 +38,7 @@ const metadata = {
   },
   title: {
     default: `${SITE_NAME} | ${SHORT_DESCRIPTION}`,
-    template: `%s | ${SITE_NAME}`,
+    template: `%s · ${SITE_NAME}`,
   },
   twitter: {
     card: "summary",
