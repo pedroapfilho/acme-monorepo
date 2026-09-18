@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   title: {
     default: "Acme | Secure Authentication Platform",
-    template: "%s | Acme",
+    template: "%s · Acme",
   },
   twitter: {
     card: "summary",
