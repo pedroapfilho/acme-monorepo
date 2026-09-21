@@ -26,22 +26,22 @@
     "check:shadcn": "node scripts/check-shadcn.mjs"
   },
   "devDependencies": {
-    "@next/playwright": "^16.3.4",
+    "@next/playwright": "^16.3.5",
     "@playwright/test": "^1.63.0",
     "@repo/db": "workspace:*",
     "@shadcn/lint": "0.1.0",
-    "@types/node": "^26.5.1",
-    "better-auth": "^1.7.3",
-    "fallow": "^3.24.1",
+    "@types/node": "^26.6.1",
+    "better-auth": "^1.7.5",
+    "fallow": "^3.27.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.5.0",
-    "oxfmt": "^0.67.0",
-    "oxlint": "^1.82.0",
-    "oxlint-config-awesomeness": "^4.5.0",
-    "oxlint-plugin-react-doctor": "^0.9.13",
+    "lint-staged": "^17.5.1",
+    "oxfmt": "^0.68.0",
+    "oxlint": "^1.83.0",
+    "oxlint-config-awesomeness": "^4.5.1",
+    "oxlint-plugin-react-doctor": "^0.9.14",
     "oxlint-tsgolint": "^7.0.2001",
-    "turbo": "^2.10.12",
-    "zod-compiler": "^2.0.4"
+    "turbo": "^2.10.13",
+    "zod-compiler": "^2.0.5"
   },
   "lint-staged": {
     "!(*.d).{ts,tsx,mts,cts,js,jsx,mjs,cjs}": [

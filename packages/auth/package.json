@@ -19,16 +19,16 @@
     "@repo/db": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/transactional": "workspace:*",
-    "better-auth": "^1.7.3"
+    "better-auth": "^1.7.5"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.6.1",
     "@types/react": "^19.3.0",
     "react": "^19.3.0",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.1"
   },
   "peerDependencies": {
     "react": "^19.0.0"
