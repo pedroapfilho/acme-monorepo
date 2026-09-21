@@ -69,6 +69,16 @@
     "db:seed": {
       "cache": false,
       "env": ["DATABASE_URL"]
+    },
+    "@repo/ui#test": {
+      "cache": true,
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/packages/config-vitest/**",
+        "$TURBO_ROOT$/packages/config-typescript/**",
+        "$TURBO_ROOT$/tsconfig.json"
+      ],
+      "env": ["CI", "LANG", "LC_ALL", "NODE_ENV", "TZ"]
     }
   }
 }
