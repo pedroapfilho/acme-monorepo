@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     template: "%s · Acme",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
     title: "Acme - Secure Authentication Platform",
   },
