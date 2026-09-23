@@ -1,0 +1,29 @@
+{
+  "name": "@repo/social-image",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "oxlint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "fontkit": "2.0.4",
+    "react": "^19.3.0"
+  },
+  "devDependencies": {
+    "@repo/config-vitest": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/fontkit": "2.0.9",
+    "@types/node": "^26.5.1",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}
