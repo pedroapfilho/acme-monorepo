@@ -67,8 +67,7 @@ const RegisterForm = ({ searchParams }: Props) => {
             toast.error(message);
             return;
           }
-          const token = result.data?.token;
-          if (token === undefined || token === null || token === "") {
+          if (result.data.token === null || result.data.token === "") {
             setSentToEmail(value.email);
             return;
           }
@@ -98,7 +97,6 @@ const RegisterForm = ({ searchParams }: Props) => {
   }
 
   return (
-    // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
     <form
       noValidate
       onSubmit={(e) => {

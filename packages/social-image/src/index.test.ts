@@ -39,6 +39,6 @@ describe("svgText", () => {
 
 describe("parseFont", () => {
   it("rejects corrupt font data", () => {
-    expect(() => parseFont(Buffer.from("invalid font"))).toThrow();
+    expect(() => parseFont(Buffer.from("invalid font"))).toThrow("Unknown font format");
   });
 });

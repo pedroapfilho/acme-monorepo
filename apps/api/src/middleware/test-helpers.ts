@@ -71,7 +71,7 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
   };
 
   // SAFETY: Every Context field read by these middleware tests is supplied below.
-  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- a partial mock cannot satisfy Hono's full Context type
   const ctx = {
     get: mocks.get,
     header: mocks.header,
