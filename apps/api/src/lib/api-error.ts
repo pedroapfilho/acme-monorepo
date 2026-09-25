@@ -27,7 +27,6 @@ class AppError extends Error {
     super(message);
     this.code = code;
     this.statusCode = statusCode;
-    Error.captureStackTrace(this, this.constructor);
   }
 }
 

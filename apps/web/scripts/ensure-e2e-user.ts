@@ -48,7 +48,6 @@ const main = async () => {
     where: { issuer_accountId: { accountId: user.id, issuer: "local:credential" } },
   });
 
-  // eslint-disable-next-line no-console -- CI step output: surface the seed result.
   console.log(`✓ e2e user ${EMAIL} ready; password: ${PASSWORD}`);
   await prisma.$disconnect();
 };

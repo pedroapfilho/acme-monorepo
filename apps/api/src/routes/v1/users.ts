@@ -160,7 +160,6 @@ const createV1UserRoutes = ({
     return c.body(null, 204);
   });
 
-  // TODO: Add a proper role/permission system (e.g. user.role === "admin").
   const listUsersRoute = createRoute({
     description:
       "List users. Currently returns only the requesting user pending a role/permission system.",

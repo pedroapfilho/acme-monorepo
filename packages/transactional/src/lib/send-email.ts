@@ -22,6 +22,11 @@ const emailConfigSchema = z.object({
   to: recipientSchema,
 });
 
+const resendErrorSchema = z.object({
+  message: z.string().optional(),
+  name: z.string().optional(),
+});
+
 type EmailConfig = z.infer<typeof emailConfigSchema>;
 
 type SendEmailOptions = EmailConfig & {
@@ -77,8 +82,9 @@ const createSendEmail =
       });
 
       if (result.error) {
+        const error = resendErrorSchema.safeParse(result.error).data;
         return {
-          error: `Resend failed to queue email: ${result.error.name ?? "unknown_error"} - ${result.error.message ?? "No message"}`,
+          error: `Resend failed to queue email: ${error?.name ?? "unknown_error"} - ${error?.message ?? "No message"}`,
           ok: false,
         };
       }

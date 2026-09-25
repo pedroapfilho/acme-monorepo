@@ -52,7 +52,7 @@ describe("sendEmail from validation", () => {
         template,
         to: "delivered+test@resend.dev",
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow("Must be a valid email or 'Display Name <email>' format");
 
     expect(sendMock).not.toHaveBeenCalled();
   });
@@ -66,7 +66,7 @@ describe("sendEmail from validation", () => {
         template,
         to: "delivered+test@resend.dev",
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow("Must be a valid email or 'Display Name <email>' format");
 
     expect(sendMock).not.toHaveBeenCalled();
   });
