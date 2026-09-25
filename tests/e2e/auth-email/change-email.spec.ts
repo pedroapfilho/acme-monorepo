@@ -37,7 +37,10 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const setCookie = signIn.headers()["set-cookie"] ?? "";
     const cookieHeader = setCookie
       .split(/,(?=\s*[\w-]+=)/u)
-      .map((c) => c.split(";")[0].trim())
+      .map((c) => {
+        const [nameValue = ""] = c.split(";");
+        return nameValue.trim();
+      })
       .filter(Boolean)
       .join("; ");
 
@@ -45,7 +48,7 @@ test.describe("Change email (two-stage confirmation + verification)", () => {
     const parsedCookies = setCookie
       .split(/,(?=\s*[\w-]+=)/u)
       .map((c) => {
-        const [nameValue] = c.split(";");
+        const [nameValue = ""] = c.split(";");
         const eq = nameValue.indexOf("=");
         return { name: nameValue.slice(0, eq).trim(), value: nameValue.slice(eq + 1).trim() };
       })

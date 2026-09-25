@@ -78,6 +78,9 @@ const svgText = (
     let cursor = x - offset;
     return run.glyphs.map((glyph, glyphIndex) => {
       const position = run.positions[glyphIndex];
+      if (position === undefined) {
+        throw new Error(`svgText: glyph ${glyphIndex} of "${value}" has no position`);
+      }
       const glyphX = cursor + position.xOffset * scale;
       const glyphY = y + lineIndex * size * lineHeight - position.yOffset * scale;
       cursor += position.xAdvance * scale + tracking;
