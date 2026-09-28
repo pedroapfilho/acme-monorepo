@@ -144,6 +144,9 @@ const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   const haystack = email.html ?? email.text ?? "";
   const hrefMatches = haystack.matchAll(/href="(?<href>[^"]+)"/gv);
   for (const [, href] of hrefMatches) {
+    if (href === undefined) {
+      throw new Error("extractLink: href pattern matched without its capture group");
+    }
     const decoded = href.replaceAll("&amp;", "&");
     if (pattern.test(decoded)) {
       return decoded;
