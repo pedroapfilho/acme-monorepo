@@ -3,7 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 
 // SAFETY: This process owns the prisma slot, and every write stores a PrismaClient.
-// oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions
+// oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- globalThis has no typed prisma slot to narrow to
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };

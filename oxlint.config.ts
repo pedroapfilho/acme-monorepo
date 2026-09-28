@@ -1,28 +1,12 @@
 import { defineConfig } from "oxlint";
 import awesomeness from "oxlint-config-awesomeness";
+import shadcn from "oxlint-config-awesomeness/shadcn";
 
 export default defineConfig({
-  extends: [awesomeness],
+  extends: [awesomeness, shadcn],
   // Generated runtime is byte-verified and tested in the control plane.
   ignorePatterns: [".github/ci/*.mjs"],
-  jsPlugins: ["@shadcn/lint"],
-  overrides: [
-    {
-      files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
-      rules: {
-        "new-cap": [
-          "error",
-          {
-            capIsNewExceptions: ["Inter", "Scalar"],
-          },
-        ],
-      },
-    },
-  ],
   rules: {
-    "shadcn/no-arbitrary-values": "error",
-    "shadcn/no-inline-styles": "error",
-    "shadcn/no-raw-colors": "error",
     "shadcn/no-restyle": [
       "error",
       {
@@ -33,8 +17,6 @@ export default defineConfig({
         ],
       },
     ],
-    "shadcn/no-unknown-classes": "error",
-    "shadcn/require-static-classes": "error",
   },
   settings: {
     shadcn: { ui: "@repo/ui/components" },
