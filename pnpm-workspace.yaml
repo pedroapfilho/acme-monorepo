@@ -3,10 +3,6 @@ packages:
   - packages/*
 
 overrides:
-  # 1.5.2 dropped the "types" conditions from its exports map, so the type
-  # declarations resolve to a broken sibling .d.mts and every OpenAPI route
-  # helper degrades to the error type (575 type-aware lint errors in apps/api).
-  "@hono/zod-openapi": "1.5.1"
   # Security: force patched transitive releases to clear pnpm audit advisories.
   # Each pin is the lowest patched version within the already-resolved major.
   mysql2: "^3.23.1"
@@ -16,6 +12,7 @@ nodeLinker: hoisted
 
 peerDependencyRules:
   allowedVersions:
+    "@typescript-eslint/parser>typescript": "7"
     "@typescript-eslint/project-service>typescript": "7"
     "@typescript-eslint/tsconfig-utils>typescript": "7"
     "@typescript-eslint/typescript-estree>typescript": "7"
