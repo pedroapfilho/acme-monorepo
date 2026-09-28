@@ -61,7 +61,7 @@ const SettingsContent = async () => {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
   const currentToken = session.session.token;
-  const emailChangeEnabled = auth.options.user?.changeEmail?.enabled ?? false;
+  const emailChangeEnabled = auth.options.user.changeEmail.enabled;
 
   return (
     <>

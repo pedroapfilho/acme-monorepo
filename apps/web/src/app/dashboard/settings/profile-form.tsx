@@ -50,7 +50,6 @@ const ProfileForm = ({ initialName }: Props) => {
   });
 
   return (
-    // oxlint-disable-next-line react-doctor/no-prevent-default -- TanStack Form + Better Auth client drives submit; JS-off progressive enhancement is N/A
     <form
       noValidate
       onSubmit={(e) => {
