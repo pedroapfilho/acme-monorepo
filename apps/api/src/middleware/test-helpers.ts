@@ -70,9 +70,7 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
     }),
   };
 
-  // SAFETY: Every Context field read by these middleware tests is supplied below.
-  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- a partial mock cannot satisfy Hono's full Context type
-  const ctx = {
+  const partialContext = {
     get: mocks.get,
     header: mocks.header,
     json: mocks.json,
@@ -84,7 +82,11 @@ export const createMockContext = (opts: CreateMockContextOptions = {}): MockCont
       url: "http://localhost/test",
     },
     set: mocks.set,
-  } as unknown as Context;
+  };
+
+  // SAFETY: Every Context field read by these middleware tests is supplied above.
+  // oxlint-disable-next-line no-unsafe-type-assertion, anti-slop/no-chained-type-assertions -- a partial mock cannot satisfy Hono's full Context type
+  const ctx = partialContext as unknown as Context;
 
   return { ctx, mocks };
 };
