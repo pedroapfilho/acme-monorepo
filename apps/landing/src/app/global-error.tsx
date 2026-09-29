@@ -20,7 +20,7 @@ const GlobalError = ({ error, retry }: GlobalErrorProps) => {
   }, [error]);
 
   return (
-    <html className={styles.document} lang="en">
+    <html className={styles.document} lang="en-US">
       <body className={styles.body}>
         <title>Something went wrong</title>
         <main className={styles.main} id="main-content">
@@ -28,8 +28,8 @@ const GlobalError = ({ error, retry }: GlobalErrorProps) => {
             Something went wrong
           </h1>
           <p className={styles.text}>
-            The application stopped unexpectedly. Try again, and if the problem continues, reload
-            the page or come back in a few minutes.
+            The site stopped unexpectedly. Try again, and if the problem continues, reload the page
+            or come back in a few minutes.
           </p>
           <button className={styles.button} onClick={retry} type="button">
             Try again
