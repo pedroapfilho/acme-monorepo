@@ -4,9 +4,11 @@ packages:
 
 overrides:
   # Security: force patched transitive releases to clear pnpm audit advisories.
-  # Each pin is the lowest patched version within the already-resolved major.
+  # Each pin is the lowest release that carries the fix.
+  fast-uri: "^3.1.7"
   mysql2: "^3.23.1"
   qs: "^6.16.0"
+  "undici@<7.29.1": "^7.29.1"
 
 nodeLinker: hoisted
 
