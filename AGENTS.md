@@ -148,7 +148,7 @@ Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 
 ## CI (GitHub Actions)
 
-Six workflows are checked in: `e2e.yml`, `fallow.yml`, `format.yml`, `lint.yml`, `react-doctor.yml`, `test.yml`. The standard workflows pin `actions/checkout`, `pnpm/action-setup`, and `actions/setup-node` to `@v6`, which run on Node 24 natively, so no `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24` env var is needed. Keep `permissions: { contents: read }` on any new workflow (`react-doctor.yml` needs extra PR-comment permissions and still uses `actions/checkout@v5`).
+Three workflows are checked in: `check.yml` (one job running the secret scan, formatting, dead-code analysis, lint, typecheck and unit tests), `e2e.yml`, and `react-doctor.yml` (pull requests only). Validation runs on pull requests, a weekly schedule and manual dispatch, never on pushes to `main`. `orchestrator standards --for .github/workflows/check.yml` prints the rules they follow.
 
 ## Notable decisions
 

@@ -1,0 +1,79 @@
+name: Check
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 4 * * 1
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Plan validation
+        id: plan
+        run: node .github/ci/ci.mjs plan check
+      # gitleaks/gitleaks-action@v2 requires a paid GITLEAKS_LICENSE for GitHub
+      # organizations, so the free binary is installed directly instead: same
+      # scanner, no license.
+      - name: Install gitleaks
+        env:
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C /usr/local/bin gitleaks
+          gitleaks version
+      - name: Scan git history for secrets
+        run: node .github/ci/ci.mjs run lint -- gitleaks git --config .gitleaks.toml --redact --verbose --exit-code 1
+      - uses: pnpm/setup@fbda4c85fc2e1e08721cd8763afea8f48d60f024 # v3.0.0
+        if: ${{ !cancelled() }}
+        with:
+          runtime: node@24
+          cache: true
+      - name: Restore Turbo task cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo/cache
+          key: turbo-${{ runner.os }}-${{ runner.arch }}-node24-check-${{ github.event.pull_request.number || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-${{ runner.arch }}-node24-check-${{ github.event.pull_request.number || github.ref_name }}-
+            turbo-${{ runner.os }}-${{ runner.arch }}-node24-check-main-
+      # Type-aware linting resolves generated Prisma client types.
+      - if: ${{ !cancelled() }}
+        run: pnpm turbo db:generate
+      - name: Check formatting
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run lint -- pnpm format:check
+      - name: Check dead code
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run lint -- pnpm fallow:dead
+      - name: Check shadcn components
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run lint -- pnpm check:shadcn
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run lint -- pnpm oxlint --format=github .
+      - name: Typecheck
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run typecheck -- pnpm typecheck
+      - name: Unit tests
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run test -- pnpm test
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        name: Upload CI evidence
+        if: ${{ !cancelled() }}
+        with:
+          name: ci-execution-${{ github.workflow }}-${{ github.job }}-${{ github.run_attempt }}
+          path: .ci-results/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: error
