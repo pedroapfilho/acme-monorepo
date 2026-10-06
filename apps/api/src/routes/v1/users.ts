@@ -1,9 +1,9 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import type { MiddlewareHandler } from "hono";
+import { createRoute, z } from "@hono/zod-openapi";
 
-import { errorSchema } from "@/lib/api-error";
-import type { UpdateUserInput } from "@/lib/users";
-import type { AuthVariables } from "@/middleware/auth";
+import { AppError, errorResponse } from "@/lib/api-error";
+import { createRouter } from "@/lib/openapi";
+import type { Authenticated } from "@/lib/session";
+import type { User, UserStore } from "@/lib/users";
 
 const userSchema = z
   .object({
@@ -23,189 +23,163 @@ const updateUserSchema = z
     name: z.string().min(1).max(100).optional(),
     username: z
       .string()
-      .min(3)
-      .max(30)
-      .regex(
-        /^[a-zA-Z0-9_\-]+$/v,
-        "Username can only contain letters, numbers, underscores, and hyphens",
-      )
-      .optional(),
+      .optional()
+      .describe(
+        "3-30 characters: letters, numbers, underscores, and dots. Stored lowercased; the submitted form is kept as the display username.",
+      ),
+  })
+  .refine((data) => data.name !== undefined || data.username !== undefined, {
+    message: "Provide at least one field to update",
   })
   .openapi("UpdateUserInput");
 
-const userListMetaSchema = z.object({
-  page: z.number(),
-  total: z.number(),
-  totalPages: z.number(),
+const deleteUserSchema = z
+  .object({
+    password: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("Required unless the session was created within the last day."),
+  })
+  .openapi("DeleteUserInput");
+
+const userResponseSchema = z.object({ data: userSchema });
+
+const userListResponseSchema = z.object({
+  data: z.array(userSchema),
+  meta: z.object({
+    page: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+  }),
 });
 
-type ServiceUser = {
-  createdAt: Date;
-  displayName: string | null;
-  email: string;
-  emailVerified: boolean;
-  id: string;
-  name: string | null;
-  updatedAt: Date;
-  username: string | null;
+const rateLimitedResponses = {
+  429: errorResponse("Rate limit exceeded"),
 };
 
 type UserRouteDependencies = {
-  authMiddleware: MiddlewareHandler<{ Variables: AuthVariables }>;
-  deleteUser: (id: string) => Promise<{ success: boolean }>;
-  findUserById: (id: string) => Promise<ServiceUser>;
-  updateUser: (id: string, data: UpdateUserInput) => Promise<ServiceUser>;
+  authenticated: Authenticated;
+  users: UserStore;
 };
 
-const serializeUser = (user: ServiceUser) => ({
+const serializeUser = (user: User) => ({
   ...user,
   createdAt: user.createdAt.toISOString(),
   updatedAt: user.updatedAt.toISOString(),
 });
 
-const createV1UserRoutes = ({
-  authMiddleware,
-  deleteUser,
-  findUserById,
-  updateUser,
-}: UserRouteDependencies) => {
-  const v1UserRoutes = new OpenAPIHono<{ Variables: AuthVariables }>();
+const createV1UserRoutes = ({ authenticated, users }: UserRouteDependencies) => {
+  const findUser = async (id: string) => {
+    const user = await users.find(id);
 
-  const getMeRoute = createRoute({
-    description: "Returns the authenticated user's profile.",
-    method: "get",
-    middleware: [authMiddleware] as const,
-    path: "/me",
-    responses: {
-      200: {
-        content: { "application/json": { schema: z.object({ data: userSchema }) } },
-        description: "Authenticated user profile",
-      },
-      401: {
-        content: { "application/json": { schema: errorSchema } },
-        description: "Unauthorized",
-      },
-    },
-    summary: "Get current user",
-    tags: ["Users"],
-  });
+    if (!user) {
+      throw new AppError("User not found", "USER_NOT_FOUND", 404);
+    }
 
-  v1UserRoutes.openapi(getMeRoute, async (c) => {
-    const user = c.get("user");
-    const fullUser = await findUserById(user.id);
-    return c.json({ data: serializeUser(fullUser) }, 200);
-  });
+    return serializeUser(user);
+  };
 
-  const updateMeRoute = createRoute({
-    description: "Update the authenticated user's profile.",
-    method: "patch",
-    middleware: [authMiddleware] as const,
-    path: "/me",
-    request: {
-      body: {
-        content: { "application/json": { schema: updateUserSchema } },
-        required: true,
-      },
-    },
-    responses: {
-      200: {
-        content: { "application/json": { schema: z.object({ data: userSchema }) } },
-        description: "Updated user profile",
-      },
-      400: {
-        content: { "application/json": { schema: errorSchema } },
-        description: "Validation error",
-      },
-      401: {
-        content: { "application/json": { schema: errorSchema } },
-        description: "Unauthorized",
-      },
-      409: {
-        content: { "application/json": { schema: errorSchema } },
-        description: "Username already taken",
-      },
-    },
-    summary: "Update current user",
-    tags: ["Users"],
-  });
-
-  v1UserRoutes.openapi(updateMeRoute, async (c) => {
-    const user = c.get("user");
-    const data: UpdateUserInput = c.req.valid("json");
-    const updatedUser = await updateUser(user.id, data);
-    return c.json({ data: serializeUser(updatedUser) }, 200);
-  });
-
-  const deleteMeRoute = createRoute({
-    description: "Delete the authenticated user's account.",
-    method: "delete",
-    middleware: [authMiddleware] as const,
-    path: "/me",
-    responses: {
-      204: {
-        description: "Account deleted",
-      },
-      401: {
-        content: { "application/json": { schema: errorSchema } },
-        description: "Unauthorized",
-      },
-    },
-    summary: "Delete current user",
-    tags: ["Users"],
-  });
-
-  v1UserRoutes.openapi(deleteMeRoute, async (c) => {
-    const user = c.get("user");
-    await deleteUser(user.id);
-    return c.body(null, 204);
-  });
-
-  const listUsersRoute = createRoute({
-    description:
-      "List users. Currently returns only the requesting user pending a role/permission system.",
-    method: "get",
-    middleware: [authMiddleware] as const,
-    path: "/",
-    responses: {
-      200: {
-        content: {
-          "application/json": {
-            schema: z.object({
-              data: z.array(userSchema),
-              meta: userListMetaSchema,
-            }),
-          },
+  const getMeRoute = createRoute(
+    authenticated({
+      description: "Returns the authenticated user's profile.",
+      method: "get",
+      path: "/me",
+      responses: {
+        200: {
+          content: { "application/json": { schema: userResponseSchema } },
+          description: "Authenticated user profile",
         },
-        description: "Paginated user list",
+        404: errorResponse("User not found"),
+        ...rateLimitedResponses,
       },
-      401: {
-        content: { "application/json": { schema: errorSchema } },
-        description: "Unauthorized",
-      },
-    },
-    summary: "List users",
-    tags: ["Users"],
-  });
+      summary: "Get current user",
+      tags: ["Users"],
+    }),
+  );
 
-  v1UserRoutes.openapi(listUsersRoute, async (c) => {
-    const user = c.get("user");
-    const fullUser = await findUserById(user.id);
-
-    return c.json(
-      {
-        data: [serializeUser(fullUser)],
-        meta: {
-          page: 1,
-          total: 1,
-          totalPages: 1,
+  const updateMeRoute = createRoute(
+    authenticated({
+      description: "Update the authenticated user's profile.",
+      method: "patch",
+      path: "/me",
+      request: {
+        body: {
+          content: { "application/json": { schema: updateUserSchema } },
+          required: true,
         },
       },
-      200,
-    );
-  });
+      responses: {
+        200: {
+          content: { "application/json": { schema: userResponseSchema } },
+          description: "Updated user profile",
+        },
+        400: errorResponse("Validation failed, or the username is invalid or already taken"),
+        409: errorResponse("A concurrent update claimed the same unique value"),
+        413: errorResponse("Request body too large"),
+        ...rateLimitedResponses,
+      },
+      summary: "Update current user",
+      tags: ["Users"],
+    }),
+  );
 
-  return v1UserRoutes;
+  const deleteMeRoute = createRoute(
+    authenticated({
+      description: "Delete the authenticated user's account.",
+      method: "delete",
+      path: "/me",
+      request: {
+        body: {
+          content: { "application/json": { schema: deleteUserSchema } },
+          required: false,
+        },
+      },
+      responses: {
+        204: {
+          description: "Account deleted",
+        },
+        400: errorResponse("Wrong password, or a stale session without a password"),
+        413: errorResponse("Request body too large"),
+        ...rateLimitedResponses,
+      },
+      summary: "Delete current user",
+      tags: ["Users"],
+    }),
+  );
+
+  const listUsersRoute = createRoute(
+    authenticated({
+      description:
+        "List users. Currently returns only the requesting user pending a role/permission system.",
+      method: "get",
+      path: "/",
+      responses: {
+        200: {
+          content: { "application/json": { schema: userListResponseSchema } },
+          description: "Paginated user list",
+        },
+        ...rateLimitedResponses,
+      },
+      summary: "List users",
+      tags: ["Users"],
+    }),
+  );
+
+  return createRouter()
+    .openapi(getMeRoute, async (c) => c.json({ data: await findUser(c.get("user").id) }, 200))
+    .openapi(updateMeRoute, async (c) => {
+      await users.update({ data: c.req.valid("json"), headers: c.req.raw.headers });
+      return c.json({ data: await findUser(c.get("user").id) }, 200);
+    })
+    .openapi(deleteMeRoute, async (c) => {
+      await users.delete({ headers: c.req.raw.headers, password: c.req.valid("json").password });
+      return c.body(null, 204);
+    })
+    .openapi(listUsersRoute, async (c) => {
+      const user = await findUser(c.get("user").id);
+      return c.json({ data: [user], meta: { page: 1, total: 1, totalPages: 1 } }, 200);
+    });
 };
 
 export { createV1UserRoutes };
-export type { UserRouteDependencies };
