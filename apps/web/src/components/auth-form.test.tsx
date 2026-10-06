@@ -1,5 +1,4 @@
-import type { StandardSchemaV1 } from "@tanstack/react-form";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
@@ -36,7 +35,7 @@ const succeed = (): Promise<Result> => Promise.resolve({ data: { id: "user-1" },
 const fail = (failure: { code?: string; message?: string }): Promise<Result> =>
   Promise.resolve({ data: null, error: failure });
 
-const Harness = ({ validator = schema }: { validator?: StandardSchemaV1<Values, unknown> }) => {
+const Harness = ({ validator = schema }: { validator?: typeof schema }) => {
   const { errorCode, form, submission } = useAuthForm({
     call,
     defaultValues: { confirmPassword: "", email: "", password: "" },
@@ -65,6 +64,28 @@ const Harness = ({ validator = schema }: { validator?: StandardSchemaV1<Values, 
   );
 };
 
+const optionalSchema = z.object({ email: z.email(), name: z.string().optional() });
+const optionalDefaults: z.input<typeof optionalSchema> = { email: "", name: "" };
+
+const OptionalFieldHarness = () => {
+  const { form, submission } = useAuthForm({
+    call: succeed,
+    defaultValues: optionalDefaults,
+    fallbackError: "Request failed",
+    schema: optionalSchema,
+  });
+  return (
+    <AuthForm submission={submission}>
+      <form.AppField name="email">
+        {(field) => <field.TextField autoComplete="email" label="Email" />}
+      </form.AppField>
+      <form.AppField name="name">
+        {(field) => <field.TextField autoComplete="name" label="Name" />}
+      </form.AppField>
+    </AuthForm>
+  );
+};
+
 const settle = () =>
   act(async () => {
     await new Promise((resolve) => {
@@ -83,7 +104,8 @@ const fillValid = () => {
 };
 
 const submit = async (times = 1) => {
-  const form = screen.getByRole("button", { name: /Save|Saving…/v }).closest("form");
+  const button = await screen.findByRole("button", { name: "Save" });
+  const form = button.closest("form");
   if (form === null) {
     throw new Error("AuthForm did not render a <form>");
   }
@@ -105,6 +127,15 @@ beforeEach(() => {
 });
 
 describe("useAuthForm", () => {
+  it("derives required and optional accessibility states from the schema", () => {
+    render(<OptionalFieldHarness />);
+
+    expect(screen.getByLabelText("Email").getAttribute("aria-required")).toBe("true");
+    expect(screen.getByLabelText("Name").getAttribute("aria-required")).toBe("false");
+    expect(screen.getByLabelText<HTMLInputElement>("Email").required).toBe(false);
+    expect(screen.getByLabelText<HTMLInputElement>("Name").required).toBe(false);
+  });
+
   it("renders each field as a labelled input typed by its autocomplete purpose", () => {
     render(<Harness />);
 
@@ -120,13 +151,18 @@ describe("useAuthForm", () => {
     expect(confirm.name).toBe("confirmPassword");
   });
 
-  it("validates on submit, then revalidates every change", async () => {
+  it("validates on blur before submit, then clears errors on change without another blur", async () => {
     render(<Harness />);
     type("Email", "not-an-email");
+    await settle();
     expect(screen.queryByRole("alert")).toBeNull();
+
+    fireEvent.blur(screen.getByLabelText("Email"));
+    expect(await screen.findByText("Invalid email")).not.toBeNull();
 
     await submit();
 
+    expect(await screen.findByText("Too short")).not.toBeNull();
     const email = screen.getByLabelText("Email");
     expect(call).not.toHaveBeenCalled();
     expect(email.getAttribute("aria-invalid")).toBe("true");
@@ -134,21 +170,46 @@ describe("useAuthForm", () => {
     expect(screen.getByText("Invalid email").getAttribute("id")).toBe("email-error");
 
     type("Email", "user@example.com");
-    expect(screen.queryByText("Invalid email")).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByText("Invalid email")).toBeNull();
+    });
 
     type("Password", "correct-horse-battery");
     type("Confirm password", "correct-horse-staple");
-    expect(screen.getByText("Passwords do not match")).not.toBeNull();
+    expect(await screen.findByText("Passwords do not match")).not.toBeNull();
 
     type("Password", "correct-horse-staple");
-    expect(screen.queryByText("Passwords do not match")).toBeNull();
+    await waitFor(() => {
+      expect(screen.queryByText("Passwords do not match")).toBeNull();
+    });
 
     call.mockImplementation(succeed);
     await submit();
-    expect(call).toHaveBeenCalledWith({
-      confirmPassword: "correct-horse-staple",
-      email: "user@example.com",
-      password: "correct-horse-staple",
+    await waitFor(() => {
+      expect(call).toHaveBeenCalledWith({
+        confirmPassword: "correct-horse-staple",
+        email: "user@example.com",
+        password: "correct-horse-staple",
+      });
+    });
+  });
+
+  it("revalidates a fixed blur error on the first Enter submission", async () => {
+    call.mockImplementation(succeed);
+    render(<Harness />);
+    fillValid();
+    type("Email", "not-an-email");
+    fireEvent.blur(screen.getByLabelText("Email"));
+    expect(await screen.findByText("Invalid email")).not.toBeNull();
+
+    type("Email", "user@example.com");
+    await submit();
+
+    await waitFor(() => {
+      expect(call).toHaveBeenCalledTimes(1);
+    });
+    await waitFor(() => {
+      expect(screen.queryByText("Invalid email")).toBeNull();
     });
   });
 
@@ -159,6 +220,9 @@ describe("useAuthForm", () => {
 
     await submit(2);
 
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
     expect(call).toHaveBeenCalledTimes(1);
   });
 
@@ -170,7 +234,7 @@ describe("useAuthForm", () => {
 
     await submit();
 
-    const button = screen.getByRole("button", { name: "Saving…" });
+    const button = await screen.findByRole("button", { name: "Saving…" });
     expect(button.matches(":disabled")).toBe(true);
     expect(button.getAttribute("aria-busy")).toBe("true");
     expect(screen.getByLabelText("Email").matches(":disabled")).toBe(true);
@@ -178,7 +242,8 @@ describe("useAuthForm", () => {
     pending.resolve({ data: { id: "user-1" }, error: null });
     await settle();
 
-    expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
+    const idleButton = await screen.findByRole("button", { name: "Save" });
+    expect(idleButton.matches(":disabled")).toBe(false);
     expect(screen.getByLabelText("Email").matches(":disabled")).toBe(false);
   });
 
@@ -189,14 +254,16 @@ describe("useAuthForm", () => {
 
     await submit();
 
-    expect(onSuccess).toHaveBeenCalledWith(
-      { id: "user-1" },
-      {
-        confirmPassword: "correct-horse-battery",
-        email: "user@example.com",
-        password: "correct-horse-battery",
-      },
-    );
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledWith(
+        { id: "user-1" },
+        {
+          confirmPassword: "correct-horse-battery",
+          email: "user@example.com",
+          password: "correct-horse-battery",
+        },
+      );
+    });
     expect(showToast).not.toHaveBeenCalled();
     expect(liveRegionText()).toBe("");
   });
@@ -211,14 +278,18 @@ describe("useAuthForm", () => {
 
     await submit();
 
+    await waitFor(() => {
+      expect(liveRegionText()).toBe("Invalid password");
+    });
     expect(showToast).toHaveBeenCalledWith("Invalid password");
-    expect(liveRegionText()).toBe("Invalid password");
     expect(onSuccess).not.toHaveBeenCalled();
 
     await submit();
 
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
     expect(call).toHaveBeenCalledTimes(2);
-    expect(onSuccess).toHaveBeenCalledTimes(1);
     expect(liveRegionText()).toBe("");
   });
 
@@ -229,8 +300,10 @@ describe("useAuthForm", () => {
 
     await submit();
 
+    await waitFor(() => {
+      expect(liveRegionText()).toBe("Request failed");
+    });
     expect(showToast).toHaveBeenCalledWith("Request failed");
-    expect(liveRegionText()).toBe("Request failed");
   });
 
   it("reports a thrown call with the generic message and logs it", async () => {
@@ -241,39 +314,81 @@ describe("useAuthForm", () => {
 
     await submit();
 
-    expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+    });
     expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "Failed to fetch" }));
 
     await submit();
-    expect(onSuccess).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("stays submittable after a validator throws", async () => {
-    let shouldThrow = true;
-    const throwingOnce: StandardSchemaV1<Values, unknown> = {
-      "~standard": {
-        validate: (value) => {
-          if (shouldThrow) {
-            shouldThrow = false;
-            throw new Error("validator exploded");
-          }
-          return { value };
-        },
-        vendor: "test",
-        version: 1,
-      },
-    };
+    const throwingOnce = schema.clone();
+    vi.spyOn(throwingOnce["~standard"], "validate").mockImplementationOnce(() => {
+      throw new Error("validator exploded");
+    });
     call.mockImplementation(succeed);
     render(<Harness validator={throwingOnce} />);
     fillValid();
 
     await submit();
 
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+    });
+    expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "validator exploded" }));
     expect(call).not.toHaveBeenCalled();
-    expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
 
     await submit();
+    await waitFor(() => {
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
     expect(call).toHaveBeenCalledTimes(1);
+  });
+
+  it("recovers from a throwing Zod refinement and validates later edits", async () => {
+    const throwingRefine = schema.refine((value) => {
+      if (value.email === "user@example.com") {
+        throw new Error("refinement exploded");
+      }
+      return true;
+    });
+    call.mockImplementation(succeed);
+    render(<Harness validator={throwingRefine} />);
+    fillValid();
+
+    await submit();
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+    });
+    expect(call).not.toHaveBeenCalled();
+    expect(logError).toHaveBeenCalledWith(
+      expect.objectContaining({ error: "refinement exploded" }),
+    );
+    expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
+
+    type("Password", "another-valid-password");
+    await settle();
+    type("Password", "correct-horse-battery");
+    await settle();
+
+    type("Email", "not-an-email");
+    expect(await screen.findByText("Invalid email")).not.toBeNull();
+    type("Email", "fixed@example.com");
+    await waitFor(() => {
+      expect(screen.queryByText("Invalid email")).toBeNull();
+    });
+    await submit();
+
+    await waitFor(() => {
+      expect(call).toHaveBeenCalledTimes(1);
+    });
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(liveRegionText()).toBe("");
   });
 
   it("leaves handled error codes to the form without a toast", async () => {
@@ -286,14 +401,16 @@ describe("useAuthForm", () => {
 
     await submit();
 
-    expect(screen.getByText("Handled EMAIL_NOT_VERIFIED")).not.toBeNull();
+    expect(await screen.findByText("Handled EMAIL_NOT_VERIFIED")).not.toBeNull();
     expect(showToast).not.toHaveBeenCalled();
     expect(liveRegionText()).toBe("");
 
     await submit();
 
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith("Invalid credentials");
+    });
     expect(screen.queryByText("Handled EMAIL_NOT_VERIFIED")).toBeNull();
-    expect(showToast).toHaveBeenCalledWith("Invalid credentials");
   });
 });
 

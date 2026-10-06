@@ -16,11 +16,13 @@ import {
   createContext,
   type ReactNode,
   use,
+  useMemo,
   useRef,
   useState,
   useTransition,
 } from "react";
 import { toast } from "sonner";
+import type { z } from "zod";
 
 import { log } from "@/lib/observability-client";
 
@@ -100,10 +102,11 @@ const useAuthRequest = <TInput, TData>({
     }
   };
 
-  return { attempt, errorCode, errorMessage, isPending, perform };
+  return { attempt, errorCode, errorMessage, isPending, perform, showUnexpectedError };
 };
 
 const PendingContext = createContext(false);
+const RequiredFieldsContext = createContext<ReadonlyArray<string>>([]);
 
 const inputTypes = {
   "current-password": "password",
@@ -125,6 +128,7 @@ const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 const TextField = ({ autoComplete, id, label, labelAction, placeholder }: TextFieldProps) => {
   const field = useFieldContext<string>();
   const isPending = use(PendingContext);
+  const requiredFields = use(RequiredFieldsContext);
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
   const inputId = id ?? field.name;
   const errorId = `${inputId}-error`;
@@ -143,7 +147,7 @@ const TextField = ({ autoComplete, id, label, labelAction, placeholder }: TextFi
       <Input
         aria-describedby={isInvalid ? errorId : undefined}
         aria-invalid={isInvalid}
-        aria-required
+        aria-required={requiredFields.includes(field.name)}
         autoComplete={autoComplete}
         disabled={isPending}
         id={inputId}
@@ -170,30 +174,47 @@ const { useAppForm } = createFormHook({
 
 type AuthFormOptions<TValues, TData> = AuthRequestOptions<TValues, TData> & {
   defaultValues: TValues;
-  schema: StandardSchemaV1<TValues, unknown>;
+  schema: z.ZodObject<Record<string, z.ZodType>> & StandardSchemaV1<TValues, unknown>;
 };
 
-/**
- * Validates on submit, then on every change. Literal `onBlur` + `onChange` validators keep a
- * blur error after the value is fixed, and that stale error blocks Enter-to-submit.
- */
 const useAuthForm = <TValues, TData>({
   defaultValues,
   schema,
   ...requestOptions
 }: AuthFormOptions<TValues, TData>) => {
-  const { attempt, errorCode, errorMessage, isPending, perform } = useAuthRequest(requestOptions);
+  const { attempt, errorCode, errorMessage, isPending, perform, showUnexpectedError } =
+    useAuthRequest(requestOptions);
+  const requiredFields = useMemo(
+    () =>
+      Object.entries(schema.shape).flatMap(([name, fieldSchema]) =>
+        fieldSchema.safeParse(undefined).success ? [] : [name],
+      ),
+    [schema],
+  );
   const form = useAppForm({
     defaultValues,
     onSubmit: ({ value }) => perform(value),
-    validationLogic: revalidateLogic(),
-    validators: { onDynamic: schema },
+    onSubmitInvalid: ({ formApi }) => {
+      const error = formApi.state.errorMap.onDynamic;
+      if (error instanceof Error) {
+        showUnexpectedError(error);
+      }
+    },
+    validationLogic: revalidateLogic({ mode: "blur" }),
+    // Zod returns a rejected promise when a refinement throws, even for synchronous schemas.
+    validators: { onDynamicAsync: schema },
   });
 
   const submission = {
     errorMessage,
     isPending,
-    submit: () => attempt(() => form.handleSubmit()),
+    requiredFields,
+    submit: () =>
+      attempt(async () => {
+        // Refresh blur errors before TanStack's submission guard checks whether fields are valid.
+        await form.validate("submit");
+        await form.handleSubmit();
+      }),
   };
 
   return { errorCode, form, submission };
@@ -218,7 +239,9 @@ const AuthForm = ({ children, submission }: { children: ReactNode; submission: S
   >
     <LiveRegion message={submission.errorMessage} />
     <PendingContext value={submission.isPending}>
-      <FieldGroup>{children}</FieldGroup>
+      <RequiredFieldsContext value={submission.requiredFields}>
+        <FieldGroup>{children}</FieldGroup>
+      </RequiredFieldsContext>
     </PendingContext>
   </form>
 );
