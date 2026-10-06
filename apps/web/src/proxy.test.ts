@@ -89,7 +89,7 @@ describe("proxy", () => {
     async (path) => {
       const error = new Error("Database unavailable");
       lookup.mockRejectedValue(error);
-      const logError = vi.spyOn(log, "error").mockImplementation(() => {});
+      const logError = vi.spyOn(log, "error");
 
       const response = await proxy(requestFor(path));
 
@@ -103,7 +103,7 @@ describe("proxy", () => {
   it("logs a session failure and redirects protected pages to login", async () => {
     const error = new Error("Database unavailable");
     lookup.mockRejectedValue(error);
-    const logError = vi.spyOn(log, "error").mockImplementation(() => {});
+    const logError = vi.spyOn(log, "error");
 
     const response = await proxy(requestFor("/dashboard/settings?tab=security"));
 
