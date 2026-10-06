@@ -13,6 +13,7 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.string().default("4000"),
   RESEND_API_KEY: z.string().optional(),
+  TRUST_PROXY: z.stringbool().default(false),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
