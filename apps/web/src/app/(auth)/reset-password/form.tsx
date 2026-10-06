@@ -1,20 +1,16 @@
 "use client";
 
-import { Button, buttonVariants } from "@repo/ui/components/button";
+import { buttonVariants } from "@repo/ui/components/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
-import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
+import { Field, FieldDescription } from "@repo/ui/components/field";
 import { cn } from "@repo/ui/lib/utils";
-import { useForm } from "@tanstack/react-form";
-import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useState } from "react";
-import { toast } from "sonner";
+import { use } from "react";
 
-import { AuthPasswordField } from "@/components/auth-password-field";
+import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
-import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
   searchParams: Promise<{ error?: string; token?: string }>;
@@ -38,84 +34,18 @@ const InvalidResetLink = () => (
 
 const NewPasswordForm = ({ token }: { token: string }) => {
   const { push } = useRouter();
-  const { isPending, run, submit } = useAuthSubmit();
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const form = useForm({
+  const { errorCode, form, submission } = useAuthForm({
+    call: (value) => authClient.resetPassword({ newPassword: value.password, token }),
     defaultValues: { confirmPassword: "", password: "" },
-    onSubmit: ({ value }) => {
-      setFormError(null);
-      run(async () => {
-        try {
-          const result = await authClient.resetPassword({
-            newPassword: value.password,
-            token,
-          });
-          if (result.error) {
-            const message = result.error.message ?? "Failed to reset password";
-            setFormError(message);
-            toast.error(message);
-            return;
-          }
-          push("/login?message=password-reset-success");
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "An error occurred. Please try again.";
-          setFormError(message);
-          toast.error(message);
-        }
-      });
+    fallbackError: "Failed to reset password",
+    handledErrorCodes: ["INVALID_TOKEN"],
+    onSuccess: () => {
+      push("/login?message=password-reset-success");
     },
-    validators: { onSubmit: resetPasswordSchema },
+    schema: resetPasswordSchema,
   });
 
-  return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void submit(form);
-      }}
-    >
-      <div aria-atomic="true" aria-live="polite" className="sr-only">
-        {formError}
-      </div>
-      <FieldGroup>
-        <div className="grid grid-cols-2 gap-4">
-          <form.Field name="password">
-            {(field) => (
-              <AuthPasswordField disabled={isPending} field={field} label="New password" />
-            )}
-          </form.Field>
-          <form.Field name="confirmPassword">
-            {(field) => (
-              <AuthPasswordField disabled={isPending} field={field} label="Confirm password" />
-            )}
-          </form.Field>
-        </div>
-
-        <Field>
-          <Button aria-busy={isPending} disabled={isPending} type="submit">
-            {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-            {isPending ? "Resetting…" : "Reset password"}
-          </Button>
-          <FieldDescription className="text-center">
-            Back to{" "}
-            <Link className="text-foreground underline underline-offset-4" href="/login">
-              sign in
-            </Link>
-          </FieldDescription>
-        </Field>
-      </FieldGroup>
-    </form>
-  );
-};
-
-const ResetPasswordForm = ({ searchParams }: Props) => {
-  const { error, token } = use(searchParams);
-
-  if (error === "INVALID_TOKEN" || token === undefined || token === "") {
+  if (errorCode === "INVALID_TOKEN") {
     return <InvalidResetLink />;
   }
 
@@ -128,10 +58,39 @@ const ResetPasswordForm = ({ searchParams }: Props) => {
         <CardDescription>Enter a new password for your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <NewPasswordForm token={token} />
+        <AuthForm submission={submission}>
+          <div className="grid grid-cols-2 gap-4">
+            <form.AppField name="password">
+              {(field) => <field.TextField autoComplete="new-password" label="New password" />}
+            </form.AppField>
+            <form.AppField name="confirmPassword">
+              {(field) => <field.TextField autoComplete="new-password" label="Confirm password" />}
+            </form.AppField>
+          </div>
+
+          <Field>
+            <SubmitButton pendingLabel="Resetting…">Reset password</SubmitButton>
+            <FieldDescription className="text-center">
+              Back to{" "}
+              <Link className="text-foreground underline underline-offset-4" href="/login">
+                sign in
+              </Link>
+            </FieldDescription>
+          </Field>
+        </AuthForm>
       </CardContent>
     </>
   );
+};
+
+const ResetPasswordForm = ({ searchParams }: Props) => {
+  const { error, token } = use(searchParams);
+
+  if (error === "INVALID_TOKEN" || token === undefined || token === "") {
+    return <InvalidResetLink />;
+  }
+
+  return <NewPasswordForm token={token} />;
 };
 
 export default ResetPasswordForm;
