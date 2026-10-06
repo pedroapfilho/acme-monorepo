@@ -88,8 +88,9 @@ App configs resolve those URLs through `@repo/portless-env` rather than hardcodi
 
 ### Forms
 
-- **@tanstack/react-form** (NOT react-hook-form). Validate `onBlur` + `onChange` with Zod.
-- Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`.
+- **@tanstack/react-form** (NOT react-hook-form). Auth forms use `useAuthForm`, `AuthForm` and `SubmitButton` from `apps/web/src/components/auth-form.tsx`; auth buttons use `AuthActionButton` from the same module. It owns the double-submit latch, Better Auth error reporting and the busy state.
+- Validate with the Zod schema on submit, then on every change: `validationLogic: revalidateLogic()` with `validators: { onDynamic: schema }`. Errors appear after the first submit and clear as soon as the value is fixed. `onBlur` + `onChange` validators keep a stale blur error after the fix, which blocks Enter-to-submit.
+- Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`. `field.TextField` does this; call sites pass a label and an `autoComplete` purpose.
 - Field primitives from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`.
 - **Never** put `field` in a `useEffect` / `useCallback` dependency array; it's a new object every render. Use `field.form.setFieldValue(field.name, value)` with stable refs.
 

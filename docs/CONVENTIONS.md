@@ -40,7 +40,8 @@ This document records the defaults used across the acme monorepo. New code shoul
 ## Forms
 
 - `@tanstack/react-form`, never `react-hook-form`.
-- Validate `onBlur` + `onChange` with Zod schemas.
+- Validate with the Zod schema on submit, then on every change (`validationLogic: revalidateLogic()` with `validators.onDynamic`). Errors appear after the first submit and clear as soon as the value is fixed. `onBlur` + `onChange` validators keep a stale blur error after the fix, which blocks Enter-to-submit.
+- Auth forms and auth action buttons are built on `apps/web/src/components/auth-form.tsx`, which owns the double-submit latch, Better Auth error reporting and the busy state.
 - Display errors with `field.state.meta.isTouched && !field.state.meta.isValid`.
 - Never call `field.handleChange` inside `useEffect` or `useCallback` with `field` in deps; use `field.form.setFieldValue(field.name, value)` with stable refs.
 
