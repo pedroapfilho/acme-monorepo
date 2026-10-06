@@ -1,5 +1,7 @@
 import "@/styles/globals.css";
 
+import { webAppUrl } from "@repo/auth/env-config";
+import { canonicalUrl } from "@repo/portless-env/apps";
 import { Toaster } from "@repo/ui/components/sonner";
 import { ThemeProvider } from "@repo/ui/compositions/theme-provider";
 import type { Metadata, Viewport } from "next";
@@ -12,11 +14,7 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-const metadataBase = process.env.WEB_APP_URL ?? "https://acme.web.localhost";
-if (!URL.canParse(metadataBase)) {
-  throw new Error("WEB_APP_URL must be a valid URL");
-}
-const metadataBaseUrl = new URL(metadataBase);
+const metadataBase = new URL(webAppUrl() ?? canonicalUrl("web"));
 
 export const metadata: Metadata = {
   authors: [{ name: "Acme Team" }],
@@ -24,7 +22,7 @@ export const metadata: Metadata = {
   creator: "Acme",
   description: "A modern, secure authentication platform built with Better Auth and Next.js.",
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
-  metadataBase: metadataBaseUrl,
+  metadataBase,
   openGraph: {
     description: "A modern, secure authentication platform built with Better Auth and Next.js.",
     locale: "en_US",

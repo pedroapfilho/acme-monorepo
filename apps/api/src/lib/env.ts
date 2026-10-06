@@ -1,4 +1,5 @@
 import { DEFAULT_CORS_ORIGINS } from "@repo/auth/env-config";
+import { apps } from "@repo/portless-env/apps";
 import { z } from "zod";
 
 // AUTH_ALLOWED_HOSTS, TRUSTED_ORIGINS, WEB_APP_URL and CI are deliberately absent: envAuthConfig()
@@ -9,7 +10,7 @@ export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   HOST: z.string().default("0.0.0.0"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  PORT: z.string().default("4000"),
+  PORT: z.string().default(String(apps.api.port)),
   TRUST_PROXY: z.stringbool().default(false),
 });
 
