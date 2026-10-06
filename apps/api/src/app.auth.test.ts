@@ -1,7 +1,6 @@
 import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 import { initApiLogger } from "@repo/observability/hono";
-import { betterAuth } from "better-auth";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import { getCookies } from "better-auth/cookies";
 import { beforeAll, describe, expect, it, vi } from "vitest";
@@ -9,13 +8,6 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { createApp } from "./app";
 import { createUserStore } from "./lib/users";
 import type { User } from "./lib/users";
-
-const authOptions = createAuth({
-  allowedHosts: ["localhost:*"],
-  fromEmail: "noreply@acme.com",
-  prisma,
-  secret: "test-secret-minimum-32-characters-long",
-}).options;
 
 type StoredUser = User & { displayUsername: string | null };
 type StoredSession = { createdAt: Date; userId: string };
@@ -31,9 +23,10 @@ const fixture = async () => {
     session: [],
     user: [],
   };
-  const auth = betterAuth({
-    ...authOptions,
+  const auth = createAuth({
+    allowedHosts: ["localhost:*"],
     database: memoryAdapter(records),
+    secret: "test-secret-minimum-32-characters-long",
   });
   const signedUp = await auth.api.signUpEmail({
     body: {

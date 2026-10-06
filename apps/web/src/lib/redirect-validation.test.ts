@@ -60,6 +60,10 @@ describe("authPageHref", () => {
     expect(authPageHref("/register", "/billing?plan=pro")).toBe(
       "/register?from=%2Fbilling%3Fplan%3Dpro",
     );
+    const from = "/dashboard/settings?tab=security&filter=name%2Bemail#sessions";
+    const url = new URL(authPageHref("/login", from), "https://acme.web.localhost");
+    expect(url.searchParams.get("from")).toBe(from);
+    expect([...url.searchParams.keys()]).toEqual(["from"]);
   });
 
   it.each([undefined, null, "", "/dashboard", "//evil.com", "https://evil.com"])(

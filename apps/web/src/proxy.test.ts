@@ -19,7 +19,7 @@ describe("proxy", () => {
     vi.restoreAllMocks();
   });
 
-  it.each(["/dashboard", "/dashboard/settings", "/dashboard/settings/profile"])(
+  it.each(["/dashboard/settings", "/dashboard/settings/profile"])(
     "sends signed-out visitors from %s to login",
     async (path) => {
       const response = await proxy(requestFor(path));
@@ -30,6 +30,12 @@ describe("proxy", () => {
       expect(destination.searchParams.get("from")).toBe(path);
     },
   );
+
+  it("sends signed-out dashboard visitors to login without a redundant return destination", async () => {
+    const response = await proxy(requestFor("/dashboard"));
+
+    expect(response.headers.get("location")).toBe("https://acme.web.localhost/login");
+  });
 
   it("preserves query parameters in the return destination", async () => {
     const path = "/dashboard/settings?tab=security&filter=name%2Bemail";
