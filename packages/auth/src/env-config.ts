@@ -1,17 +1,8 @@
-const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "**.localhost:*", "localhost:*", "127.0.0.1:*"];
-
-const LOOPBACK_TRUSTED_ORIGINS = [
-  "http://localhost:3000",
-  "http://localhost:3001",
-  "http://localhost:4000",
-  "http://127.0.0.1:3000",
-  "http://127.0.0.1:3001",
-  "http://127.0.0.1:4000",
-];
+import { canonicalUrls, localHostPatterns, loopbackOrigins } from "@repo/portless-env/apps";
 
 // Also the fallback for the api's CORS allowlist; a zod `.default()` there would be invisible here,
 // leaving Hono and Better Auth disagreeing about which origins are allowed.
-const DEFAULT_CORS_ORIGINS = ["https://acme.web.localhost", "https://acme.landing.localhost"];
+const DEFAULT_CORS_ORIGINS = canonicalUrls("CORS_ORIGINS");
 
 type EnvAuthConfigOptions = {
   additionalAllowedHosts?: Array<string>;
@@ -38,16 +29,28 @@ const parseEnvList = (value: string | undefined): Array<string> => {
     .filter((entry) => entry.length > 0);
 };
 
+const webAppUrl = (): string | undefined => {
+  const value = process.env.WEB_APP_URL;
+  if (value === undefined || value === "") {
+    return undefined;
+  }
+  if (!URL.canParse(value)) {
+    throw new Error("WEB_APP_URL must be a valid URL");
+  }
+  return value;
+};
+
 const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
   const corsTrustedOrigins =
     process.env.CORS_ORIGINS === undefined
       ? DEFAULT_CORS_ORIGINS
       : parseEnvList(process.env.CORS_ORIGINS).filter((origin) => origin !== "*");
-  const webAppUrl = process.env.WEB_APP_URL === "" ? undefined : process.env.WEB_APP_URL;
+  const appUrl = webAppUrl();
+  const secureUrl = options.secureUrl ?? appUrl;
 
   return {
     allowedHosts: [
-      ...LOCALHOST_ALLOWED_HOSTS,
+      ...localHostPatterns,
       ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS),
       ...(options.additionalAllowedHosts ?? []),
     ],
@@ -55,15 +58,15 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
       process.env.NODE_ENV === "production" &&
       (process.env.CI === undefined || process.env.CI === ""),
     trustedOrigins: [
-      ...LOOPBACK_TRUSTED_ORIGINS,
+      ...loopbackOrigins,
       ...corsTrustedOrigins,
       ...parseEnvList(process.env.TRUSTED_ORIGINS),
       ...(options.additionalTrustedOrigins ?? []),
     ],
-    useSecureCookies: (options.secureUrl ?? webAppUrl)?.startsWith("https://") === true,
-    webAppUrl,
+    useSecureCookies: secureUrl !== undefined && URL.parse(secureUrl)?.protocol === "https:",
+    webAppUrl: appUrl,
   };
 };
 
-export { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList };
+export { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList, webAppUrl };
 export type { EnvAuthConfig, EnvAuthConfigOptions };

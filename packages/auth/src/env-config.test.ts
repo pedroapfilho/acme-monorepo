@@ -1,7 +1,7 @@
 import { matchesHostPattern } from "better-auth";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList } from "./env-config";
+import { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList, webAppUrl } from "./env-config";
 
 describe("parseEnvList", () => {
   it("returns an empty list for missing input", () => {
@@ -31,7 +31,14 @@ describe("envAuthConfig", () => {
 
   it("allows portless hosts on port 443 and on its unprivileged fallback port", () => {
     const { allowedHosts } = envAuthConfig();
-    for (const host of ["acme.web.localhost", "acme.web.localhost:1355"]) {
+    for (const host of [
+      "acme.web.localhost",
+      "acme.web.localhost:1355",
+      "fix-styles.acme.web.localhost",
+      "fix-styles.acme.web.localhost:1355",
+      "localhost:3000",
+      "127.0.0.1:4000",
+    ]) {
       expect(allowedHosts.some((pattern) => matchesHostPattern(host, pattern))).toBe(true);
     }
   });
@@ -61,6 +68,10 @@ describe("envAuthConfig", () => {
   it("derives cookie security from configuration", () => {
     expect(envAuthConfig({ secureUrl: "https://web.example.com" }).useSecureCookies).toBe(true);
     expect(envAuthConfig({ secureUrl: "http://localhost:3000" }).useSecureCookies).toBe(false);
+    vi.stubEnv("WEB_APP_URL", "https://web.example.com");
+    expect(envAuthConfig().useSecureCookies).toBe(true);
+    vi.stubEnv("WEB_APP_URL", "");
+    expect(envAuthConfig().useSecureCookies).toBe(false);
   });
 
   it("links back to the web app at WEB_APP_URL", () => {
@@ -68,6 +79,12 @@ describe("envAuthConfig", () => {
     expect(envAuthConfig().webAppUrl).toBe("https://web.example.com");
     vi.stubEnv("WEB_APP_URL", "");
     expect(envAuthConfig().webAppUrl).toBeUndefined();
+  });
+
+  it("rejects a WEB_APP_URL that is not a URL", () => {
+    vi.stubEnv("WEB_APP_URL", "web.example.com");
+    expect(() => webAppUrl()).toThrow("WEB_APP_URL must be a valid URL");
+    expect(() => envAuthConfig()).toThrow("WEB_APP_URL must be a valid URL");
   });
 
   it("falls back to the shared default origins when CORS_ORIGINS is unset", () => {
