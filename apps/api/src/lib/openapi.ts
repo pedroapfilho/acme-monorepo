@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { loopbackUrl } from "@repo/portless-env/apps";
 import type { Env } from "hono";
 
 const apiDocumentMetadata = {
@@ -12,7 +13,7 @@ const apiDocumentMetadata = {
     version: "1.0.0",
   },
   servers: [
-    { description: "Local development server", url: "http://localhost:4000" },
+    { description: "Local development server", url: loopbackUrl("api", "localhost") },
     { description: "Production server", url: "https://api.acme.com" },
   ],
   tags: [
