@@ -29,13 +29,8 @@ jobs:
       # producing 401s on every authed API request from browser tests.
       NEXT_PUBLIC_API_URL: http://127.0.0.1:4000
       WEB_APP_URL: http://127.0.0.1:3000
-      # Gates the tests/e2e/auth-email/* suite. When unset (forks,
-      # contributors without secret access), those specs `test.skip()`
-      # themselves and the rest of the suite still runs. When set, the
-      # auth server flips on requireEmailVerification; the seed script
-      # bypasses that for the canonical e2e-test user by writing
-      # emailVerified: true directly to Prisma.
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY_TEST }}
+      RESEND_API_KEY: re_e2e_stub
+      RESEND_BASE_URL: http://127.0.0.1:3999
       FROM_EMAIL: "Acme <noreply@email.acme.com>"
     services:
       postgres:
