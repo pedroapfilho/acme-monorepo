@@ -94,7 +94,7 @@ Then edit each file and set:
 - `DATABASE_URL`: replace the name and password placeholders.
 - `RESEND_API_KEY` (optional, `apps/web/.env` only): turns on auth email. Without it sign-up skips verification and email changes are unavailable.
 
-The URL variables (`NEXT_PUBLIC_API_URL`, `WEB_APP_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`) are pre-set to the portless URLs and don't need changes for local dev.
+The URL variables (`WEB_APP_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`) are pre-set to the portless URLs and don't need changes for local dev.
 
 ### 5. Initialize the database
 

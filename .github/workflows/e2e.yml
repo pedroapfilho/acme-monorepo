@@ -23,11 +23,9 @@ jobs:
       PGAPPNAME: acme:ci:e2e
       BETTER_AUTH_SECRET: test-secret-minimum-32-characters-long-for-e2e
       EXPOSE_TESTING_API: 1
-      # Use 127.0.0.1 (not localhost) to match playwright.config.ts baseURL.
-      # Mismatched hosts split cookie scope: sign-in sets cookies on
-      # 127.0.0.1 but cross-origin fetches to localhost don't send them,
-      # producing 401s on every authed API request from browser tests.
-      NEXT_PUBLIC_API_URL: http://127.0.0.1:4000
+      # The web app's loopback URL from @repo/portless-env, which the Playwright
+      # baseURL also uses. 127.0.0.1, not localhost: mismatched hosts split
+      # cookie scope, producing 401s on every authed request from browser tests.
       WEB_APP_URL: http://127.0.0.1:3000
       RESEND_API_KEY: re_e2e_stub
       RESEND_BASE_URL: http://127.0.0.1:3999
