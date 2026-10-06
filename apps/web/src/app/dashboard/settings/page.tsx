@@ -89,7 +89,7 @@ const SettingsContent = async () => {
           <EmailForm
             currentEmail={session.user.email}
             emailVerified={session.user.emailVerified}
-            enabled={auth.options.user.changeEmail.enabled}
+            enabled={auth.canSendEmail}
           />
         </CardContent>
       </Card>
