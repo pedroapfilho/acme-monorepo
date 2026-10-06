@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@repo/db";
 import { log } from "@repo/observability";
+import { loopbackUrl } from "@repo/portless-env/apps";
 import type { Mailer, TransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
@@ -86,7 +87,7 @@ const createAuth = (config: AuthConfig) => {
 
     baseURL: {
       allowedHosts,
-      fallback: "http://localhost:4000",
+      fallback: loopbackUrl("api", "localhost"),
       protocol: "auto",
     },
 
