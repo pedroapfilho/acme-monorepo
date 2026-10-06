@@ -37,7 +37,7 @@ log.info({
   port,
 });
 
-serve({
+const server = serve({
   fetch: app.fetch,
   hostname: env.HOST,
   port,
@@ -46,11 +46,13 @@ serve({
 const SHUTDOWN_SIGNALS = ["SIGINT", "SIGTERM"] as const;
 
 for (const signal of SHUTDOWN_SIGNALS) {
-  process.on(signal, () => {
-    void (async () => {
-      log.info({ message: "Shutting down gracefully", signal });
-      await prisma.$disconnect();
-      process.exit(0);
-    })();
+  process.once(signal, () => {
+    log.info({ message: "Shutting down gracefully", signal });
+    server.close(() => {
+      void (async () => {
+        await prisma.$disconnect();
+        process.exit(0);
+      })();
+    });
   });
 }

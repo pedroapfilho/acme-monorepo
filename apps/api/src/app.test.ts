@@ -46,7 +46,7 @@ const createInMemoryUsers = () => {
   const users: UserStore = {
     delete: ({ headers }) => {
       rows.delete(userIdFrom(headers));
-      return Promise.resolve();
+      return Promise.resolve(new Headers());
     },
     find: (id) => Promise.resolve(rows.get(id) ?? null),
     update: ({ data, headers }) => {
@@ -54,7 +54,7 @@ const createInMemoryUsers = () => {
       if (current) {
         rows.set(current.id, { ...current, ...data });
       }
-      return Promise.resolve();
+      return Promise.resolve(new Headers());
     },
   };
 
@@ -229,7 +229,7 @@ describe("createApp", () => {
 
       expect(res.status).toBe(400);
       expect(await res.json()).toEqual({
-        error: { code: "HTTP_EXCEPTION", message: expect.any(String) },
+        error: { code: "VALIDATION_ERROR", message: expect.any(String) },
       });
     });
 
@@ -298,20 +298,46 @@ describe("createApp", () => {
       });
     });
 
-    it("rejects an oversize body with 413 before reading it", async () => {
-      const { request, rows } = setup();
+    it.each([false, true])(
+      "rejects an oversize body with 413 before auth (content length: %s)",
+      async (withLength) => {
+        const { getSession, request, rows } = setup();
+        const body = JSON.stringify({ name: "x".repeat(10 * 1024 * 1024) });
+        const headers = new Headers({ "Content-Type": "application/json", ...signedIn });
+        if (withLength) {
+          headers.set("Content-Length", String(body.length));
+        }
 
-      const res = await request("/api/v1/users/me", {
-        ...json({ name: "x".repeat(10 * 1024 * 1024) }),
-        method: "PATCH",
-      });
+        const res = await request("/api/v1/users/me", { body, headers, method: "PATCH" });
 
-      expect(res.status).toBe(413);
-      expect(await res.json()).toEqual({
-        error: { code: "PAYLOAD_TOO_LARGE", message: "Request entity too large" },
-      });
-      expect(rows.get(alice.id)?.name).toBe("Alice");
+        expect(res.status).toBe(413);
+        expect(await res.json()).toEqual({
+          error: { code: "PAYLOAD_TOO_LARGE", message: "Request entity too large" },
+        });
+        expect(getSession).not.toHaveBeenCalled();
+        expect(rows.get(alice.id)?.name).toBe("Alice");
+      },
+    );
+  });
+
+  it.each(["PATCH", "DELETE"])("forwards every Set-Cookie header after %s", async (method) => {
+    const cookies = [
+      "acme.session_token=token; Path=/; HttpOnly; SameSite=Lax",
+      "acme.session_data=cache; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Path=/; HttpOnly",
+    ];
+    const headers = new Headers(cookies.map((cookie) => ["Set-Cookie", cookie]));
+    const { request } = setup({
+      users: {
+        ...createInMemoryUsers().users,
+        delete: () => Promise.resolve(headers),
+        update: () => Promise.resolve(headers),
+      },
     });
+
+    const res = await request("/api/v1/users/me", { ...json({ name: "Alice" }), method });
+
+    expect(res.status).toBe(method === "PATCH" ? 200 : 204);
+    expect(res.headers.getSetCookie()).toEqual(cookies);
   });
 
   describe("DELETE /api/v1/users/me", () => {

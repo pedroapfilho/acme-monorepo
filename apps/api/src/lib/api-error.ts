@@ -72,7 +72,11 @@ const toKnownError = (err: Error): KnownError | undefined => {
   }
 
   if (err instanceof HTTPException) {
-    return { code: "HTTP_EXCEPTION", message: err.message, status: err.status };
+    return {
+      code: err.status === 400 ? "VALIDATION_ERROR" : "HTTP_EXCEPTION",
+      message: err.message,
+      status: err.status,
+    };
   }
 
   if (isAPIError(err)) {

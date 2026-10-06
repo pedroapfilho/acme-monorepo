@@ -20,19 +20,24 @@ type UpdateUserInput = {
 };
 
 type UserStore = {
-  delete: (request: { headers: Headers; password?: string }) => Promise<void>;
+  delete: (request: { headers: Headers; password?: string }) => Promise<Headers>;
   find: (id: string) => Promise<User | null>;
-  update: (request: { data: UpdateUserInput; headers: Headers }) => Promise<void>;
+  update: (request: { data: UpdateUserInput; headers: Headers }) => Promise<Headers>;
 };
 
-// Writes go through Better Auth so its username plugin validates, normalizes, and sets displayUsername.
 const createUserStore = (auth: Auth, prisma: PrismaClient): UserStore => ({
   delete: async ({ headers, password }) => {
-    await auth.api.deleteUser({ body: { password }, headers });
+    const result = await auth.api.deleteUser({ body: { password }, headers, returnHeaders: true });
+    return result.headers;
   },
   find: (id) => prisma.user.findUnique({ select: userSelect, where: { id } }),
   update: async ({ data, headers }) => {
-    await auth.api.updateUser({ body: { ...data, displayUsername: data.username }, headers });
+    const result = await auth.api.updateUser({
+      body: { ...data, displayUsername: data.username },
+      headers,
+      returnHeaders: true,
+    });
+    return result.headers;
   },
 });
 
