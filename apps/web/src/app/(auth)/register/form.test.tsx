@@ -5,8 +5,8 @@ import { renderWithRouter, respondToAuthRequests } from "@/lib/test-helpers";
 
 import RegisterForm from "./form";
 
-it("asks the user to verify their email when sign-up returns no session", async () => {
-  const requests = respondToAuthRequests(200, { token: null, user: { id: "user-1" } });
+it.each([null, ""])("asks for email verification when the session token is %s", async (token) => {
+  const requests = respondToAuthRequests(200, { token, user: { id: "user-1" } });
   const router = renderWithRouter(
     <RegisterForm searchParams={Promise.resolve({ from: "/billing" })} />,
   );

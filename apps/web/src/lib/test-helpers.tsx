@@ -16,29 +16,16 @@ type AuthResponseBody = {
   user?: { id: string };
 };
 
-type AuthServer = { respond: ((request: AuthRequest) => Response) | null };
-
-const authServer: AuthServer = { respond: null };
-
-// Better Auth captures `fetch` when the client is created, so this module must load before `@/lib/auth-client`.
-vi.stubGlobal("fetch", (input: URL | string, init: RequestInit) => {
-  const body: unknown = typeof init.body === "string" ? JSON.parse(init.body) : null;
-  const request = { body, path: new URL(input).pathname };
-  if (authServer.respond === null) {
-    throw new Error(`Unexpected auth request to ${request.path}`);
-  }
-  return Promise.resolve(authServer.respond(request));
-});
-
-/** Answers every Better Auth request with one JSON response and records what was sent. */
 const respondToAuthRequests = (status: number, response: AuthResponseBody) => {
   const requests: Array<AuthRequest> = [];
-  authServer.respond = (request) => {
-    requests.push(request);
-    return Response.json(response, { status });
-  };
+  vi.mocked(fetch).mockImplementation((input, init) => {
+    const body: unknown = typeof init?.body === "string" ? JSON.parse(init.body) : null;
+    const url = input instanceof Request ? input.url : input;
+    requests.push({ body, path: new URL(url).pathname });
+    return Promise.resolve(Response.json(response, { status }));
+  });
   onTestFinished(() => {
-    authServer.respond = null;
+    vi.mocked(fetch).mockReset();
   });
   return requests;
 };
