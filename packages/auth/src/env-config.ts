@@ -24,6 +24,7 @@ type EnvAuthConfig = {
   rateLimitEnabled: boolean;
   trustedOrigins: Array<string>;
   useSecureCookies: boolean;
+  webAppUrl: string | undefined;
 };
 
 const parseEnvList = (value: string | undefined): Array<string> => {
@@ -42,6 +43,7 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
     process.env.CORS_ORIGINS === undefined
       ? DEFAULT_CORS_ORIGINS
       : parseEnvList(process.env.CORS_ORIGINS).filter((origin) => origin !== "*");
+  const webAppUrl = process.env.WEB_APP_URL === "" ? undefined : process.env.WEB_APP_URL;
 
   return {
     allowedHosts: [
@@ -58,8 +60,8 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
       ...parseEnvList(process.env.TRUSTED_ORIGINS),
       ...(options.additionalTrustedOrigins ?? []),
     ],
-    useSecureCookies:
-      (options.secureUrl ?? process.env.WEB_APP_URL)?.startsWith("https://") === true,
+    useSecureCookies: (options.secureUrl ?? webAppUrl)?.startsWith("https://") === true,
+    webAppUrl,
   };
 };
 

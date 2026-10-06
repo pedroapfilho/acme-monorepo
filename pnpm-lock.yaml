@@ -83,9 +83,6 @@ importers:
       '@repo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
-      '@repo/transactional':
-        specifier: workspace:*
-        version: link:../../packages/transactional
       '@scalar/hono-api-reference':
         specifier: ^0.12.5
         version: 0.12.5(hono@4.13.9)
