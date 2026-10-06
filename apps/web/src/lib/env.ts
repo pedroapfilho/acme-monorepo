@@ -6,7 +6,10 @@ const envSchema = z.object({
     .string()
     .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
   FROM_EMAIL: senderAddressSchema,
-  RESEND_API_KEY: z.string().optional(),
+  RESEND_API_KEY: z
+    .string()
+    .optional()
+    .transform((key) => (key === "" ? undefined : key)),
 });
 
 type Env = z.infer<typeof envSchema>;

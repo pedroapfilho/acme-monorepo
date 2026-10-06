@@ -63,6 +63,13 @@ describe("envAuthConfig", () => {
     expect(envAuthConfig({ secureUrl: "http://localhost:3000" }).useSecureCookies).toBe(false);
   });
 
+  it("links back to the web app at WEB_APP_URL", () => {
+    vi.stubEnv("WEB_APP_URL", "https://web.example.com");
+    expect(envAuthConfig().webAppUrl).toBe("https://web.example.com");
+    vi.stubEnv("WEB_APP_URL", "");
+    expect(envAuthConfig().webAppUrl).toBeUndefined();
+  });
+
   it("falls back to the shared default origins when CORS_ORIGINS is unset", () => {
     expect(envAuthConfig().trustedOrigins).toEqual(
       expect.arrayContaining([...DEFAULT_CORS_ORIGINS]),
