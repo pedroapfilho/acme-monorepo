@@ -1,18 +1,12 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
-import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
-import { FormFieldError } from "@repo/ui/compositions/form-field-error";
-import { useForm } from "@tanstack/react-form";
-import { Loader2 } from "lucide-react";
+import { Field } from "@repo/ui/components/field";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
 
+import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { profileSchema } from "@/lib/form-schemas";
-import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
   initialName: string;
@@ -20,82 +14,29 @@ type Props = {
 
 const ProfileForm = ({ initialName }: Props) => {
   const { refresh } = useRouter();
-  const { isPending, run, submit } = useAuthSubmit();
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const form = useForm({
+  const { form, submission } = useAuthForm({
+    call: (value) => authClient.updateUser({ name: value.name }),
     defaultValues: { name: initialName },
-    onSubmit: ({ value }) => {
-      setFormError(null);
-      run(async () => {
-        try {
-          const result = await authClient.updateUser({ name: value.name });
-          if (result.error) {
-            const message = result.error.message ?? "Failed to update profile";
-            setFormError(message);
-            toast.error(message);
-            return;
-          }
-          toast.success("Profile updated");
-          refresh();
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "An error occurred. Please try again.";
-          setFormError(message);
-          toast.error(message);
-        }
-      });
+    fallbackError: "Failed to update profile",
+    onSuccess: () => {
+      toast.success("Profile updated");
+      refresh();
     },
-    validators: { onSubmit: profileSchema },
+    schema: profileSchema,
   });
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void submit(form);
-      }}
-    >
-      <div aria-atomic="true" aria-live="polite" className="sr-only">
-        {formError}
-      </div>
-      <FieldGroup>
-        <form.Field name="name">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input
-                  aria-describedby={isInvalid ? "name-error" : undefined}
-                  aria-invalid={isInvalid}
-                  autoComplete="name"
-                  disabled={isPending}
-                  id="name"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
-                  required
-                  value={field.state.value}
-                />
-                {isInvalid && <FormFieldError errors={field.state.meta.errors} id="name-error" />}
-              </Field>
-            );
-          }}
-        </form.Field>
+    <AuthForm submission={submission}>
+      <form.AppField name="name">
+        {(field) => <field.TextField autoComplete="name" label="Full Name" />}
+      </form.AppField>
 
-        <Field orientation="horizontal">
-          <Button aria-busy={isPending} className="w-fit" disabled={isPending} type="submit">
-            {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-            {isPending ? "Saving…" : "Save"}
-          </Button>
-        </Field>
-      </FieldGroup>
-    </form>
+      <Field orientation="horizontal">
+        <SubmitButton className="w-fit" pendingLabel="Saving…">
+          Save
+        </SubmitButton>
+      </Field>
+    </AuthForm>
   );
 };
 
