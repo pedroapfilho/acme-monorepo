@@ -1,207 +1,251 @@
-import { prisma } from "@repo/db";
-import { beforeAll, describe, expect, it } from "vitest";
+import { log } from "@repo/observability";
+import type { Mailer, TransactionalEmail } from "@repo/transactional";
+import { memoryAdapter } from "better-auth/adapters/memory";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createAuth } from "./server";
-import type { AuthConfig } from "./server";
+import type { Auth, AuthConfig } from "./server";
 
-type Plugin = NonNullable<AuthConfig["extraPlugins"]>[number];
+const WEB_APP_URL = "https://app.acme.test";
+const PASSWORD = "correct horse battery";
 
-const baseConfig = {
-  allowedHosts: ["**.localhost"],
-  fromEmail: "noreply@acme.com",
-  prisma,
-  secret: "test-secret-minimum-32-characters-long",
-} satisfies AuthConfig;
+type CapturingMailer = { mailer: Mailer; sent: Array<TransactionalEmail> };
 
-describe("Auth Server Configuration", () => {
-  let auth: ReturnType<typeof createAuth>;
+const capturingMailer = (failing: Array<TransactionalEmail["type"]> = []): CapturingMailer => {
+  const sent: Array<TransactionalEmail> = [];
+  const mailer: Mailer = (email) => {
+    sent.push(email);
+    return Promise.resolve(
+      failing.includes(email.type) ? { error: "quota exceeded", ok: false } : { ok: true },
+    );
+  };
+  return { mailer, sent };
+};
 
-  beforeAll(() => {
-    auth = createAuth(baseConfig);
+const testAuth = (config: Partial<AuthConfig> = {}) =>
+  createAuth({
+    allowedHosts: ["**.localhost"],
+    database: memoryAdapter({ account: [], session: [], user: [], verification: [] }),
+    secret: "test-secret-minimum-32-characters-long",
+    webAppUrl: WEB_APP_URL,
+    ...config,
   });
 
-  it("should have email and password authentication enabled", () => {
-    expect(auth.options.emailAndPassword?.enabled).toBe(true);
+const signUp = (auth: Auth, email = "ada@acme.test", password = PASSWORD) =>
+  auth.api.signUpEmail({ body: { email, name: "Ada", password } });
+
+const sentOfType = <T extends TransactionalEmail["type"]>(
+  sent: Array<TransactionalEmail>,
+  type: T,
+): Array<Extract<TransactionalEmail, { type: T }>> =>
+  sent.filter((email): email is Extract<TransactionalEmail, { type: T }> => email.type === type);
+
+const signedInCookie = async (auth: Auth, email: string) => {
+  const { headers } = await auth.api.signInEmail({
+    body: { email, password: PASSWORD },
+    returnHeaders: true,
+  });
+  return headers
+    .getSetCookie()
+    .map((cookie) => cookie.split(";")[0])
+    .join("; ");
+};
+
+const verify = async (auth: Auth, welcome: { verificationUrl: string }) => {
+  const token = new URL(welcome.verificationUrl).searchParams.get("token") ?? "";
+  await auth.api.verifyEmail({ query: { token } });
+};
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe("createAuth with a mailer", () => {
+  it("reports email delivery as available", () => {
+    expect(testAuth({ mailer: capturingMailer().mailer }).canSendEmail).toBe(true);
   });
 
-  it("should require 12 character minimum password", () => {
-    expect(auth.options.emailAndPassword?.minPasswordLength).toBe(12);
+  it("emails a verification link on sign-up and withholds the session until it is used", async () => {
+    const { mailer, sent } = capturingMailer();
+    const auth = testAuth({ mailer });
+
+    const result = await signUp(auth);
+
+    expect(result.token).toBeNull();
+    expect(sent).toEqual([
+      {
+        type: "welcome",
+        userEmail: "ada@acme.test",
+        userId: result.user.id,
+        username: "Ada",
+        verificationUrl: expect.stringMatching(/\/api\/auth\/verify-email\?token=/v),
+      },
+    ]);
   });
 
-  it("should have maximum password length of 128", () => {
-    expect(auth.options.emailAndPassword?.maxPasswordLength).toBe(128);
+  it("refuses an unverified sign-in and sends a fresh verification link", async () => {
+    const { mailer, sent } = capturingMailer();
+    const auth = testAuth({ mailer });
+    await signUp(auth);
+
+    await expect(signedInCookie(auth, "ada@acme.test")).rejects.toThrow(/not verified/iv);
+
+    expect(sentOfType(sent, "welcome")).toHaveLength(2);
   });
 
-  it("should have cookie cache enabled", () => {
-    expect(auth.options.session?.cookieCache?.enabled).toBe(true);
+  it("tells the account holder about a repeated sign-up with links to the web app", async () => {
+    const { mailer, sent } = capturingMailer();
+    const auth = testAuth({ mailer });
+    const first = await signUp(auth);
+
+    const repeat = await signUp(auth, "ada@acme.test", "another long password");
+
+    expect(repeat.token).toBeNull();
+    expect(repeat.user.email).toBe("ada@acme.test");
+    expect(sentOfType(sent, "sign-up-attempt")).toEqual([
+      {
+        resetPasswordUrl: `${WEB_APP_URL}/recover`,
+        signInUrl: `${WEB_APP_URL}/login`,
+        type: "sign-up-attempt",
+        userEmail: "ada@acme.test",
+        userId: first.user.id,
+        username: "Ada",
+      },
+    ]);
   });
 
-  it("should have 5 minute cookie cache max age", () => {
-    expect(auth.options.session?.cookieCache?.maxAge).toBe(5 * 60);
-  });
+  it("answers a repeated sign-up normally and logs the failure when the notice cannot be sent", async () => {
+    const logError = vi.spyOn(log, "error");
+    const auth = testAuth({ mailer: capturingMailer(["sign-up-attempt"]).mailer });
+    await signUp(auth);
 
-  it("should use acme cookie prefix", () => {
-    expect(auth.options.advanced?.cookiePrefix).toBe("acme");
-  });
+    const repeat = await signUp(auth, "ada@acme.test", "another long password");
 
-  it("should leave secure cookies off unless the caller opts in", () => {
-    expect(auth.options.advanced?.useSecureCookies).toBe(false);
-    expect(auth.options.advanced?.defaultCookieAttributes?.httpOnly).toBe(true);
-    expect(auth.options.advanced?.defaultCookieAttributes?.sameSite).toBe("lax");
-  });
-
-  it("should set useSecureCookies from config", () => {
-    const httpsAuth = createAuth({ ...baseConfig, useSecureCookies: true });
-    expect(httpsAuth.options.advanced?.useSecureCookies).toBe(true);
-  });
-
-  it("should configure dynamic baseURL with protocol auto", () => {
-    const baseURL = auth.options.baseURL;
-    if (typeof baseURL !== "object" || baseURL === null) {
-      throw new Error("expected dynamic baseURL object");
-    }
-    expect(baseURL.protocol).toBe("auto");
-    expect(baseURL.fallback).toBe("http://localhost:4000");
-  });
-
-  it("should take baseURL.allowedHosts from config", () => {
-    const hostAuth = createAuth({
-      ...baseConfig,
-      allowedHosts: ["**.localhost", "acme.com", "*.vercel.app"],
+    expect(repeat.token).toBeNull();
+    expect(repeat.user.email).toBe("ada@acme.test");
+    expect(logError).toHaveBeenCalledWith({
+      error: "quota exceeded",
+      message: "Auth: failed to send sign-up attempt email",
     });
-    const baseURL = hostAuth.options.baseURL;
-    if (typeof baseURL !== "object" || baseURL === null) {
-      throw new Error("expected dynamic baseURL object");
+  });
+
+  it("surfaces a failed verification resend to the caller", async () => {
+    const auth = testAuth({ mailer: capturingMailer(["welcome"]).mailer });
+    await signUp(auth);
+
+    await expect(
+      auth.api.sendVerificationEmail({ body: { email: "ada@acme.test" } }),
+    ).rejects.toThrow("Failed to send verification email: quota exceeded");
+  });
+
+  it("emails a password reset link", async () => {
+    const { mailer, sent } = capturingMailer();
+    const auth = testAuth({ mailer });
+    const { user } = await signUp(auth);
+
+    await auth.api.requestPasswordReset({
+      body: { email: "ada@acme.test", redirectTo: "/reset-password" },
+    });
+
+    expect(sentOfType(sent, "password-reset")).toEqual([
+      {
+        resetUrl: expect.stringMatching(
+          /\/api\/auth\/reset-password\/\w+\?callbackURL=%2Freset-password$/v,
+        ),
+        type: "password-reset",
+        userEmail: "ada@acme.test",
+        userId: user.id,
+        username: "Ada",
+      },
+    ]);
+  });
+
+  it("asks the current address to confirm an email change", async () => {
+    const { mailer, sent } = capturingMailer();
+    const auth = testAuth({ mailer });
+    const { user } = await signUp(auth);
+    const [welcome] = sentOfType(sent, "welcome");
+    if (welcome === undefined) {
+      throw new Error("sign-up sent no verification email");
     }
-    expect(baseURL.allowedHosts).toEqual(
-      expect.arrayContaining(["**.localhost", "acme.com", "*.vercel.app"]),
+    await verify(auth, welcome);
+    const cookie = await signedInCookie(auth, "ada@acme.test");
+
+    await auth.api.changeEmail({
+      body: { callbackURL: "/dashboard/settings", newEmail: "lovelace@acme.test" },
+      headers: new Headers({ cookie }),
+    });
+
+    expect(sentOfType(sent, "change-email-confirmation")).toEqual([
+      {
+        changeUrl: expect.stringMatching(
+          /\/api\/auth\/verify-email\?token=.+&callbackURL=%2Fdashboard%2Fsettings$/v,
+        ),
+        currentEmail: "ada@acme.test",
+        newEmail: "lovelace@acme.test",
+        type: "change-email-confirmation",
+        userId: user.id,
+        username: "Ada",
+      },
+    ]);
+  });
+
+  it("refuses to start without a web app URL to link emails to", () => {
+    expect(() => testAuth({ mailer: capturingMailer().mailer, webAppUrl: undefined })).toThrow(
+      "createAuth: a mailer needs webAppUrl to link emails back to the web app",
+    );
+  });
+});
+
+describe("createAuth without a mailer", () => {
+  it("reports email delivery as unavailable", () => {
+    expect(testAuth().canSendEmail).toBe(false);
+  });
+
+  it("signs the user in on sign-up without asking for verification", async () => {
+    const result = await signUp(testAuth());
+
+    expect(result.token).toEqual(expect.any(String));
+  });
+
+  it("answers a password reset request without sending anything", async () => {
+    const auth = testAuth();
+    await signUp(auth);
+
+    await expect(
+      auth.api.requestPasswordReset({ body: { email: "ada@acme.test" } }),
+    ).resolves.toMatchObject({ status: true });
+  });
+
+  it("starts without a web app URL", () => {
+    expect(testAuth({ webAppUrl: undefined }).canSendEmail).toBe(false);
+  });
+});
+
+describe("createAuth credentials and sessions", () => {
+  it("rejects passwords shorter than 12 characters", async () => {
+    await expect(signUp(testAuth(), "ada@acme.test", "elevenchars")).rejects.toThrow(
+      /password too short/iv,
     );
   });
 
-  it("should require email verification when Resend is configured", () => {
-    const verifyingAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
-    expect(verifyingAuth.options.emailAndPassword?.requireEmailVerification).toBe(true);
+  it("issues acme-prefixed session cookies that last 7 days", async () => {
+    const auth = testAuth();
+    await signUp(auth);
+
+    const cookie = await signedInCookie(auth, "ada@acme.test");
+    const session = await auth.api.getSession({ headers: new Headers({ cookie }) });
+
+    expect(cookie).toMatch(/^acme\.session_token=/v);
+    const lifetime = (session?.session.expiresAt.getTime() ?? 0) - Date.now();
+    expect(lifetime).toBeGreaterThan(60 * 60 * 24 * 7 * 1000 - 60_000);
+    expect(lifetime).toBeLessThanOrEqual(60 * 60 * 24 * 7 * 1000);
   });
 
-  it("should NOT require email verification when Resend is absent", () => {
-    const noResendAuth = createAuth(baseConfig);
-    expect(noResendAuth.options.emailAndPassword?.requireEmailVerification).toBe(false);
-  });
+  it("prefixes cookies as secure when asked to", async () => {
+    const auth = testAuth({ useSecureCookies: true });
+    await signUp(auth);
 
-  it("should have bearer token plugin enabled", () => {
-    const plugins = auth.options.plugins ?? [];
-    const hasBearerToken = plugins.some((plugin) => plugin.id === "bearer");
-    expect(hasBearerToken).toBe(true);
-  });
-
-  it("should have username plugin enabled", () => {
-    const plugins = auth.options.plugins ?? [];
-    const hasUsername = plugins.some((plugin) => plugin.id === "username");
-    expect(hasUsername).toBe(true);
-  });
-
-  it("should have account linking enabled", () => {
-    expect(auth.options.account?.accountLinking?.enabled).toBe(true);
-  });
-
-  it("should default to no trusted origins", () => {
-    expect(auth.options.trustedOrigins).toEqual([]);
-  });
-
-  it("should use database storage for rate limiting", () => {
-    expect(auth.options.rateLimit?.storage).toBe("database");
-  });
-
-  it("should have correct rate-limiting window and max", () => {
-    expect(auth.options.rateLimit?.window).toBe(60);
-    expect(auth.options.rateLimit?.max).toBe(100);
-  });
-
-  it("should leave rate limiting off unless the caller opts in", () => {
-    expect(auth.options.rateLimit?.enabled).toBe(false);
-  });
-
-  it("should enable rate limiting from config", () => {
-    const limitedAuth = createAuth({ ...baseConfig, rateLimitEnabled: true });
-    expect(limitedAuth.options.rateLimit?.enabled).toBe(true);
-  });
-
-  it("should take trustedOrigins from config", () => {
-    const originAuth = createAuth({
-      ...baseConfig,
-      trustedOrigins: ["https://app.acme.com", "http://localhost:3000"],
-    });
-    const trusted = originAuth.options.trustedOrigins;
-    expect(trusted).toContain("https://app.acme.com");
-    expect(trusted).toContain("http://localhost:3000");
-  });
-
-  it("should always define reset password handler (no-op when resendApiKey is absent)", () => {
-    expect(auth.options.emailAndPassword?.sendResetPassword).toBeDefined();
-  });
-
-  it("should configure reset password email when resendApiKey is provided", () => {
-    const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
-    expect(emailAuth.options.emailAndPassword?.sendResetPassword).toBeDefined();
-  });
-
-  it("should expire sessions after 7 days", () => {
-    expect(auth.options.session?.expiresIn).toBe(60 * 60 * 24 * 7);
-  });
-
-  it("should refresh sessions that are older than 1 day", () => {
-    expect(auth.options.session?.updateAge).toBe(60 * 60 * 24);
-  });
-
-  it("should include extra plugins in the resolved plugin list", () => {
-    const mockPlugin = { id: "test-plugin", init: () => ({}) } as unknown as Plugin;
-    const extendedAuth = createAuth({ ...baseConfig, extraPlugins: [mockPlugin] });
-    const plugins = extendedAuth.options.plugins ?? [];
-    expect(plugins.some((p) => p.id === "test-plugin")).toBe(true);
-  });
-
-  it("should omit verification email handling when Resend is absent", () => {
-    expect(auth.options.emailVerification?.sendVerificationEmail).toBeUndefined();
-  });
-
-  it("should configure verification email when resendApiKey is provided", () => {
-    const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
-    expect(emailAuth.options.emailVerification?.sendVerificationEmail).toBeDefined();
-  });
-
-  it("should always enable email changes (confirmation no-ops when resendApiKey is absent)", () => {
-    expect(auth.options.user?.changeEmail?.enabled).toBe(true);
-    expect(auth.options.user?.changeEmail?.sendChangeEmailConfirmation).toBeDefined();
-  });
-
-  it("should enable verified email changes when Resend is configured", () => {
-    const emailAuth = createAuth({ ...baseConfig, resendApiKey: "re_test_key" });
-    expect(emailAuth.options.user?.changeEmail?.enabled).toBe(true);
-    expect(emailAuth.options.user?.changeEmail?.sendChangeEmailConfirmation).toBeDefined();
-  });
-
-  it("sets emailVerification.callbackURL to the app root", () => {
-    expect(auth.options.emailVerification?.callbackURL).toBe("/");
-  });
-
-  it("enables autoSignInAfterVerification so the verification link is the login", () => {
-    expect(auth.options.emailVerification?.autoSignInAfterVerification).toBe(true);
-  });
-
-  it("re-sends the verification email on unverified sign-in attempts", () => {
-    expect(auth.options.emailVerification?.sendOnSignIn).toBe(true);
-  });
-
-  it("should allow users to delete their account", () => {
-    expect(auth.options.user?.deleteUser?.enabled).toBe(true);
-  });
-
-  it("should have displayName as optional additional user field", () => {
-    const displayName = auth.options.user?.additionalFields?.displayName;
-    expect(displayName).toEqual({
-      defaultValue: null,
-      required: false,
-      type: "string",
-    });
+    expect(await signedInCookie(auth, "ada@acme.test")).toMatch(/^__Secure-acme\.session_token=/v);
   });
 });

@@ -22,7 +22,6 @@ export default defineConfig({
       "@repo/observability",
       "@repo/observability/auth",
       "@repo/observability/hono",
-      "@repo/transactional",
     ],
   },
   entry: ["src/index.ts"],

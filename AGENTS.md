@@ -98,9 +98,9 @@ App configs resolve those URLs through `@repo/portless-env` rather than hardcodi
 - Password minimum **12 characters**. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
-- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify; it does not serve the auth routes.
+- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
-- `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
+- `createAuth` takes an optional `mailer` and reports it as `auth.canSendEmail`. `web` builds the Resend mailer when `RESEND_API_KEY` is set. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
 
 ### API
 
@@ -142,7 +142,8 @@ cp packages/db/.env.example packages/db/.env
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS`: comma-separated allowed origins
 - `NEXT_PUBLIC_API_URL`: API URL for client-side requests (defaults to portless URL)
-- `BETTER_AUTH_URL`: Better Auth base URL (api hostname)
+- `WEB_APP_URL`: web origin; secure-cookie switch and the base of auth email links (portless fills it in dev)
+- `RESEND_API_KEY` / `FROM_EMAIL`: web only; auth email is off while `RESEND_API_KEY` is unset
 
 Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 
