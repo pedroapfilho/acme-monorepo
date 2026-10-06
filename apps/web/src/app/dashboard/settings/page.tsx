@@ -10,11 +10,10 @@ import { isAPIError } from "better-auth/api";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { getAuth } from "@/lib/auth";
-import { getSession } from "@/lib/auth-helpers";
+import { requireSession } from "@/lib/auth-helpers";
 
 import { DeleteAccountForm } from "./delete-account-form";
 import { EmailForm } from "./email-form";
@@ -48,20 +47,13 @@ const listSessions = async (headersList: Headers) => {
 };
 
 const SettingsContent = async () => {
-  const session = await getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const headersList = await headers();
+  const session = await requireSession("/dashboard/settings");
   const auth = getAuth();
-  const sessions = await listSessions(headersList);
+  const sessions = await listSessions(await headers());
   const sortedSessions = sessions?.toSorted(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
   const currentToken = session.session.token;
-  const emailChangeEnabled = auth.options.user.changeEmail.enabled;
 
   return (
     <>
@@ -97,7 +89,7 @@ const SettingsContent = async () => {
           <EmailForm
             currentEmail={session.user.email}
             emailVerified={session.user.emailVerified}
-            enabled={emailChangeEnabled}
+            enabled={auth.options.user.changeEmail.enabled}
           />
         </CardContent>
       </Card>

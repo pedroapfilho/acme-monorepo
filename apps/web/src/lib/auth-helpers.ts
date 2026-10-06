@@ -1,23 +1,18 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { cache } from "react";
 
 import { getAuth } from "./auth";
-import { log } from "./observability";
 
-export const getSession = cache(async () => {
-  const headersList = await headers();
+const getSession = (requestHeaders: Headers) =>
+  getAuth().api.getSession({ headers: requestHeaders });
 
-  try {
-    const session = await getAuth().api.getSession({
-      headers: headersList,
-    });
-
-    return session;
-  } catch (error) {
-    log.error({
-      error: error instanceof Error ? error.message : String(error),
-      message: "getSession failed",
-    });
-    return null;
+const requireSession = cache(async (from: string) => {
+  const session = await getSession(await headers());
+  if (!session) {
+    redirect(`/login?${new URLSearchParams({ from }).toString()}`);
   }
+  return session;
 });
+
+export { getSession, requireSession };

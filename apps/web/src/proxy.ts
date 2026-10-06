@@ -3,27 +3,13 @@ import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { getAuth } from "@/lib/auth";
-import { log } from "@/lib/observability";
+import { getSession } from "@/lib/auth-helpers";
 
-const protectedRoutes = ["/dashboard", "/profile", "/settings"];
+const protectedRoutes = ["/dashboard"];
 
 // /reset-password is deliberately absent: bouncing an authenticated visitor to the dashboard would
 // make a reset link unusable for anyone still holding a session.
 const authRoutes = ["/login", "/register", "/recover"];
-
-const getSessionOrNull = async (request: NextRequest) => {
-  try {
-    return await getAuth().api.getSession({ headers: request.headers });
-  } catch (error) {
-    log.error({
-      error: error instanceof Error ? error.message : String(error),
-      message: "proxy: getSession failed; treating as unauthenticated",
-      pathname: request.nextUrl.pathname,
-    });
-    return null;
-  }
-};
 
 export const proxy = async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
@@ -42,7 +28,7 @@ export const proxy = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  const session = await getSessionOrNull(request);
+  const session = await getSession(request.headers);
 
   if (isProtectedRoute && !session) {
     const url = new URL("/login", request.url);
