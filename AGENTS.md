@@ -80,7 +80,7 @@ sudo portless proxy start --https     # binds :443, trusts the local cert
 
 Worktrees auto-prefix the subdomain: `main` → `https://acme.web.localhost`, branch `fix-styles` → `https://fix-styles.acme.web.localhost`. Each gets an auto-assigned backing port; no collisions.
 
-The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt`; see `apps/api/src/lib/openapi.ts`.
+The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt`; see `apps/api/src/app.ts`.
 
 App configs resolve those URLs through `@repo/portless-env` rather than hardcoding them. `applyPortlessUrls({ ENV_VAR: ["<subdomain>"] })` runs at the top of each `next.config.ts` / `tsdown.config.ts` and shells out to `portless get` for every name, filling the env var only when it is unset or still holds the canonical `*.localhost` default. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Import it by bare specifier (`@repo/portless-env`): a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
 
@@ -98,7 +98,7 @@ App configs resolve those URLs through `@repo/portless-env` rather than hardcodi
 - Password minimum **12 characters**. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
-- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify; it does not serve the auth routes.
+- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup and user writes, both wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
 - `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
 
