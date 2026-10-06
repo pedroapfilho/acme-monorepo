@@ -1,24 +1,14 @@
-import type { Context, Next } from "hono";
+import { getConnInfo } from "@hono/node-server/conninfo";
+import type { Context } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
+import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
 
-import { errorBody } from "@/lib/api-error";
+import { AppError } from "@/lib/api-error";
 
-const getClientIp = (c: Context): string => {
-  const forwarded = c.req.header("x-forwarded-for");
-  if (forwarded !== undefined && forwarded !== "") {
-    return forwarded;
-  }
-  const realIp = c.req.header("x-real-ip");
-  if (realIp !== undefined && realIp !== "") {
-    return realIp;
-  }
-  return "unknown";
-};
+const MAX_BODY_BYTES = 10 * 1024 * 1024;
 
-export { getClientIp };
-
-export const securityHeaders = secureHeaders({
+const securityHeaders = secureHeaders({
   contentSecurityPolicy: {
     connectSrc: ["'self'"],
     defaultSrc: ["'self'"],
@@ -44,47 +34,42 @@ export const securityHeaders = secureHeaders({
   xXssProtection: "1; mode=block",
 });
 
-export const standardRateLimit = rateLimiter({
-  handler: (c: Context) => {
-    c.res = c.json(
-      errorBody("RATE_LIMIT_EXCEEDED", "Too many requests, please try again later"),
-      429,
-    );
+const requestSizeLimit = bodyLimit({
+  maxSize: MAX_BODY_BYTES,
+  onError: () => {
+    throw new AppError("Request entity too large", "PAYLOAD_TOO_LARGE", 413);
   },
-  keyGenerator: getClientIp,
-  limit: 100,
-  standardHeaders: "draft-6",
-  windowMs: 15 * 60 * 1000,
 });
 
-// Keyed by IP, not by user: both limiters are registered app-level in index.ts and run before the
-// route-level authMiddleware, so no user is on the context yet when the key is computed.
-export const apiRateLimit = rateLimiter({
-  handler: (c: Context) => {
-    c.res = c.json(
-      errorBody("API_RATE_LIMIT_EXCEEDED", "API rate limit exceeded, please slow down"),
-      429,
-    );
-  },
-  keyGenerator: getClientIp,
-  limit: 30,
-  standardHeaders: "draft-6",
-  windowMs: 1 * 60 * 1000,
-});
-
-export const requestSizeLimit = (maxSize: number = 10 * 1024 * 1024) => {
-  return async (c: Context, nextHandler: Next) => {
-    const contentLength = c.req.header("content-length");
-
-    if (
-      contentLength !== undefined &&
-      contentLength !== "" &&
-      Math.trunc(Number(contentLength)) > maxSize
-    ) {
-      c.res = c.json(errorBody("PAYLOAD_TOO_LARGE", "Request entity too large"), 413);
-      return;
+const clientAddress = (c: Context, trustProxy: boolean): string => {
+  if (trustProxy) {
+    const proxiedAddress = c.req.header("x-forwarded-for")?.split(",").at(-1)?.trim();
+    if (proxiedAddress !== undefined && proxiedAddress !== "") {
+      return proxiedAddress;
     }
+  }
 
-    await nextHandler();
-  };
+  return getConnInfo(c).remote.address ?? "unknown";
 };
+
+type RateLimitOptions = {
+  code: string;
+  limit: number;
+  message: string;
+  windowMs: number;
+};
+
+const createRateLimit =
+  (trustProxy: boolean) =>
+  ({ code, limit, message, windowMs }: RateLimitOptions) =>
+    rateLimiter({
+      handler: () => {
+        throw new AppError(message, code, 429);
+      },
+      keyGenerator: (c) => clientAddress(c, trustProxy),
+      limit,
+      standardHeaders: "draft-6",
+      windowMs,
+    });
+
+export { createRateLimit, requestSizeLimit, securityHeaders };

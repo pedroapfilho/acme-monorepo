@@ -69,4 +69,9 @@ describe("envSchema", () => {
       expect(result.success).toBe(true);
     }
   });
+
+  it("should not trust forwarded client addresses unless TRUST_PROXY is set", () => {
+    expect(envSchema.parse(validEnv).TRUST_PROXY).toBe(false);
+    expect(envSchema.parse({ ...validEnv, TRUST_PROXY: "true" }).TRUST_PROXY).toBe(true);
+  });
 });
