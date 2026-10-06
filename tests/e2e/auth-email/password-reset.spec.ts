@@ -53,7 +53,7 @@ test.describe("Password reset", () => {
     await page.waitForURL(/\/login/);
 
     await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password").fill(newPassword);
+    await page.getByLabel("Password", { exact: true }).fill(newPassword);
     await page.getByRole("button", { name: "Sign in" }).click();
 
     await page.waitForURL("/dashboard");
