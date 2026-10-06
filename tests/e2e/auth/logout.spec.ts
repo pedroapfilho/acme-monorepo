@@ -1,9 +1,9 @@
 import type { APIRequestContext } from "@playwright/test";
 
-import { webUrl } from "../../../playwright.config";
 import { expect, test } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
 import { extractLink, waitForEmail } from "../helpers/resend";
+import { webUrl } from "../urls";
 
 const emailVerificationRequired = Boolean(process.env.RESEND_API_KEY);
 

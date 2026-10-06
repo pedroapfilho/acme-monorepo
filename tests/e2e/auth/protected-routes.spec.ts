@@ -1,5 +1,5 @@
-import { webUrl } from "../../../playwright.config";
 import { test, expect } from "../fixtures/auth.fixture";
+import { webUrl } from "../urls";
 
 test.describe("Root redirect", () => {
   test("sends anonymous visitors to login", async ({ page }) => {

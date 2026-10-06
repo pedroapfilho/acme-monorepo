@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { apiUrl } from "../../../playwright.config";
+import { apiUrl } from "../urls";
 
 test.use({ storageState: { cookies: [], origins: [] } });
 

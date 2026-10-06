@@ -1,6 +1,6 @@
-import { apiUrl } from "../../../playwright.config";
 import { test, expect } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
+import { apiUrl } from "../urls";
 
 test.describe("API Users", () => {
   test("GET /api/v1/users/me returns authenticated user", async ({ request }) => {

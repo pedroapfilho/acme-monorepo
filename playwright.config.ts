@@ -1,27 +1,9 @@
 /// <reference types="node" />
 
-import { execFileSync } from "node:child_process";
-
 import { defineConfig, devices } from "@playwright/test";
+import { apps } from "@repo/portless-env/apps";
 
-const getPortlessUrl = (name: string) => {
-  if (process.env.CI) {
-    return undefined;
-  }
-  try {
-    return execFileSync("portless", ["get", name], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-  } catch {
-    return undefined;
-  }
-};
-
-export const webUrl =
-  process.env.PLAYWRIGHT_WEB_URL ?? getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
-export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
-export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
+import { apiUrl, landingUrl, webUrl } from "./tests/e2e/urls";
 
 export default defineConfig({
   forbidOnly: !!process.env.CI,
@@ -80,7 +62,7 @@ export default defineConfig({
           url: `${process.env.RESEND_BASE_URL}/emails`,
         },
         {
-          command: "node_modules/.bin/next start apps/web --port 3000",
+          command: `node_modules/.bin/next start apps/web --port ${apps.web.port}`,
           env: { PGAPPNAME: "acme:ci:web" },
           stderr: "pipe",
           stdout: "pipe",
@@ -96,7 +78,7 @@ export default defineConfig({
           url: `${apiUrl}/healthz`,
         },
         {
-          command: "node_modules/.bin/next start apps/landing --port 3001",
+          command: `node_modules/.bin/next start apps/landing --port ${apps.landing.port}`,
           env: { PGAPPNAME: "acme:ci:landing" },
           stderr: "pipe",
           stdout: "pipe",

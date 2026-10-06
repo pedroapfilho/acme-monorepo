@@ -2,8 +2,8 @@ import { mkdir } from "node:fs/promises";
 
 import { expect, test as setup } from "@playwright/test";
 
-import { webUrl } from "../../../playwright.config";
 import { TEST_USER } from "../fixtures/test-user";
+import { webUrl } from "../urls";
 
 const STORAGE_STATE_PATH = "tests/e2e/.auth/user.json";
 

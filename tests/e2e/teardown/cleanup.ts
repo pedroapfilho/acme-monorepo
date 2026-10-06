@@ -1,5 +1,5 @@
-import { apiUrl, webUrl } from "../../../playwright.config";
 import { TEST_USER } from "../fixtures/test-user";
+import { apiUrl, webUrl } from "../urls";
 
 const cleanup = async () => {
   const signIn = await fetch(`${webUrl}/api/auth/sign-in/email`, {
