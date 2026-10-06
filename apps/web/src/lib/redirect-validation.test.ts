@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { safeRedirectPath } from "./redirect-validation";
+import { authPageHref, safeRedirectPath } from "./redirect-validation";
 
 describe("safeRedirectPath", () => {
   it("accepts a simple in-app path", () => {
@@ -49,5 +49,22 @@ describe("safeRedirectPath", () => {
     expect(safeRedirectPath("evil.com")).toBe("/dashboard");
     expect(safeRedirectPath("dashboard")).toBe("/dashboard");
     expect(safeRedirectPath(" /dashboard")).toBe("/dashboard");
+  });
+});
+
+describe("authPageHref", () => {
+  it("carries a safe destination as an encoded from parameter", () => {
+    expect(authPageHref("/login", "/dashboard/settings")).toBe(
+      "/login?from=%2Fdashboard%2Fsettings",
+    );
+    expect(authPageHref("/register", "/billing?plan=pro")).toBe(
+      "/register?from=%2Fbilling%3Fplan%3Dpro",
+    );
+  });
+
+  it("omits from when the destination is the default or unsafe", () => {
+    expect(authPageHref("/login", "/dashboard")).toBe("/login");
+    expect(authPageHref("/register", undefined)).toBe("/register");
+    expect(authPageHref("/login", "//evil.com")).toBe("/login");
   });
 });
