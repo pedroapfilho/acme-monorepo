@@ -21,7 +21,6 @@ const apiDocumentMetadata = {
   ],
 };
 
-// Rethrowing hands request validation failures to the central error handler's envelope.
 const createRouter = <E extends Env = Env>() =>
   new OpenAPIHono<E>({
     defaultHook: (result) => {

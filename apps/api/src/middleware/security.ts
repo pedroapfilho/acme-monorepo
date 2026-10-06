@@ -41,7 +41,6 @@ const requestSizeLimit = bodyLimit({
   },
 });
 
-// A trusted proxy appends the peer it saw, so only the last X-Forwarded-For entry is not client-supplied.
 const clientAddress = (c: Context, trustProxy: boolean): string => {
   if (trustProxy) {
     const proxiedAddress = c.req.header("x-forwarded-for")?.split(",").at(-1)?.trim();
