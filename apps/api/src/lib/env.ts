@@ -10,6 +10,7 @@ export const envSchema = z.object({
   HOST: z.string().default("0.0.0.0"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.string().default("4000"),
+  TRUST_PROXY: z.stringbool().default(false),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
