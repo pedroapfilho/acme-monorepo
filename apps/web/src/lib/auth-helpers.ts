@@ -9,15 +9,12 @@ const getSession = (requestHeaders: Headers) =>
 
 const loginUrl = (from: string) => `/login?${new URLSearchParams({ from }).toString()}`;
 
-const createRequireSession = (lookup: typeof getSession, requestHeaders: () => Promise<Headers>) =>
-  cache(async (from: string) => {
-    const session = await lookup(await requestHeaders());
-    if (!session) {
-      redirect(loginUrl(from));
-    }
-    return session;
-  });
+const requireSession = cache(async (from: string) => {
+  const session = await getSession(await headers());
+  if (!session) {
+    redirect(loginUrl(from));
+  }
+  return session;
+});
 
-const requireSession = createRequireSession(getSession, headers);
-
-export { createRequireSession, getSession, loginUrl, requireSession };
+export { getSession, loginUrl, requireSession };
