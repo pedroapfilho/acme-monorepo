@@ -128,8 +128,8 @@ const createResendMailer = (
   const sender = senderAddressSchema.parse(from);
 
   return async (email) => {
-    const { subject, template, to } = buildEmail(email);
     try {
+      const { subject, template, to } = buildEmail(email);
       const [html, text] = await Promise.all([
         render(template),
         render(template, { plainText: true }),
@@ -159,4 +159,4 @@ const createResendMailer = (
 };
 
 export { createResendMailer };
-export type { Mailer, ResendSend, TransactionalEmail };
+export type { Mailer, TransactionalEmail };

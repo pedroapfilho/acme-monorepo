@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createResendMailer } from "./mailer";
-import type { ResendSend, TransactionalEmail } from "./mailer";
+import type { TransactionalEmail } from "./mailer";
 
-const send = vi.fn<ResendSend>();
+const send = vi.fn<NonNullable<Parameters<typeof createResendMailer>[1]>>();
 
 const mailerFrom = (from: string) => createResendMailer({ apiKey: "re_test", from }, send);
 
@@ -139,5 +139,20 @@ describe("createResendMailer", () => {
     const result = await mailerFrom("noreply@acme.com")(welcome);
 
     expect(result).toEqual({ error: "socket hang up", ok: false });
+  });
+
+  it("reports a template construction error as a failed delivery", async () => {
+    const email: TransactionalEmail = {
+      ...welcome,
+      get username(): string {
+        throw new Error("Template data unavailable");
+      },
+    };
+
+    await expect(mailerFrom("noreply@acme.com")(email)).resolves.toEqual({
+      error: "Template data unavailable",
+      ok: false,
+    });
+    expect(send).not.toHaveBeenCalled();
   });
 });
