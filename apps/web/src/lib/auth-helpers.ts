@@ -7,12 +7,17 @@ import { getAuth } from "./auth";
 const getSession = (requestHeaders: Headers) =>
   getAuth().api.getSession({ headers: requestHeaders });
 
-const requireSession = cache(async (from: string) => {
-  const session = await getSession(await headers());
-  if (!session) {
-    redirect(`/login?${new URLSearchParams({ from }).toString()}`);
-  }
-  return session;
-});
+const loginUrl = (from: string) => `/login?${new URLSearchParams({ from }).toString()}`;
 
-export { getSession, requireSession };
+const createRequireSession = (lookup: typeof getSession, requestHeaders: () => Promise<Headers>) =>
+  cache(async (from: string) => {
+    const session = await lookup(await requestHeaders());
+    if (!session) {
+      redirect(loginUrl(from));
+    }
+    return session;
+  });
+
+const requireSession = createRequireSession(getSession, headers);
+
+export { createRequireSession, getSession, loginUrl, requireSession };
