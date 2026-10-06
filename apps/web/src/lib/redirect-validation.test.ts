@@ -62,9 +62,11 @@ describe("authPageHref", () => {
     );
   });
 
-  it("omits from when the destination is the default or unsafe", () => {
-    expect(authPageHref("/login", "/dashboard")).toBe("/login");
-    expect(authPageHref("/register", undefined)).toBe("/register");
-    expect(authPageHref("/login", "//evil.com")).toBe("/login");
-  });
+  it.each([undefined, null, "", "/dashboard", "//evil.com", "https://evil.com"])(
+    "omits a default or unsafe destination (%s)",
+    (from) => {
+      expect(authPageHref("/login", from)).toBe("/login");
+      expect(authPageHref("/register", from)).toBe("/register");
+    },
+  );
 });

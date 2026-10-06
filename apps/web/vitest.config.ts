@@ -9,5 +9,8 @@ export default mergeConfig(
         "@": new URL("src", import.meta.url).pathname,
       },
     },
+    test: {
+      setupFiles: ["./src/lib/test-setup.ts"],
+    },
   }),
 );

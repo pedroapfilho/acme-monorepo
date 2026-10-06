@@ -27,7 +27,6 @@ const safeRedirectPath = (value: string | null | undefined): string => {
   return value;
 };
 
-/** Link to an auth page that returns to `from` afterwards, omitting `from` when it is the default. */
 const authPageHref = (page: "/login" | "/register", from: string | null | undefined): string => {
   const destination = safeRedirectPath(from);
   return destination === FALLBACK_PATH ? page : `${page}?from=${encodeURIComponent(destination)}`;
