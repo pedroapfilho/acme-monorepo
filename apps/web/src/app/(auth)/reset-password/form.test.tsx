@@ -1,12 +1,15 @@
-import { act, render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, fireEvent, screen } from "@testing-library/react";
+import { toast } from "sonner";
+import { describe, expect, it, vi } from "vitest";
+
+import { renderWithRouter, respondToAuthRequests } from "@/lib/test-helpers";
 
 import ResetPasswordForm from "./form";
 
 const renderForm = async (params: { error?: string; token?: string }) => {
   const searchParams = Promise.resolve(params);
   await act(async () => {
-    render(<ResetPasswordForm searchParams={searchParams} />);
+    renderWithRouter(<ResetPasswordForm searchParams={searchParams} />);
     await searchParams;
   });
 };
@@ -31,5 +34,32 @@ describe("ResetPasswordForm", () => {
     await renderForm({ error: "INVALID_TOKEN" });
 
     expectInvalidLinkState();
+  });
+
+  it("offers a new link when Better Auth rejects the token on submit", async () => {
+    const showToast = vi.spyOn(toast, "error");
+    const requests = respondToAuthRequests(400, {
+      code: "INVALID_TOKEN",
+      message: "Invalid token",
+    });
+    await renderForm({ token: "expired-token" });
+
+    fireEvent.change(screen.getByLabelText("New password"), {
+      target: { value: "correct-horse-battery" },
+    });
+    fireEvent.change(screen.getByLabelText("Confirm password"), {
+      target: { value: "correct-horse-battery" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Reset password" }));
+
+    expect(await screen.findByRole("heading", { name: "Reset link invalid" })).not.toBeNull();
+    expectInvalidLinkState();
+    expect(requests).toStrictEqual([
+      {
+        body: { newPassword: "correct-horse-battery", token: "expired-token" },
+        path: "/api/auth/reset-password",
+      },
+    ]);
+    expect(showToast).not.toHaveBeenCalled();
   });
 });
