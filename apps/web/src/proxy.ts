@@ -4,7 +4,8 @@ import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { getSession, loginUrl } from "@/lib/auth-helpers";
+import { getSession } from "@/lib/auth-helpers";
+import { authPageHref } from "@/lib/redirect-validation";
 
 const protectedRoutes = ["/dashboard"];
 
@@ -39,7 +40,10 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
   }
 
   if (isProtectedRoute && !session) {
-    const url = new URL(loginUrl(`${pathname}${request.nextUrl.search}`), request.url);
+    const url = new URL(
+      authPageHref("/login", `${pathname}${request.nextUrl.search}`),
+      request.url,
+    );
     return NextResponse.redirect(url);
   }
 

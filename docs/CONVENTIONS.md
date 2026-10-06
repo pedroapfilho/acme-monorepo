@@ -55,5 +55,5 @@ This document records the defaults used across the acme monorepo. New code shoul
 
 ## Routes
 
-- API versioned under `/api/v1/*`. Better Auth at `/auth/*`. Health at `/healthz` and `/readyz`.
+- API versioned under `/api/v1/*`, with health at `/healthz` and `/readyz`. Better Auth is served by `web` at `/api/auth/*`; `api` only consumes its session and user APIs.
 - Path alias: `@/*` maps to `src/*` in every app and package.
