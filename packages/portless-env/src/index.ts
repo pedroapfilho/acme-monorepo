@@ -1,59 +1,65 @@
 import { execFileSync } from "node:child_process";
 import { env as processEnv } from "node:process";
 
-type ProcessEnvironment = Record<string, string | undefined>;
-type PortlessMapping = Record<string, ReadonlyArray<string>>;
+import { apps, canonicalHostname, urlEnv } from "@repo/portless-env/apps";
+import type { App, UrlEnvKey } from "@repo/portless-env/apps";
 
-const portless = (...args: Array<string>): string =>
+type ProcessEnvironment = Record<string, string | undefined>;
+type Run = (file: string, args: ReadonlyArray<string>) => string;
+
+type LookupOptions = { run?: Run };
+type ApplyOptions = LookupOptions & { env?: ProcessEnvironment };
+
+const runSync: Run = (file, args) =>
   // oxlint-disable-next-line node/no-sync -- Next, Vite, and tsdown evaluate their configs synchronously, so the lookup has to block.
-  execFileSync("portless", args, {
+  execFileSync(file, args, {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "inherit"],
-  }).trim();
+  });
 
-const urls = new Map<string, string>();
+const portlessUrl = (app: App, { run = runSync }: LookupOptions = {}): string => {
+  const { name } = apps[app];
+  const url = run("portless", ["get", name]).trim();
+  if (!URL.canParse(url)) {
+    throw new Error(`portless get ${name} printed "${url}" instead of a URL`);
+  }
+  return url;
+};
 
-const isCanonicalLocalDefault = (value: string, names: ReadonlyArray<string>): boolean => {
+const isCanonicalLocalDefault = (value: string, envKey: UrlEnvKey): boolean => {
   const values = value.split(",").map((item) => item.trim());
+  const owners = urlEnv[envKey];
   return (
-    values.length === names.length &&
+    values.length === owners.length &&
     values.every((item, index) => {
-      try {
-        return new URL(item).hostname === `${names[index]}.localhost`;
-      } catch {
-        return false;
-      }
+      const owner = owners[index];
+      return owner !== undefined && URL.parse(item)?.hostname === canonicalHostname(owner);
     })
   );
 };
 
-const resolve = (name: string): string => {
-  const cached = urls.get(name);
-  if (cached !== undefined) {
-    return cached;
+const applyPortlessUrls = (
+  envKeys: ReadonlyArray<UrlEnvKey>,
+  { env = processEnv, run }: ApplyOptions = {},
+): void => {
+  if (env.PORTLESS_URL === undefined || env.PORTLESS_URL === "") {
+    return;
   }
 
-  const url = portless("get", name);
-  urls.set(name, url);
-  return url;
-};
+  const urls = new Map<App, string>();
+  const resolve = (app: App): string => {
+    const url = urls.get(app) ?? portlessUrl(app, { run });
+    urls.set(app, url);
+    return url;
+  };
 
-export const applyPortlessUrls = (
-  mapping: PortlessMapping,
-  env: ProcessEnvironment = processEnv,
-  enabled = env.PORTLESS_URL !== undefined && env.PORTLESS_URL !== "",
-): ProcessEnvironment => {
-  if (!enabled) {
-    return env;
-  }
-
-  for (const [envKey, names] of Object.entries(mapping)) {
+  for (const envKey of envKeys) {
     const current = env[envKey];
-    if (current !== undefined && current !== "" && !isCanonicalLocalDefault(current, names)) {
+    if (current !== undefined && current !== "" && !isCanonicalLocalDefault(current, envKey)) {
       continue;
     }
-    env[envKey] = names.map(resolve).join(",");
+    env[envKey] = urlEnv[envKey].map(resolve).join(",");
   }
-
-  return env;
 };
+
+export { applyPortlessUrls, portlessUrl };
