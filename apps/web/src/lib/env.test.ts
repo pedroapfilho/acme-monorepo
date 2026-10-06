@@ -42,6 +42,12 @@ describe("getEnv", () => {
     expect(getEnv().RESEND_API_KEY).toBeUndefined();
   });
 
+  it("treats an empty RESEND_API_KEY as unset", async () => {
+    const getEnv = await loadGetEnv({ RESEND_API_KEY: "" });
+
+    expect(getEnv().RESEND_API_KEY).toBeUndefined();
+  });
+
   it("throws when FROM_EMAIL is missing", async () => {
     const getEnv = await loadGetEnv({ FROM_EMAIL: undefined });
 
