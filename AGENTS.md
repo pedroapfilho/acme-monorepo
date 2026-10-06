@@ -82,7 +82,11 @@ Worktrees auto-prefix the subdomain: `main` → `https://acme.web.localhost`, br
 
 The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt`; see `apps/api/src/app.ts`.
 
-App configs resolve those URLs through `@repo/portless-env` rather than hardcoding them. `applyPortlessUrls({ ENV_VAR: ["<subdomain>"] })` runs at the top of each `next.config.ts` / `tsdown.config.ts` and shells out to `portless get` for every name, filling the env var only when it is unset or still holds the canonical `*.localhost` default. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Import it by bare specifier (`@repo/portless-env`): a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
+`packages/portless-env/src/apps.ts` is the app registry: each app's Portless name and loopback port, the URL env vars each app fills, and the canonical `https://<name>.localhost` defaults derived from the names. Add or rename an app there. Application code reads defaults from the browser-safe `@repo/portless-env/apps` (auth host patterns and trusted origins, landing's `webAppUrl()`, the web `metadataBase`, the OpenAPI server, Playwright's loopback URLs); it has no `node:` imports.
+
+App configs call `applyPortlessUrls(["WEB_APP_URL", …])` from `@repo/portless-env` at the top of each `next.config.ts` / `tsdown.config.ts`. It runs `portless get` once per app and fills each env var only when it is unset or still holds its canonical default; a failed lookup throws. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Tests in `tests/e2e` import URLs from `tests/e2e/urls.ts`, which asks portless locally and uses loopback ports in CI. Import the package by bare specifier: a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
+
+The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must stay literal; `packages/portless-env/src/apps.test.ts` asserts they match the registry.
 
 ## Conventions & gotchas
 
@@ -125,7 +129,7 @@ App configs resolve those URLs through `@repo/portless-env` rather than hardcodi
 
 ### Turbo cache keys
 
-`build.env` is sensitive to: `API_URL`, `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_APP_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
+`build.env` is sensitive to: `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `EXPOSE_TESTING_API`, `NEXT_PUBLIC_WEB_APP_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
 
 ## Environment
 
@@ -143,8 +147,7 @@ cp packages/db/.env.example packages/db/.env
 - `DATABASE_URL`: PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`)
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS`: comma-separated allowed origins
-- `NEXT_PUBLIC_API_URL`: API URL for client-side requests (defaults to portless URL)
-- `WEB_APP_URL`: web origin; secure-cookie switch and the base of auth email links (portless fills it in dev)
+- `WEB_APP_URL`: web origin; secure-cookie switch, the base of auth email links and the web `metadataBase`, parsed only by `webAppUrl()` in `@repo/auth/env-config` (portless fills it in dev)
 - `RESEND_API_KEY` / `FROM_EMAIL`: web only; auth email is off while `RESEND_API_KEY` is unset
 
 Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
