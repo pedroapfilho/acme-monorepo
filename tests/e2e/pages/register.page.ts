@@ -7,6 +7,8 @@ export class RegisterPage {
   private readonly passwordInput: Locator;
   private readonly confirmPasswordInput: Locator;
   private readonly submitButton: Locator;
+  private readonly signInLink: Locator;
+  private readonly verificationSent: Locator;
   private readonly rootError: Locator;
 
   constructor(private readonly page: Page) {
@@ -15,11 +17,15 @@ export class RegisterPage {
     this.passwordInput = page.getByLabel("Password", { exact: true });
     this.confirmPasswordInput = page.getByLabel(/confirm password/iv);
     this.submitButton = page.getByRole("button", { name: /create account/iv });
+    this.signInLink = page.getByRole("link", { name: /sign in/iv });
+    this.verificationSent = page.getByRole("status").filter({ hasText: "Check your email" });
     this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
   }
 
-  goto = async () => {
-    await this.page.goto("/register");
+  goto = async (from?: string) => {
+    await this.page.goto(
+      from === undefined ? "/register" : `/register?from=${encodeURIComponent(from)}`,
+    );
   };
 
   register = async (name: string, email: string, password: string, confirmPassword: string) => {
@@ -30,11 +36,15 @@ export class RegisterPage {
     await this.submitButton.click();
   };
 
-  expectErrorVisible = async () => {
-    await expect(this.rootError).toBeVisible();
+  expectSignInLinkTo = async (href: string) => {
+    await expect(this.signInLink).toHaveAttribute("href", href);
   };
 
-  expectErrorText = async (text: string | RegExp) => {
-    await expect(this.rootError).toContainText(text);
+  expectVerificationSentTo = async (email: string) => {
+    await expect(this.verificationSent).toContainText(email);
+  };
+
+  expectErrorVisible = async () => {
+    await expect(this.rootError).toBeVisible();
   };
 }

@@ -1,49 +1,33 @@
-import { expect, test } from "@playwright/test";
 import { prisma } from "@repo/db";
 
+import { expect, test } from "../fixtures/auth.fixture";
+import { newCredentials, signUp } from "../fixtures/session";
 import { waitForEmail } from "../helpers/resend";
-import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
-import { webUrl } from "../urls";
 
-test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
-
-test.use({ storageState: { cookies: [], origins: [] } });
-
-test.describe("Sign-up for an existing email (enumeration prevention)", () => {
+test.describe("Sign-up for an existing email (enumeration prevention)", { tag: "@email" }, () => {
   test("second signup returns synthetic success, notifies the real account holder, no duplicate row", async ({
-    page,
     request,
   }, testInfo) => {
-    await page.context().clearCookies();
+    const credentials = newCredentials(testInfo);
+    await expect(await signUp(request, credentials)).toBeOK();
 
-    const email = makeTestEmail(testInfo).toLowerCase();
-    const username = makeTestUsername(email);
-
-    const first = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Original Name", password: "FirstPassword1!", username },
-    });
-    expect([200, 201]).toContain(first.status());
-
-    const since = Date.now();
-
-    const second = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: {
-        email,
+    const sinceMs = Date.now();
+    await expect(
+      await signUp(request, {
+        ...credentials,
         name: "Different Name",
         password: "SecondPassword2!",
-        username: `${username}_2`,
-      },
-    });
-    expect([200, 201]).toContain(second.status());
+      }),
+    ).toBeOK();
 
-    const users = await prisma.user.findMany({ where: { email } });
+    const users = await prisma.user.findMany({ where: { email: credentials.email } });
     expect(users).toHaveLength(1);
-    expect(users[0]?.name).toBe("Original Name");
+    expect(users[0]?.name).toBe(credentials.name);
 
     const mail = await waitForEmail({
-      sinceMs: since,
-      subject: /sign[\s-]?up|attempt|tried/i,
-      to: email,
+      sinceMs,
+      subject: /sign[\s\-]?up|attempt|tried/iv,
+      to: credentials.email,
     });
     expect(mail.last_event).not.toBe("bounced");
   });

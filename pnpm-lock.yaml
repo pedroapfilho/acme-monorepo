@@ -20,6 +20,9 @@ importers:
       '@playwright/test':
         specifier: ^1.63.0
         version: 1.63.0
+      '@repo/auth':
+        specifier: workspace:*
+        version: link:packages/auth
       '@repo/db':
         specifier: workspace:*
         version: link:packages/db

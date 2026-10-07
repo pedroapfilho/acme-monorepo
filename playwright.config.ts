@@ -1,45 +1,36 @@
 /// <reference types="node" />
 
 import { defineConfig, devices } from "@playwright/test";
+import type { PlaywrightTestProject } from "@playwright/test";
 import { apps } from "@repo/portless-env/apps";
 
+import type { SessionOptions } from "./tests/e2e/fixtures/session";
+import { TEST_USER_STATE } from "./tests/e2e/fixtures/test-user";
 import { apiUrl, landingUrl, webUrl } from "./tests/e2e/urls";
 
-export default defineConfig({
+const emailDelivery = Boolean(process.env.RESEND_API_KEY);
+
+const browserProject = (
+  name: string,
+  device: keyof typeof devices,
+): PlaywrightTestProject<SessionOptions> => ({
+  dependencies: ["setup"],
+  grepInvert: emailDelivery ? /@no-email/ : /@email/,
+  name,
+  use: { ...devices[device], emailDelivery, storageState: TEST_USER_STATE },
+});
+
+export default defineConfig<SessionOptions>({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
   globalTeardown: "./tests/e2e/teardown/cleanup.ts",
 
   projects: [
     { name: "setup", testMatch: /.*\.setup\.ts/ },
-    {
-      dependencies: ["setup"],
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState: "tests/e2e/.auth/user.json",
-      },
-    },
+    browserProject("chromium", "Desktop Chrome"),
     ...(process.env.CI
       ? []
-      : [
-          {
-            dependencies: ["setup"],
-            name: "firefox",
-            use: {
-              ...devices["Desktop Firefox"],
-              storageState: "tests/e2e/.auth/user.json",
-            },
-          },
-          {
-            dependencies: ["setup"],
-            name: "webkit",
-            use: {
-              ...devices["Desktop Safari"],
-              storageState: "tests/e2e/.auth/user.json",
-            },
-          },
-        ]),
+      : [browserProject("firefox", "Desktop Firefox"), browserProject("webkit", "Desktop Safari")]),
   ],
 
   reporter: process.env.CI ? [["html", { open: "never" }]] : [["list"], ["html"]],

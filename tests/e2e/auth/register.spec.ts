@@ -1,26 +1,24 @@
 import { test, expect } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
 
-const skipUnderResend = !!process.env.RESEND_API_KEY;
-
 test.describe("Register", () => {
-  test("registers with valid data", async ({ page, registerPage }) => {
-    test.skip(skipUnderResend, "Resend-enabled flow is covered by auth-email/* specs");
+  test(
+    "registers with valid data",
+    { tag: "@no-email" },
+    async ({ dashboardPage, page, registerPage }) => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
 
-    const uniqueEmail = `test-${Date.now()}@example.com`;
+      await page.context().clearCookies();
 
-    await page.context().clearCookies();
+      await registerPage.goto();
+      await registerPage.register("New User", uniqueEmail, "SecurePassword1!", "SecurePassword1!");
 
-    await registerPage.goto();
-    await registerPage.register("New User", uniqueEmail, "SecurePassword1!", "SecurePassword1!");
+      await page.waitForURL("/dashboard");
+      await dashboardPage.expectHeadingVisible();
+    },
+  );
 
-    await page.waitForURL("/dashboard");
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-  });
-
-  test("shows error for existing email", async ({ page, registerPage }) => {
-    test.skip(skipUnderResend, "Resend-enabled flow is covered by auth-email/* specs");
-
+  test("shows error for existing email", { tag: "@no-email" }, async ({ page, registerPage }) => {
     await page.context().clearCookies();
 
     await registerPage.goto();
