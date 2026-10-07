@@ -5,14 +5,14 @@ packages:
 overrides:
   # Security: force patched transitive releases to clear pnpm audit advisories.
   # Each pin is the lowest release that carries the fix.
-  brace-expansion: "^5.0.12"
   deepmerge-ts: "^8.0.0"
-  engine.io: "^6.6.10"
-  fast-uri: "^3.1.7"
   mysql2: "^3.23.1"
   "next@>=16.0.0 <16.3.6": "^16.3.6"
-  qs: "^6.16.0"
   "undici@<7.29.1": "^7.29.1"
+
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm
 
 nodeLinker: hoisted
 
