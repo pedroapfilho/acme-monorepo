@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -25,6 +27,8 @@ const sendRequestSchema = z.object({
   to: recipientsSchema,
 });
 
+const batchRequestSchema = z.array(sendRequestSchema);
+
 type SendRequest = z.infer<typeof sendRequestSchema>;
 
 type StoredEmail = {
@@ -49,6 +53,7 @@ type EmailSummary = Omit<StoredEmail, "html" | "tags" | "text">;
 type StubResponse =
   | StoredEmail
   | { data: Array<EmailSummary>; has_more: false; object: "list" }
+  | { data: Array<{ id: string }> }
   | { id: string }
   | { message: string; name: string };
 
@@ -99,11 +104,19 @@ const respond = (response: ServerResponse, status: number, payload: StubResponse
 
 const handle = async (request: IncomingMessage, response: ServerResponse) => {
   const url = new URL(request.url ?? "/", `http://localhost:${PORT}`);
-  const emailId = /^\/emails\/(?<id>[^\/]+)$/v.exec(url.pathname)?.groups?.id;
+  const emailId = /^\/emails\/(?<id>[^/]+)$/u.exec(url.pathname)?.groups?.id;
 
   if (request.method === "POST" && url.pathname === "/emails") {
     const sendRequest = sendRequestSchema.parse(JSON.parse(await readBody(request)));
     respond(response, 200, { id: store(sendRequest).id });
+    return;
+  }
+
+  if (request.method === "POST" && url.pathname === "/emails/batch") {
+    const sendRequests = batchRequestSchema.parse(JSON.parse(await readBody(request)));
+    respond(response, 200, {
+      data: sendRequests.map((sendRequest) => ({ id: store(sendRequest).id })),
+    });
     return;
   }
 
