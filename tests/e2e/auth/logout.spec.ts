@@ -3,24 +3,29 @@ import type { APIRequestContext } from "@playwright/test";
 import { webUrl } from "../../../playwright.config";
 import { expect, test } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
+import { extractLink, waitForEmail } from "../helpers/resend";
+
+const emailVerificationRequired = Boolean(process.env.RESEND_API_KEY);
 
 const createIsolatedUser = async (request: APIRequestContext): Promise<string> => {
-  const email = `logout-test-${crypto.randomUUID()}@acme.localhost`;
+  const email = `delivered+logout-${crypto.randomUUID()}@resend.dev`;
+  const since = Date.now();
   const response = await request.post(`${webUrl}/api/auth/sign-up/email`, {
     data: { email, name: "Logout Test User", password: TEST_USER.password },
   });
   expect([200, 201]).toContain(response.status());
+  if (emailVerificationRequired) {
+    const mail = await waitForEmail({ sinceMs: since, subject: /verify/i, to: email });
+    const verified = await request.get(extractLink(mail, /\/api\/auth\/verify-email\?token=/));
+    expect(verified.ok()).toBe(true);
+  }
   return email;
 };
-
-const skipUnderResend = !!process.env.RESEND_API_KEY;
 
 test.describe("Logout", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test("signs out and redirects to login", async ({ dashboardPage, loginPage, page, request }) => {
-    test.skip(skipUnderResend, "Resend-enabled flow blocks fresh-signup → sign-in");
-
     const email = await createIsolatedUser(request);
     await loginPage.goto();
     await loginPage.login(email, TEST_USER.password);
@@ -39,8 +44,6 @@ test.describe("Logout", () => {
     page,
     request,
   }) => {
-    test.skip(skipUnderResend, "Resend-enabled flow blocks fresh-signup → sign-in");
-
     const email = await createIsolatedUser(request);
     await loginPage.goto();
     await loginPage.login(email, TEST_USER.password);

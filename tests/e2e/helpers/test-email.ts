@@ -6,7 +6,7 @@ import type { TestInfo } from "@playwright/test";
 const makeTestEmail = (info: TestInfo): string => {
   const slug = info.title.replaceAll(/\W+/gv, "-").toLowerCase().slice(0, 28);
   const run = (process.env.GITHUB_RUN_ID ?? crypto.randomBytes(4).toString("hex")).slice(-8);
-  return `delivered+${run}-${slug}@resend.dev`;
+  return `delivered+${run}-${info.retry}-${slug}@resend.dev`;
 };
 
 const makeTestUsername = (email: string): string => {

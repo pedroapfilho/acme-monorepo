@@ -1,6 +1,6 @@
 import { sleep } from "./sleep";
 
-const RESEND_API = "https://api.resend.com";
+const RESEND_API = process.env.RESEND_BASE_URL ?? "https://api.resend.com";
 
 type ResendListItem = {
   bcc: string | null;
