@@ -26,7 +26,8 @@ test.describe("Password reset", () => {
     });
     expect([200, 201]).toContain(signUp.status());
     const verify = await verification.forVerifyEmail(email);
-    await page.goto(verify.url);
+    const verified = await page.request.get(verify.url);
+    expect(verified.ok()).toBe(true);
     await page.context().clearCookies();
 
     const since = Date.now();
