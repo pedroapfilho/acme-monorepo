@@ -30,7 +30,7 @@ packages/
   transactional/       React Email templates + Resend sender
   config-typescript/   Shared tsconfig bases (nextjs / server / react-library / vite)
   config-vitest/       Shared Vitest configs (react.ts, node.ts)
-  portless-env/        applyPortlessUrls: fills dev URL env vars from `portless get`
+  portless-env/        App registry (./apps: names, loopback ports, URL defaults) + `portless get` lookup (applyPortlessUrls)
 docs/                  CONVENTIONS.md + superpowers specs
 agents/counselors/     Agent role definitions
 tests/                 Root Playwright e2e specs

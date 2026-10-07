@@ -1,63 +1,31 @@
-import { expect, test } from "@playwright/test";
-
-import { verification } from "../fixtures/verification.fixture";
+import { expect, test } from "../fixtures/auth.fixture";
 import { extractLink, waitForEmail } from "../helpers/resend";
-import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
-import { webUrl } from "../urls";
 
-test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
-
-test.use({ storageState: { cookies: [], origins: [] } });
-
-test.describe("Password reset", () => {
+test.describe("Password reset", { tag: "@email" }, () => {
   test("user can request reset, set a new password, and sign in", async ({
+    account,
+    dashboardPage,
+    loginPage,
     page,
-    request,
-  }, testInfo) => {
-    await page.context().clearCookies();
-
-    const email = makeTestEmail(testInfo);
-    const username = makeTestUsername(email);
-    const originalPassword = "OriginalPassword1!";
+    recoverPage,
+    resetPasswordPage,
+  }) => {
     const newPassword = "BrandNewPassword2!";
-
-    const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: { email, name: "Reset Me", password: originalPassword, username },
-    });
-    expect([200, 201]).toContain(signUp.status());
-    const verify = await verification.forVerifyEmail(email);
-    const verified = await page.request.get(verify.url);
-    expect(verified.ok()).toBe(true);
     await page.context().clearCookies();
+    const sinceMs = Date.now();
 
-    const since = Date.now();
+    await recoverPage.goto();
+    await recoverPage.requestReset(account.email);
+    await recoverPage.expectResetRequested(account.email);
 
-    const reset = await request.post(`${webUrl}/api/auth/request-password-reset`, {
-      data: { email, redirectTo: "/reset-password" },
-    });
-    expect(reset.status()).toBe(200);
-
-    const mail = await waitForEmail({
-      sinceMs: since,
-      subject: /reset/i,
-      to: email,
-    });
+    const mail = await waitForEmail({ sinceMs, subject: /reset/iv, to: account.email });
     expect(mail.last_event).not.toBe("bounced");
+    await page.goto(extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/v));
+    await resetPasswordPage.submit(newPassword, newPassword);
+    await page.waitForURL(/\/login/v);
 
-    const resetUrl = extractLink(mail, /\/reset-password\/[^"?]+\?callbackURL=/);
-    await page.goto(resetUrl);
-
-    await page.getByLabel("New password", { exact: true }).fill(newPassword);
-    await page.getByLabel(/confirm password/i).fill(newPassword);
-    await page.getByRole("button", { name: /reset password/i }).click();
-
-    await page.waitForURL(/\/login/);
-
-    await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Password", { exact: true }).fill(newPassword);
-    await page.getByRole("button", { name: "Sign in" }).click();
-
+    await loginPage.login(account.email, newPassword);
     await page.waitForURL("/dashboard");
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await dashboardPage.expectHeadingVisible();
   });
 });

@@ -7,12 +7,12 @@ import { holdScripts } from "../helpers/hold-scripts";
 test.describe("Login", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test("logs in with valid credentials", async ({ loginPage, page }) => {
+  test("logs in with valid credentials", async ({ dashboardPage, loginPage, page }) => {
     await loginPage.goto();
     await loginPage.login(TEST_USER.email, TEST_USER.password);
 
     await page.waitForURL("/dashboard");
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await dashboardPage.expectHeadingVisible();
   });
 
   test("keeps the form disabled until it hydrates", async ({ loginPage, page }) => {

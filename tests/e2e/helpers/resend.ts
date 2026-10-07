@@ -27,8 +27,7 @@ const requireApiKey = (): string => {
   if (!key) {
     throw new Error(
       "RESEND_API_KEY is required for the Resend e2e helper. " +
-        "Specs that depend on delivery assertions should `test.skip` themselves " +
-        "with `test.skip(!process.env.RESEND_API_KEY, ...)`.",
+        "Tag specs that depend on delivery with @email; the Playwright config runs them only when it is set.",
     );
   }
   return key;

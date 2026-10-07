@@ -3,8 +3,11 @@ import { TEST_USER } from "../fixtures/test-user";
 import { apiUrl } from "../urls";
 
 test.describe("API Users", () => {
-  test("GET /api/v1/users/me returns authenticated user", async ({ request }) => {
-    const response = await request.get(`${apiUrl}/api/v1/users/me`);
+  // The PATCH tests rename the shared seeded user and restore it.
+  test.describe.configure({ mode: "default" });
+
+  test("GET /api/v1/users/me returns authenticated user", async ({ api }) => {
+    const response = await api.get("/api/v1/users/me");
 
     expect(response.status()).toBe(200);
 
@@ -14,8 +17,8 @@ test.describe("API Users", () => {
     expect(body.data.id).toBeTruthy();
   });
 
-  test("PATCH /api/v1/users/me updates user name", async ({ request }) => {
-    const response = await request.patch(`${apiUrl}/api/v1/users/me`, {
+  test("PATCH /api/v1/users/me updates user name", async ({ api }) => {
+    const response = await api.patch("/api/v1/users/me", {
       data: { name: "Updated Name" },
     });
 
@@ -24,21 +27,21 @@ test.describe("API Users", () => {
     const body = await response.json();
     expect(body.data.name).toBe("Updated Name");
 
-    await request.patch(`${apiUrl}/api/v1/users/me`, {
-      data: { name: "E2E Test User" },
+    await api.patch("/api/v1/users/me", {
+      data: { name: TEST_USER.name },
     });
   });
 
-  test("PATCH /api/v1/users/me validates username format", async ({ request }) => {
-    const response = await request.patch(`${apiUrl}/api/v1/users/me`, {
+  test("PATCH /api/v1/users/me validates username format", async ({ api }) => {
+    const response = await api.patch("/api/v1/users/me", {
       data: { username: "invalid username!" },
     });
 
     expect(response.status()).toBe(400);
   });
 
-  test("GET /api/v1/users lists users with pagination", async ({ request }) => {
-    const response = await request.get(`${apiUrl}/api/v1/users?limit=5&page=1`);
+  test("GET /api/v1/users lists users with pagination", async ({ api }) => {
+    const response = await api.get("/api/v1/users?limit=5&page=1");
 
     expect(response.status()).toBe(200);
 

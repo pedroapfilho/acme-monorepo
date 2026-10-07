@@ -56,7 +56,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("definitely-not-a-real-token");
     await resetPasswordPage.submit("ValidPassword123!", "ValidPassword123!");
 
-    await expect(page.locator('[data-sonner-toast][data-type="error"]')).toBeVisible();
+    await resetPasswordPage.expectInvalidLinkVisible();
     expect(page.url()).toContain("/reset-password");
   });
 });
