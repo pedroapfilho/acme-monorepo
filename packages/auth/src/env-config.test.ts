@@ -1,3 +1,4 @@
+import { matchesHostPattern } from "better-auth";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList } from "./env-config";
@@ -21,11 +22,18 @@ describe("envAuthConfig", () => {
   it("includes local hosts and loopback origins", () => {
     const config = envAuthConfig();
     expect(config.allowedHosts).toEqual(
-      expect.arrayContaining(["**.localhost", "localhost:*", "127.0.0.1:*"]),
+      expect.arrayContaining(["**.localhost", "**.localhost:*", "localhost:*", "127.0.0.1:*"]),
     );
     expect(config.trustedOrigins).toEqual(
       expect.arrayContaining(["http://localhost:3000", "http://127.0.0.1:3000"]),
     );
+  });
+
+  it("allows portless hosts on port 443 and on its unprivileged fallback port", () => {
+    const { allowedHosts } = envAuthConfig();
+    for (const host of ["acme.web.localhost", "acme.web.localhost:1355"]) {
+      expect(allowedHosts.some((pattern) => matchesHostPattern(host, pattern))).toBe(true);
+    }
   });
 
   it("includes configured hosts and explicit CORS origins", () => {

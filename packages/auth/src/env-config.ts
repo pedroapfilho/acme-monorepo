@@ -1,4 +1,4 @@
-const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "localhost:*", "127.0.0.1:*"];
+const LOCALHOST_ALLOWED_HOSTS = ["**.localhost", "**.localhost:*", "localhost:*", "127.0.0.1:*"];
 
 const LOOPBACK_TRUSTED_ORIGINS = [
   "http://localhost:3000",
