@@ -97,9 +97,8 @@ const useAuthRequest = <TInput, TData>({
       await work();
     } catch (error) {
       showUnexpectedError(error);
-    } finally {
-      isLatched.current = false;
     }
+    isLatched.current = false;
   };
 
   return { attempt, errorCode, errorMessage, isPending, perform, showUnexpectedError };
