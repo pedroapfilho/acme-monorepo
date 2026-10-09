@@ -1,11 +1,12 @@
 import { envAuthConfig } from "@repo/auth/env-config";
-import { createAuth } from "@repo/auth/server";
+import { createAuth, prismaDatabase } from "@repo/auth/server";
+import type { Auth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
+import { createResendMailer } from "@repo/transactional";
 import { nextCookies } from "better-auth/next-js";
 
 import { getEnv } from "./env";
 
-type Auth = ReturnType<typeof createAuth>;
 let cachedAuth: Auth | undefined;
 
 const getAuth = (): Auth => {
@@ -13,10 +14,12 @@ const getAuth = (): Auth => {
     const env = getEnv();
     cachedAuth = createAuth({
       ...envAuthConfig(),
+      database: prismaDatabase(prisma),
       extraPlugins: [nextCookies()],
-      fromEmail: env.FROM_EMAIL,
-      prisma,
-      resendApiKey: env.RESEND_API_KEY,
+      mailer:
+        env.RESEND_API_KEY === undefined
+          ? undefined
+          : createResendMailer({ apiKey: env.RESEND_API_KEY, from: env.FROM_EMAIL }),
       secret: env.BETTER_AUTH_SECRET,
     });
   }

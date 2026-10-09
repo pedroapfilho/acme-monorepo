@@ -1,58 +1,27 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures/auth.fixture";
+import { newCredentials, signIn, signUp } from "../fixtures/session";
+import { verificationLink } from "../fixtures/verification.fixture";
+import { DashboardPage } from "../pages/dashboard.page";
 
-import { webUrl } from "../../../playwright.config";
-import { extractLink, waitForEmail } from "../helpers/resend";
-import { makeTestEmail, makeTestUsername } from "../helpers/test-email";
-
-test.skip(!process.env.RESEND_API_KEY, "needs RESEND_API_KEY (test mode)");
-
-test.use({ storageState: { cookies: [], origins: [] } });
-
-test.describe("Sign-up email verification", () => {
+test.describe("Sign-up email verification", { tag: "@email" }, () => {
   test("verify email is sent, clicking the link signs in the clicking device", async ({
     browser,
     request,
   }, testInfo) => {
-    const since = Date.now();
-    const email = makeTestEmail(testInfo);
-    const username = makeTestUsername(email);
-    const password = "SecurePassword1!";
+    const sinceMs = Date.now();
+    const credentials = newCredentials(testInfo);
 
-    const signUp = await request.post(`${webUrl}/api/auth/sign-up/email`, {
-      data: {
-        email,
-        name: "Verify Me",
-        password,
-        username,
-      },
-    });
-    expect([200, 201]).toContain(signUp.status());
+    await expect(await signUp(request, credentials)).toBeOK();
+    await expect(await signIn(request, credentials)).not.toBeOK();
 
-    const preSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
-      data: { email, password },
-      failOnStatusCode: false,
-    });
-    expect(preSignIn.status()).not.toBe(200);
-
-    const mail = await waitForEmail({
-      sinceMs: since,
-      subject: /verify/i,
-      to: email,
-    });
-    expect(mail.last_event).not.toBe("bounced");
-
-    const verifyUrl = extractLink(mail, /\/api\/auth\/verify-email\?token=/);
+    const link = await verificationLink({ sinceMs, subject: /verify/iv, to: credentials.email });
     const clickerContext = await browser.newContext();
     const clickerPage = await clickerContext.newPage();
-    await clickerPage.goto(verifyUrl);
-    await expect(clickerPage).toHaveURL(/\/dashboard$/);
-    const clickerCookies = await clickerContext.cookies(webUrl);
-    expect(clickerCookies.find((c) => c.name.startsWith("acme."))).toBeDefined();
+    await clickerPage.goto(link);
+    await expect(clickerPage).toHaveURL(/\/dashboard$/v);
+    await new DashboardPage(clickerPage).expectHeadingVisible();
     await clickerContext.close();
 
-    const postSignIn = await request.post(`${webUrl}/api/auth/sign-in/email`, {
-      data: { email, password },
-    });
-    expect(postSignIn.status()).toBe(200);
+    await expect(await signIn(request, credentials)).toBeOK();
   });
 });

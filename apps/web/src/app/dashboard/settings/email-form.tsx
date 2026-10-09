@@ -1,17 +1,11 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
-import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
-import { FormFieldError } from "@repo/ui/compositions/form-field-error";
-import { useForm } from "@tanstack/react-form";
-import { Loader2 } from "lucide-react";
+import { Field } from "@repo/ui/components/field";
 import { useState } from "react";
-import { toast } from "sonner";
 
+import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { changeEmailSchema } from "@/lib/form-schemas";
-import { useAuthSubmit } from "@/lib/use-auth-submit";
 
 type Props = {
   currentEmail: string;
@@ -20,36 +14,16 @@ type Props = {
 };
 
 const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
-  const { isPending, run, submit } = useAuthSubmit();
-  const [formError, setFormError] = useState<string | null>(null);
   const [confirmationAddress, setConfirmationAddress] = useState<string | null>(null);
-
-  const form = useForm({
+  const { form, submission } = useAuthForm({
+    call: (value) =>
+      authClient.changeEmail({ callbackURL: "/dashboard/settings", newEmail: value.email }),
     defaultValues: { email: "" },
-    onSubmit: ({ value }) => {
-      setFormError(null);
-      run(async () => {
-        try {
-          const result = await authClient.changeEmail({
-            callbackURL: "/dashboard/settings",
-            newEmail: value.email,
-          });
-          if (result.error) {
-            const message = result.error.message ?? "Failed to change email";
-            setFormError(message);
-            toast.error(message);
-            return;
-          }
-          setConfirmationAddress(emailVerified ? currentEmail : value.email);
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "An error occurred. Please try again.";
-          setFormError(message);
-          toast.error(message);
-        }
-      });
+    fallbackError: "Failed to change email",
+    onSuccess: (_data, value) => {
+      setConfirmationAddress(emailVerified ? currentEmail : value.email);
     },
-    validators: { onSubmit: changeEmailSchema },
+    schema: changeEmailSchema,
   });
 
   if (!enabled) {
@@ -73,56 +47,24 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void submit(form);
-      }}
-    >
-      <div aria-atomic="true" aria-live="polite" className="sr-only">
-        {formError}
-      </div>
-      <FieldGroup>
-        <form.Field name="email">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="newEmail">New email</FieldLabel>
-                <Input
-                  aria-describedby={isInvalid ? "newEmail-error" : undefined}
-                  aria-invalid={isInvalid}
-                  autoComplete="email"
-                  disabled={isPending}
-                  id="newEmail"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
-                  placeholder={currentEmail}
-                  required
-                  type="email"
-                  value={field.state.value}
-                />
-                {isInvalid && (
-                  <FormFieldError errors={field.state.meta.errors} id="newEmail-error" />
-                )}
-              </Field>
-            );
-          }}
-        </form.Field>
+    <AuthForm submission={submission}>
+      <form.AppField name="email">
+        {(field) => (
+          <field.TextField
+            autoComplete="email"
+            id="newEmail"
+            label="New email"
+            placeholder={currentEmail}
+          />
+        )}
+      </form.AppField>
 
-        <Field orientation="horizontal">
-          <Button aria-busy={isPending} className="w-fit" disabled={isPending} type="submit">
-            {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-            {isPending ? "Updating…" : "Update email"}
-          </Button>
-        </Field>
-      </FieldGroup>
-    </form>
+      <Field orientation="horizontal">
+        <SubmitButton className="w-fit" pendingLabel="Updating…">
+          Update email
+        </SubmitButton>
+      </Field>
+    </AuthForm>
   );
 };
 

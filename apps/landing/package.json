@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@repo/observability": "workspace:*",
+    "@repo/portless-env": "workspace:*",
     "@repo/social-image": "workspace:*",
     "@repo/ui": "workspace:*",
     "@vercel/analytics": "^2.0.1",
@@ -26,7 +27,6 @@
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
-    "@repo/portless-env": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.3",

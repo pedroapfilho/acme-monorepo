@@ -1,11 +1,10 @@
+import { envAuthConfig } from "@repo/auth/env-config";
+import { createAuth, prismaDatabase } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 
-import { getAuth } from "@/lib/auth";
+import { getEnv } from "@/lib/env";
 
 import { TEST_USER } from "../../../tests/e2e/fixtures/test-user";
-
-const { email: EMAIL, name: NAME, password: PASSWORD } = TEST_USER;
-const SLUG = "e2e-test-user";
 
 const main = async () => {
   const dbUrl = process.env.DATABASE_URL ?? "";
@@ -18,37 +17,18 @@ const main = async () => {
     );
   }
 
-  const ctx = await getAuth().$context;
-  const hashed = await ctx.password.hash(PASSWORD);
-
-  // eslint-disable-next-line react-doctor/server-sequential-independent-await -- Hash first so a hashing failure cannot leave a partially seeded user.
-  const user = await prisma.user.upsert({
-    create: {
-      email: EMAIL,
-      emailVerified: true,
-      id: SLUG,
-      name: NAME,
-    },
-    update: {
-      emailVerified: true,
-      name: NAME,
-    },
-    where: { email: EMAIL },
+  // No mailer: sign-up then neither requires verification nor sends mail to the unroutable address.
+  const auth = createAuth({
+    ...envAuthConfig(),
+    database: prismaDatabase(prisma),
+    secret: getEnv().BETTER_AUTH_SECRET,
   });
 
-  await prisma.account.upsert({
-    create: {
-      accountId: user.id,
-      issuer: "local:credential",
-      password: hashed,
-      providerId: "credential",
-      userId: user.id,
-    },
-    update: { password: hashed },
-    where: { issuer_accountId: { accountId: user.id, issuer: "local:credential" } },
-  });
+  await prisma.user.deleteMany({ where: { email: TEST_USER.email } });
+  const { user } = await auth.api.signUpEmail({ body: TEST_USER });
+  await prisma.user.update({ data: { emailVerified: true }, where: { id: user.id } });
 
-  console.log(`✓ e2e user ${EMAIL} ready; password: ${PASSWORD}`);
+  console.log(`✓ e2e user ${TEST_USER.email} ready; password: ${TEST_USER.password}`);
   await prisma.$disconnect();
 };
 

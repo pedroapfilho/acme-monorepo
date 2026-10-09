@@ -1,14 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import type { EvlogVariables } from "@repo/observability/hono";
-import { Scalar } from "@scalar/hono-api-reference";
-
-declare module "hono" {
-  // oxlint-disable-next-line consistent-type-definitions -- declaration merging requires interface, not type
-  interface ContextVariableMap {
-    log: EvlogVariables["Variables"]["log"];
-    requestId: string;
-  }
-}
+import { loopbackUrl } from "@repo/portless-env/apps";
+import type { Env } from "hono";
 
 const apiDocumentMetadata = {
   info: {
@@ -21,7 +13,7 @@ const apiDocumentMetadata = {
     version: "1.0.0",
   },
   servers: [
-    { description: "Local development server", url: "http://localhost:4000" },
+    { description: "Local development server", url: loopbackUrl("api", "localhost") },
     { description: "Production server", url: "https://api.acme.com" },
   ],
   tags: [
@@ -30,15 +22,13 @@ const apiDocumentMetadata = {
   ],
 };
 
-const createOpenAPIApp = () => {
-  const app = new OpenAPIHono<{ Variables: EvlogVariables["Variables"] }>();
+const createRouter = <E extends Env = Env>() =>
+  new OpenAPIHono<E>({
+    defaultHook: (result) => {
+      if (!result.success) {
+        throw result.error;
+      }
+    },
+  });
 
-  // 3.0.0, not 3.1.0: external generators still reject 3.1's nullable/examples encoding.
-  app.doc("/openapi.json", { ...apiDocumentMetadata, openapi: "3.0.0" });
-
-  app.get("/docs", Scalar({ url: "/openapi.json" }));
-
-  return app;
-};
-
-export { apiDocumentMetadata, createOpenAPIApp };
+export { apiDocumentMetadata, createRouter };

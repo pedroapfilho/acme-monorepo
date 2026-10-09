@@ -1,5 +1,7 @@
-import { webUrl } from "../../../playwright.config";
 import { test, expect } from "../fixtures/auth.fixture";
+import { sessionCookieName } from "../fixtures/session";
+import { TEST_USER } from "../fixtures/test-user";
+import { webUrl } from "../urls";
 
 test.describe("Root redirect", () => {
   test("sends anonymous visitors to login", async ({ page }) => {
@@ -22,7 +24,7 @@ test.describe("Root redirect", () => {
     await page.context().clearCookies();
     await page.context().addCookies([
       {
-        name: "acme.session_token",
+        name: sessionCookieName,
         url: webUrl,
         value: "stale-session-token-that-matches-no-session",
       },
@@ -36,14 +38,19 @@ test.describe("Root redirect", () => {
 });
 
 test.describe("Protected Routes", () => {
-  test("redirects unauthenticated users to login with from param", async ({ page }) => {
+  test("returns signed-out visitors to the requested page after sign-in", async ({
+    loginPage,
+    page,
+  }) => {
+    const requested = "/dashboard/settings?tab=x";
     await page.context().clearCookies();
 
-    await page.goto("/dashboard");
-    await page.waitForURL(/\/login/);
+    await page.goto(requested);
+    await page.waitForURL(/\/login/v);
+    expect(new URL(page.url()).searchParams.get("from")).toBe(requested);
 
-    expect(page.url()).toContain("/login");
-    expect(page.url()).toContain("from=%2Fdashboard");
+    await loginPage.login(TEST_USER.email, TEST_USER.password);
+    await page.waitForURL(requested);
   });
 
   test("redirects authenticated users from auth routes to dashboard", async ({ page }) => {

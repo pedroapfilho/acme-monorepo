@@ -6,12 +6,12 @@ import { TEST_USER } from "../fixtures/test-user";
 test.describe("Login", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test("logs in with valid credentials", async ({ loginPage, page }) => {
+  test("logs in with valid credentials", async ({ dashboardPage, loginPage, page }) => {
     await loginPage.goto();
     await loginPage.login(TEST_USER.email, TEST_USER.password);
 
     await page.waitForURL("/dashboard");
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await dashboardPage.expectHeadingVisible();
   });
 
   test("shows error for wrong password", async ({ loginPage, page }) => {

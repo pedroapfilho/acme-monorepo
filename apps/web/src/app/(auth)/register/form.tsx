@@ -1,21 +1,14 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
-import { FormFieldError } from "@repo/ui/compositions/form-field-error";
-import { useForm } from "@tanstack/react-form";
-import { Loader2 } from "lucide-react";
+import { Field, FieldDescription } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense, use, useState } from "react";
-import { toast } from "sonner";
 
-import { AuthPasswordField } from "@/components/auth-password-field";
+import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
-import { safeRedirectPath } from "@/lib/redirect-validation";
-import { useAuthSubmit } from "@/lib/use-auth-submit";
+import { authPageHref, safeRedirectPath } from "@/lib/redirect-validation";
 
 type Props = {
   searchParams: Promise<{ from?: string }>;
@@ -29,12 +22,11 @@ const SignInLinkFallback = () => (
 
 const SignInLink = ({ searchParams }: Props) => {
   const { from } = use(searchParams);
-  const safeTo = safeRedirectPath(from);
 
   return (
     <Link
       className="text-foreground underline underline-offset-4"
-      href={safeTo === "/dashboard" ? "/login" : `/login?from=${encodeURIComponent(safeTo)}`}
+      href={authPageHref("/login", from)}
     >
       Sign in
     </Link>
@@ -43,45 +35,29 @@ const SignInLink = ({ searchParams }: Props) => {
 
 const RegisterForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
-  const { isPending, run, submit } = useAuthSubmit();
-  const [formError, setFormError] = useState<string | null>(null);
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
-
-  const form = useForm({
-    defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
-    onSubmit: ({ value }) => {
-      setFormError(null);
-      run(async () => {
-        try {
-          const { from } = await searchParams;
-          const safeTo = safeRedirectPath(from);
-          const result = await authClient.signUp.email({
-            callbackURL: safeTo,
-            email: value.email,
-            name: value.name,
-            password: value.password,
-          });
-          if (result.error) {
-            const message = result.error.message ?? "Failed to register";
-            setFormError(message);
-            toast.error(message);
-            return;
-          }
-          if (result.data.token === null || result.data.token === "") {
-            setSentToEmail(value.email);
-            return;
-          }
-          push(safeTo);
-          refresh();
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "An error occurred. Please try again.";
-          setFormError(message);
-          toast.error(message);
-        }
+  const { form, submission } = useAuthForm({
+    call: async (value) => {
+      const { from } = await searchParams;
+      return authClient.signUp.email({
+        callbackURL: safeRedirectPath(from),
+        email: value.email,
+        name: value.name,
+        password: value.password,
       });
     },
-    validators: { onSubmit: registerSchema },
+    defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
+    fallbackError: "Failed to register",
+    onSuccess: async (data, value) => {
+      if (data.token === null || data.token === "") {
+        setSentToEmail(value.email);
+        return;
+      }
+      const { from } = await searchParams;
+      push(safeRedirectPath(from));
+      refresh();
+    },
+    schema: registerSchema,
   });
 
   if (sentToEmail !== null) {
@@ -97,96 +73,34 @@ const RegisterForm = ({ searchParams }: Props) => {
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void submit(form);
-      }}
-    >
-      <div aria-atomic="true" aria-live="polite" className="sr-only">
-        {formError}
+    <AuthForm submission={submission}>
+      <form.AppField name="name">
+        {(field) => <field.TextField autoComplete="name" label="Full Name" />}
+      </form.AppField>
+
+      <form.AppField name="email">
+        {(field) => <field.TextField autoComplete="email" label="Email" />}
+      </form.AppField>
+
+      <div className="grid grid-cols-2 gap-4">
+        <form.AppField name="password">
+          {(field) => <field.TextField autoComplete="new-password" label="Password" />}
+        </form.AppField>
+        <form.AppField name="confirmPassword">
+          {(field) => <field.TextField autoComplete="new-password" label="Confirm Password" />}
+        </form.AppField>
       </div>
-      <FieldGroup>
-        <form.Field name="name">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input
-                  aria-describedby={isInvalid ? "name-error" : undefined}
-                  aria-invalid={isInvalid}
-                  autoComplete="name"
-                  disabled={isPending}
-                  id="name"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
-                  required
-                  value={field.state.value}
-                />
-                {isInvalid && <FormFieldError errors={field.state.meta.errors} id="name-error" />}
-              </Field>
-            );
-          }}
-        </form.Field>
 
-        <form.Field name="email">
-          {(field) => {
-            const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid || undefined}>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  aria-describedby={isInvalid ? "email-error" : undefined}
-                  aria-invalid={isInvalid}
-                  autoComplete="email"
-                  disabled={isPending}
-                  id="email"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                  }}
-                  required
-                  type="email"
-                  value={field.state.value}
-                />
-                {isInvalid && <FormFieldError errors={field.state.meta.errors} id="email-error" />}
-              </Field>
-            );
-          }}
-        </form.Field>
-
-        <div className="grid grid-cols-2 gap-4">
-          <form.Field name="password">
-            {(field) => <AuthPasswordField disabled={isPending} field={field} label="Password" />}
-          </form.Field>
-          <form.Field name="confirmPassword">
-            {(field) => (
-              <AuthPasswordField disabled={isPending} field={field} label="Confirm Password" />
-            )}
-          </form.Field>
-        </div>
-
-        <Field>
-          <Button aria-busy={isPending} disabled={isPending} type="submit">
-            {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-            {isPending ? "Creating account…" : "Create account"}
-          </Button>
-          <FieldDescription className="text-center">
-            Already have an account?{" "}
-            <Suspense fallback={<SignInLinkFallback />}>
-              <SignInLink searchParams={searchParams} />
-            </Suspense>
-          </FieldDescription>
-        </Field>
-      </FieldGroup>
-    </form>
+      <Field>
+        <SubmitButton pendingLabel="Creating account…">Create account</SubmitButton>
+        <FieldDescription className="text-center">
+          Already have an account?{" "}
+          <Suspense fallback={<SignInLinkFallback />}>
+            <SignInLink searchParams={searchParams} />
+          </Suspense>
+        </FieldDescription>
+      </Field>
+    </AuthForm>
   );
 };
 

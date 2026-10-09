@@ -9,7 +9,7 @@ export class LoginPage {
 
   constructor(private readonly page: Page) {
     this.emailInput = page.getByLabel(/email/iv);
-    this.passwordInput = page.getByLabel(/password/iv);
+    this.passwordInput = page.getByLabel("Password", { exact: true });
     this.submitButton = page.getByRole("button", { name: /sign in|log in/iv });
     this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
   }

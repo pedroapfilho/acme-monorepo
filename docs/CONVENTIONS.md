@@ -5,15 +5,15 @@ This document records the defaults used across the acme monorepo. New code shoul
 ## API responses
 
 - Success with a body: `{ data: ... }`. The envelope makes it easy to add `meta` later without breaking clients.
-- Success with no body: `204 No Content`. Used by `DELETE /api/v1/me` and other operations that have no useful payload.
-- Errors: `{ error: { code, message, details? } }`, produced exclusively by the central error handler in `apps/api/src/middleware/error-handler.ts`. Route handlers throw `AppError`, `HTTPException`, or let Zod / Prisma errors propagate; they never return error-shaped JSON directly.
+- Success with no body: `204 No Content`. Used by `DELETE /api/v1/users/me` and other operations that have no useful payload.
+- Errors: `{ error: { code, message, details? } }`, produced exclusively by the central error handler in `apps/api/src/lib/api-error.ts`. Route handlers and middleware throw `AppError` with a distinct `code`, or let Zod, Better Auth and Prisma errors propagate; they never return error-shaped JSON directly. Routers come from `createRouter()` in `apps/api/src/lib/openapi.ts`, whose `defaultHook` sends request validation failures to the same handler.
 
 ## Errors
 
 - Never swallow into `null`, `{}`, or empty arrays. A returned-null on the success path is fine when it means "no row"; a returned-null in a catch block is silent failure.
-- In api middleware and route handlers: throw `HTTPException` (for HTTP-specific errors) or `AppError` (for domain errors). The central handler renders the response and logs via `c.var.logger`.
+- In api middleware and route handlers: throw `AppError`. The central handler renders the response; the evlog request logger records the error on the request's wide event.
 - In Next.js RSC helpers (e.g. `apps/web/src/lib/auth-helpers.ts`): do not wrap in try/catch unless you are handling a _specific_ expected error. Let unknown failures propagate; Next.js renders `error.tsx` and Vercel captures the stack with full context.
-- `console.error` is not a logger. The api uses `c.var.logger` (from `@hono/structured-logger`); the web app relies on Next.js + Vercel error capture for thrown exceptions.
+- `console.error` is not a logger. The api uses the evlog request logger (`c.get("log")`); the web app relies on Next.js + Vercel error capture for thrown exceptions.
 
 ## File organization
 
@@ -34,13 +34,15 @@ This document records the defaults used across the acme monorepo. New code shoul
 
 ## Test mocks
 
-- No `as unknown as X` casts to fake framework types in test files. Use shared typed helpers (e.g. `apps/api/src/middleware/test-helpers.ts`).
-- Mocks should be the minimum needed for the test. If a test only needs `c.set` and `c.var.logger`, the helper should only expose those.
+- No `as unknown as X` casts to fake framework types in test files.
+- Test the api through `createApp(fakeDeps).request(...)` and assert status and body. Fake only the collaborators in `AppDeps` (session lookup, user store, database check), never Hono's `Context`.
 
 ## Forms
 
 - `@tanstack/react-form`, never `react-hook-form`.
-- Validate `onBlur` + `onChange` with Zod schemas.
+- Pass the Zod schema directly to `validators: { onDynamicAsync: schema }` with `validationLogic: revalidateLogic({ mode: "blur" })`. Before the first submit, validate on blur, not while typing; after it, validate on every change so errors clear as values are fixed. Every submit revalidates, including Enter with a stale blur error. The async validator handles throwing Zod refinements; `form.validate("submit")` refreshes errors before `form.handleSubmit()` checks whether submission is allowed.
+- Schemas are the single source of validation: no HTML `required` or `minLength`; keep `noValidate` on the form, `type="email"` for keyboard hints, and `type="submit"` on submit buttons. Derive `aria-required` from the field schema and subscribe to form-derived state through `form.useStore()`.
+- Auth forms and auth action buttons are built on `apps/web/src/components/auth-form.tsx`, which owns the double-submit latch, Better Auth error reporting and the busy state.
 - Display errors with `field.state.meta.isTouched && !field.state.meta.isValid`.
 - Never call `field.handleChange` inside `useEffect` or `useCallback` with `field` in deps; use `field.form.setFieldValue(field.name, value)` with stable refs.
 
@@ -53,5 +55,5 @@ This document records the defaults used across the acme monorepo. New code shoul
 
 ## Routes
 
-- API versioned under `/api/v1/*`. Better Auth at `/auth/*`. Health at `/healthz` and `/readyz`.
+- API versioned under `/api/v1/*`, with health at `/healthz` and `/readyz`. Better Auth is served by `web` at `/api/auth/*`; `api` only consumes its session and user APIs.
 - Path alias: `@/*` maps to `src/*` in every app and package.

@@ -1,120 +1,66 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { toast } from "sonner";
 
+import { AuthActionButton } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
+import { authPageHref } from "@/lib/redirect-validation";
 
 const RevokeSessionButton = ({ token }: { token: string }) => {
   const { refresh } = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const handleRevoke = () => {
-    if (isPending) {
-      return;
-    }
-    startTransition(async () => {
-      try {
-        const result = await authClient.revokeSession({ token });
-        if (result.error) {
-          toast.error(result.error.message ?? "Failed to revoke session");
-          return;
-        }
-        refresh();
-      } catch {
-        toast.error("Failed to revoke session. Please try again.");
-      }
-    });
-  };
 
   return (
-    <Button
-      aria-busy={isPending}
-      disabled={isPending}
-      onClick={handleRevoke}
+    <AuthActionButton
+      call={() => authClient.revokeSession({ token })}
+      fallbackError="Failed to revoke session"
+      onSuccess={refresh}
+      pendingLabel="Revoking…"
       size="sm"
       variant="outline"
     >
-      {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-      {isPending ? "Revoking…" : "Revoke"}
-    </Button>
+      Revoke
+    </AuthActionButton>
   );
 };
 
 const RevokeOtherSessionsButton = () => {
   const { refresh } = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const handleRevokeOthers = () => {
-    if (isPending) {
-      return;
-    }
-    startTransition(async () => {
-      try {
-        const result = await authClient.revokeOtherSessions();
-        if (result.error) {
-          toast.error(result.error.message ?? "Failed to revoke sessions");
-          return;
-        }
-        toast.success("Other sessions signed out");
-        refresh();
-      } catch {
-        toast.error("Failed to revoke sessions. Please try again.");
-      }
-    });
-  };
 
   return (
-    <Button
-      aria-busy={isPending}
+    <AuthActionButton
+      call={() => authClient.revokeOtherSessions()}
       className="w-fit"
-      disabled={isPending}
-      onClick={handleRevokeOthers}
+      fallbackError="Failed to revoke sessions"
+      onSuccess={() => {
+        toast.success("Other sessions signed out");
+        refresh();
+      }}
+      pendingLabel="Signing out…"
       variant="outline"
     >
-      {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-      {isPending ? "Signing out…" : "Sign out other sessions"}
-    </Button>
+      Sign out other sessions
+    </AuthActionButton>
   );
 };
 
 const ReauthenticateButton = () => {
   const { push, refresh } = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const handleReauthenticate = () => {
-    if (isPending) {
-      return;
-    }
-    startTransition(async () => {
-      try {
-        const result = await authClient.signOut();
-        if (result.error) {
-          toast.error(result.error.message ?? "Failed to sign out");
-          return;
-        }
-        push("/login?from=/dashboard/settings");
-        refresh();
-      } catch {
-        toast.error("Failed to sign out. Please try again.");
-      }
-    });
-  };
 
   return (
-    <Button
-      aria-busy={isPending}
+    <AuthActionButton
+      call={() => authClient.signOut()}
       className="w-fit"
-      disabled={isPending}
-      onClick={handleReauthenticate}
+      fallbackError="Failed to sign out"
+      onSuccess={() => {
+        push(authPageHref("/login", "/dashboard/settings"));
+        refresh();
+      }}
+      pendingLabel="Signing out…"
       variant="outline"
     >
-      {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-      {isPending ? "Signing out…" : "Sign in again"}
-    </Button>
+      Sign in again
+    </AuthActionButton>
   );
 };
 

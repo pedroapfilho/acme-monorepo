@@ -1,6 +1,5 @@
-import type { Prisma } from "@repo/db";
-
-import { AppError } from "@/lib/api-error";
+import type { Auth } from "@repo/auth/server";
+import type { Prisma, PrismaClient } from "@repo/db";
 
 const userSelect = {
   createdAt: true,
@@ -20,57 +19,27 @@ type UpdateUserInput = {
   username?: string;
 };
 
-type UserRepository = {
-  delete: (input: { where: { id: string } }) => Promise<void>;
-  findUnique: (input: { select: typeof userSelect; where: { id: string } }) => Promise<User | null>;
-  update: (input: {
-    data: UpdateUserInput;
-    select: typeof userSelect;
-    where: { id: string };
-  }) => Promise<User>;
+type UserStore = {
+  delete: (request: { headers: Headers; password?: string }) => Promise<Headers>;
+  find: (id: string) => Promise<User | null>;
+  update: (request: { data: UpdateUserInput; headers: Headers }) => Promise<Headers>;
 };
 
-const createUserService = (users: UserRepository) => {
-  const findUserById = async (id: string) => {
-    const user = await users.findUnique({
-      select: userSelect,
-      where: { id },
+const createUserStore = (auth: Auth, prisma: PrismaClient): UserStore => ({
+  delete: async ({ headers, password }) => {
+    const result = await auth.api.deleteUser({ body: { password }, headers, returnHeaders: true });
+    return result.headers;
+  },
+  find: (id) => prisma.user.findUnique({ select: userSelect, where: { id } }),
+  update: async ({ data, headers }) => {
+    const result = await auth.api.updateUser({
+      body: { ...data, displayUsername: data.username },
+      headers,
+      returnHeaders: true,
     });
+    return result.headers;
+  },
+});
 
-    if (!user) {
-      throw new AppError("User not found", "USER_NOT_FOUND", 404);
-    }
-
-    return user;
-  };
-
-  const updateUser = async (id: string, data: UpdateUserInput) => {
-    try {
-      return await users.update({
-        data,
-        select: userSelect,
-        where: { id },
-      });
-    } catch (error) {
-      if (
-        typeof data.username === "string" &&
-        error instanceof Error &&
-        "code" in error &&
-        error.code === "P2002"
-      ) {
-        throw new AppError("Username already taken", "USERNAME_TAKEN", 409);
-      }
-      throw error;
-    }
-  };
-
-  const deleteUser = async (id: string) => {
-    await users.delete({ where: { id } });
-    return { success: true };
-  };
-
-  return { deleteUser, findUserById, updateUser };
-};
-
-export { createUserService };
-export type { UpdateUserInput, UserRepository };
+export { createUserStore };
+export type { User, UserStore };

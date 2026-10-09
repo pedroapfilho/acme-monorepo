@@ -30,7 +30,7 @@ packages/
   transactional/       React Email templates + Resend sender
   config-typescript/   Shared tsconfig bases (nextjs / server / react-library / vite)
   config-vitest/       Shared Vitest configs (react.ts, node.ts)
-  portless-env/        applyPortlessUrls: fills dev URL env vars from `portless get`
+  portless-env/        App registry (./apps: names, loopback ports, URL defaults) + `portless get` lookup (applyPortlessUrls)
 docs/                  CONVENTIONS.md + superpowers specs
 agents/counselors/     Agent role definitions
 tests/                 Root Playwright e2e specs
@@ -80,16 +80,22 @@ sudo portless proxy start --https     # binds :443, trusts the local cert
 
 Worktrees auto-prefix the subdomain: `main` → `https://acme.web.localhost`, branch `fix-styles` → `https://fix-styles.acme.web.localhost`. Each gets an auto-assigned backing port; no collisions.
 
-The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt`; see `apps/api/src/lib/openapi.ts`.
+The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export at `/llms.txt`; see `apps/api/src/app.ts`.
 
-App configs resolve those URLs through `@repo/portless-env` rather than hardcoding them. `applyPortlessUrls({ ENV_VAR: ["<subdomain>"] })` runs at the top of each `next.config.ts` / `tsdown.config.ts` and shells out to `portless get` for every name, filling the env var only when it is unset or still holds the canonical `*.localhost` default. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Import it by bare specifier (`@repo/portless-env`): a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
+`packages/portless-env/src/apps.ts` is the app registry: each app's Portless name and loopback port, the URL env vars each app fills, and the canonical `https://<name>.localhost` defaults derived from the names. Add or rename an app there. Application code reads defaults from the browser-safe `@repo/portless-env/apps` (auth host patterns and trusted origins, landing's `webAppUrl()`, the web `metadataBase`, the OpenAPI server, Playwright's loopback URLs); it has no `node:` imports.
+
+App configs call `applyPortlessUrls(["WEB_APP_URL", …])` from `@repo/portless-env` at the top of each `next.config.ts` / `tsdown.config.ts`. It runs `portless get` once per app and fills each env var only when it is unset or still holds its canonical default; a failed lookup throws. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Tests in `tests/e2e` import URLs from `tests/e2e/urls.ts`, which asks portless locally and uses loopback ports in CI. Import the package by bare specifier: a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
+
+The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must stay literal; `packages/portless-env/src/apps.test.ts` asserts they match the registry.
 
 ## Conventions & gotchas
 
 ### Forms
 
-- **@tanstack/react-form** (NOT react-hook-form). Validate `onBlur` + `onChange` with Zod.
-- Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`.
+- **@tanstack/react-form** (NOT react-hook-form). Auth forms use `useAuthForm`, `AuthForm` and `SubmitButton` from `apps/web/src/components/auth-form.tsx`; auth buttons use `AuthActionButton` from the same module. It owns the double-submit latch, Better Auth error reporting and the busy state.
+- Pass the Zod schema directly to `validators: { onDynamicAsync: schema }` with `validationLogic: revalidateLogic({ mode: "blur" })`. Before the first submit, validate on blur, not while typing; after it, validate on every change so errors clear as values are fixed. Every submit revalidates, including Enter with a stale blur error. The async validator handles throwing Zod refinements; `form.validate("submit")` refreshes errors before `form.handleSubmit()` checks whether submission is allowed.
+- Schemas are the single source of validation: no HTML `required` or `minLength`; keep `noValidate` on the form, `type="email"` for keyboard hints, and `type="submit"` on submit buttons. Derive `aria-required` from the field schema and subscribe to form-derived state through `form.useStore()`.
+- Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`. `field.TextField` does this; call sites pass a label and an `autoComplete` purpose.
 - Field primitives from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`.
 - **Never** put `field` in a `useEffect` / `useCallback` dependency array; it's a new object every render. Use `field.form.setFieldValue(field.name, value)` with stable refs.
 
@@ -98,9 +104,9 @@ App configs resolve those URLs through `@repo/portless-env` rather than hardcodi
 - Password minimum **12 characters**. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
-- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session middleware and observability identify; it does not serve the auth routes.
+- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup and user writes, both wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
-- `requireEmailVerification` is gated on the email-infra env vars being present (no bare `true`).
+- `createAuth` takes an optional `mailer` and reports it as `auth.canSendEmail`. `web` builds the Resend mailer when `RESEND_API_KEY` is set. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
 
 ### API
 
@@ -123,7 +129,7 @@ App configs resolve those URLs through `@repo/portless-env` rather than hardcodi
 
 ### Turbo cache keys
 
-`build.env` is sensitive to: `API_URL`, `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WEB_APP_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
+`build.env` is sensitive to: `AUTH_ALLOWED_HOSTS`, `BETTER_AUTH_SECRET`, `CORS_ORIGINS`, `DATABASE_URL`, `EXPOSE_TESTING_API`, `NEXT_PUBLIC_WEB_APP_URL`, `TRUSTED_ORIGINS`, `WEB_APP_URL`. Changing any of these invalidates build cache.
 
 ## Environment
 
@@ -141,8 +147,8 @@ cp packages/db/.env.example packages/db/.env
 - `DATABASE_URL`: PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`)
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS`: comma-separated allowed origins
-- `NEXT_PUBLIC_API_URL`: API URL for client-side requests (defaults to portless URL)
-- `BETTER_AUTH_URL`: Better Auth base URL (api hostname)
+- `WEB_APP_URL`: web origin; secure-cookie switch, the base of auth email links and the web `metadataBase`, parsed only by `webAppUrl()` in `@repo/auth/env-config` (portless fills it in dev)
+- `RESEND_API_KEY` / `FROM_EMAIL`: web only; auth email is off while `RESEND_API_KEY` is unset
 
 Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 

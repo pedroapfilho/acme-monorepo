@@ -1,29 +1,17 @@
 "use client";
 
-import { Button } from "@repo/ui/components/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
-import { Input } from "@repo/ui/components/input";
-import { FormFieldError } from "@repo/ui/compositions/form-field-error";
-import { useForm } from "@tanstack/react-form";
-import { Loader2 } from "lucide-react";
+import { Field, FieldDescription } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useState } from "react";
-import { toast } from "sonner";
+import { Suspense, use } from "react";
 
+import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
-import { safeRedirectPath } from "@/lib/redirect-validation";
-import { useAuthSubmit } from "@/lib/use-auth-submit";
+import { authPageHref, safeRedirectPath } from "@/lib/redirect-validation";
 
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
-};
-
-type LoginDependencies = {
-  showError: (message: string) => void;
-  signInEmail: typeof authClient.signIn.email;
-  useAppRouter: typeof useRouter;
 };
 
 const SignUpLinkFallback = () => (
@@ -34,173 +22,74 @@ const SignUpLinkFallback = () => (
 
 const SignUpLink = ({ searchParams }: Props) => {
   const { from } = use(searchParams);
-  const safeTo = safeRedirectPath(from);
 
   return (
     <Link
       className="text-foreground underline underline-offset-4"
-      href={safeTo === "/dashboard" ? "/register" : `/register?from=${encodeURIComponent(safeTo)}`}
+      href={authPageHref("/register", from)}
     >
       Sign up
     </Link>
   );
 };
 
-const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependencies) => {
-  const LoginForm = ({ searchParams }: Props) => {
-    const { push, refresh } = useAppRouter();
-    const { isPending, run, submit } = useAuthSubmit();
-    const [formError, setFormError] = useState<string | null>(null);
-    const [showUnverifiedNotice, setShowUnverifiedNotice] = useState(false);
+const LoginForm = ({ searchParams }: Props) => {
+  const { push, refresh } = useRouter();
+  const { errorCode, form, submission } = useAuthForm({
+    call: (value) => authClient.signIn.email(value),
+    defaultValues: { email: "", password: "" },
+    fallbackError: "Invalid credentials",
+    handledErrorCodes: ["EMAIL_NOT_VERIFIED"],
+    onSuccess: async () => {
+      const { from } = await searchParams;
+      push(safeRedirectPath(from));
+      refresh();
+    },
+    schema: loginSchema,
+  });
 
-    const form = useForm({
-      defaultValues: { email: "", password: "" },
-      onSubmit: ({ value }) => {
-        setFormError(null);
-        setShowUnverifiedNotice(false);
-        run(async () => {
-          try {
-            const { from } = await searchParams;
-            const result = await signInEmail({
-              email: value.email,
-              password: value.password,
-            });
-            if (result.error) {
-              if (result.error.code === "EMAIL_NOT_VERIFIED") {
-                setShowUnverifiedNotice(true);
-                return;
-              }
-              const message = result.error.message ?? "Invalid credentials";
-              setFormError(message);
-              showError(message);
-              return;
+  return (
+    <AuthForm submission={submission}>
+      <form.AppField name="email">
+        {(field) => (
+          <field.TextField autoComplete="email" label="Email" placeholder="you@example.com" />
+        )}
+      </form.AppField>
+
+      <form.AppField name="password">
+        {(field) => (
+          <field.TextField
+            autoComplete="current-password"
+            label="Password"
+            labelAction={
+              <Link
+                className="ml-auto text-sm text-foreground underline underline-offset-4"
+                href="/recover"
+              >
+                Forgot your password?
+              </Link>
             }
-            push(safeRedirectPath(from));
-            refresh();
-          } catch (error) {
-            const message =
-              error instanceof Error ? error.message : "An error occurred. Please try again.";
-            setFormError(message);
-            showError(message);
-          }
-        });
-      },
-      validators: { onSubmit: loginSchema },
-    });
+          />
+        )}
+      </form.AppField>
 
-    return (
-      <form
-        noValidate
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          void submit(form);
-        }}
-      >
-        <div aria-atomic="true" aria-live="polite" className="sr-only">
-          {formError}
-        </div>
-        <FieldGroup>
-          <form.Field name="email">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <Input
-                    aria-describedby={isInvalid ? "email-error" : undefined}
-                    aria-invalid={isInvalid}
-                    autoComplete="email"
-                    disabled={isPending}
-                    id="email"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                    placeholder="you@example.com"
-                    required
-                    type="email"
-                    value={field.state.value}
-                  />
-                  {isInvalid && (
-                    <FormFieldError errors={field.state.meta.errors} id="email-error" />
-                  )}
-                </Field>
-              );
-            }}
-          </form.Field>
+      {errorCode === "EMAIL_NOT_VERIFIED" && (
+        <output aria-live="polite" className="block text-center text-sm">
+          This email isn&apos;t verified yet. We just sent you a new link.
+        </output>
+      )}
 
-          <form.Field name="password">
-            {(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid || undefined}>
-                  <div className="flex items-center">
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Link
-                      className="ml-auto text-sm text-foreground underline underline-offset-4"
-                      href="/recover"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
-                  <Input
-                    aria-describedby={isInvalid ? "password-error" : undefined}
-                    aria-invalid={isInvalid}
-                    autoComplete="current-password"
-                    disabled={isPending}
-                    id="password"
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                    }}
-                    required
-                    type="password"
-                    value={field.state.value}
-                  />
-                  {isInvalid && (
-                    <FormFieldError errors={field.state.meta.errors} id="password-error" />
-                  )}
-                </Field>
-              );
-            }}
-          </form.Field>
-
-          {showUnverifiedNotice && (
-            <output aria-live="polite" className="block text-center text-sm">
-              This email isn&apos;t verified yet. We just sent you a new link.
-            </output>
-          )}
-
-          <Field>
-            <Button aria-busy={isPending} disabled={isPending} type="submit">
-              {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
-              {isPending ? "Signing in…" : "Sign in"}
-            </Button>
-            <FieldDescription className="text-center">
-              Don&apos;t have an account?{" "}
-              <Suspense fallback={<SignUpLinkFallback />}>
-                <SignUpLink searchParams={searchParams} />
-              </Suspense>
-            </FieldDescription>
-          </Field>
-        </FieldGroup>
-      </form>
-    );
-  };
-
-  return LoginForm;
+      <Field>
+        <SubmitButton pendingLabel="Signing in…">Sign in</SubmitButton>
+        <FieldDescription className="text-center">
+          Don&apos;t have an account?{" "}
+          <Suspense fallback={<SignUpLinkFallback />}>
+            <SignUpLink searchParams={searchParams} />
+          </Suspense>
+        </FieldDescription>
+      </Field>
+    </AuthForm>
+  );
 };
 
-const LoginForm = createLoginForm({
-  showError: (message) => {
-    toast.error(message);
-  },
-  signInEmail: authClient.signIn.email,
-  useAppRouter: useRouter,
-});
-
-export { createLoginForm };
 export default LoginForm;

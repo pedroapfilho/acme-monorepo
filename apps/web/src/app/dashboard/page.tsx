@@ -1,11 +1,10 @@
 import { Skeleton } from "@repo/ui/components/skeleton";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { SignOutButton } from "@/components/sign-out-button";
-import { getSession } from "@/lib/auth-helpers";
+import { requireSession } from "@/lib/auth-helpers";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -13,11 +12,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 export const instant = true;
 
 const DashboardContent = async () => {
-  const session = await getSession();
-
-  if (!session) {
-    redirect("/login");
-  }
+  const session = await requireSession("/dashboard");
 
   return (
     <>
