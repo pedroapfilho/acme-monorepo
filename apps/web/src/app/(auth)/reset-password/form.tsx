@@ -3,7 +3,7 @@
 import { Button, buttonVariants } from "@repo/ui/components/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { Field, FieldDescription, FieldGroup } from "@repo/ui/components/field";
-import { useClientReady } from "@repo/ui/hooks/use-client-ready";
+import { ClientReadyForm } from "@repo/ui/compositions/client-ready-form";
 import { cn } from "@repo/ui/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
@@ -40,8 +40,6 @@ const InvalidResetLink = () => (
 const NewPasswordForm = ({ token }: { token: string }) => {
   const { push } = useRouter();
   const { isPending, run, submit } = useAuthSubmit();
-  const ready = useClientReady();
-  const disabled = !ready || isPending;
   const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm({
@@ -73,7 +71,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
   });
 
   return (
-    <form
+    <ClientReadyForm
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
@@ -88,18 +86,18 @@ const NewPasswordForm = ({ token }: { token: string }) => {
         <div className="grid grid-cols-2 gap-4">
           <form.Field name="password">
             {(field) => (
-              <AuthPasswordField disabled={disabled} field={field} label="New password" />
+              <AuthPasswordField disabled={isPending} field={field} label="New password" />
             )}
           </form.Field>
           <form.Field name="confirmPassword">
             {(field) => (
-              <AuthPasswordField disabled={disabled} field={field} label="Confirm password" />
+              <AuthPasswordField disabled={isPending} field={field} label="Confirm password" />
             )}
           </form.Field>
         </div>
 
         <Field>
-          <Button aria-busy={isPending} disabled={disabled} type="submit">
+          <Button aria-busy={isPending} disabled={isPending} type="submit">
             {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Resetting…" : "Reset password"}
           </Button>
@@ -111,7 +109,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
           </FieldDescription>
         </Field>
       </FieldGroup>
-    </form>
+    </ClientReadyForm>
   );
 };
 
