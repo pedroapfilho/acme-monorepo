@@ -2,6 +2,7 @@ import { instant } from "@next/playwright";
 
 import { test, expect } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
+import { holdScripts } from "../helpers/hold-scripts";
 
 test.describe("Login", () => {
   test.use({ storageState: { cookies: [], origins: [] } });
@@ -12,6 +13,17 @@ test.describe("Login", () => {
 
     await page.waitForURL("/dashboard");
     await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  });
+
+  test("keeps the form disabled until it hydrates", async ({ loginPage, page }) => {
+    const releaseScripts = await holdScripts(page);
+    await page.goto("/login", { waitUntil: "commit" });
+    await loginPage.expectDisabled();
+
+    releaseScripts();
+    await loginPage.login(TEST_USER.email, TEST_USER.password);
+
+    await page.waitForURL("/dashboard");
   });
 
   test("shows error for wrong password", async ({ loginPage, page }) => {

@@ -4,6 +4,7 @@ import { Button } from "@repo/ui/components/button";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { FormFieldError } from "@repo/ui/compositions/form-field-error";
+import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -21,6 +22,8 @@ type Props = {
 
 const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
   const { isPending, run, submit } = useAuthSubmit();
+  const ready = useClientReady();
+  const disabled = !ready || isPending;
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmationAddress, setConfirmationAddress] = useState<string | null>(null);
 
@@ -95,7 +98,7 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
                   aria-describedby={isInvalid ? "newEmail-error" : undefined}
                   aria-invalid={isInvalid}
                   autoComplete="email"
-                  disabled={isPending}
+                  disabled={disabled}
                   id="newEmail"
                   name={field.name}
                   onBlur={field.handleBlur}
@@ -116,7 +119,7 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
         </form.Field>
 
         <Field orientation="horizontal">
-          <Button aria-busy={isPending} className="w-fit" disabled={isPending} type="submit">
+          <Button aria-busy={isPending} className="w-fit" disabled={disabled} type="submit">
             {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
             {isPending ? "Updating…" : "Update email"}
           </Button>
