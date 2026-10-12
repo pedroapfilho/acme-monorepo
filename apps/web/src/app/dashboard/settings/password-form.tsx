@@ -4,6 +4,7 @@ import { Button } from "@repo/ui/components/button";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { FormFieldError } from "@repo/ui/compositions/form-field-error";
+import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -30,6 +31,8 @@ const createPasswordForm = ({
   const PasswordForm = () => {
     const { refresh } = useAppRouter();
     const { isPending, run, submit } = useAuthSubmit();
+    const ready = useClientReady();
+    const disabled = !ready || isPending;
     const [formError, setFormError] = useState<string | null>(null);
 
     const form = useForm({
@@ -86,7 +89,7 @@ const createPasswordForm = ({
                     aria-describedby={isInvalid ? "currentPassword-error" : undefined}
                     aria-invalid={isInvalid}
                     autoComplete="current-password"
-                    disabled={isPending}
+                    disabled={disabled}
                     id="currentPassword"
                     name={field.name}
                     onBlur={field.handleBlur}
@@ -116,7 +119,7 @@ const createPasswordForm = ({
                       aria-describedby={isInvalid ? "newPassword-error" : undefined}
                       aria-invalid={isInvalid}
                       autoComplete="new-password"
-                      disabled={isPending}
+                      disabled={disabled}
                       id="newPassword"
                       name={field.name}
                       onBlur={field.handleBlur}
@@ -145,7 +148,7 @@ const createPasswordForm = ({
                       aria-describedby={isInvalid ? "confirmPassword-error" : undefined}
                       aria-invalid={isInvalid}
                       autoComplete="new-password"
-                      disabled={isPending}
+                      disabled={disabled}
                       id="confirmPassword"
                       name={field.name}
                       onBlur={field.handleBlur}
@@ -166,7 +169,7 @@ const createPasswordForm = ({
           </div>
 
           <Field orientation="horizontal">
-            <Button aria-busy={isPending} className="w-fit" disabled={isPending} type="submit">
+            <Button aria-busy={isPending} className="w-fit" disabled={disabled} type="submit">
               {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
               {isPending ? "Updating…" : "Update password"}
             </Button>

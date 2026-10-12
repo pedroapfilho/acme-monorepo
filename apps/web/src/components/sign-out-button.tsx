@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
+import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -10,6 +11,7 @@ import { authClient } from "@/lib/auth-client";
 const SignOutButton = () => {
   const { push } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const ready = useClientReady();
   const [error, setError] = useState<string | null>(null);
 
   const handleSignOut = () => {
@@ -32,7 +34,7 @@ const SignOutButton = () => {
       <Button
         aria-busy={isPending}
         className="self-start"
-        disabled={isPending}
+        disabled={!ready || isPending}
         onClick={handleSignOut}
         variant="outline"
       >

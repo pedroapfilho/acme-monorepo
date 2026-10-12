@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
+import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -11,6 +12,7 @@ import { authClient } from "@/lib/auth-client";
 const RevokeSessionButton = ({ token }: { token: string }) => {
   const { refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const ready = useClientReady();
 
   const handleRevoke = () => {
     if (isPending) {
@@ -33,7 +35,7 @@ const RevokeSessionButton = ({ token }: { token: string }) => {
   return (
     <Button
       aria-busy={isPending}
-      disabled={isPending}
+      disabled={!ready || isPending}
       onClick={handleRevoke}
       size="sm"
       variant="outline"
@@ -47,6 +49,7 @@ const RevokeSessionButton = ({ token }: { token: string }) => {
 const RevokeOtherSessionsButton = () => {
   const { refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const ready = useClientReady();
 
   const handleRevokeOthers = () => {
     if (isPending) {
@@ -71,7 +74,7 @@ const RevokeOtherSessionsButton = () => {
     <Button
       aria-busy={isPending}
       className="w-fit"
-      disabled={isPending}
+      disabled={!ready || isPending}
       onClick={handleRevokeOthers}
       variant="outline"
     >
@@ -84,6 +87,7 @@ const RevokeOtherSessionsButton = () => {
 const ReauthenticateButton = () => {
   const { push, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const ready = useClientReady();
 
   const handleReauthenticate = () => {
     if (isPending) {
@@ -108,7 +112,7 @@ const ReauthenticateButton = () => {
     <Button
       aria-busy={isPending}
       className="w-fit"
-      disabled={isPending}
+      disabled={!ready || isPending}
       onClick={handleReauthenticate}
       variant="outline"
     >
