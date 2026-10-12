@@ -3,8 +3,8 @@
 import { Button } from "@repo/ui/components/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { ClientReadyForm } from "@repo/ui/compositions/client-ready-form";
 import { FormFieldError } from "@repo/ui/compositions/form-field-error";
-import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -51,8 +51,6 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
   const LoginForm = ({ searchParams }: Props) => {
     const { push, refresh } = useAppRouter();
     const { isPending, run, submit } = useAuthSubmit();
-    const ready = useClientReady();
-    const disabled = !ready || isPending;
     const [formError, setFormError] = useState<string | null>(null);
     const [showUnverifiedNotice, setShowUnverifiedNotice] = useState(false);
 
@@ -92,7 +90,7 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
     });
 
     return (
-      <form
+      <ClientReadyForm
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
@@ -114,7 +112,7 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
                     aria-describedby={isInvalid ? "email-error" : undefined}
                     aria-invalid={isInvalid}
                     autoComplete="email"
-                    disabled={disabled}
+                    disabled={isPending}
                     id="email"
                     name={field.name}
                     onBlur={field.handleBlur}
@@ -152,7 +150,7 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
                     aria-describedby={isInvalid ? "password-error" : undefined}
                     aria-invalid={isInvalid}
                     autoComplete="current-password"
-                    disabled={disabled}
+                    disabled={isPending}
                     id="password"
                     name={field.name}
                     onBlur={field.handleBlur}
@@ -178,7 +176,7 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
           )}
 
           <Field>
-            <Button aria-busy={isPending} disabled={disabled} type="submit">
+            <Button aria-busy={isPending} disabled={isPending} type="submit">
               {isPending && <Loader2 className="size-4 motion-safe:animate-spin" />}
               {isPending ? "Signing in…" : "Sign in"}
             </Button>
@@ -190,7 +188,7 @@ const createLoginForm = ({ showError, signInEmail, useAppRouter }: LoginDependen
             </FieldDescription>
           </Field>
         </FieldGroup>
-      </form>
+      </ClientReadyForm>
     );
   };
 
