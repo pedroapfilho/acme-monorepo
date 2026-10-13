@@ -1,11 +1,22 @@
+import { createRequestLogger } from "evlog";
 import { describe, expect, it } from "vitest";
 
 import { createIdentify } from "./auth";
 
 describe("createIdentify", () => {
-  it("returns an identify function bound to the given auth", () => {
-    const fakeAuth = { api: { getSession: () => Promise.resolve(null) } };
-    const identify = createIdentify(fakeAuth);
-    expect(typeof identify).toBe("function");
+  it("puts the resolved session's user on the request's wide event", () => {
+    const log = createRequestLogger({ method: "GET", path: "/api/v1/users/me" });
+
+    const identified = createIdentify()(log, {
+      session: { id: "session-1" },
+      user: { email: "alice@example.com", id: "user-1" },
+    });
+
+    expect(identified).toBe(true);
+    expect(log.getContext()).toMatchObject({
+      session: { id: "session-1" },
+      user: { email: "alice@example.com", id: "user-1" },
+      userId: "user-1",
+    });
   });
 });

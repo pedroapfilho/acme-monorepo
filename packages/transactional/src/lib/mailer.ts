@@ -1,16 +1,14 @@
 import * as React from "react";
+import { render } from "react-email";
+import { Resend } from "resend";
+import type { CreateEmailOptions, CreateEmailResponse } from "resend";
 
 import { ChangeEmail } from "../emails/change-email";
 import { PasswordResetEmail } from "../emails/password-reset";
 import { SignUpAttemptEmail } from "../emails/sign-up-attempt";
 import { WelcomeEmail } from "../emails/welcome";
 
-import { sendEmail } from "./send-email";
-
-type MailerConfig = {
-  apiKey: string;
-  from: string;
-};
+import { senderAddressSchema } from "./sender-address";
 
 type WelcomePayload = {
   userEmail: string;
@@ -49,6 +47,12 @@ type TransactionalEmail =
   | ({ type: "sign-up-attempt" } & SignUpAttemptPayload)
   | ({ type: "password-reset" } & PasswordResetPayload)
   | ({ type: "change-email-confirmation" } & ChangeEmailPayload);
+
+type DeliveryResult = { ok: true } | { error: string; ok: false };
+
+type Mailer = (email: TransactionalEmail) => Promise<DeliveryResult>;
+
+type ResendSend = (payload: CreateEmailOptions) => Promise<CreateEmailResponse>;
 
 type EmailBuild = { subject: string; template: React.ReactElement; to: string };
 
@@ -111,23 +115,48 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
   }
 };
 
-const createTransactionalEmailSender =
-  (deliver: typeof sendEmail) => (email: TransactionalEmail, config: MailerConfig) => {
-    const { subject, template, to } = buildEmail(email);
-    return deliver({
-      apiKey: config.apiKey,
-      from: config.from,
-      subject,
-      tags: [
-        { name: "type", value: email.type },
-        { name: "userId", value: email.userId },
-      ],
-      template,
-      to,
-    });
+const resendSend = (apiKey: string): ResendSend => {
+  const resend = new Resend(apiKey);
+  return (payload) => resend.emails.send(payload);
+};
+
+// A malformed sender is a configuration error and throws here; delivery failures are results the caller decides how to surface.
+const createResendMailer = (
+  { apiKey, from }: { apiKey: string; from: string },
+  send: ResendSend = resendSend(apiKey),
+): Mailer => {
+  const sender = senderAddressSchema.parse(from);
+
+  return async (email) => {
+    try {
+      const { subject, template, to } = buildEmail(email);
+      const [html, text] = await Promise.all([
+        render(template),
+        render(template, { plainText: true }),
+      ]);
+      const { error } = await send({
+        from: sender,
+        html,
+        subject,
+        tags: [
+          { name: "type", value: email.type },
+          { name: "userId", value: email.userId },
+        ],
+        text,
+        to,
+      });
+      if (error) {
+        return {
+          error: `Resend failed to queue email: ${error.name} - ${error.message}`,
+          ok: false,
+        };
+      }
+      return { ok: true };
+    } catch (error) {
+      return { error: error instanceof Error ? error.message : "Failed to send email", ok: false };
+    }
   };
+};
 
-const sendTransactionalEmail = createTransactionalEmailSender(sendEmail);
-
-export type { MailerConfig, TransactionalEmail };
-export { createTransactionalEmailSender, sendTransactionalEmail };
+export { createResendMailer };
+export type { Mailer, TransactionalEmail };

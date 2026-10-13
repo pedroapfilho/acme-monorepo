@@ -2,14 +2,12 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.stubEnv("BETTER_AUTH_SECRET", "a".repeat(32));
 vi.stubEnv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db");
-vi.stubEnv("FROM_EMAIL", "noreply@acme.com");
 
 const { envSchema } = await import("./env");
 
 const validEnv = {
   BETTER_AUTH_SECRET: "a".repeat(32),
   DATABASE_URL: "postgresql://user:pass@localhost:5432/db",
-  FROM_EMAIL: "noreply@acme.com",
 };
 
 describe("envSchema", () => {
@@ -22,7 +20,7 @@ describe("envSchema", () => {
     const result = envSchema.safeParse(validEnv);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.PORT).toBe("4000");
+      expect(result.data.PORT).toBe(4000);
       expect(result.data.HOST).toBe("0.0.0.0");
       expect(result.data.NODE_ENV).toBe("development");
       expect(result.data.CORS_ORIGINS).toBe(
@@ -57,29 +55,6 @@ describe("envSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject a missing FROM_EMAIL rather than defaulting the sender", () => {
-    const { FROM_EMAIL: _omitted, ...withoutFromEmail } = validEnv;
-    const result = envSchema.safeParse(withoutFromEmail);
-    expect(result.success).toBe(false);
-  });
-
-  it("should reject an empty FROM_EMAIL", () => {
-    const result = envSchema.safeParse({ ...validEnv, FROM_EMAIL: "" });
-    expect(result.success).toBe(false);
-  });
-
-  it("should reject a FROM_EMAIL that is not an address", () => {
-    for (const fromEmail of ["noreply@acme", "noreply", "noreply@", "@acme.com"]) {
-      const result = envSchema.safeParse({ ...validEnv, FROM_EMAIL: fromEmail });
-      expect(result.success).toBe(false);
-    }
-  });
-
-  it("should accept the display-name sender form the mailer allows", () => {
-    const result = envSchema.safeParse({ ...validEnv, FROM_EMAIL: "Acme <noreply@acme.com>" });
-    expect(result.success).toBe(true);
-  });
-
   it("should reject invalid NODE_ENV values", () => {
     const result = envSchema.safeParse({
       ...validEnv,
@@ -95,11 +70,15 @@ describe("envSchema", () => {
     }
   });
 
-  it("should allow optional RESEND_API_KEY", () => {
-    const result = envSchema.safeParse(validEnv);
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.RESEND_API_KEY).toBeUndefined();
+  it("should not trust forwarded client addresses unless TRUSTED_PROXY_HOPS is set", () => {
+    expect(envSchema.parse(validEnv).TRUSTED_PROXY_HOPS).toBe(0);
+    expect(envSchema.parse({ ...validEnv, TRUSTED_PROXY_HOPS: "2" }).TRUSTED_PROXY_HOPS).toBe(2);
+    expect(envSchema.safeParse({ ...validEnv, TRUSTED_PROXY_HOPS: "true" }).success).toBe(false);
+  });
+
+  it("should reject a PORT that is empty or not a port number", () => {
+    for (const port of ["", "abc", "-1"]) {
+      expect(envSchema.safeParse({ ...validEnv, PORT: port }).success).toBe(false);
     }
   });
 });

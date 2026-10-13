@@ -1,55 +1,45 @@
 import { z } from "zod";
 
-export const loginSchema = z.object({
-  email: z.email("Invalid email address"),
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
+const email = z.email("Invalid email address");
+const name = z.string().min(3, "Name must be at least 3 characters").max(32);
+const password = z.string().min(12, "Password must be at least 12 characters");
 
-export const registerSchema = z
-  .object({
-    confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-    email: z.email("Invalid email address"),
-    name: z.string().min(3, "Name must be at least 3 characters").max(32),
-    password: z.string().min(12, "Password must be at least 12 characters"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
+type PasswordKey = "newPassword" | "password";
+
+const withPasswordConfirmation = <
+  TSchema extends z.ZodType<{ confirmPassword: string } & Partial<Record<PasswordKey, string>>>,
+>(
+  schema: TSchema,
+  passwordKey: PasswordKey,
+) =>
+  schema.refine((data) => data[passwordKey] === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const loginSchema = z.object({ email, password });
+
+export const registerSchema = withPasswordConfirmation(
+  z.object({ confirmPassword: password, email, name, password }),
+  "password",
+);
 
 export const recoverSchema = z.object({
   email: z.email("Enter a valid email address"),
 });
 
-export const resetPasswordSchema = z
-  .object({
-    confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-    password: z.string().min(12, "Password must be at least 12 characters"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+export const resetPasswordSchema = withPasswordConfirmation(
+  z.object({ confirmPassword: password, password }),
+  "password",
+);
 
-export const profileSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters").max(32),
-});
+export const profileSchema = z.object({ name });
 
-export const changeEmailSchema = z.object({
-  email: z.email("Invalid email address"),
-});
+export const changeEmailSchema = z.object({ email });
 
-export const changePasswordSchema = z
-  .object({
-    confirmPassword: z.string().min(12, "Password must be at least 12 characters"),
-    currentPassword: z.string().min(12, "Password must be at least 12 characters"),
-    newPassword: z.string().min(12, "Password must be at least 12 characters"),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+export const changePasswordSchema = withPasswordConfirmation(
+  z.object({ confirmPassword: password, currentPassword: password, newPassword: password }),
+  "newPassword",
+);
 
-export const deleteAccountSchema = z.object({
-  password: z.string().min(12, "Password must be at least 12 characters"),
-});
+export const deleteAccountSchema = z.object({ password });

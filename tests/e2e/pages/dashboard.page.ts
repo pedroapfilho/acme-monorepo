@@ -27,4 +27,8 @@ export class DashboardPage {
   expectUserEmailVisible = async () => {
     await expect(this.userEmail).toBeVisible();
   };
+
+  expectGreeting = async (name: string) => {
+    await expect(this.page.getByText(`Welcome back, ${name}`)).toBeVisible();
+  };
 }

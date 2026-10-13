@@ -12,5 +12,4 @@ const initApiLogger = (opts: { service: string }): void => {
 const honoEvlog = () => evlog();
 
 export { honoEvlog, initApiLogger };
-export { log } from "evlog";
 export type { EvlogVariables } from "evlog/hono";

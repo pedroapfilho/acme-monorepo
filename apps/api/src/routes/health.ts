@@ -1,5 +1,6 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import type { EvlogVariables } from "@repo/observability/hono";
+import { createRoute, z } from "@hono/zod-openapi";
+
+import { createRouter } from "@/lib/openapi";
 
 const healthRoute = createRoute({
   description: "Liveness probe; does not touch the database.",
@@ -51,7 +52,7 @@ const readyzRoute = createRoute({
 type CheckDatabase = () => Promise<void>;
 
 const createHealthRoutes = (checkDatabase: CheckDatabase) => {
-  const healthRoutes = new OpenAPIHono<{ Variables: EvlogVariables["Variables"] }>();
+  const healthRoutes = createRouter();
 
   healthRoutes.openapi(healthRoute, (c) =>
     c.json(

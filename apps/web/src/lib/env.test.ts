@@ -4,6 +4,7 @@ const VALID_ENV = {
   BETTER_AUTH_SECRET: "a".repeat(32),
   FROM_EMAIL: "noreply@acme.com",
   RESEND_API_KEY: "re_test",
+  WEB_APP_URL: "https://acme.web.localhost",
 };
 
 const loadGetEnv = async (overrides: Record<string, string | undefined> = {}) => {
@@ -42,6 +43,12 @@ describe("getEnv", () => {
     expect(getEnv().RESEND_API_KEY).toBeUndefined();
   });
 
+  it("treats an empty RESEND_API_KEY as unset", async () => {
+    const getEnv = await loadGetEnv({ RESEND_API_KEY: "" });
+
+    expect(getEnv().RESEND_API_KEY).toBeUndefined();
+  });
+
   it("throws when FROM_EMAIL is missing", async () => {
     const getEnv = await loadGetEnv({ FROM_EMAIL: undefined });
 
@@ -64,5 +71,17 @@ describe("getEnv", () => {
     const getEnv = await loadGetEnv({ BETTER_AUTH_SECRET: "short" });
 
     expect(() => getEnv()).toThrow(/BETTER_AUTH_SECRET/v);
+  });
+
+  it("throws when RESEND_API_KEY is set without WEB_APP_URL", async () => {
+    const getEnv = await loadGetEnv({ WEB_APP_URL: undefined });
+
+    expect(() => getEnv()).toThrow(/WEB_APP_URL/v);
+  });
+
+  it("allows a missing WEB_APP_URL when no mailer is configured", async () => {
+    const getEnv = await loadGetEnv({ RESEND_API_KEY: undefined, WEB_APP_URL: undefined });
+
+    expect(getEnv().RESEND_API_KEY).toBeUndefined();
   });
 });

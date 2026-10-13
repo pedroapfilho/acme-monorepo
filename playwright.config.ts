@@ -1,63 +1,36 @@
 /// <reference types="node" />
 
-import { execFileSync } from "node:child_process";
-
 import { defineConfig, devices } from "@playwright/test";
+import type { PlaywrightTestProject } from "@playwright/test";
+import { apps } from "@repo/portless-env/apps";
 
-const getPortlessUrl = (name: string) => {
-  if (process.env.CI) {
-    return undefined;
-  }
-  try {
-    return execFileSync("portless", ["get", name], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-  } catch {
-    return undefined;
-  }
-};
+import type { SessionOptions } from "./tests/e2e/fixtures/session";
+import { TEST_USER_STATE } from "./tests/e2e/fixtures/test-user";
+import { apiUrl, landingUrl, webUrl } from "./tests/e2e/urls";
 
-export const webUrl =
-  process.env.PLAYWRIGHT_WEB_URL ?? getPortlessUrl("acme.web") ?? "http://127.0.0.1:3000";
-export const apiUrl = getPortlessUrl("acme.api") ?? "http://127.0.0.1:4000";
-export const landingUrl = getPortlessUrl("acme.landing") ?? "http://127.0.0.1:3001";
+const emailDelivery = Boolean(process.env.RESEND_API_KEY);
 
-export default defineConfig({
+const browserProject = (
+  name: string,
+  device: keyof typeof devices,
+): PlaywrightTestProject<SessionOptions> => ({
+  dependencies: ["setup"],
+  grepInvert: emailDelivery ? /@no-email/ : /@email/,
+  name,
+  use: { ...devices[device], emailDelivery, storageState: TEST_USER_STATE },
+});
+
+export default defineConfig<SessionOptions>({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
   globalTeardown: "./tests/e2e/teardown/cleanup.ts",
 
   projects: [
     { name: "setup", testMatch: /.*\.setup\.ts/ },
-    {
-      dependencies: ["setup"],
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState: "tests/e2e/.auth/user.json",
-      },
-    },
+    browserProject("chromium", "Desktop Chrome"),
     ...(process.env.CI
       ? []
-      : [
-          {
-            dependencies: ["setup"],
-            name: "firefox",
-            use: {
-              ...devices["Desktop Firefox"],
-              storageState: "tests/e2e/.auth/user.json",
-            },
-          },
-          {
-            dependencies: ["setup"],
-            name: "webkit",
-            use: {
-              ...devices["Desktop Safari"],
-              storageState: "tests/e2e/.auth/user.json",
-            },
-          },
-        ]),
+      : [browserProject("firefox", "Desktop Firefox"), browserProject("webkit", "Desktop Safari")]),
   ],
 
   reporter: process.env.CI ? [["html", { open: "never" }]] : [["list"], ["html"]],
@@ -80,7 +53,7 @@ export default defineConfig({
           url: `${process.env.RESEND_BASE_URL}/emails`,
         },
         {
-          command: "node_modules/.bin/next start apps/web --port 3000",
+          command: `node_modules/.bin/next start apps/web --port ${apps.web.port}`,
           env: { PGAPPNAME: "acme:ci:web" },
           stderr: "pipe",
           stdout: "pipe",
@@ -96,7 +69,7 @@ export default defineConfig({
           url: `${apiUrl}/healthz`,
         },
         {
-          command: "node_modules/.bin/next start apps/landing --port 3001",
+          command: `node_modules/.bin/next start apps/landing --port ${apps.landing.port}`,
           env: { PGAPPNAME: "acme:ci:landing" },
           stderr: "pipe",
           stdout: "pipe",

@@ -5,10 +5,7 @@ import alias from "@rollup/plugin-alias";
 import { defineConfig } from "tsdown";
 import zodCompiler from "zod-compiler/rolldown";
 
-applyPortlessUrls({
-  CORS_ORIGINS: ["acme.web", "acme.landing"],
-  WEB_APP_URL: ["acme.web"],
-});
+applyPortlessUrls(["CORS_ORIGINS", "WEB_APP_URL"]);
 
 const srcDir = path.resolve(process.cwd(), "src");
 
@@ -17,12 +14,13 @@ export default defineConfig({
   deps: {
     alwaysBundle: [
       "@repo/auth",
+      "@repo/auth/env-config",
       "@repo/auth/server",
       "@repo/db",
       "@repo/observability",
       "@repo/observability/auth",
       "@repo/observability/hono",
-      "@repo/transactional",
+      "@repo/portless-env/apps",
     ],
   },
   entry: ["src/index.ts"],

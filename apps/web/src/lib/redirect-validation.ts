@@ -27,4 +27,9 @@ const safeRedirectPath = (value: string | null | undefined): string => {
   return value;
 };
 
-export { safeRedirectPath };
+const authPageHref = (page: "/login" | "/register", from: string | null | undefined): string => {
+  const destination = safeRedirectPath(from);
+  return destination === FALLBACK_PATH ? page : `${page}?from=${encodeURIComponent(destination)}`;
+};
+
+export { authPageHref, safeRedirectPath };

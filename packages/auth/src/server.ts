@@ -1,47 +1,54 @@
 import type { PrismaClient } from "@repo/db";
 import { log } from "@repo/observability";
-import type { MailerConfig, TransactionalEmail } from "@repo/transactional";
-import { sendTransactionalEmail } from "@repo/transactional";
+import { loopbackUrl } from "@repo/portless-env/apps";
+import type { Mailer, TransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
-import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth/types";
+import type { BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
 
 const COOKIE_PREFIX = "acme";
 
 type AuthConfig = {
   allowedHosts: Array<string>;
+  database: DBAdapterInstance;
   extraPlugins?: Array<BetterAuthPlugin>;
-  fromEmail: string;
-  prisma: PrismaClient;
+  mailer?: Mailer;
   rateLimitEnabled?: boolean;
-  resendApiKey?: string;
   secret: string;
   trustedOrigins?: Array<string>;
   useSecureCookies?: boolean;
+  webAppUrl?: string;
+};
+
+const prismaDatabase = (prisma: PrismaClient) => prismaAdapter(prisma, { provider: "postgresql" });
+
+const signUpAttemptLinks = (webAppUrl: string | undefined) => {
+  if (webAppUrl === undefined) {
+    throw new Error("createAuth: a mailer needs webAppUrl to link emails back to the web app");
+  }
+  return {
+    resetPasswordUrl: new URL("/recover", webAppUrl).href,
+    signInUrl: new URL("/login", webAppUrl).href,
+  };
 };
 
 const createAuth = (config: AuthConfig) => {
   const {
     allowedHosts,
+    database,
     extraPlugins = [],
-    fromEmail,
-    prisma,
+    mailer,
     rateLimitEnabled = false,
-    resendApiKey,
     secret,
     trustedOrigins = [],
     useSecureCookies = false,
+    webAppUrl,
   } = config;
 
-  const mailer: MailerConfig | null =
-    resendApiKey !== undefined && resendApiKey !== ""
-      ? { apiKey: resendApiKey, from: fromEmail }
-      : null;
+  const links = mailer && signUpAttemptLinks(webAppUrl);
 
-  // "log" is load-bearing for onExistingUserSignUp: Better Auth runs that hook on a background path
-  // where a throw escapes into the sign-up response instead of failing the send.
   const deliver = async (
     email: TransactionalEmail,
     onFailure: { message: string; mode: "log" | "throw" },
@@ -49,7 +56,7 @@ const createAuth = (config: AuthConfig) => {
     if (!mailer) {
       return;
     }
-    const result = await sendTransactionalEmail(email, mailer);
+    const result = await mailer(email);
     if (result.ok) {
       return;
     }
@@ -59,29 +66,7 @@ const createAuth = (config: AuthConfig) => {
     log.error({ error: result.error, message: onFailure.message });
   };
 
-  const emailVerification: NonNullable<BetterAuthOptions["emailVerification"]> & {
-    callbackURL: string;
-  } = {
-    autoSignInAfterVerification: true,
-    callbackURL: "/",
-    sendOnSignIn: true,
-  };
-  if (mailer) {
-    emailVerification.sendVerificationEmail = async ({ url, user }) => {
-      await deliver(
-        {
-          type: "welcome",
-          userEmail: user.email,
-          userId: user.id,
-          username: user.name,
-          verificationUrl: url,
-        },
-        { message: "Failed to send verification email", mode: "throw" },
-      );
-    };
-  }
-
-  return betterAuth({
+  const auth = betterAuth({
     account: {
       accountLinking: {
         enabled: true,
@@ -102,32 +87,31 @@ const createAuth = (config: AuthConfig) => {
 
     baseURL: {
       allowedHosts,
-      fallback: "http://localhost:4000",
+      fallback: loopbackUrl("api", "localhost"),
       protocol: "auto",
     },
 
-    database: prismaAdapter(prisma, {
-      provider: "postgresql",
-    }),
+    database,
 
     emailAndPassword: {
       enabled: true,
       maxPasswordLength: 128,
       minPasswordLength: 12,
-      onExistingUserSignUp: async ({ user }, request) => {
-        const origin = request?.headers.get("origin") ?? "";
-        await deliver(
-          {
-            resetPasswordUrl: `${origin}/recover`,
-            signInUrl: `${origin}/login`,
-            type: "sign-up-attempt",
-            userEmail: user.email,
-            userId: user.id,
-            username: user.name,
-          },
-          { message: "Auth: failed to send sign-up attempt email", mode: "log" },
-        );
-      },
+      // A failed notice must not fail the sign-up: the generic response is what hides that the email is registered.
+      onExistingUserSignUp:
+        links &&
+        (async ({ user }) => {
+          await deliver(
+            {
+              ...links,
+              type: "sign-up-attempt",
+              userEmail: user.email,
+              userId: user.id,
+              username: user.name,
+            },
+            { message: "Auth: failed to send sign-up attempt email", mode: "log" },
+          );
+        }),
       requireEmailVerification: Boolean(mailer),
       sendResetPassword: async ({ url, user }) => {
         await deliver(
@@ -143,7 +127,24 @@ const createAuth = (config: AuthConfig) => {
       },
     },
 
-    emailVerification,
+    emailVerification: {
+      autoSignInAfterVerification: true,
+      sendOnSignIn: true,
+      sendVerificationEmail:
+        mailer &&
+        (async ({ url, user }) => {
+          await deliver(
+            {
+              type: "welcome",
+              userEmail: user.email,
+              userId: user.id,
+              username: user.name,
+              verificationUrl: url,
+            },
+            { message: "Failed to send verification email", mode: "throw" },
+          );
+        }),
+    },
 
     plugins: [username(), bearer(), ...extraPlugins],
 
@@ -195,9 +196,11 @@ const createAuth = (config: AuthConfig) => {
       },
     },
   });
+
+  return { ...auth, canSendEmail: mailer !== undefined };
 };
 
 type Auth = ReturnType<typeof createAuth>;
 
-export { COOKIE_PREFIX, createAuth };
+export { COOKIE_PREFIX, createAuth, prismaDatabase };
 export type { Auth, AuthConfig };

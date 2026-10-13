@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { landingUrl } from "../../../playwright.config";
+import { landingUrl } from "../urls";
 
 test.use({ storageState: { cookies: [], origins: [] } });
 

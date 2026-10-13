@@ -1,17 +1,12 @@
-import crypto from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 import type { TestInfo } from "@playwright/test";
 
-// Resend `delivered+<label>@resend.dev` simulates delivery without reputation cost; slice GITHUB_RUN_ID to 8 chars so the change-email `new-` prefix stays under RFC 5321's 64-char local-part limit.
+// Resend delivers `delivered+<label>@resend.dev` without reputation cost; the short slug keeps a
+// change-email `new-` label inside RFC 5321's 64-character local part.
 const makeTestEmail = (info: TestInfo): string => {
   const slug = info.title.replaceAll(/\W+/gv, "-").toLowerCase().slice(0, 28);
-  const run = (process.env.GITHUB_RUN_ID ?? crypto.randomBytes(4).toString("hex")).slice(-8);
-  return `delivered+${run}-${info.retry}-${slug}@resend.dev`;
+  return `delivered+${randomBytes(4).toString("hex")}-${slug}@resend.dev`;
 };
 
-const makeTestUsername = (email: string): string => {
-  const hash = crypto.createHash("sha256").update(email).digest("hex").slice(0, 16);
-  return `e2e_${hash}`;
-};
-
-export { makeTestEmail, makeTestUsername };
+export { makeTestEmail };
