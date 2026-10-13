@@ -3,7 +3,9 @@
 import { Button } from "@repo/ui/components/button";
 import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
+import { ClientReadyForm } from "@repo/ui/compositions/client-ready-form";
 import { FormFieldError } from "@repo/ui/compositions/form-field-error";
+import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import {
   createFormHook,
   createFormHookContexts,
@@ -228,7 +230,7 @@ const LiveRegion = ({ message }: { message: string | null }) => (
 );
 
 const AuthForm = ({ children, submission }: { children: ReactNode; submission: Submission }) => (
-  <form
+  <ClientReadyForm
     noValidate
     onSubmit={(event) => {
       event.preventDefault();
@@ -242,7 +244,7 @@ const AuthForm = ({ children, submission }: { children: ReactNode; submission: S
         <FieldGroup>{children}</FieldGroup>
       </RequiredFieldsContext>
     </PendingContext>
-  </form>
+  </ClientReadyForm>
 );
 
 type BusyButtonProps = ComponentProps<typeof Button> & { isPending: boolean; pendingLabel: string };
@@ -273,12 +275,14 @@ const AuthActionButton = <TData,>({
     fallbackError,
     onSuccess,
   });
+  const ready = useClientReady();
 
   return (
     <>
       <LiveRegion message={errorMessage} />
       <BusyButton
         {...props}
+        disabled={!ready || isPending}
         isPending={isPending}
         onClick={() => {
           void attempt(perform);
