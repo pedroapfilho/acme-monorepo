@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import {
   AppRouterContext,
   type AppRouterInstance,
@@ -30,7 +30,7 @@ const respondToAuthRequests = (status: number, response: AuthResponseBody) => {
   return requests;
 };
 
-const renderWithRouter = (ui: ReactNode) => {
+const renderWithRouter = async (ui: ReactNode) => {
   const router = {
     back: vi.fn<() => void>(),
     bfcacheId: "test",
@@ -40,7 +40,10 @@ const renderWithRouter = (ui: ReactNode) => {
     refresh: vi.fn<() => void>(),
     replace: vi.fn<(href: string) => void>(),
   } satisfies AppRouterInstance;
-  render(<AppRouterContext value={router}>{ui}</AppRouterContext>);
+  // Awaiting act lets components that suspend on `use(searchParams)` resolve before the test queries.
+  await act(() =>
+    Promise.resolve(render(<AppRouterContext value={router}>{ui}</AppRouterContext>)),
+  );
   return router;
 };
 

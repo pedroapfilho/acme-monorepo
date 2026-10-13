@@ -7,7 +7,7 @@ import RegisterForm from "./form";
 
 it.each([null, ""])("asks for email verification when the session token is %s", async (token) => {
   const requests = respondToAuthRequests(200, { token, user: { id: "user-1" } });
-  const router = renderWithRouter(
+  const router = await renderWithRouter(
     <RegisterForm searchParams={Promise.resolve({ from: "/billing" })} />,
   );
 

@@ -9,7 +9,7 @@ import LoginForm from "./form";
 it("asks for email verification instead of reporting an unverified sign-in as an error", async () => {
   const showToast = vi.spyOn(toast, "error");
   respondToAuthRequests(403, { code: "EMAIL_NOT_VERIFIED", message: "Email not verified" });
-  const router = renderWithRouter(<LoginForm searchParams={Promise.resolve({})} />);
+  const router = await renderWithRouter(<LoginForm searchParams={Promise.resolve({})} />);
 
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "user@example.com" } });
   fireEvent.change(screen.getByLabelText("Password"), {

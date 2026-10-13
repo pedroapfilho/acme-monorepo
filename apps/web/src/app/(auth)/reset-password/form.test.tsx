@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { toast } from "sonner";
 import { describe, expect, it, vi } from "vitest";
 
@@ -6,13 +6,8 @@ import { renderWithRouter, respondToAuthRequests } from "@/lib/test-helpers";
 
 import ResetPasswordForm from "./form";
 
-const renderForm = async (params: { error?: string; token?: string }) => {
-  const searchParams = Promise.resolve(params);
-  await act(async () => {
-    renderWithRouter(<ResetPasswordForm searchParams={searchParams} />);
-    await searchParams;
-  });
-};
+const renderForm = (params: { error?: string; token?: string }) =>
+  renderWithRouter(<ResetPasswordForm searchParams={Promise.resolve(params)} />);
 
 const expectInvalidLinkState = () => {
   expect(screen.getByRole("heading", { name: "Reset link invalid" })).not.toBeNull();

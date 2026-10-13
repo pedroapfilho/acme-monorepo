@@ -1,12 +1,13 @@
 import { test, expect } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
+import { makeTestEmail } from "../helpers/test-email";
 
 test.describe("Register", () => {
   test(
     "registers with valid data",
     { tag: "@no-email" },
-    async ({ dashboardPage, page, registerPage }) => {
-      const uniqueEmail = `test-${Date.now()}@example.com`;
+    async ({ dashboardPage, page, registerPage }, testInfo) => {
+      const uniqueEmail = makeTestEmail(testInfo);
 
       await page.context().clearCookies();
 

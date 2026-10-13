@@ -87,6 +87,11 @@ jobs:
       - name: Install Playwright browsers and system deps
         run: pnpm exec playwright install --with-deps chromium
       - run: node .github/ci/ci.mjs run e2e -- pnpm test:e2e
+      - name: Run the no-mailer specs
+        run: node .github/ci/ci.mjs run e2e -- pnpm test:e2e --grep @no-email
+        env:
+          RESEND_API_KEY: ""
+          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/no-email
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ !cancelled() }}
         with:
