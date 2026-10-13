@@ -9,8 +9,8 @@ import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import {
   createFormHook,
   createFormHookContexts,
-  revalidateLogic,
   type StandardSchemaV1,
+  useSelector,
 } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import {
@@ -130,7 +130,8 @@ const TextField = ({ autoComplete, id, label, labelAction, placeholder }: TextFi
   const field = useFieldContext<string>();
   const isPending = use(PendingContext);
   const requiredFields = use(RequiredFieldsContext);
-  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+  const isSubmitted = useSelector(field.form.store, (state) => state.submissionAttempts > 0);
+  const isInvalid = !field.state.meta.isValid && (field.state.meta.isBlurred || isSubmitted);
   const inputId = id ?? field.name;
   const errorId = `${inputId}-error`;
   const fieldLabel = <FieldLabel htmlFor={inputId}>{label}</FieldLabel>;
@@ -196,14 +197,13 @@ const useAuthForm = <TValues, TData>({
     defaultValues,
     onSubmit: ({ value }) => perform(value),
     onSubmitInvalid: ({ formApi }) => {
-      const error = formApi.state.errorMap.onDynamic;
+      const error = formApi.state.errorMap.onChange;
       if (error instanceof Error) {
         showUnexpectedError(error);
       }
     },
-    validationLogic: revalidateLogic({ mode: "blur" }),
     // Zod returns a rejected promise when a refinement throws, even for synchronous schemas.
-    validators: { onDynamicAsync: schema },
+    validators: { onChangeAsync: schema },
   });
 
   const submission = {

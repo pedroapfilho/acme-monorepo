@@ -194,6 +194,21 @@ describe("useAuthForm", () => {
     });
   });
 
+  it("keeps a field's errors hidden while typing until that field blurs or the form submits", async () => {
+    render(<Harness />);
+    type("Email", "user@example.com");
+    fireEvent.blur(screen.getByLabelText("Email"));
+    await settle();
+
+    type("Password", "c");
+    await settle();
+    expect(screen.queryByText("Too short")).toBeNull();
+    expect(screen.getByLabelText("Password").getAttribute("aria-invalid")).toBe("false");
+
+    fireEvent.blur(screen.getByLabelText("Password"));
+    expect(await screen.findByText("Too short")).not.toBeNull();
+  });
+
   it("revalidates a fixed blur error on the first Enter submission", async () => {
     call.mockImplementation(succeed);
     render(<Harness />);
@@ -327,12 +342,13 @@ describe("useAuthForm", () => {
 
   it("stays submittable after a validator throws", async () => {
     const throwingOnce = schema.clone();
-    vi.spyOn(throwingOnce["~standard"], "validate").mockImplementationOnce(() => {
-      throw new Error("validator exploded");
-    });
     call.mockImplementation(succeed);
     render(<Harness validator={throwingOnce} />);
     fillValid();
+    await settle();
+    vi.spyOn(throwingOnce["~standard"], "validate").mockImplementationOnce(() => {
+      throw new Error("validator exploded");
+    });
 
     await submit();
 

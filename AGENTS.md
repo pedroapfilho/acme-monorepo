@@ -93,9 +93,9 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 ### Forms
 
 - **@tanstack/react-form** (NOT react-hook-form). Auth forms use `useAuthForm`, `AuthForm` and `SubmitButton` from `apps/web/src/components/auth-form.tsx`; auth buttons use `AuthActionButton` from the same module. It owns the double-submit latch, Better Auth error reporting and the busy state.
-- Pass the Zod schema directly to `validators: { onDynamicAsync: schema }` with `validationLogic: revalidateLogic({ mode: "blur" })`. Before the first submit, validate on blur, not while typing; after it, validate on every change so errors clear as values are fixed. Every submit revalidates, including Enter with a stale blur error. The async validator handles throwing Zod refinements; `form.validate("submit")` refreshes errors before `form.handleSubmit()` checks whether submission is allowed.
+- Pass the Zod schema directly to `validators: { onChangeAsync: schema }`. Every change revalidates the whole form, so no field ever shows a stale error, and TanStack runs the same validator on submit. `form.validate("submit")` refreshes errors before `form.handleSubmit()` checks whether submission is allowed, and the async validator turns a throwing Zod refinement into a field error.
 - Schemas are the single source of validation: no HTML `required` or `minLength`; keep `noValidate` on the form, `type="email"` for keyboard hints, and `type="submit"` on submit buttons. Derive `aria-required` from the field schema and subscribe to form-derived state through `form.useStore()`.
-- Render errors via `field.state.meta.isTouched && !field.state.meta.isValid`. `field.TextField` does this; call sites pass a label and an `autoComplete` purpose.
+- Render errors via `!field.state.meta.isValid && (field.state.meta.isBlurred || submitted)`, where `submitted` reads `submissionAttempts > 0` from the form store: a field shows its errors once the user leaves it or submits, never while they first type into it. `field.TextField` does this; call sites pass a label and an `autoComplete` purpose.
 - Field primitives from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`.
 - **Never** put `field` in a `useEffect` / `useCallback` dependency array; it's a new object every render. Use `field.form.setFieldValue(field.name, value)` with stable refs.
 
