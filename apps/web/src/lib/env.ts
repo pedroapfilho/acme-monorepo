@@ -1,16 +1,22 @@
+import { webAppUrl } from "@repo/auth/env-config";
 import { senderAddressSchema } from "@repo/transactional/sender-address";
 import { z } from "zod";
 
-const envSchema = z.object({
-  BETTER_AUTH_SECRET: z
-    .string()
-    .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
-  FROM_EMAIL: senderAddressSchema,
-  RESEND_API_KEY: z
-    .string()
-    .optional()
-    .transform((key) => (key === "" ? undefined : key)),
-});
+const envSchema = z
+  .object({
+    BETTER_AUTH_SECRET: z
+      .string()
+      .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
+    FROM_EMAIL: senderAddressSchema,
+    RESEND_API_KEY: z
+      .string()
+      .optional()
+      .transform((key) => (key === "" ? undefined : key)),
+  })
+  .refine((env) => env.RESEND_API_KEY === undefined || webAppUrl() !== undefined, {
+    message: "WEB_APP_URL is required when RESEND_API_KEY is set; emailed links are built from it",
+    path: ["WEB_APP_URL"],
+  });
 
 type Env = z.infer<typeof envSchema>;
 
