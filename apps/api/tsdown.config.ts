@@ -14,11 +14,13 @@ export default defineConfig({
   deps: {
     alwaysBundle: [
       "@repo/auth",
+      "@repo/auth/env-config",
       "@repo/auth/server",
       "@repo/db",
       "@repo/observability",
       "@repo/observability/auth",
       "@repo/observability/hono",
+      "@repo/portless-env/apps",
     ],
   },
   entry: ["src/index.ts"],

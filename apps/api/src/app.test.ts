@@ -74,7 +74,7 @@ const setup = (overrides: Partial<AppDeps> = {}) => {
     getSession,
     isProduction: false,
     sessionCookieName: "__Secure-acme.session_token",
-    trustProxy: false,
+    trustedProxyHops: 0,
     users,
     ...overrides,
   });
@@ -416,7 +416,7 @@ describe("createApp", () => {
     });
 
     it("keys on the address a trusted proxy appended, not on client-supplied entries", async () => {
-      const { request } = setup({ trustProxy: true });
+      const { request } = setup({ trustedProxyHops: 1 });
 
       await exhaust(request, (attempt) => `10.0.0.${attempt}, 198.51.100.7`);
       const limited = await request("/api/v1/users/me", {
@@ -429,9 +429,44 @@ describe("createApp", () => {
       expect(limited.status).toBe(429);
       expect(otherClient.status).toBe(200);
     });
+
+    it("keys on the address the outermost of two trusted proxies appended", async () => {
+      const { request } = setup({ trustedProxyHops: 2 });
+
+      await exhaust(request, (attempt) => `10.0.0.${attempt}, 198.51.100.7, 192.0.2.1`);
+      const limited = await request("/api/v1/users/me", {
+        headers: { ...signedIn, "X-Forwarded-For": "198.51.100.7, 192.0.2.2" },
+      });
+      const otherClient = await request("/api/v1/users/me", {
+        headers: { ...signedIn, "X-Forwarded-For": "198.51.100.8, 192.0.2.1" },
+      });
+
+      expect(limited.status).toBe(429);
+      expect(otherClient.status).toBe(200);
+    });
+
+    it("falls back to the socket address when fewer proxies appended than are trusted", async () => {
+      const { request } = setup({ trustedProxyHops: 2 });
+
+      await exhaust(request, (attempt) => `198.51.100.${attempt}`);
+      const limited = await request("/api/v1/users/me", {
+        headers: { ...signedIn, "X-Forwarded-For": "198.51.100.250" },
+      });
+
+      expect(limited.status).toBe(429);
+    });
   });
 
   describe("OpenAPI document", () => {
+    it("serves the Scalar page without the api's script-blocking CSP", async () => {
+      const { request } = setup();
+
+      const res = await request("/docs");
+
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-security-policy")).toBeNull();
+    });
+
     it("declares session security and the shared error envelope on authenticated routes", async () => {
       const { request } = setup();
 

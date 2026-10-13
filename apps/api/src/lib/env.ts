@@ -10,8 +10,8 @@ export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   HOST: z.string().default("0.0.0.0"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  PORT: z.string().default(String(apps.api.port)),
-  TRUST_PROXY: z.stringbool().default(false),
+  PORT: z.coerce.number().int().positive().default(apps.api.port),
+  TRUSTED_PROXY_HOPS: z.coerce.number().int().nonnegative().default(0),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

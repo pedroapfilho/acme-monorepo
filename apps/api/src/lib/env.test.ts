@@ -20,7 +20,7 @@ describe("envSchema", () => {
     const result = envSchema.safeParse(validEnv);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.PORT).toBe("4000");
+      expect(result.data.PORT).toBe(4000);
       expect(result.data.HOST).toBe("0.0.0.0");
       expect(result.data.NODE_ENV).toBe("development");
       expect(result.data.CORS_ORIGINS).toBe(
@@ -70,8 +70,15 @@ describe("envSchema", () => {
     }
   });
 
-  it("should not trust forwarded client addresses unless TRUST_PROXY is set", () => {
-    expect(envSchema.parse(validEnv).TRUST_PROXY).toBe(false);
-    expect(envSchema.parse({ ...validEnv, TRUST_PROXY: "true" }).TRUST_PROXY).toBe(true);
+  it("should not trust forwarded client addresses unless TRUSTED_PROXY_HOPS is set", () => {
+    expect(envSchema.parse(validEnv).TRUSTED_PROXY_HOPS).toBe(0);
+    expect(envSchema.parse({ ...validEnv, TRUSTED_PROXY_HOPS: "2" }).TRUSTED_PROXY_HOPS).toBe(2);
+    expect(envSchema.safeParse({ ...validEnv, TRUSTED_PROXY_HOPS: "true" }).success).toBe(false);
+  });
+
+  it("should reject a PORT that is empty or not a port number", () => {
+    for (const port of ["", "abc", "-1"]) {
+      expect(envSchema.safeParse({ ...validEnv, PORT: port }).success).toBe(false);
+    }
   });
 });

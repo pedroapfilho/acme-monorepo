@@ -41,10 +41,15 @@ const requestSizeLimit = bodyLimit({
   },
 });
 
-const clientAddress = (c: Context, trustProxy: boolean): string => {
-  if (trustProxy) {
-    const proxiedAddress = c.req.header("x-forwarded-for")?.split(",").at(-1)?.trim();
-    if (proxiedAddress !== undefined && proxiedAddress !== "") {
+const clientAddress = (c: Context, trustedProxyHops: number): string => {
+  if (trustedProxyHops > 0) {
+    const forwarded = c.req.header("x-forwarded-for")?.split(",") ?? [];
+    const proxiedAddress = forwarded.at(-trustedProxyHops)?.trim();
+    if (
+      forwarded.length >= trustedProxyHops &&
+      proxiedAddress !== undefined &&
+      proxiedAddress !== ""
+    ) {
       return proxiedAddress;
     }
   }
@@ -60,13 +65,13 @@ type RateLimitOptions = {
 };
 
 const createRateLimit =
-  (trustProxy: boolean) =>
+  (trustedProxyHops: number) =>
   ({ code, limit, message, windowMs }: RateLimitOptions) =>
     rateLimiter({
       handler: () => {
         throw new AppError(message, code, 429);
       },
-      keyGenerator: (c) => clientAddress(c, trustProxy),
+      keyGenerator: (c) => clientAddress(c, trustedProxyHops),
       limit,
       standardHeaders: "draft-6",
       windowMs,

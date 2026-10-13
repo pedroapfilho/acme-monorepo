@@ -44,7 +44,7 @@ const fixture = async () => {
     getSession: auth.api.getSession,
     isProduction: true,
     sessionCookieName: getCookies(auth.options).sessionToken.name,
-    trustProxy: false,
+    trustedProxyHops: 0,
     users: {
       ...createUserStore(auth, prisma),
       find: (id) => {

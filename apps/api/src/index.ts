@@ -23,24 +23,22 @@ const app = createApp({
   getSession: auth.api.getSession,
   isProduction: env.NODE_ENV === "production",
   sessionCookieName: getCookies(auth.options).sessionToken.name,
-  trustProxy: env.TRUST_PROXY,
+  trustedProxyHops: env.TRUSTED_PROXY_HOPS,
   users: createUserStore(auth, prisma),
 });
-
-const port = Number(env.PORT);
 
 log.info({
   cors: env.CORS_ORIGINS,
   env: env.NODE_ENV,
   hostname: env.HOST,
   message: "Starting server",
-  port,
+  port: env.PORT,
 });
 
 const server = serve({
   fetch: app.fetch,
   hostname: env.HOST,
-  port,
+  port: env.PORT,
 });
 
 const SHUTDOWN_SIGNALS = ["SIGINT", "SIGTERM"] as const;

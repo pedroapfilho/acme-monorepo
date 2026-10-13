@@ -30,17 +30,22 @@ type AppDeps = {
   getSession: SessionLookup;
   isProduction: boolean;
   sessionCookieName: string;
-  trustProxy: boolean;
+  trustedProxyHops: number;
   users: UserStore;
 };
 
 const createApp = (deps: AppDeps) => {
   const app = createRouter();
-  const rateLimit = createRateLimit(deps.trustProxy);
+  const rateLimit = createRateLimit(deps.trustedProxyHops);
   const authenticated = createSessionAuth(app.openAPIRegistry, {
     cookieName: deps.sessionCookieName,
     getSession: deps.getSession,
   });
+
+  // Registered before the middleware so the Scalar page loads its CDN bundle outside the strict CSP.
+  // 3.0.0, not 3.1.0: external generators still reject 3.1's nullable/examples encoding.
+  app.doc("/openapi.json", { ...apiDocumentMetadata, openapi: "3.0.0" });
+  app.get("/docs", Scalar({ url: "/openapi.json" }));
 
   app.use(requestId());
   app.use(honoEvlog());
@@ -77,16 +82,12 @@ const createApp = (deps: AppDeps) => {
   app.route("/", createHealthRoutes(deps.checkDatabase));
   app.route("/api/v1/users", createV1UserRoutes({ authenticated, users: deps.users }));
 
-  // 3.0.0, not 3.1.0: external generators still reject 3.1's nullable/examples encoding.
-  app.doc("/openapi.json", { ...apiDocumentMetadata, openapi: "3.0.0" });
-  app.get("/docs", Scalar({ url: "/openapi.json" }));
-
-  let llmsMarkdown: Promise<string> | undefined;
+  let llmsMarkdown: string | undefined;
   app.get("/llms.txt", async (c) => {
-    llmsMarkdown ??= createMarkdownFromOpenApi(
+    llmsMarkdown ??= await createMarkdownFromOpenApi(
       JSON.stringify(app.getOpenAPI31Document({ ...apiDocumentMetadata, openapi: "3.1.0" })),
     );
-    return c.text(await llmsMarkdown);
+    return c.text(llmsMarkdown);
   });
 
   app.notFound(notFound);
