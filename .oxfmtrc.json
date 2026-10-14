@@ -27,6 +27,7 @@
     "preserveWhitespace": false
   },
   "ignorePatterns": [
+    ".agents/friction-log/**",
     ".context/**",
     "dist/**",
     ".next/**",
