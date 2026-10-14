@@ -4,6 +4,14 @@ Guidance for AI coding agents working in `acme`, the template monorepo and sourc
 
 Project conventions and defaults live in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md).
 
+## Friction Log
+
+- Log papercuts and friction (tooling, docs, APIs, tests, conventions) as you hit them with `npx frog log`.
+- Do not add global, system, or internal friction.
+- Run `npx frog list` first to see what is already known.
+
+Entries live in `.agents/friction-log/`, one directory each. A GitHub Action reports them as issues and deletes the entry once the issue closes, so anything still in that directory is still outstanding.
+
 ## Stack
 
 - **Framework:** Next.js 16 (App Router, Turbopack dev), Hono on Node 24
