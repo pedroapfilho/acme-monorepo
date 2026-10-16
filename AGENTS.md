@@ -184,7 +184,7 @@ Three workflows are checked in: `check.yml` (one job running the secret scan, fo
 ## References
 
 - Conventions: [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md)
-- Keel (cross-repo standards + checks): `~/dev/standy`
+- standy (cross-repo standards + checks): `~/dev/standy`
 - Portless: <https://www.npmjs.com/package/portless>
 - Better Auth: <https://www.better-auth.com>
 - Turborepo: <https://turborepo.com>
