@@ -17,8 +17,10 @@ const FormFieldError = ({ errors, ...props }: FormFieldErrorProps) => {
     if (typeof error === "object" && "message" in error && typeof error.message === "string") {
       return [{ message: error.message }];
     }
-    // oxlint-disable-next-line typescript/no-base-to-string -- TanStack validators may return arbitrary values; String also handles BigInt and symbols without throwing.
-    return [{ message: String(error) }];
+    if (typeof error === "number" || typeof error === "bigint" || typeof error === "boolean") {
+      return [{ message: String(error) }];
+    }
+    return [];
   });
 
   return <FieldError errors={messages} {...props} />;
