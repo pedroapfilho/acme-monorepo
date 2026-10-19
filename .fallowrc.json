@@ -13,6 +13,7 @@
   "ignorePatterns": ["tests/e2e/setup/auth.setup.ts", ".github/ci/*.mjs"],
   "ignoreDependencies": [
     "eslint-plugin-*",
+    "@shadcn/lint",
     "better-auth",
     "hono",
     "@tailwindcss/postcss",

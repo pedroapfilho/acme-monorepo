@@ -6,19 +6,22 @@ type FormFieldErrorProps = Omit<ComponentProps<typeof FieldError>, "errors"> & {
   errors?: Array<unknown>;
 };
 
+const PRINTABLE_TYPES = new Set(["string", "number", "bigint", "boolean"]);
+
 const FormFieldError = ({ errors, ...props }: FormFieldErrorProps) => {
   const messages = errors?.flatMap((error) => {
-    if (error === undefined || error === null) {
-      return [];
+    if (PRINTABLE_TYPES.has(typeof error)) {
+      return [{ message: String(error) }];
     }
-    if (typeof error === "string") {
-      return [{ message: error }];
-    }
-    if (typeof error === "object" && "message" in error && typeof error.message === "string") {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string"
+    ) {
       return [{ message: error.message }];
     }
-    // oxlint-disable-next-line typescript/no-base-to-string -- TanStack validators may return arbitrary values; String also handles BigInt and symbols without throwing.
-    return [{ message: String(error) }];
+    return [];
   });
 
   return <FieldError errors={messages} {...props} />;
