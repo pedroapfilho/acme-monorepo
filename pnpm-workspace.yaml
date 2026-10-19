@@ -79,3 +79,8 @@ minimumReleaseAgeExclude:
   - oxlint@1.79.0
   - cn@0.2.4
   - "@shadcn/lint@0.1.0"
+
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - prisma@7.10.0
+  - semver@6.3.1
