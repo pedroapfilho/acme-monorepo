@@ -56,6 +56,9 @@ jobs:
       - name: Check dead code
         if: ${{ !cancelled() }}
         run: node .github/ci/ci.mjs run lint -- pnpm fallow:dead
+      - name: Audit changed code
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run lint -- pnpm fallow:audit
       - name: Check shadcn components
         if: ${{ !cancelled() }}
         run: node .github/ci/ci.mjs run lint -- pnpm check:shadcn
@@ -68,6 +71,17 @@ jobs:
       - name: Unit tests
         if: ${{ !cancelled() }}
         run: node .github/ci/ci.mjs run test -- pnpm test
+      - name: Install zizmor
+        if: ${{ !cancelled() }}
+        env:
+          ZIZMOR_VERSION: 1.31.1
+        run: |
+          curl -sSfL "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar -xz -C /usr/local/bin zizmor
+          zizmor --version
+      - name: Audit workflows
+        if: ${{ !cancelled() }}
+        run: node .github/ci/ci.mjs run lint -- zizmor --offline --format github .github
       - name: Audit dependencies
         if: ${{ !cancelled() && github.event_name != 'pull_request' }}
         run: node .github/ci/ci.mjs run lint -- pnpm audit --audit-level=high
