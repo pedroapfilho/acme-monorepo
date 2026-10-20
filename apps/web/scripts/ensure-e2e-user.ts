@@ -6,16 +6,10 @@ import { getEnv } from "@/lib/env";
 
 import { TEST_USER } from "../../../tests/e2e/fixtures/test-user";
 
-const main = async () => {
-  const dbUrl = process.env.DATABASE_URL ?? "";
-  const isLocal =
-    (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) &&
-    (dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1"));
-  if (!isLocal) {
-    throw new Error(
-      `Refusing to run ensure-e2e-user.ts against non-local DATABASE_URL (${dbUrl}).`,
-    );
-  }
+import { assertLocalDatabaseUrl } from "./e2e-database";
+
+const ensureE2eUser = async () => {
+  assertLocalDatabaseUrl(process.env.DATABASE_URL ?? "");
 
   // No mailer: sign-up then neither requires verification nor sends mail to the unroutable address.
   const auth = createAuth({
@@ -32,4 +26,4 @@ const main = async () => {
   await prisma.$disconnect();
 };
 
-await main();
+await ensureE2eUser();
