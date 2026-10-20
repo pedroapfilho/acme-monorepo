@@ -1,17 +1,16 @@
 import { expect, test } from "../fixtures/auth.fixture";
-import { newCredentials, signIn, signUp } from "../fixtures/session";
+import { signIn } from "../fixtures/session";
 import { verificationLink } from "../fixtures/verification.fixture";
 import { DashboardPage } from "../pages/dashboard.page";
 
 test.describe("Sign-up email verification", { tag: "@email" }, () => {
   test("verify email is sent, clicking the link signs in the clicking device", async ({
     browser,
+    createAccount,
     request,
-  }, testInfo) => {
+  }) => {
     const sinceMs = Date.now();
-    const credentials = newCredentials(testInfo);
-
-    await expect(await signUp(request, credentials)).toBeOK();
+    const credentials = await createAccount();
     await expect(await signIn(request, credentials)).not.toBeOK();
 
     const link = await verificationLink({ sinceMs, subject: /verify/iv, to: credentials.email });

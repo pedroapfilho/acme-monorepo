@@ -1,20 +1,18 @@
 import { test, expect } from "../fixtures/auth.fixture";
 import { TEST_USER } from "../fixtures/test-user";
-import { makeTestEmail } from "../helpers/test-email";
 
 test.describe("Register", () => {
   test(
     "registers with valid data",
     { tag: "@no-email" },
-    async ({ dashboardPage, page, registerPage }, testInfo) => {
-      const uniqueEmail = makeTestEmail(testInfo);
-
+    async ({ createAccount, dashboardPage, page, registerPage }) => {
       await page.context().clearCookies();
 
-      await registerPage.goto();
-      await registerPage.register("New User", uniqueEmail, "SecurePassword1!", "SecurePassword1!");
-
-      await page.waitForURL("/dashboard");
+      await createAccount(async ({ email, name, password }) => {
+        await registerPage.goto();
+        await registerPage.register(name, email, password, password);
+        await page.waitForURL("/dashboard");
+      });
       await dashboardPage.expectHeadingVisible();
     },
   );

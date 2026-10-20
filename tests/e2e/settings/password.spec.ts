@@ -7,7 +7,7 @@ test.describe("Settings password form", () => {
     const currentPassword = page.getByLabel("Current password");
     const newPassword = page.getByLabel("New password", { exact: true });
     const confirmPassword = page.getByLabel("Confirm new password");
-    const submitButton = page.getByRole("button", { name: "Update password" });
+    const submitButton = page.getByRole("button", { includeHidden: true, name: "Update password" });
 
     const releaseScripts = await holdScripts(page);
     await page.goto("/dashboard/settings", { waitUntil: "commit" });
