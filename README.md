@@ -143,3 +143,7 @@ branch fix-styles:    https://fix-styles.acme.web.localhost
 | `pnpm db:push`      | Push schema to database       |
 | `pnpm db:seed`      | Seed database                 |
 | `pnpm clean`        | Clean all build artifacts     |
+
+Before `pnpm test:e2e`, export `DATABASE_URL` in the test runner's shell, pointing to the same disposable database used by web and api. The root Playwright process does not load the packages' `.env` files. Set `RESEND_API_KEY` in that shell when the running web app has email delivery enabled.
+
+Mutable account fixtures register unique identities and delete their recorded user IDs after each test, including signed-out, unverified, renamed and already-deleted accounts. The shared seeded user is reserved for read-only and login coverage.
