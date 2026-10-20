@@ -1,5 +1,5 @@
 import type { OpenAPIHono, RouteConfig } from "@hono/zod-openapi";
-import { createIdentify } from "@repo/observability/auth";
+import { identifyUser } from "@repo/observability/auth";
 import type { ResolvedSession } from "@repo/observability/auth";
 import { createMiddleware } from "hono/factory";
 
@@ -12,8 +12,6 @@ type Session = ResolvedSession & {
 type SessionLookup = (input: { headers: Headers }) => Promise<Session | null>;
 
 type SessionUser = { email: string; id: string };
-
-const identify = createIdentify();
 
 const SESSION_SECURITY: Array<Record<string, Array<string>>> = [
   { bearerAuth: [] },
@@ -50,7 +48,7 @@ const createSessionAuth = (
       throw new AppError("Authentication required", "UNAUTHENTICATED", 401);
     }
 
-    identify(c.get("log"), session);
+    identifyUser(c.get("log"), session);
     c.set("user", { email: session.user.email, id: session.user.id });
     return next();
   });
