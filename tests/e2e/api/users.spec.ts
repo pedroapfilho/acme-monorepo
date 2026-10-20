@@ -1,19 +1,15 @@
 import { test, expect } from "../fixtures/auth.fixture";
-import { TEST_USER } from "../fixtures/test-user";
 import { apiUrl } from "../urls";
 
 test.describe("API Users", () => {
-  // The PATCH tests rename the shared seeded user and restore it.
-  test.describe.configure({ mode: "default" });
-
-  test("GET /api/v1/users/me returns authenticated user", async ({ api }) => {
+  test("GET /api/v1/users/me returns authenticated user", async ({ account, api }) => {
     const response = await api.get("/api/v1/users/me");
 
     expect(response.status()).toBe(200);
 
     const body = await response.json();
-    expect(body.data.email).toBe(TEST_USER.email);
-    expect(body.data.name).toBe(TEST_USER.name);
+    expect(body.data.email).toBe(account.email);
+    expect(body.data.name).toBe(account.name);
     expect(body.data.id).toBeTruthy();
   });
 
@@ -26,10 +22,6 @@ test.describe("API Users", () => {
 
     const body = await response.json();
     expect(body.data.name).toBe("Updated Name");
-
-    await api.patch("/api/v1/users/me", {
-      data: { name: TEST_USER.name },
-    });
   });
 
   test("PATCH /api/v1/users/me validates username format", async ({ api }) => {

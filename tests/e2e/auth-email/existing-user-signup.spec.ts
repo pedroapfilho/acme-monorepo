@@ -1,15 +1,15 @@
 import { prisma } from "@repo/db";
 
 import { expect, test } from "../fixtures/auth.fixture";
-import { newCredentials, signUp } from "../fixtures/session";
+import { signUp } from "../fixtures/session";
 import { waitForEmail } from "../helpers/resend";
 
 test.describe("Sign-up for an existing email (enumeration prevention)", { tag: "@email" }, () => {
   test("second signup returns synthetic success, notifies the real account holder, no duplicate row", async ({
+    createAccount,
     request,
-  }, testInfo) => {
-    const credentials = newCredentials(testInfo);
-    await expect(await signUp(request, credentials)).toBeOK();
+  }) => {
+    const credentials = await createAccount();
 
     const sinceMs = Date.now();
     await expect(
