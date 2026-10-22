@@ -4,10 +4,13 @@ import { applyPortlessUrls, portlessUrl } from "./index";
 
 const worktree = (prefix: string) => {
   const calls: Array<Array<string>> = [];
+
   const run = (file: string, args: ReadonlyArray<string>) => {
     calls.push([file, ...args]);
+
     return `https://${prefix}.${args.at(-1)}.localhost\n`;
   };
+
   return { calls, run };
 };
 
@@ -56,11 +59,13 @@ describe("applyPortlessUrls", () => {
 
   it("replaces canonical local defaults on any scheme or port", () => {
     const { run } = worktree("fix-styles");
+
     const env = {
       CORS_ORIGINS: "https://acme.web.localhost, http://acme.landing.localhost:1355",
       NEXT_PUBLIC_WEB_APP_URL: "https://acme.web.localhost",
       PORTLESS_URL: "https://fix-styles.acme.landing.localhost",
     };
+
     applyPortlessUrls(["CORS_ORIGINS", "NEXT_PUBLIC_WEB_APP_URL"], { env, run });
     expect(env).toMatchObject({
       CORS_ORIGINS:
@@ -75,6 +80,7 @@ describe("applyPortlessUrls", () => {
       NEXT_PUBLIC_WEB_APP_URL: "https://other.acme.web.localhost",
       WEB_APP_URL: "https://app.example.com",
     };
+
     const { calls, run } = worktree("fix-styles");
     const env = { ...explicit, PORTLESS_URL: "https://fix-styles.acme.api.localhost" };
     applyPortlessUrls(["CORS_ORIGINS", "NEXT_PUBLIC_WEB_APP_URL", "WEB_APP_URL"], { env, run });

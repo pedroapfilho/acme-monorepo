@@ -143,6 +143,7 @@ const FieldSeparator = ({
   children?: React.ReactNode;
 }) => {
   const hasChildren = Boolean(children);
+
   return (
     <div
       className={cn(
@@ -176,6 +177,7 @@ const FieldError = ({
 }) => {
   const content = useMemo(() => {
     const hasChildren = Boolean(children);
+
     if (hasChildren) {
       return children;
     }
@@ -202,6 +204,7 @@ const FieldError = ({
   }, [children, errors]);
 
   const hasContent = Boolean(content);
+
   if (!hasContent) {
     return null;
   }

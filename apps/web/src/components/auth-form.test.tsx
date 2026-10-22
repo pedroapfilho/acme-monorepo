@@ -10,6 +10,7 @@ import { AuthActionButton, AuthForm, SubmitButton, useAuthForm } from "./auth-fo
 const UNEXPECTED_ERROR = expect.stringMatching(/try again/v);
 
 type Values = { confirmPassword: string; email: string; password: string };
+
 type Result = {
   data: { id: string } | null;
   error: { code?: string; message?: string } | null;
@@ -32,6 +33,7 @@ const showToast = vi.spyOn(toast, "error");
 const logError = vi.spyOn(log, "error");
 
 const succeed = (): Promise<Result> => Promise.resolve({ data: { id: "user-1" }, error: null });
+
 const fail = (failure: { code?: string; message?: string }): Promise<Result> =>
   Promise.resolve({ data: null, error: failure });
 
@@ -80,6 +82,7 @@ const OptionalFieldHarness = () => {
     fallbackError: "Request failed",
     schema: optionalSchema,
   });
+
   return (
     <AuthForm submission={submission}>
       <form.AppField name="email">
@@ -112,12 +115,15 @@ const fillValid = () => {
 const submit = async (times = 1) => {
   const button = await screen.findByRole("button", { name: "Save" });
   const form = button.closest("form");
+
   if (form === null) {
     throw new Error("AuthForm did not render a <form>");
   }
+
   for (let attempt = 0; attempt < times; attempt += 1) {
     fireEvent.submit(form);
   }
+
   await settle();
 };
 
@@ -393,8 +399,10 @@ describe("useAuthForm", () => {
       if (value.email === "user@example.com") {
         throw new Error("refinement exploded");
       }
+
       return true;
     });
+
     call.mockImplementation(succeed);
     render(<Harness validator={throwingRefine} />);
     fillValid();
@@ -468,6 +476,7 @@ describe("AuthActionButton", () => {
         Sign out
       </AuthActionButton>,
     );
+
     return screen.getByRole("button", { name: "Sign out" });
   };
 

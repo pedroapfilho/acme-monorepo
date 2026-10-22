@@ -10,6 +10,7 @@ import { createUserStore } from "./lib/users";
 import type { User } from "./lib/users";
 
 type StoredUser = User & { displayUsername: string | null };
+
 type StoredSession = { createdAt: Date; userId: string };
 
 const cookieHeader = (headers: Headers) =>
@@ -23,11 +24,13 @@ const fixture = async () => {
     session: [],
     user: [],
   };
+
   const auth = createAuth({
     allowedHosts: ["localhost:*"],
     database: memoryAdapter(records),
     secret: "test-secret-minimum-32-characters-long",
   });
+
   const signedUp = await auth.api.signUpEmail({
     body: {
       email: "test@example.com",
@@ -37,7 +40,9 @@ const fixture = async () => {
     },
     returnHeaders: true,
   });
+
   const headers = { "Content-Type": "application/json", Cookie: cookieHeader(signedUp.headers) };
+
   const app = createApp({
     checkDatabase: () => Promise.resolve(),
     corsOrigins: [],
@@ -49,6 +54,7 @@ const fixture = async () => {
       ...createUserStore(auth, prisma),
       find: (id) => {
         const user = records.user.find((record) => record.id === id);
+
         return Promise.resolve(
           user
             ? {
@@ -66,10 +72,12 @@ const fixture = async () => {
       },
     },
   });
+
   const request = (init: RequestInit) =>
     app.request("/api/v1/users/me", init, {
       incoming: { socket: { remoteAddress: "203.0.113.10" } },
     });
+
   return { auth, headers, records, request };
 };
 
@@ -85,6 +93,7 @@ beforeAll(() => {
 describe("Better Auth account writes through createApp", () => {
   it("normalizes usernames, preserves displayUsername and refreshes the cookie cache", async () => {
     const { auth, headers, records, request } = await fixture();
+
     const response = await request({
       body: JSON.stringify({ username: "New.Name" }),
       headers,
@@ -100,9 +109,11 @@ describe("Better Auth account writes through createApp", () => {
         expect.stringContaining("acme.session_data="),
       ]),
     );
+
     const session = await auth.api.getSession({
       headers: new Headers({ Cookie: cookieHeader(response.headers) }),
     });
+
     expect(session?.user).toMatchObject({ displayUsername: "New.Name", username: "new.name" });
   });
 
@@ -110,6 +121,7 @@ describe("Better Auth account writes through createApp", () => {
     "rejects invalid username %s without changing the user",
     async (username) => {
       const { headers, records, request } = await fixture();
+
       const response = await request({
         body: JSON.stringify({ username }),
         headers,
@@ -134,6 +146,7 @@ describe("Better Auth account writes through createApp", () => {
         username: "taken",
       },
     });
+
     const response = await request({
       body: JSON.stringify({ username: "TaKeN" }),
       headers,
@@ -148,9 +161,11 @@ describe("Better Auth account writes through createApp", () => {
   it("requires a fresh authoritative session before deletion, even with a fresh cookie cache", async () => {
     const { headers, records, request } = await fixture();
     const session = records.session[0];
+
     if (!session) {
       throw new Error("Sign-up did not create a session");
     }
+
     session.createdAt = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
     const response = await request({ headers: { Cookie: headers.Cookie }, method: "DELETE" });
 

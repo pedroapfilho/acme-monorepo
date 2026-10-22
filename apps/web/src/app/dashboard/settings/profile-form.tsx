@@ -14,6 +14,7 @@ type Props = {
 
 const ProfileForm = ({ initialName }: Props) => {
   const { refresh } = useRouter();
+
   const { form, submission } = useAuthForm({
     call: (value) => authClient.updateUser({ name: value.name }),
     defaultValues: { name: initialName },

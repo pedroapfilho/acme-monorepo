@@ -10,6 +10,7 @@ import { recoverSchema } from "@/lib/form-schemas";
 
 const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
+
   const { form, submission } = useAuthForm({
     call: (value) =>
       authClient.requestPasswordReset({

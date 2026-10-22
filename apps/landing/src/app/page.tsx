@@ -112,6 +112,7 @@ const Page = () => {
           <dl className="mt-14 grid gap-x-12 gap-y-10 md:grid-cols-3">
             {CAPABILITIES.map((capability) => {
               const Icon = capability.icon;
+
               return (
                 <div key={capability.title}>
                   <Icon aria-hidden="true" className="size-6 shrink-0 text-primary" />

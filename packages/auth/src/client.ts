@@ -5,4 +5,5 @@ const createBetterAuthClient = createAuthClient;
 type AuthClient = ReturnType<typeof createBetterAuthClient>;
 
 export { createBetterAuthClient };
+
 export type { AuthClient };

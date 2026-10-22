@@ -45,6 +45,7 @@ const clientAddress = (c: Context, trustedProxyHops: number): string => {
   if (trustedProxyHops > 0) {
     const forwarded = c.req.header("x-forwarded-for")?.split(",") ?? [];
     const proxiedAddress = forwarded.at(-trustedProxyHops)?.trim();
+
     if (
       forwarded.length >= trustedProxyHops &&
       proxiedAddress !== undefined &&

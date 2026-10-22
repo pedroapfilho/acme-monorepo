@@ -10,6 +10,7 @@ import { changePasswordSchema } from "@/lib/form-schemas";
 
 const PasswordForm = () => {
   const { refresh } = useRouter();
+
   const { form, submission } = useAuthForm({
     call: (value) =>
       authClient.changePassword({

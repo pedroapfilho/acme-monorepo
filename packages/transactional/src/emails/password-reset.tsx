@@ -76,4 +76,5 @@ const PasswordResetEmail = ({
 };
 
 export { PasswordResetEmail };
+
 export default PasswordResetEmail;

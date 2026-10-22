@@ -78,7 +78,9 @@ const store = (request: SendRequest): StoredEmail => {
     text: request.text ?? null,
     to: request.to,
   };
+
   emails.unshift(email);
+
   return email;
 };
 
@@ -91,9 +93,11 @@ const summarize = ({
 
 const readBody = async (request: IncomingMessage): Promise<string> => {
   const chunks: Array<Buffer> = [];
+
   for await (const chunk of request) {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
   }
+
   return Buffer.concat(chunks).toString("utf8");
 };
 
@@ -109,6 +113,7 @@ const handle = async (request: IncomingMessage, response: ServerResponse) => {
   if (request.method === "POST" && url.pathname === "/emails") {
     const sendRequest = sendRequestSchema.parse(JSON.parse(await readBody(request)));
     respond(response, 200, { id: store(sendRequest).id });
+
     return;
   }
 
@@ -117,6 +122,7 @@ const handle = async (request: IncomingMessage, response: ServerResponse) => {
     respond(response, 200, {
       data: sendRequests.map((sendRequest) => ({ id: store(sendRequest).id })),
     });
+
     return;
   }
 
@@ -127,16 +133,21 @@ const handle = async (request: IncomingMessage, response: ServerResponse) => {
       has_more: false,
       object: "list",
     });
+
     return;
   }
 
   if (request.method === "GET" && emailId !== undefined) {
     const email = emails.find((candidate) => candidate.id === emailId);
+
     if (email === undefined) {
       respond(response, 404, { message: "Email not found", name: "not_found" });
+
       return;
     }
+
     respond(response, 200, email);
+
     return;
   }
 

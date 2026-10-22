@@ -36,6 +36,7 @@ const createSessionAuth = (
 
   const requireSession = createMiddleware<{ Variables: { user: SessionUser } }>(async (c, next) => {
     let session: Session | null;
+
     try {
       session = await getSession({ headers: c.req.raw.headers });
     } catch (error) {
@@ -50,6 +51,7 @@ const createSessionAuth = (
 
     identifyUser(c.get("log"), session);
     c.set("user", { email: session.user.email, id: session.user.id });
+
     return next();
   });
 
@@ -68,4 +70,5 @@ const createSessionAuth = (
 type Authenticated = ReturnType<typeof createSessionAuth>;
 
 export { createSessionAuth };
+
 export type { Authenticated, SessionLookup };

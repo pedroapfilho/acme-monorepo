@@ -7,6 +7,8 @@ export const { onRequestError, register } = defineNodeInstrumentation(async () =
     import("./src/lib/observability"),
     import("./src/lib/env"),
   ]);
+
   getEnv();
+
   return observability;
 });

@@ -28,6 +28,7 @@ const signUpAttemptLinks = (webAppUrl: string | undefined) => {
   if (webAppUrl === undefined) {
     throw new Error("createAuth: a mailer needs webAppUrl to link emails back to the web app");
   }
+
   return {
     resetPasswordUrl: new URL("/recover", webAppUrl).href,
     signInUrl: new URL("/login", webAppUrl).href,
@@ -56,13 +57,17 @@ const createAuth = (config: AuthConfig) => {
     if (!mailer) {
       return;
     }
+
     const result = await mailer(email);
+
     if (result.ok) {
       return;
     }
+
     if (onFailure.mode === "throw") {
       throw new Error(`${onFailure.message}: ${result.error}`);
     }
+
     log.error({ error: result.error, message: onFailure.message });
   };
 
@@ -203,4 +208,5 @@ const createAuth = (config: AuthConfig) => {
 type Auth = ReturnType<typeof createAuth>;
 
 export { COOKIE_PREFIX, createAuth, prismaDatabase };
+
 export type { Auth, AuthConfig };

@@ -8,11 +8,14 @@ import { defineConfig } from "prisma/config";
 const databaseUrl = () => {
   const value = process.env.DATABASE_URL ?? "";
   const applicationName = process.env.PGAPPNAME;
+
   if (value === "" || !applicationName) {
     return value;
   }
+
   const url = new URL(value);
   url.searchParams.set("application_name", applicationName);
+
   return url.toString();
 };
 

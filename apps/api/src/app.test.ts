@@ -26,11 +26,15 @@ const serializedAlice = {
 const signedIn = { Authorization: `Bearer ${alice.id}` };
 
 vi.stubEnv("NODE_ENV", "production");
+
 initApiLogger({ service: "api" });
+
 vi.unstubAllEnvs();
 
 const infoLogs = vi.spyOn(console, "info").mockImplementation(() => undefined);
+
 vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
 vi.spyOn(console, "error").mockImplementation(() => undefined);
 
 const wideEventFor = (path: string) =>
@@ -46,14 +50,17 @@ const createInMemoryUsers = () => {
   const users: UserStore = {
     delete: ({ headers }) => {
       rows.delete(userIdFrom(headers));
+
       return Promise.resolve(new Headers());
     },
     find: (id) => Promise.resolve(rows.get(id) ?? null),
     update: ({ data, headers }) => {
       const current = rows.get(userIdFrom(headers));
+
       if (current) {
         rows.set(current.id, { ...current, ...data });
       }
+
       return Promise.resolve(new Headers());
     },
   };
@@ -63,8 +70,10 @@ const createInMemoryUsers = () => {
 
 const setup = (overrides: Partial<AppDeps> = {}) => {
   const { rows, users } = createInMemoryUsers();
+
   const getSession = vi.fn<AppDeps["getSession"]>(({ headers }) => {
     const user = rows.get(userIdFrom(headers));
+
     return Promise.resolve(user ? { session: { id: "session-1" }, user } : null);
   });
 
@@ -178,6 +187,7 @@ describe("createApp", () => {
         },
         method: "OPTIONS",
       });
+
       const missing = await request("/api/v1/nope", { headers: signedIn });
 
       expect(preflight.status).toBe(204);
@@ -304,6 +314,7 @@ describe("createApp", () => {
         const { getSession, request, rows } = setup();
         const body = JSON.stringify({ name: "x".repeat(10 * 1024 * 1024) });
         const headers = new Headers({ "Content-Type": "application/json", ...signedIn });
+
         if (withLength) {
           headers.set("Content-Length", String(body.length));
         }
@@ -325,7 +336,9 @@ describe("createApp", () => {
       "acme.session_token=token; Path=/; HttpOnly; SameSite=Lax",
       "acme.session_data=cache; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Path=/; HttpOnly",
     ];
+
     const headers = new Headers(cookies.map((cookie) => ["Set-Cookie", cookie]));
+
     const { request } = setup({
       users: {
         ...createInMemoryUsers().users,
@@ -391,6 +404,7 @@ describe("createApp", () => {
         const res = await request("/api/v1/users/me", {
           headers: { ...signedIn, "X-Forwarded-For": forwardedFor(attempt) },
         });
+
         expect(res.status).toBe(200);
       }
     };
@@ -399,9 +413,11 @@ describe("createApp", () => {
       const { request } = setup();
 
       await exhaust(request, (attempt) => `198.51.100.${attempt}`);
+
       const limited = await request("/api/v1/users/me", {
         headers: { ...signedIn, "X-Forwarded-For": "198.51.100.250" },
       });
+
       const otherClient = await request("/api/v1/users/me", { headers: signedIn }, "203.0.113.99");
 
       expect(limited.status).toBe(429);
@@ -419,9 +435,11 @@ describe("createApp", () => {
       const { request } = setup({ trustedProxyHops: 1 });
 
       await exhaust(request, (attempt) => `10.0.0.${attempt}, 198.51.100.7`);
+
       const limited = await request("/api/v1/users/me", {
         headers: { ...signedIn, "X-Forwarded-For": "10.0.0.250, 198.51.100.7" },
       });
+
       const otherClient = await request("/api/v1/users/me", {
         headers: { ...signedIn, "X-Forwarded-For": "198.51.100.8" },
       });
@@ -434,9 +452,11 @@ describe("createApp", () => {
       const { request } = setup({ trustedProxyHops: 2 });
 
       await exhaust(request, (attempt) => `10.0.0.${attempt}, 198.51.100.7, 192.0.2.1`);
+
       const limited = await request("/api/v1/users/me", {
         headers: { ...signedIn, "X-Forwarded-For": "198.51.100.7, 192.0.2.2" },
       });
+
       const otherClient = await request("/api/v1/users/me", {
         headers: { ...signedIn, "X-Forwarded-For": "198.51.100.8, 192.0.2.1" },
       });
@@ -449,6 +469,7 @@ describe("createApp", () => {
       const { request } = setup({ trustedProxyHops: 2 });
 
       await exhaust(request, (attempt) => `198.51.100.${attempt}`);
+
       const limited = await request("/api/v1/users/me", {
         headers: { ...signedIn, "X-Forwarded-For": "198.51.100.250" },
       });
@@ -471,6 +492,7 @@ describe("createApp", () => {
       const { request } = setup();
 
       const res = await request("/openapi.json");
+
       const doc = (await res.json()) as {
         components: {
           schemas: Record<string, { properties?: Record<string, unknown> }>;
@@ -493,11 +515,13 @@ describe("createApp", () => {
 
       const patchMe = doc.paths["/api/v1/users/me"]?.patch;
       expect(patchMe?.security).toEqual([{ bearerAuth: [] }, { sessionCookie: [] }]);
+
       for (const status of ["400", "401", "413", "429", "503"]) {
         expect(patchMe?.responses[status]).toMatchObject({
           content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
         });
       }
+
       expect(doc.paths["/healthz"]?.get?.security).toBeUndefined();
     });
 

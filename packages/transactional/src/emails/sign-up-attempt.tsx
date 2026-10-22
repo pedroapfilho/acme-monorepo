@@ -86,4 +86,5 @@ const SignUpAttemptEmail = ({
 };
 
 export { SignUpAttemptEmail };
+
 export default SignUpAttemptEmail;

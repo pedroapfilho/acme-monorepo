@@ -29,6 +29,7 @@ test.describe("Sign-up for an existing email (enumeration prevention)", { tag: "
       subject: /sign[\s\-]?up|attempt|tried/iv,
       to: credentials.email,
     });
+
     expect(mail.last_event).not.toBe("bounced");
   });
 });

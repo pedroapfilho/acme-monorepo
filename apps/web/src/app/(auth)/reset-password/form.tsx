@@ -34,6 +34,7 @@ const InvalidResetLink = () => (
 
 const NewPasswordForm = ({ token }: { token: string }) => {
   const { push } = useRouter();
+
   const { errorCode, form, submission } = useAuthForm({
     call: (value) => authClient.resetPassword({ newPassword: value.password, token }),
     defaultValues: { confirmPassword: "", password: "" },

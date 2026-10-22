@@ -8,6 +8,7 @@ declare global {
 
 const assertDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;
+
   if (url === undefined || url.trim() === "") {
     throw new Error(
       "DATABASE_URL is not set. Set it in the environment; packages/db/.env.example has the local value.",
@@ -18,12 +19,14 @@ const assertDatabaseUrl = () => {
 class PrismaPgRequiringUrl extends PrismaPg {
   override async connect() {
     assertDatabaseUrl();
+
     return super.connect();
   }
 }
 
 const createPrismaClient = () => {
   const adapter = new PrismaPgRequiringUrl({ connectionString: process.env.DATABASE_URL });
+
   return new PrismaClient({ adapter });
 };
 
