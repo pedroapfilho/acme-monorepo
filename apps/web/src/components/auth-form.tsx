@@ -80,11 +80,13 @@ const useAuthRequest = <TInput, TData>({
       startTransition(async () => {
         try {
           const { data, error } = await call(input);
+
           if (error === null && data !== null) {
             await onSuccess?.(data, input);
           } else {
             const code = error?.code ?? null;
             setErrorCode(code);
+
             if (code === null || !handledErrorCodes.includes(code)) {
               showError(error?.message ?? fallbackError);
             }
@@ -92,6 +94,7 @@ const useAuthRequest = <TInput, TData>({
         } catch (error) {
           showUnexpectedError(error);
         }
+
         resolve();
       });
     });
@@ -101,13 +104,16 @@ const useAuthRequest = <TInput, TData>({
     if (isPending || isLatched.current) {
       return;
     }
+
     isLatched.current = true;
     clearError();
+
     try {
       await work();
     } catch (error) {
       showUnexpectedError(error);
     }
+
     isLatched.current = false;
   };
 
@@ -158,9 +164,11 @@ const TextField = ({
   const inputId = id ?? field.name;
   const errorId = `${inputId}-error`;
   const descriptionId = `${inputId}-description`;
+
   const describedBy = [description === undefined ? null : descriptionId, isInvalid ? errorId : null]
     .filter((describer) => describer !== null)
     .join(" ");
+
   const fieldLabel = <FieldLabel htmlFor={inputId}>{label}</FieldLabel>;
 
   return (
@@ -216,6 +224,7 @@ const useAuthForm = <TValues, TData>({
 }: AuthFormOptions<TValues, TData>) => {
   const { attempt, clearError, errorCode, errorMessage, isPending, perform, showUnexpectedError } =
     useAuthRequest(requestOptions);
+
   const requiredFields = useMemo(
     () =>
       Object.entries(schema.shape).flatMap(([name, fieldSchema]) =>
@@ -223,16 +232,20 @@ const useAuthForm = <TValues, TData>({
       ),
     [schema],
   );
+
   const form = useAppForm({
     defaultValues,
     listeners: { onChange: clearError },
     onSubmit: ({ value }) => perform(value),
     onSubmitInvalid: ({ formApi }) => {
       const error = formApi.state.errorMap.onDynamic;
+
       if (error instanceof Error) {
         showUnexpectedError(error);
+
         return;
       }
+
       focusFirstInvalidField(formApi.formId);
     },
     validationLogic: revalidateLogic(),
@@ -289,6 +302,7 @@ const BusyButton = ({ children, isPending, pendingLabel, ...props }: BusyButtonP
 
 const SubmitButton = (props: Omit<BusyButtonProps, "isPending" | "type">) => {
   const isPending = use(PendingContext);
+
   return <BusyButton {...props} isPending={isPending} type="submit" />;
 };
 
@@ -309,6 +323,7 @@ const AuthActionButton = <TData,>({
     },
     onSuccess,
   });
+
   const ready = useClientReady();
 
   return (
