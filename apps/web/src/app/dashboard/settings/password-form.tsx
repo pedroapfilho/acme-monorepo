@@ -35,7 +35,13 @@ const PasswordForm = () => {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <form.AppField name="newPassword">
-          {(field) => <field.TextField autoComplete="new-password" label="New password" />}
+          {(field) => (
+            <field.TextField
+              autoComplete="new-password"
+              description="At least 12 characters."
+              label="New password"
+            />
+          )}
         </form.AppField>
         <form.AppField name="confirmPassword">
           {(field) => <field.TextField autoComplete="new-password" label="Confirm new password" />}

@@ -1,16 +1,17 @@
 "use client";
 
 import { Button } from "@repo/ui/components/button";
-import { Field, FieldGroup, FieldLabel } from "@repo/ui/components/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { ClientReadyForm } from "@repo/ui/compositions/client-ready-form";
 import { FormFieldError } from "@repo/ui/compositions/form-field-error";
 import { useClientReady } from "@repo/ui/hooks/use-client-ready";
+import { focusFirstInvalidField } from "@repo/ui/lib/focus-first-invalid-field";
 import {
   createFormHook,
   createFormHookContexts,
+  revalidateLogic,
   type StandardSchemaV1,
-  useSelector,
 } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
 import {
@@ -53,6 +54,11 @@ const useAuthRequest = <TInput, TData>({
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const isLatched = useRef(false);
 
+  const clearError = () => {
+    setErrorMessage(null);
+    setErrorCode(null);
+  };
+
   const showError = (message: string) => {
     setErrorMessage(message);
     toast.error(message);
@@ -93,8 +99,7 @@ const useAuthRequest = <TInput, TData>({
       return;
     }
     isLatched.current = true;
-    setErrorMessage(null);
-    setErrorCode(null);
+    clearError();
     try {
       await work();
     } catch (error) {
@@ -103,7 +108,15 @@ const useAuthRequest = <TInput, TData>({
     isLatched.current = false;
   };
 
-  return { attempt, errorCode, errorMessage, isPending, perform, showUnexpectedError };
+  return {
+    attempt,
+    clearError,
+    errorCode,
+    errorMessage,
+    isPending,
+    perform,
+    showUnexpectedError,
+  };
 };
 
 const PendingContext = createContext(false);
@@ -118,6 +131,7 @@ const inputTypes = {
 
 type TextFieldProps = {
   autoComplete: keyof typeof inputTypes;
+  description?: string;
   id?: string;
   label: string;
   labelAction?: ReactNode;
@@ -126,14 +140,24 @@ type TextFieldProps = {
 
 const { fieldContext, formContext, useFieldContext } = createFormHookContexts();
 
-const TextField = ({ autoComplete, id, label, labelAction, placeholder }: TextFieldProps) => {
+const TextField = ({
+  autoComplete,
+  description,
+  id,
+  label,
+  labelAction,
+  placeholder,
+}: TextFieldProps) => {
   const field = useFieldContext<string>();
   const isPending = use(PendingContext);
   const requiredFields = use(RequiredFieldsContext);
-  const isSubmitted = useSelector(field.form.store, (state) => state.submissionAttempts > 0);
-  const isInvalid = !field.state.meta.isValid && (field.state.meta.isBlurred || isSubmitted);
+  const isInvalid = !field.state.meta.isValid;
   const inputId = id ?? field.name;
   const errorId = `${inputId}-error`;
+  const descriptionId = `${inputId}-description`;
+  const describedBy = [description === undefined ? null : descriptionId, isInvalid ? errorId : null]
+    .filter((describer) => describer !== null)
+    .join(" ");
   const fieldLabel = <FieldLabel htmlFor={inputId}>{label}</FieldLabel>;
 
   return (
@@ -147,7 +171,7 @@ const TextField = ({ autoComplete, id, label, labelAction, placeholder }: TextFi
         </div>
       )}
       <Input
-        aria-describedby={isInvalid ? errorId : undefined}
+        aria-describedby={describedBy === "" ? undefined : describedBy}
         aria-invalid={isInvalid}
         aria-required={requiredFields.includes(field.name)}
         autoComplete={autoComplete}
@@ -162,6 +186,9 @@ const TextField = ({ autoComplete, id, label, labelAction, placeholder }: TextFi
         type={inputTypes[autoComplete]}
         value={field.state.value}
       />
+      {description !== undefined && (
+        <FieldDescription id={descriptionId}>{description}</FieldDescription>
+      )}
       {isInvalid && <FormFieldError errors={field.state.meta.errors} id={errorId} />}
     </Field>
   );
@@ -174,6 +201,10 @@ const { useAppForm } = createFormHook({
   formContext,
 });
 
+type SubmitMeta = { form: HTMLFormElement | null };
+
+const noSubmitForm: SubmitMeta = { form: null };
+
 type AuthFormOptions<TValues, TData> = AuthRequestOptions<TValues, TData> & {
   defaultValues: TValues;
   schema: z.ZodObject<Record<string, z.ZodType>> & StandardSchemaV1<TValues, unknown>;
@@ -184,7 +215,7 @@ const useAuthForm = <TValues, TData>({
   schema,
   ...requestOptions
 }: AuthFormOptions<TValues, TData>) => {
-  const { attempt, errorCode, errorMessage, isPending, perform, showUnexpectedError } =
+  const { attempt, clearError, errorCode, errorMessage, isPending, perform, showUnexpectedError } =
     useAuthRequest(requestOptions);
   const requiredFields = useMemo(
     () =>
@@ -195,27 +226,27 @@ const useAuthForm = <TValues, TData>({
   );
   const form = useAppForm({
     defaultValues,
+    listeners: { onChange: clearError },
     onSubmit: ({ value }) => perform(value),
-    onSubmitInvalid: ({ formApi }) => {
-      const error = formApi.state.errorMap.onChange;
+    onSubmitInvalid: ({ formApi, meta }) => {
+      const error = formApi.state.errorMap.onDynamic;
       if (error instanceof Error) {
         showUnexpectedError(error);
+        return;
       }
+      focusFirstInvalidField(meta.form);
     },
+    onSubmitMeta: noSubmitForm,
+    validationLogic: revalidateLogic(),
     // Zod returns a rejected promise when a refinement throws, even for synchronous schemas.
-    validators: { onChangeAsync: schema },
+    validators: { onDynamicAsync: schema },
   });
 
   const submission = {
     errorMessage,
     isPending,
     requiredFields,
-    submit: () =>
-      attempt(async () => {
-        // Refresh blur errors before TanStack's submission guard checks whether fields are valid.
-        await form.validate("submit");
-        await form.handleSubmit();
-      }),
+    submit: (element: HTMLFormElement) => attempt(() => form.handleSubmit({ form: element })),
   };
 
   return { errorCode, form, submission };
@@ -235,7 +266,7 @@ const AuthForm = ({ children, submission }: { children: ReactNode; submission: S
     onSubmit={(event) => {
       event.preventDefault();
       event.stopPropagation();
-      void submission.submit();
+      void submission.submit(event.currentTarget);
     }}
   >
     <LiveRegion message={submission.errorMessage} />
