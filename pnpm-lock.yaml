@@ -54,8 +54,8 @@ importers:
         specifier: ^1.85.0
         version: 1.85.0(oxlint-tsgolint@7.0.2003)
       oxlint-config-awesomeness:
-        specifier: ^4.8.1
-        version: 4.8.1(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint-tsgolint@7.0.2003)(oxlint@1.85.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)
+        specifier: ^4.9.0
+        version: 4.9.0(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint-tsgolint@7.0.2003)(oxlint@1.85.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2)
       oxlint-plugin-react-doctor:
         specifier: ^0.9.14
         version: 0.9.14
@@ -5319,8 +5319,8 @@ packages:
       vite-plus:
         optional: true
 
-  oxlint-config-awesomeness@4.8.1:
-    resolution: {integrity: sha512-ZEzWG4jlpeAj/vFBYXqePUWqS3MD12q4+etl4qAorMcPeBdQKohBhRY2UMk4WNnXRs1n+sy+44wHSr1fiWos3Q==}
+  oxlint-config-awesomeness@4.9.0:
+    resolution: {integrity: sha512-NIrLIuDrOvcsGSv6tGtlr6tHI1lXqRj8lEDJEokhguwy6v2dhSvuOHuXNZtLV9ZH7e+QQiMvJpRMpwfTkZK28w==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
@@ -10971,7 +10971,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.70.0
       '@oxfmt/binding-win32-x64-msvc': 0.70.0
 
-  oxlint-config-awesomeness@4.8.1(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint-tsgolint@7.0.2003)(oxlint@1.85.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2):
+  oxlint-config-awesomeness@4.9.0(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint-tsgolint@7.0.2003)(oxlint@1.85.0(oxlint-tsgolint@7.0.2003))(typescript@7.0.2):
     dependencies:
       '@nkzw/eslint-plugin': 2.0.0(eslint@10.8.0(jiti@2.7.0))
       '@oxlint/plugins': 1.85.0
