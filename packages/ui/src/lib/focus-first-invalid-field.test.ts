@@ -29,6 +29,21 @@ describe("focusFirstInvalidField", () => {
     expect(document.activeElement).toBe(email);
   });
 
+  it("focuses the first control inside an invalid group, such as a radio group", async () => {
+    document.body.innerHTML = `
+      <form id="decision">
+        <div aria-invalid="true" role="radiogroup">
+          <input id="approve" name="decision" type="radio" />
+          <input id="reject" name="decision" type="radio" />
+        </div>
+      </form>`;
+
+    focusFirstInvalidField("decision");
+    await nextFrame();
+
+    expect(document.activeElement).toBe(document.querySelector("#approve"));
+  });
+
   it("does nothing when the form is gone", async () => {
     focusFirstInvalidField("missing");
     await nextFrame();
