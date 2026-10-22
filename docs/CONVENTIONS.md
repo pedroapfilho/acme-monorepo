@@ -40,7 +40,7 @@ This document records the defaults used across the acme monorepo. New code shoul
 ## Forms
 
 - `@tanstack/react-form`, never `react-hook-form`.
-- Schemas are the single source of validation: no HTML `required` or `minLength`; keep `noValidate` on the form, `type="email"` for keyboard hints, and `type="submit"` on submit buttons. Derive `aria-required` from the field schema and subscribe to form-derived state through `form.useStore()`.
+- Schemas are the single source of validation: no HTML `required` or `minLength`; keep `noValidate` on the form, `type="email"` for keyboard hints, and `type="submit"` on submit buttons. Derive `aria-required` from the field schema and subscribe to form-derived state through `useSelector(form.store, selector)` or `form.Subscribe`.
 - Auth forms and auth action buttons are built on `apps/web/src/components/auth-form.tsx`, which owns the double-submit latch, Better Auth error reporting and the busy state.
 - Validation follows six rules. `useAuthForm` and `field.TextField` implement them, so a call site passes a schema, a label, an `autoComplete` purpose and any `description`:
   1. Validate on submit, then on every change: `validationLogic: revalidateLogic()` with `validators: { onDynamicAsync: schema }`. No error shows before the first submit attempt, and after a failed one an error clears on the keystroke that fixes it. Never validate on blur. The validator is async because Zod returns a rejected promise when a refinement throws, and the async validator turns it into an error instead of an unhandled rejection.
