@@ -53,4 +53,5 @@ const ChangeEmail = ({ changeUrl, currentEmail, newEmail, username }: ChangeEmai
 };
 
 export { ChangeEmail };
+
 export default ChangeEmail;

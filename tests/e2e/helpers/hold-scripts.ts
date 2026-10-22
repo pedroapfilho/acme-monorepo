@@ -6,6 +6,7 @@ const holdScripts = async (page: Page) => {
     await scripts.promise;
     await route.continue();
   });
+
   return () => {
     scripts.resolve(undefined);
   };

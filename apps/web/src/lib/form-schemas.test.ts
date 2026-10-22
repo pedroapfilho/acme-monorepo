@@ -17,6 +17,7 @@ describe("loginSchema", () => {
       email: "user@example.com",
       password: "securepassword",
     });
+
     expect(result.success).toBe(true);
   });
 
@@ -25,6 +26,7 @@ describe("loginSchema", () => {
       email: "not-an-email",
       password: "securepassword",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -33,6 +35,7 @@ describe("loginSchema", () => {
       email: "",
       password: "securepassword",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -41,6 +44,7 @@ describe("loginSchema", () => {
       email: "user@example.com",
       password: "short",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -49,6 +53,7 @@ describe("loginSchema", () => {
       email: "user@example.com",
       password: "123456789012",
     });
+
     expect(result.success).toBe(true);
   });
 });
@@ -107,7 +112,9 @@ describe("registerSchema", () => {
       confirmPassword: "differentpassword",
       password: "securepassword",
     });
+
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toContainEqual(
         expect.objectContaining({
@@ -124,6 +131,7 @@ describe("registerSchema", () => {
       confirmPassword: "securepassword",
       password: "securepassword",
     });
+
     expect(result.success).toBe(true);
   });
 });
@@ -156,6 +164,7 @@ describe("resetPasswordSchema", () => {
       confirmPassword: "newpassword12",
       password: "newpassword12",
     });
+
     expect(result.success).toBe(true);
   });
 
@@ -164,6 +173,7 @@ describe("resetPasswordSchema", () => {
       confirmPassword: "newpassword12",
       password: "short",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -172,6 +182,7 @@ describe("resetPasswordSchema", () => {
       confirmPassword: "short",
       password: "newpassword12",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -180,6 +191,7 @@ describe("resetPasswordSchema", () => {
       confirmPassword: "123456789012",
       password: "123456789012",
     });
+
     expect(result.success).toBe(true);
   });
 
@@ -188,7 +200,9 @@ describe("resetPasswordSchema", () => {
       confirmPassword: "newpassword34",
       password: "newpassword12",
     });
+
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toContainEqual(
         expect.objectContaining({
@@ -204,6 +218,7 @@ describe("resetPasswordSchema", () => {
       confirmPassword: "newpassword12",
       password: "newpassword12",
     });
+
     expect(result.success).toBe(true);
   });
 });
@@ -265,6 +280,7 @@ describe("changePasswordSchema", () => {
       confirmPassword: "short",
       newPassword: "short",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -273,7 +289,9 @@ describe("changePasswordSchema", () => {
       ...validData,
       confirmPassword: "differentpass12",
     });
+
     expect(result.success).toBe(false);
+
     if (!result.success) {
       expect(result.error.issues).toContainEqual(
         expect.objectContaining({

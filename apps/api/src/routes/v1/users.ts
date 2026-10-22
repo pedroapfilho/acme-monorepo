@@ -170,9 +170,11 @@ const createV1UserRoutes = ({ authenticated, users }: UserRouteDependencies) => 
     .openapi(getMeRoute, async (c) => c.json({ data: await findUser(c.get("user").id) }, 200))
     .openapi(updateMeRoute, async (c) => {
       const headers = await users.update({ data: c.req.valid("json"), headers: c.req.raw.headers });
+
       for (const cookie of headers.getSetCookie()) {
         c.header("Set-Cookie", cookie, { append: true });
       }
+
       return c.json({ data: await findUser(c.get("user").id) }, 200);
     })
     .openapi(deleteMeRoute, async (c) => {
@@ -180,13 +182,16 @@ const createV1UserRoutes = ({ authenticated, users }: UserRouteDependencies) => 
         headers: c.req.raw.headers,
         password: c.req.valid("json").password,
       });
+
       for (const cookie of headers.getSetCookie()) {
         c.header("Set-Cookie", cookie, { append: true });
       }
+
       return c.body(null, 204);
     })
     .openapi(listUsersRoute, async (c) => {
       const user = await findUser(c.get("user").id);
+
       return c.json({ data: [user], meta: { page: 1, total: 1, totalPages: 1 } }, 200);
     });
 };

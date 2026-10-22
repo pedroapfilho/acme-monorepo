@@ -9,6 +9,7 @@ import { deleteAccountSchema } from "@/lib/form-schemas";
 
 const DeleteAccountForm = () => {
   const { push, refresh } = useRouter();
+
   const { form, submission } = useAuthForm({
     call: (value) => authClient.deleteUser({ password: value.password }),
     defaultValues: { password: "" },

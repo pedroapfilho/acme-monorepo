@@ -5,9 +5,11 @@ import geist from "./fonts/geist.json" with { type: "json" };
 
 const parseFont = (data: Buffer): Font => {
   const font = create(data);
+
   if (!("layout" in font)) {
     throw new TypeError("Social images require a single font face");
   }
+
   return font;
 };
 
@@ -43,29 +45,37 @@ const svgText = (
   }: SvgTextOptions,
 ) => {
   const scale = size / font.unitsPerEm;
+
   const runWidth = (run: GlyphRun) =>
     run.advanceWidth * scale + Math.max(0, run.glyphs.length - 1) * tracking;
+
   const measure = (value: string) => runWidth(font.layout(value));
   const lines: Array<string> = [];
   let line = "";
+
   for (const word of text.trim().split(/\s+/v)) {
     const next = line ? `${line} ${word}` : word;
+
     if (width === undefined || measure(next) <= width) {
       line = next;
       continue;
     }
+
     if (line) {
       lines.push(line);
       line = "";
     }
+
     for (const { segment } of segmenter.segment(word)) {
       if (line && measure(line + segment) > width) {
         lines.push(line);
         line = "";
       }
+
       line += segment;
     }
   }
+
   if (line) {
     lines.push(line);
   }
@@ -76,14 +86,18 @@ const svgText = (
     const offsets = { end: lineWidth, middle: lineWidth / 2, start: 0 };
     const offset = offsets[anchor];
     let cursor = x - offset;
+
     return run.glyphs.map((glyph, glyphIndex) => {
       const position = run.positions[glyphIndex];
+
       if (position === undefined) {
         throw new Error(`svgText: glyph ${glyphIndex} of "${value}" has no position`);
       }
+
       const glyphX = cursor + position.xOffset * scale;
       const glyphY = y + lineIndex * size * lineHeight - position.yOffset * scale;
       cursor += position.xAdvance * scale + tracking;
+
       return createElement("path", {
         d: glyph.path.toSVG(),
         key: `${lineIndex}-${glyphIndex}`,
@@ -91,6 +105,7 @@ const svgText = (
       });
     });
   });
+
   return createElement("g", { fill: color }, paths);
 };
 

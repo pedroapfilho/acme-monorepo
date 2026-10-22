@@ -31,6 +31,7 @@ describe("envAuthConfig", () => {
 
   it("allows portless hosts on port 443 and on its unprivileged fallback port", () => {
     const { allowedHosts } = envAuthConfig();
+
     for (const host of [
       "acme.web.localhost",
       "acme.web.localhost:1355",
@@ -61,6 +62,7 @@ describe("envAuthConfig", () => {
       additionalAllowedHosts: ["desktop.example.com"],
       additionalTrustedOrigins: ["example-app:/"],
     });
+
     expect(config.allowedHosts).toContain("desktop.example.com");
     expect(config.trustedOrigins).toContain("example-app:/");
   });

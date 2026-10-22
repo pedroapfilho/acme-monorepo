@@ -33,10 +33,12 @@ describe("ResetPasswordForm", () => {
 
   it("offers a new link when Better Auth rejects the token on submit", async () => {
     const showToast = vi.spyOn(toast, "error");
+
     const requests = respondToAuthRequests(400, {
       code: "INVALID_TOKEN",
       message: "Invalid token",
     });
+
     await renderForm({ token: "expired-token" });
 
     fireEvent.change(screen.getByLabelText("New password"), {

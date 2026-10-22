@@ -5,14 +5,18 @@ import { parseFont, svgText } from "./index";
 
 const positions = (text: string, width: number) => {
   const group = svgText(text, { color: "currentColor", size: 24, width, x: 0, y: 40 });
+
   return Children.toArray(group.props.children).map((child) => {
     if (!isValidElement<{ transform: string }>(child)) {
       throw new TypeError("Expected a glyph path element");
     }
+
     const match = /translate\((?<x>\S+) (?<y>\S+)\) scale/v.exec(child.props.transform);
+
     if (!match?.groups) {
       throw new TypeError(`Unexpected transform: ${child.props.transform}`);
     }
+
     return { x: Number(match.groups.x), y: Number(match.groups.y) };
   });
 };

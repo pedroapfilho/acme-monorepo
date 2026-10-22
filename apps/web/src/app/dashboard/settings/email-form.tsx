@@ -15,6 +15,7 @@ type Props = {
 
 const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
   const [confirmationAddress, setConfirmationAddress] = useState<string | null>(null);
+
   const { form, submission } = useAuthForm({
     call: (value) =>
       authClient.changeEmail({ callbackURL: "/dashboard/settings", newEmail: value.email }),

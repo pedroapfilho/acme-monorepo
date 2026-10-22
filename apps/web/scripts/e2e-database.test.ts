@@ -43,19 +43,25 @@ describe("E2E database boundary", () => {
 
 it("refuses before connecting to Prisma or initializing auth", async () => {
   let connections = 0;
+
   const server = createServer((socket) => {
     connections += 1;
     socket.destroy();
   });
+
   await new Promise<void>((resolve) => {
     server.listen(0, "127.0.0.1", resolve);
   });
+
   try {
     const address = server.address();
+
     if (address === null || typeof address === "string") {
       throw new Error("Expected a TCP listener address");
     }
+
     let errorOutput = "";
+
     const execution = new Promise<void>((resolve, reject) => {
       execFile(
         process.execPath,
@@ -70,6 +76,7 @@ it("refuses before connecting to Prisma or initializing auth", async () => {
         },
         (error, _stdout, stderr) => {
           errorOutput = stderr;
+
           if (error instanceof Error) {
             reject(error);
           } else {
@@ -78,6 +85,7 @@ it("refuses before connecting to Prisma or initializing auth", async () => {
         },
       );
     });
+
     await expect(execution).rejects.toMatchObject({ code: 1 });
     expect(errorOutput).toContain(
       "Refusing to run ensure-e2e-user.ts against DATABASE_URL host 127.0.0.1.",

@@ -13,6 +13,7 @@ const FormFieldError = ({ errors, ...props }: FormFieldErrorProps) => {
     if (PRINTABLE_TYPES.has(typeof error)) {
       return [{ message: String(error) }];
     }
+
     if (
       typeof error === "object" &&
       error !== null &&
@@ -21,6 +22,7 @@ const FormFieldError = ({ errors, ...props }: FormFieldErrorProps) => {
     ) {
       return [{ message: error.message }];
     }
+
     return [];
   });
 

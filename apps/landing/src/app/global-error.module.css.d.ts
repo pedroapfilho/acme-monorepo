@@ -7,4 +7,5 @@ declare const styles: {
   readonly main: string;
   readonly text: string;
 };
+
 export default styles;

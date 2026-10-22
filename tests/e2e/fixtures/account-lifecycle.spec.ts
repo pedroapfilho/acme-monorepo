@@ -5,11 +5,13 @@ import { signOut, signUp } from "./session";
 import { TEST_USER } from "./test-user";
 
 const ownedUserIds = new Set<string>();
+
 const test = sessionTest.extend({
   createAccount: async ({ createAccount }, use) => {
     await use(async (register) => {
       const account = await createAccount(register);
       ownedUserIds.add(account.id);
+
       return account;
     });
   },

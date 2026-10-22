@@ -36,9 +36,11 @@ const SignInLink = ({ searchParams }: Props) => {
 const RegisterForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
+
   const { form, submission } = useAuthForm({
     call: async (value) => {
       const { from } = await searchParams;
+
       return authClient.signUp.email({
         callbackURL: safeRedirectPath(from),
         email: value.email,
@@ -51,8 +53,10 @@ const RegisterForm = ({ searchParams }: Props) => {
     onSuccess: async (data, value) => {
       if (data.token === null || data.token === "") {
         setSentToEmail(value.email);
+
         return;
       }
+
       const { from } = await searchParams;
       push(safeRedirectPath(from));
       refresh();

@@ -9,10 +9,13 @@ const VALID_ENV = {
 
 const loadGetEnv = async (overrides: Record<string, string | undefined> = {}) => {
   vi.resetModules();
+
   for (const [key, value] of Object.entries({ ...VALID_ENV, ...overrides })) {
     vi.stubEnv(key, value);
   }
+
   const { getEnv } = await import("./env");
+
   return getEnv;
 };
 

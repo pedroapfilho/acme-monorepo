@@ -31,12 +31,15 @@ const parseEnvList = (value: string | undefined): Array<string> => {
 
 const webAppUrl = (): string | undefined => {
   const value = process.env.WEB_APP_URL;
+
   if (value === undefined || value === "") {
     return undefined;
   }
+
   if (!URL.canParse(value)) {
     throw new Error("WEB_APP_URL must be a valid URL");
   }
+
   return value;
 };
 
@@ -45,6 +48,7 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
     process.env.CORS_ORIGINS === undefined
       ? DEFAULT_CORS_ORIGINS
       : parseEnvList(process.env.CORS_ORIGINS).filter((origin) => origin !== "*");
+
   const appUrl = webAppUrl();
   const secureUrl = options.secureUrl ?? appUrl;
 
@@ -69,4 +73,5 @@ const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
 };
 
 export { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList, webAppUrl };
+
 export type { EnvAuthConfig, EnvAuthConfigOptions };

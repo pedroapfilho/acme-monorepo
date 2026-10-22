@@ -42,6 +42,7 @@ const listSessions = async (headersList: Headers) => {
     if (isAPIError(error) && error.body?.code === "SESSION_NOT_FRESH") {
       return null;
     }
+
     throw error;
   }
 };
@@ -50,9 +51,11 @@ const SettingsContent = async () => {
   const session = await requireSession("/dashboard/settings");
   const auth = getAuth();
   const sessions = await listSessions(await headers());
+
   const sortedSessions = sessions?.toSorted(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
+
   const currentToken = session.session.token;
 
   return (
@@ -120,6 +123,7 @@ const SettingsContent = async () => {
                 {sortedSessions.map((activeSession) => {
                   const isCurrent = activeSession.token === currentToken;
                   const ipAddress = activeSession.ipAddress ?? "";
+
                   return (
                     <li
                       className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"

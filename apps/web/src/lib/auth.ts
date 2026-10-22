@@ -23,6 +23,7 @@ const getAuth = (): Auth => {
       secret: env.BETTER_AUTH_SECRET,
     });
   }
+
   return cachedAuth;
 };
 

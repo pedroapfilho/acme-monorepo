@@ -114,6 +114,7 @@ const resolveError = (err: Error, isProduction: boolean): ResolvedError => {
   }
 
   const known = toKnownError(err);
+
   if (known) {
     return { body: errorBody(known.code, known.message), status: known.status };
   }
@@ -134,6 +135,7 @@ const createErrorHandler =
   (isProduction: boolean): ErrorHandler =>
   (err, c) => {
     const { body, status } = resolveError(err, isProduction);
+
     return c.json(body, status);
   };
 

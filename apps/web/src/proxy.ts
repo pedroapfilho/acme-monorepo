@@ -19,6 +19,7 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
   if (pathname === "/") {
     const destination =
       getSessionCookie(request, { cookiePrefix: COOKIE_PREFIX }) === null ? "/login" : "/dashboard";
+
     return NextResponse.redirect(new URL(destination, request.url));
   }
 
@@ -33,6 +34,7 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
   }
 
   let session;
+
   try {
     session = await lookup(request.headers);
   } catch (error) {
@@ -44,11 +46,13 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
       authPageHref("/login", `${pathname}${request.nextUrl.search}`),
       request.url,
     );
+
     return NextResponse.redirect(url);
   }
 
   if (isAuthRoute && session) {
     const url = new URL("/dashboard", request.url);
+
     return NextResponse.redirect(url);
   }
 

@@ -1,5 +1,6 @@
 const assertLocalDatabaseUrl = (value: string): void => {
   const url = URL.parse(value);
+
   if (
     url === null ||
     !["postgres:", "postgresql:"].includes(url.protocol) ||

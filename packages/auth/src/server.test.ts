@@ -13,12 +13,15 @@ type CapturingMailer = { mailer: Mailer; sent: Array<TransactionalEmail> };
 
 const capturingMailer = (failing: Array<TransactionalEmail["type"]> = []): CapturingMailer => {
   const sent: Array<TransactionalEmail> = [];
+
   const mailer: Mailer = (email) => {
     sent.push(email);
+
     return Promise.resolve(
       failing.includes(email.type) ? { error: "quota exceeded", ok: false } : { ok: true },
     );
   };
+
   return { mailer, sent };
 };
 
@@ -45,6 +48,7 @@ const signedInCookie = async (auth: Auth, email: string) => {
     body: { email, password: PASSWORD },
     returnHeaders: true,
   });
+
   return headers
     .getSetCookie()
     .map((cookie) => cookie.split(";")[0])
@@ -165,9 +169,11 @@ describe("createAuth with a mailer", () => {
     const auth = testAuth({ mailer });
     const { user } = await signUp(auth);
     const [welcome] = sentOfType(sent, "welcome");
+
     if (welcome === undefined) {
       throw new Error("sign-up sent no verification email");
     }
+
     await verify(auth, welcome);
     const cookie = await signedInCookie(auth, "ada@acme.test");
 
