@@ -62,7 +62,13 @@ const NewPasswordForm = ({ token }: { token: string }) => {
         <AuthForm submission={submission}>
           <div className="grid grid-cols-2 gap-4">
             <form.AppField name="password">
-              {(field) => <field.TextField autoComplete="new-password" label="New password" />}
+              {(field) => (
+                <field.TextField
+                  autoComplete="new-password"
+                  description="At least 12 characters."
+                  label="New password"
+                />
+              )}
             </form.AppField>
             <form.AppField name="confirmPassword">
               {(field) => <field.TextField autoComplete="new-password" label="Confirm password" />}

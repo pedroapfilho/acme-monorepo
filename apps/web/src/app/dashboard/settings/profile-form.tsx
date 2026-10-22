@@ -29,7 +29,13 @@ const ProfileForm = ({ initialName }: Props) => {
   return (
     <AuthForm submission={submission}>
       <form.AppField name="name">
-        {(field) => <field.TextField autoComplete="name" label="Full Name" />}
+        {(field) => (
+          <field.TextField
+            autoComplete="name"
+            description="3 to 32 characters."
+            label="Full Name"
+          />
+        )}
       </form.AppField>
 
       <Field orientation="horizontal">

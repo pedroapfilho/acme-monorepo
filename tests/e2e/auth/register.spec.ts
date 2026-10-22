@@ -38,7 +38,8 @@ test.describe("Register", () => {
     await registerPage.goto();
     await registerPage.register("Short Pass", `short-${Date.now()}@example.com`, "short", "short");
 
-    await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
+    await expect(page.getByText("Password must be at least 12 characters").first()).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeFocused();
     expect(page.url()).toContain("/register");
   });
 

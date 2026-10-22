@@ -22,6 +22,6 @@ test.describe("Settings password form", () => {
     await confirmPassword.fill("AnotherPassword123!");
     await submitButton.click();
 
-    await expect(page.locator('[data-sonner-toast][data-type="error"]')).toBeVisible();
+    await expect(page.locator('[data-slot="form-alert"]')).toBeVisible();
   });
 });
