@@ -4,6 +4,7 @@ import { Button } from "@repo/ui/components/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@repo/ui/components/field";
 import { Input } from "@repo/ui/components/input";
 import { ClientReadyForm } from "@repo/ui/compositions/client-ready-form";
+import { FormAlert } from "@repo/ui/compositions/form-alert";
 import { FormFieldError } from "@repo/ui/compositions/form-field-error";
 import { useClientReady } from "@repo/ui/hooks/use-client-ready";
 import { focusFirstInvalidField } from "@repo/ui/lib/focus-first-invalid-field";
@@ -38,6 +39,7 @@ type AuthRequestOptions<TInput, TData> = {
   call: (input: TInput) => Promise<AuthResult<TData>>;
   fallbackError: string;
   handledErrorCodes?: ReadonlyArray<string>;
+  onError?: (message: string) => void;
   onSuccess?: (data: TData, input: TInput) => Promise<void> | void;
 };
 
@@ -47,6 +49,7 @@ const useAuthRequest = <TInput, TData>({
   call,
   fallbackError,
   handledErrorCodes = [],
+  onError,
   onSuccess,
 }: AuthRequestOptions<TInput, TData>) => {
   const [isPending, startTransition] = useTransition();
@@ -61,7 +64,7 @@ const useAuthRequest = <TInput, TData>({
 
   const showError = (message: string) => {
     setErrorMessage(message);
-    toast.error(message);
+    onError?.(message);
   };
 
   const showUnexpectedError = (cause: unknown) => {
@@ -201,10 +204,6 @@ const { useAppForm } = createFormHook({
   formContext,
 });
 
-type SubmitMeta = { form: HTMLFormElement | null };
-
-const noSubmitForm: SubmitMeta = { form: null };
-
 type AuthFormOptions<TValues, TData> = AuthRequestOptions<TValues, TData> & {
   defaultValues: TValues;
   schema: z.ZodObject<Record<string, z.ZodType>> & StandardSchemaV1<TValues, unknown>;
@@ -228,15 +227,14 @@ const useAuthForm = <TValues, TData>({
     defaultValues,
     listeners: { onChange: clearError },
     onSubmit: ({ value }) => perform(value),
-    onSubmitInvalid: ({ formApi, meta }) => {
+    onSubmitInvalid: ({ formApi }) => {
       const error = formApi.state.errorMap.onDynamic;
       if (error instanceof Error) {
         showUnexpectedError(error);
         return;
       }
-      focusFirstInvalidField(meta.form);
+      focusFirstInvalidField(formApi.formId);
     },
-    onSubmitMeta: noSubmitForm,
     validationLogic: revalidateLogic(),
     // Zod returns a rejected promise when a refinement throws, even for synchronous schemas.
     validators: { onDynamicAsync: schema },
@@ -244,9 +242,10 @@ const useAuthForm = <TValues, TData>({
 
   const submission = {
     errorMessage,
+    formId: form.formId,
     isPending,
     requiredFields,
-    submit: (element: HTMLFormElement) => attempt(() => form.handleSubmit({ form: element })),
+    submit: () => attempt(() => form.handleSubmit()),
   };
 
   return { errorCode, form, submission };
@@ -262,14 +261,15 @@ const LiveRegion = ({ message }: { message: string | null }) => (
 
 const AuthForm = ({ children, submission }: { children: ReactNode; submission: Submission }) => (
   <ClientReadyForm
+    id={submission.formId}
     noValidate
     onSubmit={(event) => {
       event.preventDefault();
       event.stopPropagation();
-      void submission.submit(event.currentTarget);
+      void submission.submit();
     }}
   >
-    <LiveRegion message={submission.errorMessage} />
+    <FormAlert message={submission.errorMessage} />
     <PendingContext value={submission.isPending}>
       <RequiredFieldsContext value={submission.requiredFields}>
         <FieldGroup>{children}</FieldGroup>
@@ -304,6 +304,9 @@ const AuthActionButton = <TData,>({
   const { attempt, errorMessage, isPending, perform } = useAuthRequest({
     call,
     fallbackError,
+    onError: (message) => {
+      toast.error(message);
+    },
     onSuccess,
   });
   const ready = useClientReady();

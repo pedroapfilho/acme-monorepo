@@ -124,6 +124,8 @@ const submit = async (times = 1) => {
 const liveRegionText = () =>
   document.querySelector('[aria-live="polite"][aria-atomic="true"]')?.textContent;
 
+const formAlertText = () => document.querySelector('[data-slot="form-alert"]')?.textContent ?? null;
+
 beforeEach(() => {
   call.mockReset();
   onSuccess.mockReset();
@@ -296,10 +298,10 @@ describe("useAuthForm", () => {
       );
     });
     expect(showToast).not.toHaveBeenCalled();
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
   });
 
-  it("reports the Better Auth message in a toast and the live region, then retries", async () => {
+  it("reports the Better Auth message in the form alert, clears it on change, then retries", async () => {
     call.mockImplementationOnce(() =>
       fail({ code: "INVALID_PASSWORD", message: "Invalid password" }),
     );
@@ -310,14 +312,15 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(liveRegionText()).toBe("Invalid password");
+      expect(formAlertText()).toBe("Invalid password");
     });
-    expect(showToast).toHaveBeenCalledWith("Invalid password");
+    expect(showToast).not.toHaveBeenCalled();
+    expect(formAlertText()).toBe("Invalid password");
     expect(onSuccess).not.toHaveBeenCalled();
 
     type("Password", "correct-horse-staple");
     type("Confirm password", "correct-horse-staple");
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
 
     await submit();
 
@@ -325,7 +328,7 @@ describe("useAuthForm", () => {
       expect(onSuccess).toHaveBeenCalledTimes(1);
     });
     expect(call).toHaveBeenCalledTimes(2);
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
   });
 
   it("falls back to the form's message when Better Auth sends none", async () => {
@@ -336,9 +339,9 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(liveRegionText()).toBe("Request failed");
+      expect(formAlertText()).toBe("Request failed");
     });
-    expect(showToast).toHaveBeenCalledWith("Request failed");
+    expect(formAlertText()).toBe("Request failed");
   });
 
   it("reports a thrown call with the generic message and logs it", async () => {
@@ -350,7 +353,7 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+      expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "Failed to fetch" }));
 
@@ -373,7 +376,7 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+      expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "validator exploded" }));
     expect(call).not.toHaveBeenCalled();
@@ -399,7 +402,7 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+      expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(call).not.toHaveBeenCalled();
     expect(logError).toHaveBeenCalledWith(
@@ -424,10 +427,10 @@ describe("useAuthForm", () => {
       expect(call).toHaveBeenCalledTimes(1);
     });
     expect(onSuccess).toHaveBeenCalledTimes(1);
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
   });
 
-  it("leaves handled error codes to the form without a toast", async () => {
+  it("leaves handled error codes to the form without a form alert", async () => {
     call.mockImplementationOnce(() =>
       fail({ code: "EMAIL_NOT_VERIFIED", message: "Email not verified" }),
     );
@@ -439,12 +442,12 @@ describe("useAuthForm", () => {
 
     expect(await screen.findByText("Handled EMAIL_NOT_VERIFIED")).not.toBeNull();
     expect(showToast).not.toHaveBeenCalled();
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
 
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith("Invalid credentials");
+      expect(formAlertText()).toBe("Invalid credentials");
     });
     expect(screen.queryByText("Handled EMAIL_NOT_VERIFIED")).toBeNull();
   });

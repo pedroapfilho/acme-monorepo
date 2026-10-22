@@ -1,7 +1,7 @@
-const focusFirstInvalidField = (form: HTMLFormElement | null) => {
-  // TanStack calls onSubmitInvalid before React renders the new aria-invalid and disabled states.
+const focusFirstInvalidField = (formId: string) => {
+  // A submit handler runs before React renders the aria-invalid and enabled state it just set.
   requestAnimationFrame(() => {
-    form?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+    document.querySelector<HTMLElement>(`[id="${formId}"] [aria-invalid="true"]`)?.focus();
   });
 };
 
