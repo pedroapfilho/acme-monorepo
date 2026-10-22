@@ -22,11 +22,13 @@ const respondToAuthRequests = (status: number, response: AuthResponseBody) => {
     const body: unknown = typeof init?.body === "string" ? JSON.parse(init.body) : null;
     const url = input instanceof Request ? input.url : input;
     requests.push({ body, path: new URL(url).pathname });
+
     return Promise.resolve(Response.json(response, { status }));
   });
   onTestFinished(() => {
     vi.mocked(fetch).mockReset();
   });
+
   return requests;
 };
 
@@ -40,10 +42,12 @@ const renderWithRouter = async (ui: ReactNode) => {
     refresh: vi.fn<() => void>(),
     replace: vi.fn<(href: string) => void>(),
   } satisfies AppRouterInstance;
+
   // Awaiting act lets components that suspend on `use(searchParams)` resolve before the test queries.
   await act(() =>
     Promise.resolve(render(<AppRouterContext value={router}>{ui}</AppRouterContext>)),
   );
+
   return router;
 };
 

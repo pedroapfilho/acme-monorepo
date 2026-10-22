@@ -10,9 +10,11 @@ const getSession = (requestHeaders: Headers) =>
 
 const requireSession = cache(async (from: string) => {
   const session = await getSession(await headers());
+
   if (!session) {
     redirect(authPageHref("/login", from));
   }
+
   return session;
 });
 

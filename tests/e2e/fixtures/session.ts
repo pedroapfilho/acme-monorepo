@@ -12,6 +12,7 @@ import { verificationLink } from "./verification.fixture";
 type Credentials = { email: string; name: string; password: string };
 
 type OwnedAccount = Credentials & { id: string };
+
 type CreateAccount = (
   register?: (credentials: Credentials) => Promise<void>,
 ) => Promise<OwnedAccount>;
@@ -45,14 +46,17 @@ const test = base.extend<
     const sinceMs = Date.now();
     await context.clearCookies();
     const account = await createAccount();
+
     if (emailDelivery) {
       const link = await verificationLink({ sinceMs, subject: /verify/iv, to: account.email });
       await expect(await context.request.get(link)).toBeOK();
     }
+
     await use(account);
   },
   createAccount: async ({ context }, use, testInfo) => {
     const ownedUserIds = new Set<string>();
+
     try {
       await use(
         async (
@@ -65,7 +69,9 @@ const test = base.extend<
             name: "E2E Account",
             password: "E2eAccountPassword1!",
           };
+
           let user: { id: string } | null;
+
           try {
             await register(credentials);
           } finally {
@@ -73,13 +79,16 @@ const test = base.extend<
               select: { id: true },
               where: { email: credentials.email },
             });
+
             if (user !== null) {
               ownedUserIds.add(user.id);
             }
           }
+
           if (user === null) {
             throw new Error("The account registration did not create its allocated identity.");
           }
+
           return { ...credentials, id: user.id };
         },
       );
@@ -91,13 +100,16 @@ const test = base.extend<
   api: async ({ account, context, playwright }, use) => {
     const cookies = await context.cookies(webUrl);
     const session = cookies.find(({ name }) => name === sessionCookieName);
+
     if (session === undefined) {
       throw new Error(`The api fixture needs a web session for account ${account.id}.`);
     }
+
     const api = await playwright.request.newContext({
       baseURL: apiUrl,
       extraHTTPHeaders: { authorization: `Bearer ${decodeURIComponent(session.value)}` },
     });
+
     await use(api);
     await api.dispose();
   },
@@ -105,4 +117,5 @@ const test = base.extend<
 });
 
 export { sessionCookieName, signIn, signOut, signUp, test };
+
 export type { SessionOptions };

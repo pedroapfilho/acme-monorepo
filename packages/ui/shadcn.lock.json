@@ -25,7 +25,7 @@
     "src/components/field.tsx": {
       "registry": "field",
       "registrySha256": "586110f5563cbb5dc0929207ee34361f1349cf2f816465799c60b98821e4cedc",
-      "sha256": "f8896b9925e7b199ed73b77fd4b3964e7c2a2776569f371e1c2d8d35951b82c5"
+      "sha256": "fbfc85c0b7dea9a152557740ed3d2c7b09fc73c6b1d974e7206d08c0c69d3d23"
     },
     "src/components/input.tsx": {
       "registry": "input",

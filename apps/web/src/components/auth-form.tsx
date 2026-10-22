@@ -71,11 +71,13 @@ const useAuthRequest = <TInput, TData>({
       startTransition(async () => {
         try {
           const { data, error } = await call(input);
+
           if (error === null && data !== null) {
             await onSuccess?.(data, input);
           } else {
             const code = error?.code ?? null;
             setErrorCode(code);
+
             if (code === null || !handledErrorCodes.includes(code)) {
               showError(error?.message ?? fallbackError);
             }
@@ -83,6 +85,7 @@ const useAuthRequest = <TInput, TData>({
         } catch (error) {
           showUnexpectedError(error);
         }
+
         resolve();
       });
     });
@@ -92,14 +95,17 @@ const useAuthRequest = <TInput, TData>({
     if (isPending || isLatched.current) {
       return;
     }
+
     isLatched.current = true;
     setErrorMessage(null);
     setErrorCode(null);
+
     try {
       await work();
     } catch (error) {
       showUnexpectedError(error);
     }
+
     isLatched.current = false;
   };
 
@@ -186,6 +192,7 @@ const useAuthForm = <TValues, TData>({
 }: AuthFormOptions<TValues, TData>) => {
   const { attempt, errorCode, errorMessage, isPending, perform, showUnexpectedError } =
     useAuthRequest(requestOptions);
+
   const requiredFields = useMemo(
     () =>
       Object.entries(schema.shape).flatMap(([name, fieldSchema]) =>
@@ -193,11 +200,13 @@ const useAuthForm = <TValues, TData>({
       ),
     [schema],
   );
+
   const form = useAppForm({
     defaultValues,
     onSubmit: ({ value }) => perform(value),
     onSubmitInvalid: ({ formApi }) => {
       const error = formApi.state.errorMap.onChange;
+
       if (error instanceof Error) {
         showUnexpectedError(error);
       }
@@ -258,6 +267,7 @@ const BusyButton = ({ children, isPending, pendingLabel, ...props }: BusyButtonP
 
 const SubmitButton = (props: Omit<BusyButtonProps, "isPending" | "type">) => {
   const isPending = use(PendingContext);
+
   return <BusyButton {...props} isPending={isPending} type="submit" />;
 };
 
@@ -275,6 +285,7 @@ const AuthActionButton = <TData,>({
     fallbackError,
     onSuccess,
   });
+
   const ready = useClientReady();
 
   return (

@@ -28,6 +28,7 @@ type UserStore = {
 const createUserStore = (auth: Auth, prisma: PrismaClient): UserStore => ({
   delete: async ({ headers, password }) => {
     const result = await auth.api.deleteUser({ body: { password }, headers, returnHeaders: true });
+
     return result.headers;
   },
   find: (id) => prisma.user.findUnique({ select: userSelect, where: { id } }),
@@ -37,9 +38,11 @@ const createUserStore = (auth: Auth, prisma: PrismaClient): UserStore => ({
       headers,
       returnHeaders: true,
     });
+
     return result.headers;
   },
 });
 
 export { createUserStore };
+
 export type { User, UserStore };

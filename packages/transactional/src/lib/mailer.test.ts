@@ -17,9 +17,11 @@ const welcome: TransactionalEmail = {
 
 const sentPayload = () => {
   const payload = send.mock.calls[0]?.[0];
+
   if (payload === undefined) {
     throw new Error("Resend was not called");
   }
+
   return payload;
 };
 

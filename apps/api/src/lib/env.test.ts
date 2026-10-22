@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.stubEnv("BETTER_AUTH_SECRET", "a".repeat(32));
+
 vi.stubEnv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db");
 
 const { envSchema } = await import("./env");
@@ -19,6 +20,7 @@ describe("envSchema", () => {
   it("should apply default values", () => {
     const result = envSchema.safeParse(validEnv);
     expect(result.success).toBe(true);
+
     if (result.success) {
       expect(result.data.PORT).toBe(4000);
       expect(result.data.HOST).toBe("0.0.0.0");
@@ -39,6 +41,7 @@ describe("envSchema", () => {
       BETTER_AUTH_SECRET: "short",
       DATABASE_URL: "postgresql://localhost/db",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -52,6 +55,7 @@ describe("envSchema", () => {
       BETTER_AUTH_SECRET: "a".repeat(32),
       DATABASE_URL: "",
     });
+
     expect(result.success).toBe(false);
   });
 
@@ -60,6 +64,7 @@ describe("envSchema", () => {
       ...validEnv,
       NODE_ENV: "staging",
     });
+
     expect(result.success).toBe(false);
   });
 

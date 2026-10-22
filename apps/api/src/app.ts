@@ -37,6 +37,7 @@ type AppDeps = {
 const createApp = (deps: AppDeps) => {
   const app = createRouter();
   const rateLimit = createRateLimit(deps.trustedProxyHops);
+
   const authenticated = createSessionAuth(app.openAPIRegistry, {
     cookieName: deps.sessionCookieName,
     getSession: deps.getSession,
@@ -87,6 +88,7 @@ const createApp = (deps: AppDeps) => {
     llmsMarkdown ??= await createMarkdownFromOpenApi(
       JSON.stringify(app.getOpenAPI31Document({ ...apiDocumentMetadata, openapi: "3.1.0" })),
     );
+
     return c.text(llmsMarkdown);
   });
 
@@ -97,4 +99,5 @@ const createApp = (deps: AppDeps) => {
 };
 
 export { createApp };
+
 export type { AppDeps };

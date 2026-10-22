@@ -97,6 +97,7 @@ export class SettingsPage {
 
   expectSessions = async (devices: Array<string>) => {
     await expect(this.sessions).toHaveCount(devices.length);
+
     for (const device of devices) {
       await expect(this.sessions.filter({ hasText: device })).toHaveCount(1);
     }

@@ -35,6 +35,7 @@ const SignUpLink = ({ searchParams }: Props) => {
 
 const LoginForm = ({ searchParams }: Props) => {
   const { push, refresh } = useRouter();
+
   const { errorCode, form, submission } = useAuthForm({
     call: (value) => authClient.signIn.email(value),
     defaultValues: { email: "", password: "" },

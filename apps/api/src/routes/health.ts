@@ -80,6 +80,7 @@ const createHealthRoutes = (checkDatabase: CheckDatabase) => {
       );
     } catch (error) {
       c.get("log").error("Readiness check failed", { error });
+
       return c.json(
         {
           checks: { database: "unhealthy" as const },
@@ -95,4 +96,5 @@ const createHealthRoutes = (checkDatabase: CheckDatabase) => {
 };
 
 export { createHealthRoutes };
+
 export type { CheckDatabase };

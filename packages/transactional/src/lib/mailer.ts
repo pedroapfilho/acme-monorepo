@@ -61,6 +61,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
     case "welcome": {
       const greetingName =
         email.username !== undefined && email.username !== "" ? `, ${email.username}` : "";
+
       return {
         subject: `Welcome to Acme${greetingName}! Please verify your email`,
         template: React.createElement(WelcomeEmail, {
@@ -71,6 +72,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
         to: email.userEmail,
       };
     }
+
     case "sign-up-attempt": {
       return {
         subject: "Sign-up attempt with your Acme account",
@@ -83,6 +85,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
         to: email.userEmail,
       };
     }
+
     case "password-reset": {
       return {
         subject: "Reset your Acme password",
@@ -96,6 +99,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
         to: email.userEmail,
       };
     }
+
     case "change-email-confirmation": {
       return {
         subject: "Confirm change of your Acme account email",
@@ -108,6 +112,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
         to: email.currentEmail,
       };
     }
+
     default: {
       const unhandled: never = email;
       throw new Error(`Unhandled transactional email: ${String(unhandled)}`);
@@ -117,6 +122,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
 
 const resendSend = (apiKey: string): ResendSend => {
   const resend = new Resend(apiKey);
+
   return (payload) => resend.emails.send(payload);
 };
 
@@ -130,10 +136,12 @@ const createResendMailer = (
   return async (email) => {
     try {
       const { subject, template, to } = buildEmail(email);
+
       const [html, text] = await Promise.all([
         render(template),
         render(template, { plainText: true }),
       ]);
+
       const { error } = await send({
         from: sender,
         html,
@@ -145,12 +153,14 @@ const createResendMailer = (
         text,
         to,
       });
+
       if (error) {
         return {
           error: `Resend failed to queue email: ${error.name} - ${error.message}`,
           ok: false,
         };
       }
+
       return { ok: true };
     } catch (error) {
       return { error: error instanceof Error ? error.message : "Failed to send email", ok: false };
@@ -159,4 +169,5 @@ const createResendMailer = (
 };
 
 export { createResendMailer };
+
 export type { Mailer, TransactionalEmail };

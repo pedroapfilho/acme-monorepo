@@ -7,6 +7,7 @@ import { useClientReady } from "./use-client-ready";
 
 const Control = () => {
   const ready = useClientReady();
+
   return <input aria-label="Email" disabled={!ready} />;
 };
 
