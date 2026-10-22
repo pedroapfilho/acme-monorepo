@@ -1,9 +1,9 @@
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "../lib/utils";
 
 type FormAlertProps = Omit<ComponentProps<"p">, "children" | "role"> & {
-  message: string | null;
+  message: NonNullable<ReactNode> | null;
 };
 
 const FormAlert = ({ className, message, ...props }: FormAlertProps) =>
