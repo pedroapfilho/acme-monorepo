@@ -53,7 +53,13 @@ const Harness = ({ validator = schema }: { validator?: typeof schema }) => {
         {(field) => <field.TextField autoComplete="email" label="Email" />}
       </form.AppField>
       <form.AppField name="password">
-        {(field) => <field.TextField autoComplete="new-password" label="Password" />}
+        {(field) => (
+          <field.TextField
+            autoComplete="new-password"
+            description="At least 12 characters."
+            label="Password"
+          />
+        )}
       </form.AppField>
       <form.AppField name="confirmPassword">
         {(field) => (
@@ -124,6 +130,8 @@ const submit = async (times = 1) => {
 const liveRegionText = () =>
   document.querySelector('[aria-live="polite"][aria-atomic="true"]')?.textContent;
 
+const formAlertText = () => document.querySelector('[data-slot="form-alert"]')?.textContent ?? null;
+
 beforeEach(() => {
   call.mockReset();
   onSuccess.mockReset();
@@ -157,28 +165,34 @@ describe("useAuthForm", () => {
     expect(confirm.name).toBe("confirmPassword");
   });
 
-  it("validates on blur before submit, then clears errors on change without another blur", async () => {
+  it("shows no error before submit, then revalidates every change after a failed submit", async () => {
     render(<Harness />);
     type("Email", "not-an-email");
-    await settle();
-    expect(screen.queryByRole("alert")).toBeNull();
-
     fireEvent.blur(screen.getByLabelText("Email"));
-    expect(await screen.findByText("Invalid email")).not.toBeNull();
+    type("Password", "c");
+    fireEvent.blur(screen.getByLabelText("Password"));
+    await settle();
+    expect(screen.queryByText("Invalid email")).toBeNull();
+    expect(screen.queryByText("Too short")).toBeNull();
+    expect(screen.getByLabelText("Email").getAttribute("aria-invalid")).toBe("false");
+    expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
 
     await submit();
 
-    expect(await screen.findByText("Too short")).not.toBeNull();
+    expect(await screen.findByText("Invalid email")).not.toBeNull();
+    expect(screen.getByText("Too short")).not.toBeNull();
     const email = screen.getByLabelText("Email");
     expect(call).not.toHaveBeenCalled();
     expect(email.getAttribute("aria-invalid")).toBe("true");
     expect(email.getAttribute("aria-describedby")).toBe("email-error");
     expect(screen.getByText("Invalid email").getAttribute("id")).toBe("email-error");
+    expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
 
     type("Email", "user@example.com");
     await waitFor(() => {
       expect(screen.queryByText("Invalid email")).toBeNull();
     });
+    expect(screen.getByText("Too short")).not.toBeNull();
 
     type("Password", "correct-horse-battery");
     type("Confirm password", "correct-horse-staple");
@@ -200,37 +214,41 @@ describe("useAuthForm", () => {
     });
   });
 
-  it("keeps a field's errors hidden while typing until that field blurs or the form submits", async () => {
+  it("keeps an error that is still wrong after the next keystroke", async () => {
     render(<Harness />);
-    type("Email", "user@example.com");
-    fireEvent.blur(screen.getByLabelText("Email"));
-    await settle();
-
     type("Password", "c");
-    await settle();
-    expect(screen.queryByText("Too short")).toBeNull();
-    expect(screen.getByLabelText("Password").getAttribute("aria-invalid")).toBe("false");
-
-    fireEvent.blur(screen.getByLabelText("Password"));
+    await submit();
     expect(await screen.findByText("Too short")).not.toBeNull();
+
+    type("Password", "co");
+    await settle();
+
+    expect(screen.getByText("Too short")).not.toBeNull();
   });
 
-  it("revalidates a fixed blur error on the first Enter submission", async () => {
-    call.mockImplementation(succeed);
+  it("describes a field by its helper text from the start, and by its error after submit", async () => {
     render(<Harness />);
-    fillValid();
-    type("Email", "not-an-email");
-    fireEvent.blur(screen.getByLabelText("Email"));
-    expect(await screen.findByText("Invalid email")).not.toBeNull();
+    const password = screen.getByLabelText("Password");
+    expect(screen.getByText("At least 12 characters.").getAttribute("id")).toBe(
+      "password-description",
+    );
+    expect(password.getAttribute("aria-describedby")).toBe("password-description");
 
-    type("Email", "user@example.com");
     await submit();
 
     await waitFor(() => {
-      expect(call).toHaveBeenCalledTimes(1);
+      expect(password.getAttribute("aria-describedby")).toBe("password-description password-error");
     });
+  });
+
+  it("moves focus to the first invalid field on a failed submit", async () => {
+    render(<Harness />);
+    type("Email", "user@example.com");
+
+    await submit();
+
     await waitFor(() => {
-      expect(screen.queryByText("Invalid email")).toBeNull();
+      expect(document.activeElement).toBe(screen.getByLabelText("Password"));
     });
   });
 
@@ -286,10 +304,10 @@ describe("useAuthForm", () => {
       );
     });
     expect(showToast).not.toHaveBeenCalled();
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
   });
 
-  it("reports the Better Auth message in a toast and the live region, then retries", async () => {
+  it("reports the Better Auth message in the form alert, clears it on change, then retries", async () => {
     call.mockImplementationOnce(() =>
       fail({ code: "INVALID_PASSWORD", message: "Invalid password" }),
     );
@@ -300,10 +318,15 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(liveRegionText()).toBe("Invalid password");
+      expect(formAlertText()).toBe("Invalid password");
     });
-    expect(showToast).toHaveBeenCalledWith("Invalid password");
+    expect(showToast).not.toHaveBeenCalled();
+    expect(formAlertText()).toBe("Invalid password");
     expect(onSuccess).not.toHaveBeenCalled();
+
+    type("Password", "correct-horse-staple");
+    type("Confirm password", "correct-horse-staple");
+    expect(formAlertText()).toBeNull();
 
     await submit();
 
@@ -311,7 +334,7 @@ describe("useAuthForm", () => {
       expect(onSuccess).toHaveBeenCalledTimes(1);
     });
     expect(call).toHaveBeenCalledTimes(2);
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
   });
 
   it("falls back to the form's message when Better Auth sends none", async () => {
@@ -322,9 +345,9 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(liveRegionText()).toBe("Request failed");
+      expect(formAlertText()).toBe("Request failed");
     });
-    expect(showToast).toHaveBeenCalledWith("Request failed");
+    expect(formAlertText()).toBe("Request failed");
   });
 
   it("reports a thrown call with the generic message and logs it", async () => {
@@ -336,7 +359,7 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+      expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "Failed to fetch" }));
 
@@ -359,7 +382,7 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+      expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "validator exploded" }));
     expect(call).not.toHaveBeenCalled();
@@ -387,7 +410,7 @@ describe("useAuthForm", () => {
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
+      expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(call).not.toHaveBeenCalled();
     expect(logError).toHaveBeenCalledWith(
@@ -412,10 +435,10 @@ describe("useAuthForm", () => {
       expect(call).toHaveBeenCalledTimes(1);
     });
     expect(onSuccess).toHaveBeenCalledTimes(1);
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
   });
 
-  it("leaves handled error codes to the form without a toast", async () => {
+  it("leaves handled error codes to the form without a form alert", async () => {
     call.mockImplementationOnce(() =>
       fail({ code: "EMAIL_NOT_VERIFIED", message: "Email not verified" }),
     );
@@ -427,12 +450,12 @@ describe("useAuthForm", () => {
 
     expect(await screen.findByText("Handled EMAIL_NOT_VERIFIED")).not.toBeNull();
     expect(showToast).not.toHaveBeenCalled();
-    expect(liveRegionText()).toBe("");
+    expect(formAlertText()).toBeNull();
 
     await submit();
 
     await waitFor(() => {
-      expect(showToast).toHaveBeenCalledWith("Invalid credentials");
+      expect(formAlertText()).toBe("Invalid credentials");
     });
     expect(screen.queryByText("Handled EMAIL_NOT_VERIFIED")).toBeNull();
   });

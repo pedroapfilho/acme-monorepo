@@ -19,7 +19,7 @@ export class RegisterPage {
     this.submitButton = page.getByRole("button", { name: /create account/iv });
     this.signInLink = page.getByRole("link", { name: /sign in/iv });
     this.verificationSent = page.getByRole("status").filter({ hasText: "Check your email" });
-    this.rootError = page.locator('[data-sonner-toast][data-type="error"]');
+    this.rootError = page.locator('[data-slot="form-alert"]');
   }
 
   goto = async (from?: string) => {

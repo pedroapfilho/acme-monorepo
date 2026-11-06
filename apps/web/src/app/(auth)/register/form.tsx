@@ -79,7 +79,13 @@ const RegisterForm = ({ searchParams }: Props) => {
   return (
     <AuthForm submission={submission}>
       <form.AppField name="name">
-        {(field) => <field.TextField autoComplete="name" label="Full Name" />}
+        {(field) => (
+          <field.TextField
+            autoComplete="name"
+            description="3 to 32 characters."
+            label="Full Name"
+          />
+        )}
       </form.AppField>
 
       <form.AppField name="email">
@@ -88,7 +94,13 @@ const RegisterForm = ({ searchParams }: Props) => {
 
       <div className="grid grid-cols-2 gap-4">
         <form.AppField name="password">
-          {(field) => <field.TextField autoComplete="new-password" label="Password" />}
+          {(field) => (
+            <field.TextField
+              autoComplete="new-password"
+              description="At least 12 characters."
+              label="Password"
+            />
+          )}
         </form.AppField>
         <form.AppField name="confirmPassword">
           {(field) => <field.TextField autoComplete="new-password" label="Confirm Password" />}
