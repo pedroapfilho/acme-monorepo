@@ -3,34 +3,15 @@
 import { Field, FieldDescription } from "@repo/ui/components/field";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use } from "react";
 
+import { AuthPageLink } from "@/app/(auth)/auth-page-link";
 import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
-import { authPageHref, safeRedirectPath } from "@/lib/redirect-validation";
+import { safeRedirectPath } from "@/lib/redirect-validation";
 
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
-};
-
-const SignUpLinkFallback = () => (
-  <Link className="text-foreground underline underline-offset-4" href="/register">
-    Sign up
-  </Link>
-);
-
-const SignUpLink = ({ searchParams }: Props) => {
-  const { from } = use(searchParams);
-
-  return (
-    <Link
-      className="text-foreground underline underline-offset-4"
-      href={authPageHref("/register", from)}
-    >
-      Sign up
-    </Link>
-  );
 };
 
 const LoginForm = ({ searchParams }: Props) => {
@@ -84,9 +65,9 @@ const LoginForm = ({ searchParams }: Props) => {
         <SubmitButton pendingLabel="Signing in…">Sign in</SubmitButton>
         <FieldDescription className="text-center">
           Don&apos;t have an account?{" "}
-          <Suspense fallback={<SignUpLinkFallback />}>
-            <SignUpLink searchParams={searchParams} />
-          </Suspense>
+          <AuthPageLink page="/register" searchParams={searchParams}>
+            Sign up
+          </AuthPageLink>
         </FieldDescription>
       </Field>
     </AuthForm>

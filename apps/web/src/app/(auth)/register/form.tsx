@@ -1,36 +1,17 @@
 "use client";
 
 import { Field, FieldDescription } from "@repo/ui/components/field";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense, use, useState } from "react";
+import { useState } from "react";
 
+import { AuthPageLink } from "@/app/(auth)/auth-page-link";
 import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
-import { authPageHref, safeRedirectPath } from "@/lib/redirect-validation";
+import { safeRedirectPath } from "@/lib/redirect-validation";
 
 type Props = {
   searchParams: Promise<{ from?: string }>;
-};
-
-const SignInLinkFallback = () => (
-  <Link className="text-foreground underline underline-offset-4" href="/login">
-    Sign in
-  </Link>
-);
-
-const SignInLink = ({ searchParams }: Props) => {
-  const { from } = use(searchParams);
-
-  return (
-    <Link
-      className="text-foreground underline underline-offset-4"
-      href={authPageHref("/login", from)}
-    >
-      Sign in
-    </Link>
-  );
 };
 
 const RegisterForm = ({ searchParams }: Props) => {
@@ -99,9 +80,9 @@ const RegisterForm = ({ searchParams }: Props) => {
         <SubmitButton pendingLabel="Creating account…">Create account</SubmitButton>
         <FieldDescription className="text-center">
           Already have an account?{" "}
-          <Suspense fallback={<SignInLinkFallback />}>
-            <SignInLink searchParams={searchParams} />
-          </Suspense>
+          <AuthPageLink page="/login" searchParams={searchParams}>
+            Sign in
+          </AuthPageLink>
         </FieldDescription>
       </Field>
     </AuthForm>

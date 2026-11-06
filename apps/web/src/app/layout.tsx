@@ -8,6 +8,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { LONG_DESCRIPTION, SHORT_DESCRIPTION, SITE_NAME } from "@/lib/site";
+
 const inter = Inter({
   display: "swap",
   subsets: ["latin"],
@@ -17,32 +19,32 @@ const inter = Inter({
 const metadataBase = new URL(webAppUrl() ?? canonicalUrl("web"));
 
 export const metadata: Metadata = {
-  authors: [{ name: "Acme Team" }],
+  authors: [{ name: `${SITE_NAME} Team` }],
   category: "technology",
-  creator: "Acme",
-  description: "A modern, secure authentication platform built with Better Auth and Next.js.",
+  creator: SITE_NAME,
+  description: LONG_DESCRIPTION,
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
   metadataBase,
   openGraph: {
-    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
+    description: LONG_DESCRIPTION,
     locale: "en_US",
-    siteName: "Acme",
-    title: "Acme - Secure Authentication Platform",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
     type: "website",
   },
-  publisher: "Acme",
+  publisher: SITE_NAME,
   robots: {
     follow: false,
     index: false,
   },
   title: {
-    default: "Acme | Secure Authentication Platform",
-    template: "%s · Acme",
+    default: `${SITE_NAME} | ${SHORT_DESCRIPTION}`,
+    template: `%s · ${SITE_NAME}`,
   },
   twitter: {
     card: "summary_large_image",
-    description: "A modern, secure authentication platform built with Better Auth and Next.js.",
-    title: "Acme - Secure Authentication Platform",
+    description: LONG_DESCRIPTION,
+    title: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
   },
 };
 

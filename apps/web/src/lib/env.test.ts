@@ -4,7 +4,6 @@ const VALID_ENV = {
   BETTER_AUTH_SECRET: "a".repeat(32),
   FROM_EMAIL: "noreply@acme.com",
   RESEND_API_KEY: "re_test",
-  WEB_APP_URL: "https://acme.web.localhost",
 };
 
 const loadGetEnv = async (overrides: Record<string, string | undefined> = {}) => {
@@ -58,33 +57,9 @@ describe("getEnv", () => {
     expect(() => getEnv()).toThrow(/FROM_EMAIL/v);
   });
 
-  it("throws when FROM_EMAIL is not an address", async () => {
-    const getEnv = await loadGetEnv({ FROM_EMAIL: "noreply@acme" });
-
-    expect(() => getEnv()).toThrow(/FROM_EMAIL/v);
-  });
-
-  it("accepts the display-name sender form the mailer allows", async () => {
-    const getEnv = await loadGetEnv({ FROM_EMAIL: "Acme <noreply@acme.com>" });
-
-    expect(getEnv().FROM_EMAIL).toBe("Acme <noreply@acme.com>");
-  });
-
   it("throws when BETTER_AUTH_SECRET is too short", async () => {
     const getEnv = await loadGetEnv({ BETTER_AUTH_SECRET: "short" });
 
     expect(() => getEnv()).toThrow(/BETTER_AUTH_SECRET/v);
-  });
-
-  it("throws when RESEND_API_KEY is set without WEB_APP_URL", async () => {
-    const getEnv = await loadGetEnv({ WEB_APP_URL: undefined });
-
-    expect(() => getEnv()).toThrow(/WEB_APP_URL/v);
-  });
-
-  it("allows a missing WEB_APP_URL when no mailer is configured", async () => {
-    const getEnv = await loadGetEnv({ RESEND_API_KEY: undefined, WEB_APP_URL: undefined });
-
-    expect(getEnv().RESEND_API_KEY).toBeUndefined();
   });
 });

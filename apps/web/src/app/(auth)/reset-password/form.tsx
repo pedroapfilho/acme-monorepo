@@ -11,6 +11,7 @@ import { use } from "react";
 import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
+import { PASSWORD_RESET_NOTICE } from "@/lib/redirect-validation";
 
 type Props = {
   searchParams: Promise<{ error?: string; token?: string }>;
@@ -41,7 +42,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
     fallbackError: "Failed to reset password",
     handledErrorCodes: ["INVALID_TOKEN"],
     onSuccess: () => {
-      push("/login?message=password-reset-success");
+      push(`/login?message=${PASSWORD_RESET_NOTICE}`);
     },
     schema: resetPasswordSchema,
   });

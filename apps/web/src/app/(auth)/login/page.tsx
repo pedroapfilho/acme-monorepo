@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import LoginForm from "@/app/(auth)/login/form";
+import { PASSWORD_RESET_NOTICE } from "@/lib/redirect-validation";
 
 const metadata: Metadata = {
   description: "Sign in to your Acme account to access your dashboard and manage your profile.",
@@ -21,9 +22,8 @@ type Props = {
 
 const LoginDescription = async ({ searchParams }: Props) => {
   const { message } = await searchParams;
-  const isAfterPasswordReset = message === "password-reset-success";
 
-  return isAfterPasswordReset
+  return message === PASSWORD_RESET_NOTICE
     ? "Your password was reset. Sign in with your new password."
     : "Enter your details to sign in to your account";
 };
