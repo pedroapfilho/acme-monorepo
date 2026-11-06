@@ -4,7 +4,7 @@ import { rateLimiter } from "hono-rate-limiter";
 import { bodyLimit } from "hono/body-limit";
 import { secureHeaders } from "hono/secure-headers";
 
-import { AppError } from "@/lib/api-error";
+import { AppError, errorResponse } from "@/lib/api-error";
 
 const MAX_BODY_BYTES = 10 * 1024 * 1024;
 
@@ -40,6 +40,8 @@ const requestSizeLimit = bodyLimit({
     throw new AppError("Request entity too large", "PAYLOAD_TOO_LARGE", 413);
   },
 });
+
+const requestSizeLimitResponses = { 413: errorResponse("Request body too large") };
 
 const clientAddress = (c: Context, trustedProxyHops: number): string => {
   if (trustedProxyHops > 0) {
@@ -78,4 +80,12 @@ const createRateLimit =
       windowMs,
     });
 
-export { createRateLimit, requestSizeLimit, securityHeaders };
+const rateLimitResponses = { 429: errorResponse("Rate limit exceeded") };
+
+export {
+  createRateLimit,
+  rateLimitResponses,
+  requestSizeLimit,
+  requestSizeLimitResponses,
+  securityHeaders,
+};
