@@ -8,10 +8,11 @@ const send = vi.fn<NonNullable<Parameters<typeof createResendMailer>[1]>>();
 const mailerFrom = (from: string) => createResendMailer({ apiKey: "re_test", from }, send);
 
 const welcome: TransactionalEmail = {
+  linkLifetimeHours: 1,
+  name: "Ada",
   type: "welcome",
   userEmail: "new@acme.com",
   userId: "user_1",
-  username: "Ada",
   verificationUrl: "https://acme.com/verify",
 };
 
@@ -57,6 +58,7 @@ describe("createResendMailer", () => {
     },
     {
       email: {
+        linkLifetimeHours: 1,
         resetUrl: "https://acme.com/reset",
         type: "password-reset",
         userEmail: "reset@acme.com",
@@ -70,6 +72,7 @@ describe("createResendMailer", () => {
       email: {
         changeUrl: "https://acme.com/change",
         currentEmail: "current@acme.com",
+        linkLifetimeHours: 1,
         newEmail: "next@acme.com",
         type: "change-email-confirmation",
         userId: "user_4",
@@ -99,8 +102,17 @@ describe("createResendMailer", () => {
     },
   );
 
-  it("omits the username clause in the welcome subject when username is absent", async () => {
-    await mailerFrom("noreply@acme.com")({ ...welcome, username: undefined });
+  it.each([
+    [1, "1 hour"],
+    [24, "24 hours"],
+  ])("states a %i-hour link lifetime as %s", async (linkLifetimeHours, phrase) => {
+    await mailerFrom("noreply@acme.com")({ ...welcome, linkLifetimeHours });
+
+    expect(sentPayload().text).toContain(`verification link expires in ${phrase}.`);
+  });
+
+  it("omits the name clause in the welcome subject when the name is absent", async () => {
+    await mailerFrom("noreply@acme.com")({ ...welcome, name: undefined });
 
     expect(sentPayload().subject).toBe("Welcome to Acme! Please verify your email");
   });
@@ -146,7 +158,7 @@ describe("createResendMailer", () => {
   it("reports a template construction error as a failed delivery", async () => {
     const email: TransactionalEmail = {
       ...welcome,
-      get username(): string {
+      get name(): string {
         throw new Error("Template data unavailable");
       },
     };

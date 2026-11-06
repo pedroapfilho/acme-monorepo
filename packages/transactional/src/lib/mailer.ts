@@ -10,43 +10,13 @@ import { WelcomeEmail } from "../emails/welcome";
 
 import { senderAddressSchema } from "./sender-address";
 
-type WelcomePayload = {
-  userEmail: string;
-  userId: string;
-  username?: string;
-  verificationUrl: string;
-};
-
-type SignUpAttemptPayload = {
-  resetPasswordUrl: string;
-  signInUrl: string;
-  userEmail: string;
-  userId: string;
-  username?: string;
-};
-
-type PasswordResetPayload = {
-  browserInfo?: string;
-  ipAddress?: string;
-  resetUrl: string;
-  userEmail: string;
-  userId: string;
-  username?: string;
-};
-
-type ChangeEmailPayload = {
-  changeUrl: string;
-  currentEmail: string;
-  newEmail: string;
-  userId: string;
-  username?: string;
-};
-
 type TransactionalEmail =
-  | ({ type: "welcome" } & WelcomePayload)
-  | ({ type: "sign-up-attempt" } & SignUpAttemptPayload)
-  | ({ type: "password-reset" } & PasswordResetPayload)
-  | ({ type: "change-email-confirmation" } & ChangeEmailPayload);
+  | ({ type: "welcome"; userId: string } & React.ComponentProps<typeof WelcomeEmail>)
+  | ({ type: "sign-up-attempt"; userId: string } & React.ComponentProps<typeof SignUpAttemptEmail>)
+  | ({ type: "password-reset"; userId: string } & React.ComponentProps<typeof PasswordResetEmail>)
+  | ({ type: "change-email-confirmation"; userId: string } & React.ComponentProps<
+      typeof ChangeEmail
+    >);
 
 type DeliveryResult = { ok: true } | { error: string; ok: false };
 
@@ -59,16 +29,11 @@ type EmailBuild = { subject: string; template: React.ReactElement; to: string };
 const buildEmail = (email: TransactionalEmail): EmailBuild => {
   switch (email.type) {
     case "welcome": {
-      const greetingName =
-        email.username !== undefined && email.username !== "" ? `, ${email.username}` : "";
+      const greetingName = email.name !== undefined && email.name !== "" ? `, ${email.name}` : "";
 
       return {
         subject: `Welcome to Acme${greetingName}! Please verify your email`,
-        template: React.createElement(WelcomeEmail, {
-          userEmail: email.userEmail,
-          username: email.username,
-          verificationUrl: email.verificationUrl,
-        }),
+        template: React.createElement(WelcomeEmail, email),
         to: email.userEmail,
       };
     }
@@ -76,12 +41,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
     case "sign-up-attempt": {
       return {
         subject: "Sign-up attempt with your Acme account",
-        template: React.createElement(SignUpAttemptEmail, {
-          resetPasswordUrl: email.resetPasswordUrl,
-          signInUrl: email.signInUrl,
-          userEmail: email.userEmail,
-          username: email.username,
-        }),
+        template: React.createElement(SignUpAttemptEmail, email),
         to: email.userEmail,
       };
     }
@@ -89,13 +49,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
     case "password-reset": {
       return {
         subject: "Reset your Acme password",
-        template: React.createElement(PasswordResetEmail, {
-          browserInfo: email.browserInfo,
-          ipAddress: email.ipAddress,
-          resetUrl: email.resetUrl,
-          userEmail: email.userEmail,
-          username: email.username,
-        }),
+        template: React.createElement(PasswordResetEmail, email),
         to: email.userEmail,
       };
     }
@@ -103,12 +57,7 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
     case "change-email-confirmation": {
       return {
         subject: "Confirm change of your Acme account email",
-        template: React.createElement(ChangeEmail, {
-          changeUrl: email.changeUrl,
-          currentEmail: email.currentEmail,
-          newEmail: email.newEmail,
-          username: email.username,
-        }),
+        template: React.createElement(ChangeEmail, email),
         to: email.currentEmail,
       };
     }

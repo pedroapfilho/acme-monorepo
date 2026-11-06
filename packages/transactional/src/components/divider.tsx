@@ -1,11 +1,10 @@
 import { Hr } from "react-email";
 
 type DividerProps = {
-  spacing?: "sm" | "md" | "lg";
+  spacing?: "sm" | "md";
 };
 
 const SPACING_CLASSES = {
-  lg: "py-5",
   md: "py-4",
   sm: "py-3",
 };

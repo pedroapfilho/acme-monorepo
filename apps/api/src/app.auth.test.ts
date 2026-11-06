@@ -2,7 +2,6 @@ import { createAuth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
 import { initApiLogger } from "@repo/observability/hono";
 import { memoryAdapter } from "better-auth/adapters/memory";
-import { getCookies } from "better-auth/cookies";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { createApp } from "./app";
@@ -48,7 +47,7 @@ const fixture = async () => {
     corsOrigins: [],
     getSession: auth.api.getSession,
     isProduction: true,
-    sessionCookieName: getCookies(auth.options).sessionToken.name,
+    sessionCookieName: auth.sessionCookieName,
     trustedProxyHops: 0,
     users: {
       ...createUserStore(auth, prisma),

@@ -6,7 +6,6 @@ import { parseEnvList } from "@repo/auth/env-config";
 import { prisma } from "@repo/db";
 import { log } from "@repo/observability";
 import { initApiLogger } from "@repo/observability/hono";
-import { getCookies } from "better-auth/cookies";
 
 import { createApp } from "./app";
 import { auth } from "./lib/auth";
@@ -22,7 +21,7 @@ const app = createApp({
   corsOrigins: parseEnvList(env.CORS_ORIGINS),
   getSession: auth.api.getSession,
   isProduction: env.NODE_ENV === "production",
-  sessionCookieName: getCookies(auth.options).sessionToken.name,
+  sessionCookieName: auth.sessionCookieName,
   trustedProxyHops: env.TRUSTED_PROXY_HOPS,
   users: createUserStore(auth, prisma),
 });

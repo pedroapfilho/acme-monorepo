@@ -2,16 +2,23 @@ import { Heading, Link, Text } from "react-email";
 
 import { Button } from "../components/button";
 import { Divider } from "../components/divider";
+import { formatHours } from "../lib/format-hours";
 
 import { BaseLayout } from "./base-layout";
 
 type WelcomeEmailProps = {
+  linkLifetimeHours: number;
+  name?: string;
   userEmail: string;
-  username?: string;
   verificationUrl: string;
 };
 
-const WelcomeEmail = ({ userEmail, username, verificationUrl }: WelcomeEmailProps) => {
+const WelcomeEmail = ({
+  linkLifetimeHours,
+  name,
+  userEmail,
+  verificationUrl,
+}: WelcomeEmailProps) => {
   return (
     <BaseLayout preview="Welcome to Acme. Verify your email to get started.">
       <Heading className="mt-0 mb-4 text-2xl font-semibold tracking-tight text-balance break-words text-foreground">
@@ -23,24 +30,22 @@ const WelcomeEmail = ({ userEmail, username, verificationUrl }: WelcomeEmailProp
       </Text>
 
       <div className="mb-6">
-        <Button fullWidth href={verificationUrl} variant="primary">
-          Verify email address
-        </Button>
+        <Button href={verificationUrl}>Verify email address</Button>
       </div>
 
       <Divider />
 
       <Text className="m-0 mb-4 text-sm text-muted-foreground">
         If you didn&apos;t create an account with Acme, you can safely ignore this email. The
-        verification link expires in 24 hours.
+        verification link expires in {formatHours(linkLifetimeHours)}.
       </Text>
 
       <Text className="m-0 mb-4 text-sm text-muted-foreground">
         <strong>Account details</strong>
         <br />
-        {username !== undefined && username !== "" ? (
+        {name !== undefined && name !== "" ? (
           <>
-            Username: {username}
+            Name: {name}
             <br />
           </>
         ) : null}
@@ -59,6 +64,13 @@ const WelcomeEmail = ({ userEmail, username, verificationUrl }: WelcomeEmailProp
     </BaseLayout>
   );
 };
+
+WelcomeEmail.PreviewProps = {
+  linkLifetimeHours: 1,
+  name: "Ada Lovelace",
+  userEmail: "ada@example.com",
+  verificationUrl: "https://acme.web.localhost/api/auth/verify-email?token=preview",
+} satisfies WelcomeEmailProps;
 
 export { WelcomeEmail };
 
