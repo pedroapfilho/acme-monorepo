@@ -28,12 +28,10 @@
   "devDependencies": {
     "@next/playwright": "^16.3.6",
     "@playwright/test": "^1.63.0",
-    "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/portless-env": "workspace:*",
     "@shadcn/lint": "0.2.0",
     "@types/node": "^26.6.2",
-    "better-auth": "^1.7.6",
     "fallow": "^3.28.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.5.1",

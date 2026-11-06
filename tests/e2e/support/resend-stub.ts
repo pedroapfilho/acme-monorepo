@@ -57,7 +57,13 @@ type StubResponse =
   | { id: string }
   | { message: string; name: string };
 
-const PORT = Number(process.env.RESEND_STUB_PORT ?? 3999);
+const BASE_URL = URL.parse(process.env.RESEND_BASE_URL ?? "");
+
+if (BASE_URL === null || BASE_URL.port === "") {
+  throw new Error(
+    "RESEND_BASE_URL must give the stub's address with a port, e.g. http://127.0.0.1:3999",
+  );
+}
 
 const emails: Array<StoredEmail> = [];
 
@@ -107,7 +113,7 @@ const respond = (response: ServerResponse, status: number, payload: StubResponse
 };
 
 const handle = async (request: IncomingMessage, response: ServerResponse) => {
-  const url = new URL(request.url ?? "/", `http://localhost:${PORT}`);
+  const url = new URL(request.url ?? "/", BASE_URL);
   const emailId = /^\/emails\/(?<id>[^/]+)$/u.exec(url.pathname)?.groups?.id;
 
   if (request.method === "POST" && url.pathname === "/emails") {
@@ -167,4 +173,4 @@ const serve = async (request: IncomingMessage, response: ServerResponse) => {
 
 createServer((request, response) => {
   void serve(request, response);
-}).listen(PORT);
+}).listen(Number(BASE_URL.port));

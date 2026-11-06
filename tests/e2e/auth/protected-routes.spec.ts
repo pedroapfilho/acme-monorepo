@@ -1,5 +1,5 @@
 import { test, expect } from "../fixtures/auth.fixture";
-import { sessionCookieName } from "../fixtures/session";
+import { findSessionCookie } from "../fixtures/session";
 import { TEST_USER } from "../fixtures/test-user";
 import { webUrl } from "../urls";
 
@@ -21,14 +21,18 @@ test.describe("Root redirect", () => {
   });
 
   test("sends visitors holding a stale session cookie to login", async ({ page }) => {
+    const session = findSessionCookie(await page.context().cookies(webUrl));
+
+    if (session === undefined) {
+      throw new Error("The seeded storage state holds no session cookie.");
+    }
+
     await page.context().clearCookies();
-    await page.context().addCookies([
-      {
-        name: sessionCookieName,
-        url: webUrl,
-        value: "stale-session-token-that-matches-no-session",
-      },
-    ]);
+    await page
+      .context()
+      .addCookies([
+        { name: session.name, url: webUrl, value: "stale-session-token-that-matches-no-session" },
+      ]);
 
     await page.goto("/");
     await page.waitForURL(/\/login/);
