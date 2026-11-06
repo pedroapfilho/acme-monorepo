@@ -5,13 +5,11 @@ import { createMiddleware } from "hono/factory";
 
 import { AppError, errorResponse } from "@/lib/api-error";
 
-type Session = ResolvedSession & {
-  user: { email: string; id: string };
-};
+type SessionUser = { email: string; id: string };
+
+type Session = ResolvedSession & { user: SessionUser };
 
 type SessionLookup = (input: { headers: Headers }) => Promise<Session | null>;
-
-type SessionUser = { email: string; id: string };
 
 const SESSION_SECURITY: Array<Record<string, Array<string>>> = [
   { bearerAuth: [] },

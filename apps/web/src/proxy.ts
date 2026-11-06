@@ -1,11 +1,9 @@
-import { COOKIE_PREFIX } from "@repo/auth/server";
 import { log } from "@repo/observability";
-import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { getSession } from "@/lib/auth-helpers";
-import { authPageHref } from "@/lib/redirect-validation";
+import { authPageHref, HOME_PATH } from "@/lib/redirect-validation";
 
 const protectedRoutes = ["/dashboard"];
 
@@ -15,13 +13,7 @@ const authRoutes = new Set(["/login", "/register", "/recover"]);
 
 export const createProxy = (lookup: typeof getSession) => async (request: NextRequest) => {
   const pathname = request.nextUrl.pathname;
-
-  if (pathname === "/") {
-    const destination =
-      getSessionCookie(request, { cookiePrefix: COOKIE_PREFIX }) === null ? "/login" : "/dashboard";
-
-    return NextResponse.redirect(new URL(destination, request.url));
-  }
+  const isRoot = pathname === "/";
 
   const isProtectedRoute = protectedRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
@@ -29,7 +21,7 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
 
   const isAuthRoute = authRoutes.has(pathname);
 
-  if (!isProtectedRoute && !isAuthRoute) {
+  if (!isRoot && !isProtectedRoute && !isAuthRoute) {
     return NextResponse.next();
   }
 
@@ -39,6 +31,10 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
     session = await lookup(request.headers);
   } catch (error) {
     log.error(new Error("Proxy: failed to look up session", { cause: error }));
+  }
+
+  if (isRoot) {
+    return NextResponse.redirect(new URL(session ? HOME_PATH : "/login", request.url));
   }
 
   if (isProtectedRoute && !session) {
@@ -51,9 +47,7 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
   }
 
   if (isAuthRoute && session) {
-    const url = new URL("/dashboard", request.url);
-
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL(HOME_PATH, request.url));
   }
 
   return NextResponse.next();

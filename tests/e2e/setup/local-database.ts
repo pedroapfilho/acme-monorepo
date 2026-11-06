@@ -8,9 +8,15 @@ const assertLocalDatabaseUrl = (value: string): void => {
     url.searchParams.has("host")
   ) {
     throw new Error(
-      `Refusing to run ensure-e2e-user.ts against DATABASE_URL host ${url === null || url.hostname === "" ? "<invalid>" : url.hostname}.`,
+      `Refusing to run the e2e suite against DATABASE_URL host ${url === null || url.hostname === "" ? "<invalid>" : url.hostname}.`,
     );
   }
 };
 
+const globalSetup = () => {
+  assertLocalDatabaseUrl(process.env.DATABASE_URL ?? "");
+};
+
 export { assertLocalDatabaseUrl };
+
+export default globalSetup;

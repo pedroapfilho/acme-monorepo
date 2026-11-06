@@ -12,16 +12,7 @@ const srcDir = path.resolve(process.cwd(), "src");
 export default defineConfig({
   clean: true,
   deps: {
-    alwaysBundle: [
-      "@repo/auth",
-      "@repo/auth/env-config",
-      "@repo/auth/server",
-      "@repo/db",
-      "@repo/observability",
-      "@repo/observability/auth",
-      "@repo/observability/hono",
-      "@repo/portless-env/apps",
-    ],
+    alwaysBundle: [/^@repo\//v],
   },
   entry: ["src/index.ts"],
   format: ["esm"],

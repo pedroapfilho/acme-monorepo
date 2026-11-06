@@ -78,10 +78,11 @@ describe("createAuth with a mailer", () => {
     expect(result.token).toBeNull();
     expect(sent).toEqual([
       {
+        linkLifetimeHours: 1,
+        name: "Ada",
         type: "welcome",
         userEmail: "ada@acme.test",
         userId: result.user.id,
-        username: "Ada",
         verificationUrl: expect.stringMatching(/\/api\/auth\/verify-email\?token=/v),
       },
     ]);
@@ -108,12 +109,12 @@ describe("createAuth with a mailer", () => {
     expect(repeat.user.email).toBe("ada@acme.test");
     expect(sentOfType(sent, "sign-up-attempt")).toEqual([
       {
+        name: "Ada",
         resetPasswordUrl: `${WEB_APP_URL}/recover`,
         signInUrl: `${WEB_APP_URL}/login`,
         type: "sign-up-attempt",
         userEmail: "ada@acme.test",
         userId: first.user.id,
-        username: "Ada",
       },
     ]);
   });
@@ -153,13 +154,14 @@ describe("createAuth with a mailer", () => {
 
     expect(sentOfType(sent, "password-reset")).toEqual([
       {
+        linkLifetimeHours: 1,
+        name: "Ada",
         resetUrl: expect.stringMatching(
           /\/api\/auth\/reset-password\/\w+\?callbackURL=%2Freset-password$/v,
         ),
         type: "password-reset",
         userEmail: "ada@acme.test",
         userId: user.id,
-        username: "Ada",
       },
     ]);
   });
@@ -188,10 +190,11 @@ describe("createAuth with a mailer", () => {
           /\/api\/auth\/verify-email\?token=.+&callbackURL=%2Fdashboard%2Fsettings$/v,
         ),
         currentEmail: "ada@acme.test",
+        linkLifetimeHours: 1,
+        name: "Ada",
         newEmail: "lovelace@acme.test",
         type: "change-email-confirmation",
         userId: user.id,
-        username: "Ada",
       },
     ]);
   });
@@ -243,6 +246,7 @@ describe("createAuth credentials and sessions", () => {
     const session = await auth.api.getSession({ headers: new Headers({ cookie }) });
 
     expect(cookie).toMatch(/^acme\.session_token=/v);
+    expect(cookie.split("=")[0]).toBe(auth.sessionCookieName);
     const lifetime = (session?.session.expiresAt.getTime() ?? 0) - Date.now();
     expect(lifetime).toBeGreaterThan(60 * 60 * 24 * 7 * 1000 - 60_000);
     expect(lifetime).toBeLessThanOrEqual(60 * 60 * 24 * 7 * 1000);
@@ -252,6 +256,9 @@ describe("createAuth credentials and sessions", () => {
     const auth = testAuth({ useSecureCookies: true });
     await signUp(auth);
 
-    expect(await signedInCookie(auth, "ada@acme.test")).toMatch(/^__Secure-acme\.session_token=/v);
+    const cookie = await signedInCookie(auth, "ada@acme.test");
+
+    expect(cookie).toMatch(/^__Secure-acme\.session_token=/v);
+    expect(cookie.split("=")[0]).toBe(auth.sessionCookieName);
   });
 });

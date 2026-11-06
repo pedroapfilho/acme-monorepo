@@ -6,17 +6,10 @@ import { tailwindConfig } from "../styles/theme";
 
 type BaseLayoutProps = {
   children: React.ReactNode;
-  footerText?: string;
   preview: string;
-  unsubscribeUrl?: string;
 };
 
-const BaseLayout = ({
-  children,
-  footerText = "You're receiving this email because you have an account with Acme.",
-  preview,
-  unsubscribeUrl,
-}: BaseLayoutProps) => {
+const BaseLayout = ({ children, preview }: BaseLayoutProps) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -33,7 +26,7 @@ const BaseLayout = ({
           <Container className="mx-auto w-full max-w-150 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <Section className="bg-primary px-6 py-8 text-center">
               <Link className="inline-block no-underline" href="https://acme.com">
-                <AcmeLogo height={28} width={104} />
+                <AcmeLogo />
               </Link>
             </Section>
 
@@ -42,7 +35,9 @@ const BaseLayout = ({
             </Section>
 
             <Section className="border-t border-border bg-muted px-6 py-8 text-center">
-              <Text className="m-0 mb-4 text-sm text-muted-foreground">{footerText}</Text>
+              <Text className="m-0 mb-4 text-sm text-muted-foreground">
+                You&apos;re receiving this email because you have an account with Acme.
+              </Text>
 
               <Text className="mb-4 text-sm text-muted-foreground">
                 <Link
@@ -51,17 +46,6 @@ const BaseLayout = ({
                 >
                   Visit Acme
                 </Link>
-                {unsubscribeUrl !== undefined && unsubscribeUrl !== "" && (
-                  <>
-                    <span className="px-2 text-sm text-border">·</span>
-                    <Link
-                      className="text-sm font-semibold text-muted-foreground no-underline"
-                      href={unsubscribeUrl}
-                    >
-                      Unsubscribe
-                    </Link>
-                  </>
-                )}
               </Text>
 
               <Text className="m-0 text-xs text-muted-foreground">

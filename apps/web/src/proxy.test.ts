@@ -31,6 +31,26 @@ describe("proxy", () => {
     },
   );
 
+  it.each([
+    { destination: "/login", session: null },
+    { destination: "/dashboard", session: { user: { id: "user_1" } } },
+  ])("sends root visitors to $destination", async ({ destination, session }) => {
+    lookup.mockResolvedValue(session);
+
+    const response = await proxy(requestFor("/"));
+
+    expect(response.headers.get("location")).toBe(`https://acme.web.localhost${destination}`);
+  });
+
+  it("sends root visitors to login when the session lookup fails", async () => {
+    lookup.mockRejectedValue(new Error("Database unavailable"));
+    vi.spyOn(log, "error").mockImplementation(() => undefined);
+
+    const response = await proxy(requestFor("/"));
+
+    expect(response.headers.get("location")).toBe("https://acme.web.localhost/login");
+  });
+
   it("sends signed-out dashboard visitors to login without a redundant return destination", async () => {
     const response = await proxy(requestFor("/dashboard"));
 

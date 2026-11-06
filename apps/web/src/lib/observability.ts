@@ -1,4 +1,3 @@
 import { createObservability } from "@repo/observability/next";
 
-export const { createError, log, onRequestError, register, useLogger, withEvlog } =
-  createObservability({ service: "web" });
+export const { onRequestError, register } = createObservability({ service: "web" });

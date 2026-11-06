@@ -23,7 +23,7 @@ const browserProject = (
 export default defineConfig<SessionOptions>({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
-  globalTeardown: "./tests/e2e/teardown/cleanup.ts",
+  globalSetup: "./tests/e2e/setup/local-database.ts",
 
   projects: [
     { name: "setup", testMatch: /.*\.setup\.ts/ },

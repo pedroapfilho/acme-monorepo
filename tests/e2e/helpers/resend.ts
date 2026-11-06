@@ -1,4 +1,4 @@
-import { sleep } from "./sleep";
+import { setTimeout as sleep } from "node:timers/promises";
 
 const RESEND_API = process.env.RESEND_BASE_URL ?? "https://api.resend.com";
 
@@ -179,6 +179,4 @@ const extractLink = (email: ResendEmail, pattern: RegExp): string => {
   );
 };
 
-export { extractLink, getEmail, listEmails, waitForEmail };
-
-export type { ResendEmail, ResendListItem };
+export { extractLink, waitForEmail };

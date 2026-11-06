@@ -7,17 +7,17 @@ import { Divider } from "../components/divider";
 import { BaseLayout } from "./base-layout";
 
 type SignUpAttemptEmailProps = {
+  name?: string;
   resetPasswordUrl: string;
   signInUrl: string;
   userEmail: string;
-  username?: string;
 };
 
 const SignUpAttemptEmail = ({
+  name,
   resetPasswordUrl,
   signInUrl,
   userEmail,
-  username,
 }: SignUpAttemptEmailProps) => {
   return (
     <BaseLayout preview="A sign-up attempt was made with your Acme account email">
@@ -26,7 +26,7 @@ const SignUpAttemptEmail = ({
       </Heading>
 
       <Text className="m-0 mb-2 text-base text-pretty break-words text-muted-foreground">
-        Hi{username !== undefined && username !== "" ? ` ${username}` : ""},
+        Hi{name !== undefined && name !== "" ? ` ${name}` : ""},
       </Text>
 
       <Text className="m-0 mb-2 text-base text-pretty break-words text-muted-foreground">
@@ -41,9 +41,7 @@ const SignUpAttemptEmail = ({
       </Text>
 
       <div className="mb-6">
-        <Button fullWidth href={signInUrl} variant="primary">
-          Sign in
-        </Button>
+        <Button href={signInUrl}>Sign in</Button>
       </div>
 
       <Text className="m-0 mb-6 text-base text-muted-foreground">
@@ -56,7 +54,7 @@ const SignUpAttemptEmail = ({
 
       <Divider />
 
-      <Card accent title="Didn't try to sign up?">
+      <Card title="Didn't try to sign up?">
         <Text className="m-0 mb-2 text-base text-muted-foreground">
           You can safely ignore this email. No account changes were made. If you keep getting these
           notifications, someone may be probing for accounts using your email. We recommend:
@@ -84,6 +82,13 @@ const SignUpAttemptEmail = ({
     </BaseLayout>
   );
 };
+
+SignUpAttemptEmail.PreviewProps = {
+  name: "Ada Lovelace",
+  resetPasswordUrl: "https://acme.web.localhost/recover",
+  signInUrl: "https://acme.web.localhost/login",
+  userEmail: "ada@example.com",
+} satisfies SignUpAttemptEmailProps;
 
 export { SignUpAttemptEmail };
 

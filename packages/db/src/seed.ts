@@ -19,21 +19,9 @@ const DEFAULT_USERS = [
 
 try {
   const results = await Promise.allSettled(
-    DEFAULT_USERS.map(async (user) => {
-      const upserted = await prisma.user.upsert({
-        create: {
-          ...user,
-        },
-        update: {
-          ...user,
-        },
-        where: {
-          id: user.id,
-        },
-      });
-
-      return upserted;
-    }),
+    DEFAULT_USERS.map((user) =>
+      prisma.user.upsert({ create: user, update: user, where: { id: user.id } }),
+    ),
   );
 
   const failures = results.filter((r) => r.status === "rejected");
@@ -42,9 +30,6 @@ try {
     console.error("Some seed operations failed:", failures);
     throw new Error(`Seed failed: ${failures.length} upsert(s) rejected`);
   }
-} catch (error) {
-  console.error(error);
-  throw error;
 } finally {
   await prisma.$disconnect();
 }

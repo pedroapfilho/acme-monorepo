@@ -1,7 +1,6 @@
-// Owned here and seeded by apps/web/scripts/ensure-e2e-user.ts. Kept dependency-free so the
-// Playwright config, the setup project, the specs and the seed script can all import it.
+// Kept dependency-free so the Playwright config can import it.
 const TEST_USER = {
-  email: "e2e-test@acme.localhost",
+  email: "delivered+e2e-seeded-user@resend.dev",
   name: "E2E Test User",
   password: "TestPassword123!",
 } as const;

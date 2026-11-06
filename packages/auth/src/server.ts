@@ -4,11 +4,16 @@ import { loopbackUrl } from "@repo/portless-env/apps";
 import type { Mailer, TransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { getCookies } from "better-auth/cookies";
 import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
 
+import { PASSWORD_LENGTH, USERNAME_LENGTH } from "./policy";
+
 const COOKIE_PREFIX = "acme";
+
+const EMAIL_LINK_LIFETIME_HOURS = 1;
 
 type AuthConfig = {
   allowedHosts: Array<string>;
@@ -92,7 +97,7 @@ const createAuth = (config: AuthConfig) => {
 
     baseURL: {
       allowedHosts,
-      fallback: loopbackUrl("api", "localhost"),
+      fallback: webAppUrl ?? loopbackUrl("web", "localhost"),
       protocol: "auto",
     },
 
@@ -100,8 +105,8 @@ const createAuth = (config: AuthConfig) => {
 
     emailAndPassword: {
       enabled: true,
-      maxPasswordLength: 128,
-      minPasswordLength: 12,
+      maxPasswordLength: PASSWORD_LENGTH.max,
+      minPasswordLength: PASSWORD_LENGTH.min,
       // A failed notice must not fail the sign-up: the generic response is what hides that the email is registered.
       onExistingUserSignUp:
         links &&
@@ -109,23 +114,25 @@ const createAuth = (config: AuthConfig) => {
           await deliver(
             {
               ...links,
+              name: user.name,
               type: "sign-up-attempt",
               userEmail: user.email,
               userId: user.id,
-              username: user.name,
             },
             { message: "Auth: failed to send sign-up attempt email", mode: "log" },
           );
         }),
       requireEmailVerification: Boolean(mailer),
+      resetPasswordTokenExpiresIn: EMAIL_LINK_LIFETIME_HOURS * 60 * 60,
       sendResetPassword: async ({ url, user }) => {
         await deliver(
           {
+            linkLifetimeHours: EMAIL_LINK_LIFETIME_HOURS,
+            name: user.name,
             resetUrl: url,
             type: "password-reset",
             userEmail: user.email,
             userId: user.id,
-            username: user.name,
           },
           { message: "Failed to send password reset email", mode: "throw" },
         );
@@ -134,16 +141,18 @@ const createAuth = (config: AuthConfig) => {
 
     emailVerification: {
       autoSignInAfterVerification: true,
+      expiresIn: EMAIL_LINK_LIFETIME_HOURS * 60 * 60,
       sendOnSignIn: true,
       sendVerificationEmail:
         mailer &&
         (async ({ url, user }) => {
           await deliver(
             {
+              linkLifetimeHours: EMAIL_LINK_LIFETIME_HOURS,
+              name: user.name,
               type: "welcome",
               userEmail: user.email,
               userId: user.id,
-              username: user.name,
               verificationUrl: url,
             },
             { message: "Failed to send verification email", mode: "throw" },
@@ -151,7 +160,11 @@ const createAuth = (config: AuthConfig) => {
         }),
     },
 
-    plugins: [username(), bearer(), ...extraPlugins],
+    plugins: [
+      username({ maxUsernameLength: USERNAME_LENGTH.max, minUsernameLength: USERNAME_LENGTH.min }),
+      bearer(),
+      ...extraPlugins,
+    ],
 
     rateLimit: {
       enabled: rateLimitEnabled,
@@ -187,10 +200,11 @@ const createAuth = (config: AuthConfig) => {
             {
               changeUrl: url,
               currentEmail: user.email,
+              linkLifetimeHours: EMAIL_LINK_LIFETIME_HOURS,
+              name: user.name,
               newEmail,
               type: "change-email-confirmation",
               userId: user.id,
-              username: user.name,
             },
             { message: "Failed to send change-email confirmation", mode: "throw" },
           );
@@ -202,11 +216,15 @@ const createAuth = (config: AuthConfig) => {
     },
   });
 
-  return { ...auth, canSendEmail: mailer !== undefined };
+  return {
+    ...auth,
+    canSendEmail: mailer !== undefined,
+    sessionCookieName: getCookies(auth.options).sessionToken.name,
+  };
 };
 
 type Auth = ReturnType<typeof createAuth>;
 
-export { COOKIE_PREFIX, createAuth, prismaDatabase };
+export { createAuth, prismaDatabase };
 
 export type { Auth, AuthConfig };

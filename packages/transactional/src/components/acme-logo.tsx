@@ -1,14 +1,7 @@
 import { Img } from "react-email";
 
-type AcmeLogoProps = {
-  height?: number;
-  width?: number;
-};
-
-const AcmeLogo = ({ height = 32, width = 120 }: AcmeLogoProps) => {
-  return (
-    <Img alt="Acme" height={height} src="https://www.acme.com/logo-wordmark.svg" width={width} />
-  );
-};
+const AcmeLogo = () => (
+  <Img alt="Acme" height={28} src="https://www.acme.com/logo-wordmark.svg" width={104} />
+);
 
 export { AcmeLogo };

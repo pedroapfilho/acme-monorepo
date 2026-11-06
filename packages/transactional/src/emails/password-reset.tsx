@@ -3,23 +3,22 @@ import { Heading, Link, Text } from "react-email";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { Divider } from "../components/divider";
+import { formatHours } from "../lib/format-hours";
 
 import { BaseLayout } from "./base-layout";
 
 type PasswordResetEmailProps = {
-  browserInfo?: string;
-  ipAddress?: string;
+  linkLifetimeHours: number;
+  name?: string;
   resetUrl: string;
   userEmail: string;
-  username?: string;
 };
 
 const PasswordResetEmail = ({
-  browserInfo,
-  ipAddress,
+  linkLifetimeHours,
+  name,
   resetUrl,
   userEmail,
-  username,
 }: PasswordResetEmailProps) => {
   return (
     <BaseLayout preview="Reset your Acme password">
@@ -28,7 +27,7 @@ const PasswordResetEmail = ({
       </Heading>
 
       <Text className="m-0 mb-2 text-base text-pretty break-words text-muted-foreground">
-        Hi{username !== undefined && username !== "" ? ` ${username}` : ""},
+        Hi{name !== undefined && name !== "" ? ` ${name}` : ""},
       </Text>
 
       <Text className="m-0 mb-6 text-base text-pretty break-words text-muted-foreground">
@@ -37,26 +36,18 @@ const PasswordResetEmail = ({
       </Text>
 
       <div className="mb-6">
-        <Button fullWidth href={resetUrl} variant="primary">
-          Reset password
-        </Button>
+        <Button href={resetUrl}>Reset password</Button>
       </div>
 
       <Divider />
 
-      <Card accent title="Request details">
+      <Card title="Request details">
         <ul className="m-0 list-none p-0 text-base text-muted-foreground">
           <li className="py-1">Email: {userEmail}</li>
-          {ipAddress !== undefined && ipAddress !== "" && (
-            <li className="py-1">IP address: {ipAddress}</li>
-          )}
-          {browserInfo !== undefined && browserInfo !== "" && (
-            <li className="py-1">Browser: {browserInfo}</li>
-          )}
         </ul>
         <Text className="m-0 mt-3 mb-2 text-base font-semibold text-foreground">Important</Text>
         <ul className="m-0 list-inside list-disc text-base text-muted-foreground">
-          <li className="py-1">This link expires in 1 hour</li>
+          <li className="py-1">This link expires in {formatHours(linkLifetimeHours)}</li>
           <li className="py-1">It can only be used once</li>
           <li className="py-1">If you didn&apos;t request this, secure your account</li>
         </ul>
@@ -74,6 +65,13 @@ const PasswordResetEmail = ({
     </BaseLayout>
   );
 };
+
+PasswordResetEmail.PreviewProps = {
+  linkLifetimeHours: 1,
+  name: "Ada Lovelace",
+  resetUrl: "https://acme.web.localhost/api/auth/reset-password/preview",
+  userEmail: "ada@example.com",
+} satisfies PasswordResetEmailProps;
 
 export { PasswordResetEmail };
 

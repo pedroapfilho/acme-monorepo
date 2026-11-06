@@ -1,6 +1,6 @@
 import { createRoute, z } from "@hono/zod-openapi";
 
-import { createRouter } from "@/lib/openapi";
+import { apiDocumentMetadata, createRouter } from "@/lib/openapi";
 
 const healthRoute = createRoute({
   description: "Liveness probe; does not touch the database.",
@@ -60,7 +60,7 @@ const createHealthRoutes = (checkDatabase: CheckDatabase) => {
         service: "api",
         status: "healthy" as const,
         timestamp: new Date().toISOString(),
-        version: "1.0.0",
+        version: apiDocumentMetadata.info.version,
       },
       200,
     ),

@@ -1,8 +1,12 @@
+import { PASSWORD_LENGTH } from "@repo/auth/policy";
 import { z } from "zod";
 
 const email = z.email("Invalid email address");
 const name = z.string().min(3, "Name must be at least 3 characters").max(32);
-const password = z.string().min(12, "Password must be at least 12 characters");
+
+const password = z
+  .string()
+  .min(PASSWORD_LENGTH.min, `Password must be at least ${PASSWORD_LENGTH.min} characters`);
 
 type PasswordKey = "newPassword" | "password";
 

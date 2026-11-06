@@ -1,8 +1,6 @@
 import { test as base, expect } from "@playwright/test";
-import type { APIRequestContext } from "@playwright/test";
-import { COOKIE_PREFIX } from "@repo/auth/server";
+import type { APIRequestContext, Cookie } from "@playwright/test";
 import { prisma } from "@repo/db";
-import { getCookies } from "better-auth/cookies";
 
 import { makeTestEmail } from "../helpers/test-email";
 import { apiUrl, webUrl } from "../urls";
@@ -19,12 +17,8 @@ type CreateAccount = (
 
 type SessionOptions = { emailDelivery: boolean };
 
-const sessionCookieName = getCookies({
-  advanced: {
-    cookiePrefix: COOKIE_PREFIX,
-    useSecureCookies: new URL(webUrl).protocol === "https:",
-  },
-}).sessionToken.name;
+const findSessionCookie = (cookies: Array<Cookie>) =>
+  cookies.find(({ name }) => name.endsWith(".session_token"));
 
 // Better Auth checks the Origin of every cookie-carrying POST.
 const authPost = (request: APIRequestContext, endpoint: string, data: Record<string, string>) =>
@@ -98,8 +92,7 @@ const test = base.extend<
   },
   // Session cookies are host-only, so the api on its own host receives the session as a bearer token.
   api: async ({ account, context, playwright }, use) => {
-    const cookies = await context.cookies(webUrl);
-    const session = cookies.find(({ name }) => name === sessionCookieName);
+    const session = findSessionCookie(await context.cookies(webUrl));
 
     if (session === undefined) {
       throw new Error(`The api fixture needs a web session for account ${account.id}.`);
@@ -116,6 +109,6 @@ const test = base.extend<
   emailDelivery: [false, { option: true, scope: "worker" }],
 });
 
-export { sessionCookieName, signIn, signOut, signUp, test };
+export { findSessionCookie, signIn, signOut, signUp, test };
 
 export type { SessionOptions };

@@ -1,5 +1,19 @@
+import { z } from "@hono/zod-openapi";
 import type { Auth } from "@repo/auth/server";
 import type { Prisma, PrismaClient } from "@repo/db";
+
+const userSchema = z
+  .object({
+    createdAt: z.iso.datetime(),
+    displayName: z.string().nullable(),
+    email: z.email(),
+    emailVerified: z.boolean(),
+    id: z.string(),
+    name: z.string().nullable(),
+    updatedAt: z.iso.datetime(),
+    username: z.string().nullable(),
+  })
+  .openapi("User");
 
 const userSelect = {
   createdAt: true,
@@ -13,6 +27,12 @@ const userSelect = {
 } satisfies Prisma.UserSelect;
 
 type User = Prisma.UserGetPayload<{ select: typeof userSelect }>;
+
+const serializeUser = (user: User): z.input<typeof userSchema> => ({
+  ...user,
+  createdAt: user.createdAt.toISOString(),
+  updatedAt: user.updatedAt.toISOString(),
+});
 
 type UpdateUserInput = {
   name?: string;
@@ -43,6 +63,6 @@ const createUserStore = (auth: Auth, prisma: PrismaClient): UserStore => ({
   },
 });
 
-export { createUserStore };
+export { createUserStore, serializeUser, userSchema };
 
 export type { User, UserStore };

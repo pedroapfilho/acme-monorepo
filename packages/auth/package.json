@@ -6,7 +6,8 @@
   "exports": {
     "./server": "./src/server.ts",
     "./client": "./src/client.ts",
-    "./env-config": "./src/env-config.ts"
+    "./env-config": "./src/env-config.ts",
+    "./policy": "./src/policy.ts"
   },
   "scripts": {
     "lint": "oxlint src",
