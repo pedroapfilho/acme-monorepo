@@ -1,6 +1,7 @@
 ---
 title: 'Standy intent-to-add guidance conflicts with partial commits'
 severity: 'minor'
+issue: 'pedroapfilho/acme-monorepo#272'
 ---
 
 ### Expected Behavior

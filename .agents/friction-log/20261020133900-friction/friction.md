@@ -1,6 +1,7 @@
 ---
 title: 'Playwright cleanup throws when auth setup never wrote storage state'
 severity: 'minor'
+issue: 'pedroapfilho/acme-monorepo#271'
 ---
 
 ### Expected Behavior
