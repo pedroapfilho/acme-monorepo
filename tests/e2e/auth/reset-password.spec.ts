@@ -46,7 +46,7 @@ test.describe("Reset Password", () => {
     await resetPasswordPage.goto("any-token-value");
     await resetPasswordPage.submit("short", "short");
 
-    await expect(page.getByText(/at least 12 characters/i).first()).toBeVisible();
+    await expect(page.getByText("Password must be at least 12 characters").first()).toBeVisible();
     expect(page.url()).toContain("/reset-password");
   });
 
