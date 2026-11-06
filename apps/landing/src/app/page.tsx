@@ -3,12 +3,14 @@ import { cn } from "@repo/ui/lib/utils";
 import { ArrowUpRight, Database, KeyRound, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 
+import { SHORT_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import type { SectionId } from "@/lib/site";
 import { webAppUrl } from "@/lib/urls";
 
 const metadata: Metadata = {
   description:
     "A Next.js monorepo baseline with Better Auth, Prisma, and shadcn/ui: configured, tested, and ready to fork.",
-  title: { absolute: "Acme: The one template to rule them all" },
+  title: { absolute: `${SITE_NAME}: ${SHORT_DESCRIPTION}` },
 };
 
 /** @public Next.js App Router consumes this route config through the module loader. */
@@ -97,7 +99,10 @@ const Page = () => {
         </div>
       </section>
 
-      <section className="border-t border-border py-20 md:py-24" id="capabilities">
+      <section
+        className="border-t border-border py-20 md:py-24"
+        id={"capabilities" satisfies SectionId}
+      >
         <div className="mx-auto max-w-5xl px-6 md:px-8">
           <div>
             <p className="font-mono text-sm tracking-wide text-primary uppercase">What you get</p>
@@ -127,7 +132,10 @@ const Page = () => {
         </div>
       </section>
 
-      <section className="border-t border-border py-20 md:py-24" id="structure">
+      <section
+        className="border-t border-border py-20 md:py-24"
+        id={"structure" satisfies SectionId}
+      >
         <div className="mx-auto grid max-w-5xl gap-12 px-6 md:grid-cols-2 md:px-8">
           <div>
             <p className="font-mono text-sm tracking-wide text-primary uppercase">Structure</p>

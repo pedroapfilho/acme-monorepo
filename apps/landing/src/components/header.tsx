@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { Logo } from "@/components/logo";
+import { SECTIONS, SITE_NAME } from "@/lib/site";
 import { webAppUrl } from "@/lib/urls";
 
 const Header = () => {
@@ -22,23 +23,22 @@ const Header = () => {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-5xl items-center gap-8 px-6 text-base md:px-8">
         <Link
-          aria-label="Acme homepage"
+          aria-label={`${SITE_NAME} homepage`}
           className="flex items-center gap-2 font-semibold tracking-tight"
           href="/"
         >
           <Logo className="size-5 shrink-0 text-primary" />
-          Acme
+          {SITE_NAME}
         </Link>
         <nav
           aria-label="Main"
           className="flex items-center gap-6 text-sm text-muted-foreground max-md:hidden"
         >
-          <Link className="hover:text-foreground" href="/#capabilities">
-            Capabilities
-          </Link>
-          <Link className="hover:text-foreground" href="/#structure">
-            Structure
-          </Link>
+          {SECTIONS.map(({ id, label }) => (
+            <Link className="hover:text-foreground" href={`/#${id}`} key={id}>
+              {label}
+            </Link>
+          ))}
         </nav>
         <div className="ml-auto flex items-center gap-4 text-sm max-md:hidden">
           <a className="text-muted-foreground hover:text-foreground" href={webAppUrl("/login")}>
@@ -64,20 +64,16 @@ const Header = () => {
             aria-label="Mobile"
             className="absolute top-full right-0 mt-2 grid min-w-56 gap-1 rounded-xl border border-border bg-background p-2 text-base shadow-lg"
           >
-            <Link
-              className="rounded-lg px-3 py-2 hover:bg-muted"
-              href="/#capabilities"
-              onClick={handleSectionClick}
-            >
-              Capabilities
-            </Link>
-            <Link
-              className="rounded-lg px-3 py-2 hover:bg-muted"
-              href="/#structure"
-              onClick={handleSectionClick}
-            >
-              Structure
-            </Link>
+            {SECTIONS.map(({ id, label }) => (
+              <Link
+                className="rounded-lg px-3 py-2 hover:bg-muted"
+                href={`/#${id}`}
+                key={id}
+                onClick={handleSectionClick}
+              >
+                {label}
+              </Link>
+            ))}
             <a className="rounded-lg px-3 py-2 hover:bg-muted" href={webAppUrl("/login")}>
               Sign in
             </a>

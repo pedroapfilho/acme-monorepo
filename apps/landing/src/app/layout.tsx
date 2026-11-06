@@ -1,10 +1,10 @@
 import "@/styles/globals.css";
 
 import { cn } from "@repo/ui/lib/utils";
+import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
 import { Geist as geistFont, Geist_Mono as geistMonoFont } from "next/font/google";
 
-import { Analytics } from "@/components/analytics";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import {
