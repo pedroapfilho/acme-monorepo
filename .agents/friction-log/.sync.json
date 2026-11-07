@@ -1,0 +1,9 @@
+{
+  "mirrors": [
+    {
+      "issue": "pedroapfilho/acme-monorepo#271",
+      "path": ".agents/friction-log/20261020133900-friction/friction.md"
+    }
+  ],
+  "version": 1
+}
