@@ -7,8 +7,8 @@ overrides:
   # Each pin is the lowest release that carries the fix.
   deepmerge-ts: "^8.0.0"
   mysql2: "^3.23.1"
-  "next@>=16.0.0 <16.3.8": "^16.3.8"
-  "undici@<7.29.1": "^7.29.1"
+  "next@>=16.0.0 <16.4.1": "^16.4.1"
+  "undici@<7.30.1": "^7.30.1"
 
 auditConfig:
   ignoreGhsas:
