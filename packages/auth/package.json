@@ -21,7 +21,7 @@
     "@repo/observability": "workspace:*",
     "@repo/portless-env": "workspace:*",
     "@repo/transactional": "workspace:*",
-    "better-auth": "^1.7.7"
+    "better-auth": "^1.7.20"
   },
   "devDependencies": {
     "@repo/config-vitest": "workspace:*",
