@@ -23,7 +23,7 @@
     "@repo/portless-env": "workspace:*",
     "@scalar/hono-api-reference": "^0.12.5",
     "@scalar/openapi-to-markdown": "^0.6.0",
-    "better-auth": "^1.7.7",
+    "better-auth": "^1.7.20",
     "dotenv": "^17.4.2",
     "hono": "^4.13.9",
     "hono-rate-limiter": "^0.5.4",
