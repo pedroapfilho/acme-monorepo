@@ -25,7 +25,7 @@ const Footer = async () => {
             <Logo className="size-5 shrink-0 text-primary" />
             {SITE_NAME}
           </Link>
-          <p className="mt-5 max-w-(--container-measure-summary) text-base text-pretty text-muted-foreground sm:text-sm">
+          <p className="mt-5 max-w-measure-summary text-base text-pretty text-muted-foreground sm:text-sm">
             A production-ready Next.js baseline for teams that want product work to start on day
             one.
           </p>
