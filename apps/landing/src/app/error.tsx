@@ -24,13 +24,13 @@ const RouteError = ({ error, retry }: RouteErrorProps) => {
       <div className="mx-auto max-w-5xl px-6 md:px-8">
         <p className="font-mono text-sm tracking-wide text-primary uppercase">Error</p>
         <h1
-          className="mt-4 max-w-(--container-measure-heading) text-3xl font-semibold tracking-tight text-balance outline-none md:text-4xl"
+          className="mt-4 max-w-measure-heading text-3xl font-semibold tracking-tight text-balance outline-none md:text-4xl"
           ref={headingRef}
           tabIndex={-1}
         >
           Something went wrong.
         </h1>
-        <p className="mt-4 max-w-(--container-measure-body) text-lg text-pretty text-muted-foreground">
+        <p className="mt-4 max-w-measure-body text-lg text-pretty text-muted-foreground">
           This page failed to load. Try again, and if it keeps happening, come back in a few
           minutes.
         </p>
