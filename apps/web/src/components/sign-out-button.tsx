@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { AuthActionButton } from "@/components/auth-form";
+import { AuthActionButton } from "@/components/auth-action-button";
 import { authClient } from "@/lib/auth-client";
 
 const SignOutButton = () => {

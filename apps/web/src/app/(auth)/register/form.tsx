@@ -1,11 +1,12 @@
 "use client";
 
 import { Field, FieldDescription } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AuthPageLink } from "@/app/(auth)/auth-page-link";
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
@@ -58,7 +59,7 @@ const RegisterForm = ({ searchParams }: Props) => {
   }
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="name">
         {(field) => (
           <field.TextField
@@ -70,7 +71,7 @@ const RegisterForm = ({ searchParams }: Props) => {
       </form.AppField>
 
       <form.AppField name="email">
-        {(field) => <field.TextField autoComplete="email" label="Email" />}
+        {(field) => <field.TextField autoComplete="email" label="Email" type="email" />}
       </form.AppField>
 
       <div className="grid grid-cols-2 gap-4">
@@ -80,11 +81,14 @@ const RegisterForm = ({ searchParams }: Props) => {
               autoComplete="new-password"
               description="At least 12 characters."
               label="Password"
+              type="password"
             />
           )}
         </form.AppField>
         <form.AppField name="confirmPassword">
-          {(field) => <field.TextField autoComplete="new-password" label="Confirm Password" />}
+          {(field) => (
+            <field.TextField autoComplete="new-password" label="Confirm Password" type="password" />
+          )}
         </form.AppField>
       </div>
 
@@ -97,7 +101,7 @@ const RegisterForm = ({ searchParams }: Props) => {
           </AuthPageLink>
         </FieldDescription>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

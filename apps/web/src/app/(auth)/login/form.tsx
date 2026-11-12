@@ -1,11 +1,12 @@
 "use client";
 
 import { Field, FieldDescription } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { AuthPageLink } from "@/app/(auth)/auth-page-link";
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
@@ -31,10 +32,15 @@ const LoginForm = ({ searchParams }: Props) => {
   });
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="email">
         {(field) => (
-          <field.TextField autoComplete="email" label="Email" placeholder="you@example.com" />
+          <field.TextField
+            autoComplete="email"
+            label="Email"
+            placeholder="you@example.com"
+            type="email"
+          />
         )}
       </form.AppField>
 
@@ -51,6 +57,7 @@ const LoginForm = ({ searchParams }: Props) => {
                 Forgot your password?
               </Link>
             }
+            type="password"
           />
         )}
       </form.AppField>
@@ -70,7 +77,7 @@ const LoginForm = ({ searchParams }: Props) => {
           </AuthPageLink>
         </FieldDescription>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

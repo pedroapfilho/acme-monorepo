@@ -1,11 +1,9 @@
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
-import { log } from "@/lib/observability-client";
-
-import { AuthActionButton, AuthForm, SubmitButton, useAuthForm } from "./auth-form";
+import { useAuthForm } from "./use-auth-form";
 
 const UNEXPECTED_ERROR = expect.stringMatching(/try again/v);
 
@@ -29,8 +27,9 @@ const schema = z
 
 const call = vi.fn<(value: Values) => Promise<Result>>();
 const onSuccess = vi.fn();
-const showToast = vi.spyOn(toast, "error");
-const logError = vi.spyOn(log, "error");
+const consoleError = vi.spyOn(console, "error");
+
+const reportedErrors = () => consoleError.mock.calls.flat();
 
 const succeed = (): Promise<Result> => Promise.resolve({ data: { id: "user-1" }, error: null });
 
@@ -48,9 +47,9 @@ const Harness = ({ validator = schema }: { validator?: typeof schema }) => {
   });
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="email">
-        {(field) => <field.TextField autoComplete="email" label="Email" />}
+        {(field) => <field.TextField autoComplete="email" label="Email" type="email" />}
       </form.AppField>
       <form.AppField name="password">
         {(field) => (
@@ -58,40 +57,23 @@ const Harness = ({ validator = schema }: { validator?: typeof schema }) => {
             autoComplete="new-password"
             description="At least 12 characters."
             label="Password"
+            type="password"
           />
         )}
       </form.AppField>
       <form.AppField name="confirmPassword">
         {(field) => (
-          <field.TextField autoComplete="new-password" id="confirm" label="Confirm password" />
+          <field.TextField
+            autoComplete="new-password"
+            id="confirm"
+            label="Confirm password"
+            type="password"
+          />
         )}
       </form.AppField>
       {errorCode !== null && <p>Handled {errorCode}</p>}
       <SubmitButton pendingLabel="Saving…">Save</SubmitButton>
-    </AuthForm>
-  );
-};
-
-const optionalSchema = z.object({ email: z.email(), name: z.string().optional() });
-const optionalDefaults: z.input<typeof optionalSchema> = { email: "", name: "" };
-
-const OptionalFieldHarness = () => {
-  const { form, submission } = useAuthForm({
-    call: succeed,
-    defaultValues: optionalDefaults,
-    fallbackError: "Request failed",
-    schema: optionalSchema,
-  });
-
-  return (
-    <AuthForm submission={submission}>
-      <form.AppField name="email">
-        {(field) => <field.TextField autoComplete="email" label="Email" />}
-      </form.AppField>
-      <form.AppField name="name">
-        {(field) => <field.TextField autoComplete="name" label="Name" />}
-      </form.AppField>
-    </AuthForm>
+    </AppForm>
   );
 };
 
@@ -117,7 +99,7 @@ const submit = async (times = 1) => {
   const form = button.closest("form");
 
   if (form === null) {
-    throw new Error("AuthForm did not render a <form>");
+    throw new Error("AppForm did not render a <form>");
   }
 
   for (let attempt = 0; attempt < times; attempt += 1) {
@@ -127,131 +109,15 @@ const submit = async (times = 1) => {
   await settle();
 };
 
-const liveRegionText = () =>
-  document.querySelector('[aria-live="polite"][aria-atomic="true"]')?.textContent;
-
 const formAlertText = () => document.querySelector('[data-slot="form-alert"]')?.textContent ?? null;
 
 beforeEach(() => {
   call.mockReset();
   onSuccess.mockReset();
-  showToast.mockClear();
-  logError.mockReset();
-  logError.mockImplementation(() => {});
+  consoleError.mockReset();
 });
 
 describe("useAuthForm", () => {
-  it("derives required and optional accessibility states from the schema", () => {
-    render(<OptionalFieldHarness />);
-
-    expect(screen.getByLabelText("Email").getAttribute("aria-required")).toBe("true");
-    expect(screen.getByLabelText("Name").getAttribute("aria-required")).toBe("false");
-    expect(screen.getByLabelText<HTMLInputElement>("Email").required).toBe(false);
-    expect(screen.getByLabelText<HTMLInputElement>("Name").required).toBe(false);
-  });
-
-  it("renders each field as a labelled input typed by its autocomplete purpose", () => {
-    render(<Harness />);
-
-    const email = screen.getByLabelText<HTMLInputElement>("Email");
-    const confirm = screen.getByLabelText<HTMLInputElement>("Confirm password");
-    expect(email.type).toBe("email");
-    expect(email.autocomplete).toBe("email");
-    expect(email.getAttribute("aria-required")).toBe("true");
-    expect(email.required).toBe(false);
-    expect(confirm.type).toBe("password");
-    expect(confirm.autocomplete).toBe("new-password");
-    expect(confirm.id).toBe("confirm");
-    expect(confirm.name).toBe("confirmPassword");
-  });
-
-  it("shows no error before submit, then revalidates every change after a failed submit", async () => {
-    render(<Harness />);
-    type("Email", "not-an-email");
-    fireEvent.blur(screen.getByLabelText("Email"));
-    type("Password", "c");
-    fireEvent.blur(screen.getByLabelText("Password"));
-    await settle();
-    expect(screen.queryByText("Invalid email")).toBeNull();
-    expect(screen.queryByText("Too short")).toBeNull();
-    expect(screen.getByLabelText("Email").getAttribute("aria-invalid")).toBe("false");
-    expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
-
-    await submit();
-
-    expect(await screen.findByText("Invalid email")).not.toBeNull();
-    expect(screen.getByText("Too short")).not.toBeNull();
-    const email = screen.getByLabelText("Email");
-    expect(call).not.toHaveBeenCalled();
-    expect(email.getAttribute("aria-invalid")).toBe("true");
-    expect(email.getAttribute("aria-describedby")).toBe("email-error");
-    expect(screen.getByText("Invalid email").getAttribute("id")).toBe("email-error");
-    expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
-
-    type("Email", "user@example.com");
-    await waitFor(() => {
-      expect(screen.queryByText("Invalid email")).toBeNull();
-    });
-    expect(screen.getByText("Too short")).not.toBeNull();
-
-    type("Password", "correct-horse-battery");
-    type("Confirm password", "correct-horse-staple");
-    expect(await screen.findByText("Passwords do not match")).not.toBeNull();
-
-    type("Password", "correct-horse-staple");
-    await waitFor(() => {
-      expect(screen.queryByText("Passwords do not match")).toBeNull();
-    });
-
-    call.mockImplementation(succeed);
-    await submit();
-    await waitFor(() => {
-      expect(call).toHaveBeenCalledWith({
-        confirmPassword: "correct-horse-staple",
-        email: "user@example.com",
-        password: "correct-horse-staple",
-      });
-    });
-  });
-
-  it("keeps an error that is still wrong after the next keystroke", async () => {
-    render(<Harness />);
-    type("Password", "c");
-    await submit();
-    expect(await screen.findByText("Too short")).not.toBeNull();
-
-    type("Password", "co");
-    await settle();
-
-    expect(screen.getByText("Too short")).not.toBeNull();
-  });
-
-  it("describes a field by its helper text from the start, and by its error after submit", async () => {
-    render(<Harness />);
-    const password = screen.getByLabelText("Password");
-    expect(screen.getByText("At least 12 characters.").getAttribute("id")).toBe(
-      "password-description",
-    );
-    expect(password.getAttribute("aria-describedby")).toBe("password-description");
-
-    await submit();
-
-    await waitFor(() => {
-      expect(password.getAttribute("aria-describedby")).toBe("password-description password-error");
-    });
-  });
-
-  it("moves focus to the first invalid field on a failed submit", async () => {
-    render(<Harness />);
-    type("Email", "user@example.com");
-
-    await submit();
-
-    await waitFor(() => {
-      expect(document.activeElement).toBe(screen.getByLabelText("Password"));
-    });
-  });
-
   it("calls once when submitted twice in the same frame", async () => {
     call.mockImplementation(succeed);
     render(<Harness />);
@@ -303,7 +169,6 @@ describe("useAuthForm", () => {
         },
       );
     });
-    expect(showToast).not.toHaveBeenCalled();
     expect(formAlertText()).toBeNull();
   });
 
@@ -320,7 +185,6 @@ describe("useAuthForm", () => {
     await waitFor(() => {
       expect(formAlertText()).toBe("Invalid password");
     });
-    expect(showToast).not.toHaveBeenCalled();
     expect(formAlertText()).toBe("Invalid password");
     expect(onSuccess).not.toHaveBeenCalled();
 
@@ -361,7 +225,9 @@ describe("useAuthForm", () => {
     await waitFor(() => {
       expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
-    expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "Failed to fetch" }));
+    expect(reportedErrors()).toContainEqual(
+      expect.objectContaining({ message: "Failed to fetch" }),
+    );
 
     await submit();
     await waitFor(() => {
@@ -384,7 +250,9 @@ describe("useAuthForm", () => {
     await waitFor(() => {
       expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
-    expect(logError).toHaveBeenCalledWith(expect.objectContaining({ error: "validator exploded" }));
+    expect(reportedErrors()).toContainEqual(
+      expect.objectContaining({ message: "validator exploded" }),
+    );
     expect(call).not.toHaveBeenCalled();
 
     await submit();
@@ -413,8 +281,8 @@ describe("useAuthForm", () => {
       expect(formAlertText()).toEqual(UNEXPECTED_ERROR);
     });
     expect(call).not.toHaveBeenCalled();
-    expect(logError).toHaveBeenCalledWith(
-      expect.objectContaining({ error: "refinement exploded" }),
+    expect(reportedErrors()).toContainEqual(
+      expect.objectContaining({ message: "refinement exploded" }),
     );
     expect(screen.getByRole("button", { name: "Save" }).matches(":disabled")).toBe(false);
 
@@ -449,7 +317,6 @@ describe("useAuthForm", () => {
     await submit();
 
     expect(await screen.findByText("Handled EMAIL_NOT_VERIFIED")).not.toBeNull();
-    expect(showToast).not.toHaveBeenCalled();
     expect(formAlertText()).toBeNull();
 
     await submit();
@@ -458,75 +325,5 @@ describe("useAuthForm", () => {
       expect(formAlertText()).toBe("Invalid credentials");
     });
     expect(screen.queryByText("Handled EMAIL_NOT_VERIFIED")).toBeNull();
-  });
-});
-
-describe("AuthActionButton", () => {
-  const action = vi.fn<() => Promise<Result>>();
-  const onDone = vi.fn();
-
-  const renderButton = () => {
-    render(
-      <AuthActionButton
-        call={action}
-        fallbackError="Failed to sign out"
-        onSuccess={onDone}
-        pendingLabel="Signing out…"
-      >
-        Sign out
-      </AuthActionButton>,
-    );
-
-    return screen.getByRole("button", { name: "Sign out" });
-  };
-
-  beforeEach(() => {
-    action.mockReset();
-    onDone.mockReset();
-  });
-
-  it("runs once per burst of clicks and reports the outcome", async () => {
-    action.mockImplementationOnce(() => fail({}));
-    action.mockImplementationOnce(succeed);
-    const button = renderButton();
-
-    fireEvent.click(button);
-    fireEvent.click(button);
-    await settle();
-
-    expect(action).toHaveBeenCalledTimes(1);
-    expect(showToast).toHaveBeenCalledWith("Failed to sign out");
-    expect(liveRegionText()).toBe("Failed to sign out");
-    expect(onDone).not.toHaveBeenCalled();
-
-    fireEvent.click(button);
-    await settle();
-
-    expect(action).toHaveBeenCalledTimes(2);
-    expect(onDone).toHaveBeenCalledWith({ id: "user-1" }, undefined);
-    expect(liveRegionText()).toBe("");
-  });
-
-  it("shows the pending label until the call settles", async () => {
-    const pending = Promise.withResolvers<Result>();
-    action.mockReturnValue(pending.promise);
-    fireEvent.click(renderButton());
-    await settle();
-
-    expect(screen.getByRole("button", { name: "Signing out…" }).matches(":disabled")).toBe(true);
-
-    pending.resolve({ data: { id: "user-1" }, error: null });
-    await settle();
-
-    expect(screen.getByRole("button", { name: "Sign out" }).matches(":disabled")).toBe(false);
-  });
-
-  it("reports a thrown call with the generic message", async () => {
-    action.mockRejectedValue(new Error("network down"));
-    fireEvent.click(renderButton());
-    await settle();
-
-    expect(showToast).toHaveBeenCalledWith(UNEXPECTED_ERROR);
-    expect(screen.getByRole("button", { name: "Sign out" }).matches(":disabled")).toBe(false);
   });
 });

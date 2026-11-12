@@ -2,4 +2,4 @@
 
 import { createClientObservability } from "@repo/observability/client";
 
-export const { log } = createClientObservability({ service: "landing" });
+export const { reportError } = createClientObservability({ service: "landing" });

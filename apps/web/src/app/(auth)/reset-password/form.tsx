@@ -3,12 +3,13 @@
 import { buttonVariants } from "@repo/ui/components/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { Field, FieldDescription } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { cn } from "@repo/ui/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use } from "react";
 
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
 import { PASSWORD_RESET_NOTICE } from "@/lib/redirect-validation";
@@ -60,7 +61,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
         <CardDescription>Enter a new password for your account</CardDescription>
       </CardHeader>
       <CardContent>
-        <AuthForm submission={submission}>
+        <AppForm submission={submission}>
           <div className="grid grid-cols-2 gap-4">
             <form.AppField name="password">
               {(field) => (
@@ -68,11 +69,18 @@ const NewPasswordForm = ({ token }: { token: string }) => {
                   autoComplete="new-password"
                   description="At least 12 characters."
                   label="New password"
+                  type="password"
                 />
               )}
             </form.AppField>
             <form.AppField name="confirmPassword">
-              {(field) => <field.TextField autoComplete="new-password" label="Confirm password" />}
+              {(field) => (
+                <field.TextField
+                  autoComplete="new-password"
+                  label="Confirm password"
+                  type="password"
+                />
+              )}
             </form.AppField>
           </div>
 
@@ -85,7 +93,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
               </Link>
             </FieldDescription>
           </Field>
-        </AuthForm>
+        </AppForm>
       </CardContent>
     </>
   );

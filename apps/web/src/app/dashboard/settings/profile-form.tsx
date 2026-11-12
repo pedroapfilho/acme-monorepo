@@ -1,10 +1,11 @@
 "use client";
 
 import { Field } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { profileSchema } from "@/lib/form-schemas";
 
@@ -27,7 +28,7 @@ const ProfileForm = ({ initialName }: Props) => {
   });
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="name">
         {(field) => (
           <field.TextField
@@ -43,7 +44,7 @@ const ProfileForm = ({ initialName }: Props) => {
           Save
         </SubmitButton>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

@@ -4,4 +4,6 @@ export { buildConfig } from "./config";
 
 export type { ObservabilityConfig } from "./config";
 
+export { serializeError } from "./serialize-error";
+
 export { createError, log } from "evlog";

@@ -1,9 +1,10 @@
 "use client";
 
 import { Field } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
 
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { deleteAccountSchema } from "@/lib/form-schemas";
 
@@ -22,13 +23,14 @@ const DeleteAccountForm = () => {
   });
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="password">
         {(field) => (
           <field.TextField
             autoComplete="current-password"
             id="deletePassword"
             label="Confirm with your password"
+            type="password"
           />
         )}
       </form.AppField>
@@ -38,7 +40,7 @@ const DeleteAccountForm = () => {
           Delete account
         </SubmitButton>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

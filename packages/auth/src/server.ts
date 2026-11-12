@@ -15,11 +15,17 @@ const COOKIE_PREFIX = "acme";
 
 const EMAIL_LINK_LIFETIME_HOURS = 1;
 
+type EmailConfig = {
+  mailer: Mailer;
+  resetPasswordUrl: string;
+  signInUrl: string;
+};
+
 type AuthConfig = {
   allowedHosts: Array<string>;
   database: DBAdapterInstance;
+  email?: EmailConfig;
   extraPlugins?: Array<BetterAuthPlugin>;
-  mailer?: Mailer;
   rateLimitEnabled?: boolean;
   secret: string;
   trustedOrigins?: Array<string>;
@@ -29,23 +35,12 @@ type AuthConfig = {
 
 const prismaDatabase = (prisma: PrismaClient) => prismaAdapter(prisma, { provider: "postgresql" });
 
-const signUpAttemptLinks = (webAppUrl: string | undefined) => {
-  if (webAppUrl === undefined) {
-    throw new Error("createAuth: a mailer needs webAppUrl to link emails back to the web app");
-  }
-
-  return {
-    resetPasswordUrl: new URL("/recover", webAppUrl).href,
-    signInUrl: new URL("/login", webAppUrl).href,
-  };
-};
-
 const createAuth = (config: AuthConfig) => {
   const {
     allowedHosts,
     database,
+    email,
     extraPlugins = [],
-    mailer,
     rateLimitEnabled = false,
     secret,
     trustedOrigins = [],
@@ -53,17 +48,17 @@ const createAuth = (config: AuthConfig) => {
     webAppUrl,
   } = config;
 
-  const links = mailer && signUpAttemptLinks(webAppUrl);
+  const mailer = email?.mailer;
 
   const deliver = async (
-    email: TransactionalEmail,
+    mail: TransactionalEmail,
     onFailure: { message: string; mode: "log" | "throw" },
   ) => {
     if (!mailer) {
       return;
     }
 
-    const result = await mailer(email);
+    const result = await mailer(mail);
 
     if (result.ok) {
       return;
@@ -109,12 +104,13 @@ const createAuth = (config: AuthConfig) => {
       minPasswordLength: PASSWORD_LENGTH.min,
       // A failed notice must not fail the sign-up: the generic response is what hides that the email is registered.
       onExistingUserSignUp:
-        links &&
+        email &&
         (async ({ user }) => {
           await deliver(
             {
-              ...links,
               name: user.name,
+              resetPasswordUrl: email.resetPasswordUrl,
+              signInUrl: email.signInUrl,
               type: "sign-up-attempt",
               userEmail: user.email,
               userId: user.id,

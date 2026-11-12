@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { AuthActionButton } from "@/components/auth-form";
+import { AuthActionButton } from "@/components/auth-action-button";
 import { authClient } from "@/lib/auth-client";
 import { authPageHref } from "@/lib/redirect-validation";
 
