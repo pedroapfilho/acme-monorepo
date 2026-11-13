@@ -30,4 +30,13 @@ const username = z
     `${USERNAME_LENGTH.min} to ${USERNAME_LENGTH.max} characters: letters, numbers, underscores and dots.`,
   );
 
-export { email, existingPassword, name, newPassword, PASSWORD_LENGTH, username, USERNAME_LENGTH };
+export {
+  email,
+  existingPassword,
+  name,
+  NAME_LENGTH,
+  newPassword,
+  PASSWORD_LENGTH,
+  username,
+  USERNAME_LENGTH,
+};
