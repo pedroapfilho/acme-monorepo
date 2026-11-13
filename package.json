@@ -23,7 +23,7 @@
     "fallow:health": "fallow health --score",
     "fallow:audit": "fallow audit",
     "prepare": "husky",
-    "check:shadcn": "node scripts/check-shadcn.mjs"
+    "check:shadcn": "node .github/ci/check-shadcn.mjs"
   },
   "devDependencies": {
     "@next/playwright": "^16.3.6",
