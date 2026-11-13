@@ -1,5 +1,6 @@
 "use client";
 
+import { newPassword } from "@repo/auth/policy";
 import { Field } from "@repo/ui/components/field";
 import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
@@ -46,7 +47,7 @@ const PasswordForm = () => {
           {(field) => (
             <field.TextField
               autoComplete="new-password"
-              description="At least 12 characters."
+              description={newPassword.description}
               label="New password"
               type="password"
             />

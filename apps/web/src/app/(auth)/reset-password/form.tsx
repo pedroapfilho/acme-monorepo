@@ -1,5 +1,6 @@
 "use client";
 
+import { newPassword } from "@repo/auth/policy";
 import { buttonVariants } from "@repo/ui/components/button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@repo/ui/components/card";
 import { Field, FieldDescription } from "@repo/ui/components/field";
@@ -67,7 +68,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
               {(field) => (
                 <field.TextField
                   autoComplete="new-password"
-                  description="At least 12 characters."
+                  description={newPassword.description}
                   label="New password"
                   type="password"
                 />

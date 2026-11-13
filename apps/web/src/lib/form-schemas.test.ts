@@ -39,22 +39,19 @@ describe("loginSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("should reject password shorter than 12 characters", () => {
+  it("should accept an existing password shorter than the sign-up minimum", () => {
     const result = loginSchema.safeParse({
       email: "user@example.com",
       password: "short",
     });
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
-  it("should accept password with exactly 12 characters", () => {
-    const result = loginSchema.safeParse({
-      email: "user@example.com",
-      password: "123456789012",
-    });
+  it("should reject an empty password", () => {
+    const result = loginSchema.safeParse({ email: "user@example.com", password: "" });
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
   });
 });
 
@@ -269,8 +266,20 @@ describe("changePasswordSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("should reject short current password", () => {
+  it("should accept a current password shorter than the sign-up minimum", () => {
     const result = changePasswordSchema.safeParse({ ...validData, currentPassword: "short" });
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject a new password longer than 128 characters", () => {
+    const tooLong = "a".repeat(129);
+
+    const result = changePasswordSchema.safeParse({
+      ...validData,
+      confirmPassword: tooLong,
+      newPassword: tooLong,
+    });
+
     expect(result.success).toBe(false);
   });
 
@@ -304,13 +313,13 @@ describe("changePasswordSchema", () => {
 });
 
 describe("deleteAccountSchema", () => {
-  it("should accept a password of at least 12 characters", () => {
-    const result = deleteAccountSchema.safeParse({ password: "securepassword" });
+  it("should accept an existing password shorter than the sign-up minimum", () => {
+    const result = deleteAccountSchema.safeParse({ password: "short" });
     expect(result.success).toBe(true);
   });
 
-  it("should reject a short password", () => {
-    const result = deleteAccountSchema.safeParse({ password: "short" });
+  it("should reject an empty password", () => {
+    const result = deleteAccountSchema.safeParse({ password: "" });
     expect(result.success).toBe(false);
   });
 

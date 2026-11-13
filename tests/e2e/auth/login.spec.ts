@@ -38,7 +38,7 @@ test.describe("Login", () => {
     await loginPage.goto();
     await loginPage.login("not-an-email", TEST_USER.password);
 
-    await expect(page.getByText(/invalid email/i)).toBeVisible();
+    await expect(page.getByText(/valid email/i)).toBeVisible();
   });
 
   test("shows the login shell on an initial load", async ({ baseURL, page }) => {

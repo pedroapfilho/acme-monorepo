@@ -1,12 +1,5 @@
-import { PASSWORD_LENGTH } from "@repo/auth/policy";
+import { email, existingPassword, name, newPassword } from "@repo/auth/policy";
 import { z } from "zod";
-
-const email = z.email("Invalid email address");
-const name = z.string().min(3, "Name must be at least 3 characters").max(32);
-
-const password = z
-  .string()
-  .min(PASSWORD_LENGTH.min, `Password must be at least ${PASSWORD_LENGTH.min} characters`);
 
 type PasswordKey = "newPassword" | "password";
 
@@ -21,19 +14,17 @@ const withPasswordConfirmation = <
     path: ["confirmPassword"],
   });
 
-export const loginSchema = z.object({ email, password });
+export const loginSchema = z.object({ email, password: existingPassword });
 
 export const registerSchema = withPasswordConfirmation(
-  z.object({ confirmPassword: password, email, name, password }),
+  z.object({ confirmPassword: newPassword, email, name, password: newPassword }),
   "password",
 );
 
-export const recoverSchema = z.object({
-  email: z.email("Enter a valid email address"),
-});
+export const recoverSchema = z.object({ email });
 
 export const resetPasswordSchema = withPasswordConfirmation(
-  z.object({ confirmPassword: password, password }),
+  z.object({ confirmPassword: newPassword, password: newPassword }),
   "password",
 );
 
@@ -42,8 +33,8 @@ export const profileSchema = z.object({ name });
 export const changeEmailSchema = z.object({ email });
 
 export const changePasswordSchema = withPasswordConfirmation(
-  z.object({ confirmPassword: password, currentPassword: password, newPassword: password }),
+  z.object({ confirmPassword: newPassword, currentPassword: existingPassword, newPassword }),
   "newPassword",
 );
 
-export const deleteAccountSchema = z.object({ password });
+export const deleteAccountSchema = z.object({ password: existingPassword });
