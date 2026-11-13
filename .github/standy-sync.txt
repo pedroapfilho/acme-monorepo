@@ -10,4 +10,5 @@ packages/config-typescript/base.json
 packages/config-typescript/library.json
 packages/config-typescript/nextjs.json
 packages/config-typescript/react-library.json
+packages/portless-env/src/apps.ts
 packages/portless-env/src/index.ts
