@@ -1,3 +1,4 @@
+.github/ci/check-shadcn.mjs
 .github/ci/ci.mjs
 .github/ci/plan.mjs
 .github/ci/report.mjs
