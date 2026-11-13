@@ -6,7 +6,7 @@
   "globalPassThroughEnv": ["PGAPPNAME"],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^db:generate", "db:generate"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "env": [
         "AUTH_ALLOWED_HOSTS",
@@ -20,36 +20,35 @@
       ]
     },
     "lint": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^db:generate", "db:generate"],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^build", "db:generate"]
+      "dependsOn": ["^db:generate", "db:generate"]
     },
     "format:check": {
       "cache": false
     },
     "dev": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^db:generate"],
       "cache": false,
       "persistent": true
     },
     "start": {
-      "dependsOn": ["^build"],
       "cache": false
     },
     "test": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^db:generate", "db:generate"],
       "outputs": ["coverage/**"],
       "cache": false
     },
     "test:watch": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^db:generate"],
       "cache": false,
       "persistent": true
     },
     "test:coverage": {
-      "dependsOn": ["^build", "db:generate"],
+      "dependsOn": ["^db:generate", "db:generate"],
       "outputs": ["coverage/**"],
       "cache": false
     },

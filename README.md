@@ -132,7 +132,7 @@ branch fix-styles:    https://fix-styles.acme.web.localhost
 | Command             | Description                   |
 | ------------------- | ----------------------------- |
 | `pnpm dev`          | Start all apps in development |
-| `pnpm build`        | Build all apps and packages   |
+| `pnpm build`        | Build the three apps          |
 | `pnpm test`         | Run unit tests                |
 | `pnpm test:e2e`     | Run Playwright e2e tests      |
 | `pnpm lint`         | Run oxlint                    |
