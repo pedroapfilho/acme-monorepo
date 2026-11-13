@@ -1,5 +1,6 @@
 "use client";
 
+import { name, newPassword } from "@repo/auth/policy";
 import { Field, FieldDescription } from "@repo/ui/components/field";
 import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
@@ -62,11 +63,7 @@ const RegisterForm = ({ searchParams }: Props) => {
     <AppForm submission={submission}>
       <form.AppField name="name">
         {(field) => (
-          <field.TextField
-            autoComplete="name"
-            description="3 to 32 characters."
-            label="Full Name"
-          />
+          <field.TextField autoComplete="name" description={name.description} label="Full Name" />
         )}
       </form.AppField>
 
@@ -79,7 +76,7 @@ const RegisterForm = ({ searchParams }: Props) => {
           {(field) => (
             <field.TextField
               autoComplete="new-password"
-              description="At least 12 characters."
+              description={newPassword.description}
               label="Password"
               type="password"
             />

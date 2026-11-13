@@ -4,12 +4,13 @@ import { loopbackUrl } from "@repo/portless-env/apps";
 import type { Mailer, TransactionalEmail } from "@repo/transactional";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError } from "better-auth/api";
 import { getCookies } from "better-auth/cookies";
 import { bearer } from "better-auth/plugins/bearer";
 import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
 
-import { PASSWORD_LENGTH, USERNAME_LENGTH } from "./policy";
+import { name, PASSWORD_LENGTH, USERNAME_LENGTH } from "./policy";
 
 const COOKIE_PREFIX = "acme";
 
@@ -31,6 +32,15 @@ type AuthConfig = {
   trustedOrigins?: Array<string>;
   useSecureCookies?: boolean;
   webAppUrl?: string;
+};
+
+// Better Auth accepts any string as a name.
+const assertName = (value: string | undefined) => {
+  const issue = value === undefined ? undefined : name.safeParse(value).error?.issues[0];
+
+  if (issue) {
+    throw new APIError("BAD_REQUEST", { message: issue.message });
+  }
 };
 
 const prismaDatabase = (prisma: PrismaClient) => prismaAdapter(prisma, { provider: "postgresql" });
@@ -97,6 +107,25 @@ const createAuth = (config: AuthConfig) => {
     },
 
     database,
+
+    databaseHooks: {
+      user: {
+        create: {
+          before: (user) => {
+            assertName(user.name);
+
+            return Promise.resolve();
+          },
+        },
+        update: {
+          before: (user) => {
+            assertName(user.name);
+
+            return Promise.resolve();
+          },
+        },
+      },
+    },
 
     emailAndPassword: {
       enabled: true,

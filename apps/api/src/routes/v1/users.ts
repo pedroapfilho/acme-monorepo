@@ -1,5 +1,5 @@
 import { createRoute, z } from "@hono/zod-openapi";
-import { USERNAME_LENGTH } from "@repo/auth/policy";
+import { name, username } from "@repo/auth/policy";
 import type { Context } from "hono";
 
 import { AppError, errorResponse } from "@/lib/api-error";
@@ -10,15 +10,7 @@ import type { UserStore } from "@/lib/users";
 import { rateLimitResponses, requestSizeLimitResponses } from "@/middleware/security";
 
 const updateUserSchema = z
-  .object({
-    name: z.string().min(1).max(100).optional(),
-    username: z
-      .string()
-      .optional()
-      .describe(
-        `${USERNAME_LENGTH.min}-${USERNAME_LENGTH.max} characters: letters, numbers, underscores, and dots. Stored lowercased; the submitted form is kept as the display username.`,
-      ),
-  })
+  .object({ name: name.optional(), username: username.optional() })
   .refine((data) => data.name !== undefined || data.username !== undefined, {
     message: "Provide at least one field to update",
   })

@@ -226,6 +226,27 @@ describe("createAuth without a mailer", () => {
 });
 
 describe("createAuth credentials and sessions", () => {
+  it.each(["Al", "A".repeat(33)])("rejects the sign-up name %s", async (name) => {
+    const auth = testAuth();
+
+    await expect(
+      auth.api.signUpEmail({ body: { email: "ada@acme.test", name, password: PASSWORD } }),
+    ).rejects.toThrow(/Name must be at/v);
+  });
+
+  it("rejects a profile update to a name outside the policy and keeps the old one", async () => {
+    const auth = testAuth();
+    await signUp(auth);
+    const headers = new Headers({ cookie: await signedInCookie(auth, "ada@acme.test") });
+
+    await expect(auth.api.updateUser({ body: { name: "Al" }, headers })).rejects.toThrow(
+      "Name must be at least 3 characters",
+    );
+
+    const session = await auth.api.getSession({ headers });
+    expect(session?.user.name).toBe("Ada");
+  });
+
   it("rejects passwords shorter than 12 characters", async () => {
     await expect(signUp(testAuth(), "ada@acme.test", "elevenchars")).rejects.toThrow(
       /password too short/iv,

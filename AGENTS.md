@@ -116,7 +116,8 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 
 ### Auth
 
-- Password minimum **12 characters**. Sessions expire after 7 days.
+- `@repo/auth/policy` owns the field rules as zod schemas: `email`, `name`, `newPassword`, `existingPassword` and `username`, each rule's helper text in its `.description`. Web form schemas, api bodies and `createAuth` read them; no form or route retypes a length or its copy. `existingPassword` only requires a value, so raising the minimum never locks an account out at a form.
+- Passwords are 12 to 128 characters and names 3 to 32, enforced by `createAuth` as well as the forms. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
 - `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup and user writes, both wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.

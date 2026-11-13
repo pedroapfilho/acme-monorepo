@@ -128,8 +128,8 @@ describe("Better Auth account writes through createApp", () => {
       });
 
       expect(response.status).toBe(400);
-      expect(await response.json()).toEqual({
-        error: { code: expect.any(String), message: expect.any(String) },
+      expect(await response.json()).toMatchObject({
+        error: { code: "VALIDATION_ERROR", details: [{ field: "username" }] },
       });
       expect(records.user[0]?.username).toBe("testuser");
     },

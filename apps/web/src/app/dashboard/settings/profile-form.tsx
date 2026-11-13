@@ -1,5 +1,6 @@
 "use client";
 
+import { name } from "@repo/auth/policy";
 import { Field } from "@repo/ui/components/field";
 import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
@@ -31,11 +32,7 @@ const ProfileForm = ({ initialName }: Props) => {
     <AppForm submission={submission}>
       <form.AppField name="name">
         {(field) => (
-          <field.TextField
-            autoComplete="name"
-            description="3 to 32 characters."
-            label="Full Name"
-          />
+          <field.TextField autoComplete="name" description={name.description} label="Full Name" />
         )}
       </form.AppField>
 
