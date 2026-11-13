@@ -1,10 +1,11 @@
 "use client";
 
 import { Field } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { changePasswordSchema } from "@/lib/form-schemas";
 
@@ -29,9 +30,15 @@ const PasswordForm = () => {
   });
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="currentPassword">
-        {(field) => <field.TextField autoComplete="current-password" label="Current password" />}
+        {(field) => (
+          <field.TextField
+            autoComplete="current-password"
+            label="Current password"
+            type="password"
+          />
+        )}
       </form.AppField>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -41,11 +48,18 @@ const PasswordForm = () => {
               autoComplete="new-password"
               description="At least 12 characters."
               label="New password"
+              type="password"
             />
           )}
         </form.AppField>
         <form.AppField name="confirmPassword">
-          {(field) => <field.TextField autoComplete="new-password" label="Confirm new password" />}
+          {(field) => (
+            <field.TextField
+              autoComplete="new-password"
+              label="Confirm new password"
+              type="password"
+            />
+          )}
         </form.AppField>
       </div>
 
@@ -54,7 +68,7 @@ const PasswordForm = () => {
           Update password
         </SubmitButton>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

@@ -108,9 +108,9 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 
 ### Forms
 
-- **@tanstack/react-form** (NOT react-hook-form). Auth forms use `useAuthForm`, `AuthForm` and `SubmitButton` from `apps/web/src/components/auth-form.tsx`; auth buttons use `AuthActionButton` from the same module. It owns the double-submit latch, Better Auth error reporting and the busy state.
+- **@tanstack/react-form** (NOT react-hook-form). The form kit lives in `@repo/ui`: `useAppForm` from `hooks/use-app-form` (the validation recipe and the bound `field.TextField`), the `AppForm` shell and `SubmitButton` from `compositions/app-form`; `withFieldGroup` shares a group of fields between forms. Auth forms call `useAuthForm` from `apps/web/src/hooks/use-auth-form.ts`, which adds the double-submit latch and Better Auth error reporting; auth buttons use `AuthActionButton` from `apps/web/src/components/auth-action-button.tsx`.
 - Schemas are the single source of validation: no HTML `required` or `minLength`; keep `noValidate` on the form, `type="email"` for keyboard hints, and `type="submit"` on submit buttons. Derive `aria-required` from the field schema and subscribe to form-derived state through `useSelector(form.store, selector)` or `form.Subscribe`.
-- Validate on submit, then on every change (`revalidateLogic()` with `onDynamicAsync: schema`), never on blur; show an error whenever the field is invalid, focus the first invalid field on a failed submit (`id={form.formId}` plus `focusFirstInvalidField(formApi.formId)`), report submit failures in `FormAlert` rather than a toast, and keep submit enabled except while submitting. The six rules, with the one-field exception, are in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md#forms). `field.TextField` implements them; call sites pass a label, an `autoComplete` purpose and a `description` for any rule people can't guess.
+- Validate on submit, then on every change (`revalidateLogic()` with `onDynamicAsync: schema`), never on blur; show an error whenever the field is invalid, focus the first invalid field on a failed submit (`id={form.formId}` plus `focusFirstInvalidField(formApi.formId)`), report submit failures in `FormAlert` rather than a toast, and keep submit enabled except while submitting. The six rules, with the one-field exception, are in [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md#forms). `field.TextField` implements them; call sites pass a label, an input `type`, an `autoComplete` purpose and a `description` for any rule people can't guess.
 - Field primitives from `@repo/ui`: `Field`, `FieldGroup`, `FieldLabel`, `FieldError`.
 - **Never** put `field` in a `useEffect` / `useCallback` dependency array; it's a new object every render. Use `field.form.setFieldValue(field.name, value)` with stable refs.
 
@@ -121,7 +121,13 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
 - `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup and user writes, both wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
-- `createAuth` takes an optional `mailer` and reports it as `auth.canSendEmail`. `web` builds the Resend mailer when `RESEND_API_KEY` is set. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
+- `createAuth` takes an optional `email` (the mailer plus the web URLs its emails link to) and reports it as `auth.canSendEmail`. `web` builds it when `RESEND_API_KEY` is set; `packages/auth` knows no web route. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
+
+### Errors
+
+- Log a caught error as `log.error({ error: serializeError(error), message })` with `serializeError` from `@repo/observability`: evlog writes an `Error` held in a field, or in another error's `cause`, as `{}`. Client code calls `reportError(error)` from the app's `lib/observability-client.ts`.
+- `error.tsx`, `global-error.tsx` and `not-found.tsx` in both Next apps render `RouteError`, `GlobalError` and `NotFoundPage` from `@repo/ui/compositions`; the app file passes its copy, its layout classes and `reportError`.
+- The web proxy answers a failed session lookup with an uncached 503. It never treats an auth outage as signed out.
 
 ### API
 

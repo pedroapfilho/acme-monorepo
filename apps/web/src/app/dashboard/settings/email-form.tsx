@@ -1,9 +1,10 @@
 "use client";
 
 import { Field } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import { useState } from "react";
 
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { changeEmailSchema } from "@/lib/form-schemas";
 
@@ -48,7 +49,7 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
   }
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="email">
         {(field) => (
           <field.TextField
@@ -56,6 +57,7 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
             id="newEmail"
             label="New email"
             placeholder={currentEmail}
+            type="email"
           />
         )}
       </form.AppField>
@@ -65,7 +67,7 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
           Update email
         </SubmitButton>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

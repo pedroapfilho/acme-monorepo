@@ -158,7 +158,7 @@ importers:
         version: 1.48.0(react@19.3.0)
       next:
         specifier: ^16.4.6
-        version: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -175,9 +175,6 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.3.3
         version: 4.3.3
-      '@testing-library/react':
-        specifier: ^16.3.3
-        version: 16.3.3(@testing-library/dom@10.4.1)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@total-typescript/ts-reset':
         specifier: ^0.6.1
         version: 0.6.1
@@ -237,7 +234,7 @@ importers:
         version: 1.48.0(react@19.3.0)
       next:
         specifier: ^16.4.6
-        version: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -427,7 +424,7 @@ importers:
         version: 4.13.9
       next:
         specifier: ^16.4.6
-        version: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -535,6 +532,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.8.0
         version: 1.8.0(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tanstack/react-form':
+        specifier: ^1.33.5
+        version: 1.33.5(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -559,6 +559,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@repo/config-vitest':
         specifier: workspace:*
@@ -575,9 +578,15 @@ importers:
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0
+      next:
+        specifier: ^16.4.6
+        version: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       postcss:
         specifier: ^8.5.28
         version: 8.5.28
+      react-dom:
+        specifier: ^19.3.0
+        version: 19.3.0(react@19.3.0)
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -7874,7 +7883,7 @@ snapshots:
     dependencies:
       esbuild: 0.28.1
       jiti: 2.6.1
-      next: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      next: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
     transitivePeerDependencies:
       - '@babel/core'
       - '@opentelemetry/api'
@@ -8658,7 +8667,7 @@ snapshots:
 
   '@vercel/analytics@2.0.1(next@16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react@19.3.0)(vue@3.5.42(typescript@7.0.2))':
     optionalDependencies:
-      next: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      next: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
       vue: 3.5.42(typescript@7.0.2)
 
@@ -9043,7 +9052,7 @@ snapshots:
     optionalDependencies:
       '@prisma/client': 7.10.0(prisma@7.10.0(@types/node@26.6.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(magicast@0.5.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2))(typescript@7.0.2)
       mysql2: 3.24.3(@types/node@26.6.2)
-      next: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      next: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       pg: 8.23.0
       prisma: 7.10.0(@types/node@26.6.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(magicast@0.5.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@7.0.2)
       react: 19.3.0
@@ -9685,7 +9694,7 @@ snapshots:
     optionalDependencies:
       express: 5.2.1
       hono: 4.13.9
-      next: 16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      next: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
       vite: 8.3.6(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
 
@@ -10909,7 +10918,7 @@ snapshots:
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  next@16.4.6(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  next@16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@next/env': 16.4.6
       '@swc/helpers': 0.5.23
@@ -10918,7 +10927,7 @@ snapshots:
       postcss: 8.5.23
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
-      styled-jsx: 5.1.6(react@19.3.0)
+      styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.3.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.4.6
       '@next/swc-darwin-x64': 16.4.6
@@ -11941,10 +11950,12 @@ snapshots:
 
   stubborn-utils@1.0.2: {}
 
-  styled-jsx@5.1.6(react@19.3.0):
+  styled-jsx@5.1.6(@babel/core@7.29.7)(react@19.3.0):
     dependencies:
       client-only: 0.0.1
       react: 19.3.0
+    optionalDependencies:
+      '@babel/core': 7.29.7
 
   systeminformation@5.33.19: {}
 

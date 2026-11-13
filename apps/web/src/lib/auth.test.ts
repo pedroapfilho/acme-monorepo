@@ -40,7 +40,7 @@ describe("getAuth", () => {
   it("refuses RESEND_API_KEY without WEB_APP_URL", async () => {
     const getAuth = await loadGetAuth({ WEB_APP_URL: undefined });
 
-    expect(() => getAuth()).toThrow(/webAppUrl/v);
+    expect(() => getAuth()).toThrow(/WEB_APP_URL/v);
   });
 
   it("starts without WEB_APP_URL when no mailer is configured", async () => {

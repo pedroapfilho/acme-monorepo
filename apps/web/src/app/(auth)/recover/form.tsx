@@ -1,10 +1,11 @@
 "use client";
 
 import { Field, FieldDescription } from "@repo/ui/components/field";
+import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
 import Link from "next/link";
 import { useState } from "react";
 
-import { AuthForm, SubmitButton, useAuthForm } from "@/components/auth-form";
+import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
 
@@ -45,10 +46,15 @@ const RecoverForm = () => {
   }
 
   return (
-    <AuthForm submission={submission}>
+    <AppForm submission={submission}>
       <form.AppField name="email">
         {(field) => (
-          <field.TextField autoComplete="email" label="Email" placeholder="you@example.com" />
+          <field.TextField
+            autoComplete="email"
+            label="Email"
+            placeholder="you@example.com"
+            type="email"
+          />
         )}
       </form.AppField>
 
@@ -61,7 +67,7 @@ const RecoverForm = () => {
           </Link>
         </FieldDescription>
       </Field>
-    </AuthForm>
+    </AppForm>
   );
 };
 

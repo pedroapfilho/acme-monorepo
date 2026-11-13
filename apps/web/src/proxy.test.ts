@@ -42,15 +42,6 @@ describe("proxy", () => {
     expect(response.headers.get("location")).toBe(`https://acme.web.localhost${destination}`);
   });
 
-  it("sends root visitors to login when the session lookup fails", async () => {
-    lookup.mockRejectedValue(new Error("Database unavailable"));
-    vi.spyOn(log, "error").mockImplementation(() => undefined);
-
-    const response = await proxy(requestFor("/"));
-
-    expect(response.headers.get("location")).toBe("https://acme.web.localhost/login");
-  });
-
   it("sends signed-out dashboard visitors to login without a redundant return destination", async () => {
     const response = await proxy(requestFor("/dashboard"));
 
@@ -110,34 +101,21 @@ describe("proxy", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
-  it.each(["/login", "/register", "/recover"])(
-    "logs a session failure and still renders %s",
+  it.each(["/", "/login", "/dashboard/settings?tab=security"])(
+    "answers %s with an uncached 503 when the session lookup fails",
     async (path) => {
-      const error = new Error("Database unavailable");
-      lookup.mockRejectedValue(error);
-      const logError = vi.spyOn(log, "error");
+      lookup.mockRejectedValue(new Error("Database unavailable"));
+      const logError = vi.spyOn(log, "error").mockImplementation(() => undefined);
 
       const response = await proxy(requestFor(path));
 
-      expect(response.headers.get("x-middleware-next")).toBe("1");
-      expect(logError).toHaveBeenCalledWith(
-        expect.objectContaining({ cause: error, message: "Proxy: failed to look up session" }),
-      );
+      expect(response.status).toBe(503);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.get("location")).toBeNull();
+      expect(logError).toHaveBeenCalledWith({
+        error: expect.objectContaining({ message: "Database unavailable" }),
+        message: "Proxy: failed to look up session",
+      });
     },
   );
-
-  it("logs a session failure and redirects protected pages to login", async () => {
-    const error = new Error("Database unavailable");
-    lookup.mockRejectedValue(error);
-    const logError = vi.spyOn(log, "error");
-
-    const response = await proxy(requestFor("/dashboard/settings?tab=security"));
-
-    const destination = new URL(response.headers.get("location") ?? "");
-    expect(destination.pathname).toBe("/login");
-    expect(destination.searchParams.get("from")).toBe("/dashboard/settings?tab=security");
-    expect(logError).toHaveBeenCalledWith(
-      expect.objectContaining({ cause: error, message: "Proxy: failed to look up session" }),
-    );
-  });
 });

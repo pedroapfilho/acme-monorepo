@@ -25,12 +25,16 @@ const capturingMailer = (failing: Array<TransactionalEmail["type"]> = []): Captu
   return { mailer, sent };
 };
 
-const testAuth = (config: Partial<AuthConfig> = {}) =>
+const testAuth = ({ mailer, ...config }: Partial<AuthConfig> & { mailer?: Mailer } = {}) =>
   createAuth({
     allowedHosts: ["**.localhost"],
     database: memoryAdapter({ account: [], session: [], user: [], verification: [] }),
+    email: mailer && {
+      mailer,
+      resetPasswordUrl: `${WEB_APP_URL}/recover`,
+      signInUrl: `${WEB_APP_URL}/login`,
+    },
     secret: "test-secret-minimum-32-characters-long",
-    webAppUrl: WEB_APP_URL,
     ...config,
   });
 
@@ -98,7 +102,7 @@ describe("createAuth with a mailer", () => {
     expect(sentOfType(sent, "welcome")).toHaveLength(2);
   });
 
-  it("tells the account holder about a repeated sign-up with links to the web app", async () => {
+  it("tells the account holder about a repeated sign-up with the links it was given", async () => {
     const { mailer, sent } = capturingMailer();
     const auth = testAuth({ mailer });
     const first = await signUp(auth);
@@ -198,12 +202,6 @@ describe("createAuth with a mailer", () => {
       },
     ]);
   });
-
-  it("refuses to start without a web app URL to link emails to", () => {
-    expect(() => testAuth({ mailer: capturingMailer().mailer, webAppUrl: undefined })).toThrow(
-      "createAuth: a mailer needs webAppUrl to link emails back to the web app",
-    );
-  });
 });
 
 describe("createAuth without a mailer", () => {
@@ -224,10 +222,6 @@ describe("createAuth without a mailer", () => {
     await expect(
       auth.api.requestPasswordReset({ body: { email: "ada@acme.test" } }),
     ).resolves.toMatchObject({ status: true });
-  });
-
-  it("starts without a web app URL", () => {
-    expect(testAuth({ webAppUrl: undefined }).canSendEmail).toBe(false);
   });
 });
 

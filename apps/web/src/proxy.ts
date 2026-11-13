@@ -1,4 +1,4 @@
-import { log } from "@repo/observability";
+import { log, serializeError } from "@repo/observability";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -30,7 +30,13 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
   try {
     session = await lookup(request.headers);
   } catch (error) {
-    log.error(new Error("Proxy: failed to look up session", { cause: error }));
+    log.error({ error: serializeError(error), message: "Proxy: failed to look up session" });
+
+    // Treating an auth outage as "signed out" would bounce every signed-in visitor to /login.
+    return new NextResponse("Authentication service unavailable", {
+      headers: { "Cache-Control": "no-store" },
+      status: 503,
+    });
   }
 
   if (isRoot) {
