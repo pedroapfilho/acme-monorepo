@@ -1,9 +1,5 @@
-import { portlessUrl } from "@repo/portless-env";
 import { loopbackUrl } from "@repo/portless-env/apps";
-import type { App } from "@repo/portless-env/apps";
 
-const appUrl = (app: App) => (process.env.CI ? loopbackUrl(app, "127.0.0.1") : portlessUrl(app));
-
-export const webUrl = appUrl("web");
-export const apiUrl = appUrl("api");
-export const landingUrl = appUrl("landing");
+export const webUrl = loopbackUrl("web", "127.0.0.1");
+export const apiUrl = loopbackUrl("api", "127.0.0.1");
+export const landingUrl = loopbackUrl("landing", "127.0.0.1");

@@ -67,7 +67,7 @@ pnpm format              # oxfmt (write)
 pnpm format:check        # oxfmt --check (used in CI)
 
 pnpm test                # turbo run test; Vitest in every workspace
-pnpm test:e2e            # playwright test (requires web + api running)
+pnpm test:e2e            # builds the apps, then playwright test starts them on loopback ports
 pnpm test:e2e:ui         # playwright with interactive UI
 
 pnpm db:generate         # prisma generate
@@ -100,7 +100,7 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 
 `packages/portless-env/src/apps.ts` is the app registry: each app's Portless name and loopback port, the URL env vars each app fills, and the canonical `https://<name>.localhost` defaults derived from the names. Add or rename an app there. Application code reads defaults from the browser-safe `@repo/portless-env/apps` (auth host patterns and trusted origins, landing's `webAppUrl()`, the web `metadataBase`, the OpenAPI server, Playwright's loopback URLs); it has no `node:` imports.
 
-App configs call `applyPortlessUrls(["WEB_APP_URL", …])` from `@repo/portless-env` at the top of each `next.config.ts` / `tsdown.config.ts`. It runs `portless get` once per app and fills each env var only when it is unset or still holds its canonical default; a failed lookup throws. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Tests in `tests/e2e` import URLs from `tests/e2e/urls.ts`, which asks portless locally and uses loopback ports in CI. Import the package by bare specifier: a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
+App configs call `applyPortlessUrls(["WEB_APP_URL", …])` from `@repo/portless-env` at the top of each `next.config.ts` / `tsdown.config.ts`. It runs `portless get` once per app and fills each env var only when it is unset or still holds its canonical default; a failed lookup throws. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Tests in `tests/e2e` import URLs from `tests/e2e/urls.ts`, which are the registry's loopback URLs everywhere: Playwright starts the built apps there itself, locally and in CI, and reuses servers already listening locally. `playwright.config.ts` loads `apps/web/.env` for the runner and the servers. Import the package by bare specifier: a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
 
 The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must stay literal; `packages/portless-env/src/apps.test.ts` asserts they match the registry.
 

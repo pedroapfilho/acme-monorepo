@@ -73,7 +73,6 @@ jobs:
             next-${{ runner.os }}-${{ runner.arch }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-${{ github.event.pull_request.number || github.ref_name }}-
             next-${{ runner.os }}-${{ runner.arch }}-node24-${{ hashFiles('pnpm-lock.yaml') }}-e2e-main-
       - run: pnpm db:push
-      - run: pnpm build --filter=web --filter=api --filter=landing
       - name: Read Playwright version
         id: playwright
         run: echo "version=$(pnpm exec playwright --version | cut -d ' ' -f 2)" >> "$GITHUB_OUTPUT"
