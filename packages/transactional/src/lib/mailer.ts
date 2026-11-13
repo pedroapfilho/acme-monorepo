@@ -1,12 +1,11 @@
 import * as React from "react";
 import { render } from "react-email";
-import { Resend } from "resend";
-import type { CreateEmailOptions, CreateEmailResponse } from "resend";
 
 import { ChangeEmail } from "../emails/change-email";
 import { PasswordResetEmail } from "../emails/password-reset";
 import { SignUpAttemptEmail } from "../emails/sign-up-attempt";
 import { WelcomeEmail } from "../emails/welcome";
+import type { Transport } from "../transport";
 
 import { senderAddressSchema } from "./sender-address";
 
@@ -21,8 +20,6 @@ type TransactionalEmail =
 type DeliveryResult = { ok: true } | { error: string; ok: false };
 
 type Mailer = (email: TransactionalEmail) => Promise<DeliveryResult>;
-
-type ResendSend = (payload: CreateEmailOptions) => Promise<CreateEmailResponse>;
 
 type EmailBuild = { subject: string; template: React.ReactElement; to: string };
 
@@ -69,17 +66,8 @@ const buildEmail = (email: TransactionalEmail): EmailBuild => {
   }
 };
 
-const resendSend = (apiKey: string): ResendSend => {
-  const resend = new Resend(apiKey);
-
-  return (payload) => resend.emails.send(payload);
-};
-
 // A malformed sender is a configuration error and throws here; delivery failures are results the caller decides how to surface.
-const createResendMailer = (
-  { apiKey, from }: { apiKey: string; from: string },
-  send: ResendSend = resendSend(apiKey),
-): Mailer => {
+const createMailer = ({ from, transport }: { from: string; transport: Transport }): Mailer => {
   const sender = senderAddressSchema.parse(from);
 
   return async (email) => {
@@ -91,7 +79,7 @@ const createResendMailer = (
         render(template, { plainText: true }),
       ]);
 
-      const { error } = await send({
+      const { error } = await transport({
         from: sender,
         html,
         subject,
@@ -105,7 +93,7 @@ const createResendMailer = (
 
       if (error) {
         return {
-          error: `Resend failed to queue email: ${error.name} - ${error.message}`,
+          error: `Failed to queue email: ${error.name} - ${error.message}`,
           ok: false,
         };
       }
@@ -117,6 +105,6 @@ const createResendMailer = (
   };
 };
 
-export { createResendMailer };
+export { createMailer };
 
 export type { Mailer, TransactionalEmail };

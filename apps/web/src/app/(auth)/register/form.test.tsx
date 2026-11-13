@@ -5,12 +5,10 @@ import { renderWithRouter, respondToAuthRequests } from "@/lib/test-helpers";
 
 import RegisterForm from "./form";
 
-it.each([null, ""])("asks for email verification when the session token is %s", async (token) => {
-  const requests = respondToAuthRequests(200, { token, user: { id: "user-1" } });
+it("asks for email verification after sign-up", async () => {
+  const requests = respondToAuthRequests(200, { token: null, user: { id: "user-1" } });
 
-  const router = await renderWithRouter(
-    <RegisterForm searchParams={Promise.resolve({ from: "/billing" })} />,
-  );
+  await renderWithRouter(<RegisterForm searchParams={Promise.resolve({ from: "/billing" })} />);
 
   fireEvent.change(screen.getByLabelText("Full Name"), { target: { value: "Ada Lovelace" } });
   fireEvent.change(screen.getByLabelText("Email"), { target: { value: "ada@example.com" } });
@@ -35,5 +33,4 @@ it.each([null, ""])("asks for email verification when the session token is %s", 
       path: "/api/auth/sign-up/email",
     },
   ]);
-  expect(router.push).not.toHaveBeenCalled();
 });

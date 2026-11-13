@@ -26,6 +26,9 @@ importers:
       '@repo/portless-env':
         specifier: workspace:*
         version: link:packages/portless-env
+      '@repo/transactional':
+        specifier: workspace:*
+        version: link:packages/transactional
       '@shadcn/lint':
         specifier: 0.2.0
         version: 0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))

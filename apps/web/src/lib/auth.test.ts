@@ -26,10 +26,22 @@ describe("getAuth", () => {
     vi.unstubAllEnvs();
   });
 
-  it("sends email when Resend, the sender and the web app URL are configured", async () => {
+  it("starts when Resend, the sender and the web app URL are configured", async () => {
     const getAuth = await loadGetAuth();
 
-    expect(getAuth().canSendEmail).toBe(true);
+    expect(() => getAuth()).not.toThrow();
+  });
+
+  it("starts without RESEND_API_KEY when mail goes to the outbox", async () => {
+    const getAuth = await loadGetAuth({ MAIL_TRANSPORT: "outbox", RESEND_API_KEY: undefined });
+
+    expect(() => getAuth()).not.toThrow();
+  });
+
+  it.each([undefined, ""])("refuses to start with the RESEND_API_KEY %j", async (key) => {
+    const getAuth = await loadGetAuth({ RESEND_API_KEY: key });
+
+    expect(() => getAuth()).toThrow("RESEND_API_KEY is required unless MAIL_TRANSPORT=outbox");
   });
 
   it("refuses a FROM_EMAIL that is not an address", async () => {
@@ -38,15 +50,9 @@ describe("getAuth", () => {
     expect(() => getAuth()).toThrow(/valid email/v);
   });
 
-  it("refuses RESEND_API_KEY without WEB_APP_URL", async () => {
+  it("refuses to start without WEB_APP_URL", async () => {
     const getAuth = await loadGetAuth({ WEB_APP_URL: undefined });
 
     expect(() => getAuth()).toThrow(/WEB_APP_URL/v);
-  });
-
-  it("starts without WEB_APP_URL when no mailer is configured", async () => {
-    const getAuth = await loadGetAuth({ RESEND_API_KEY: undefined, WEB_APP_URL: undefined });
-
-    expect(getAuth().canSendEmail).toBe(false);
   });
 });

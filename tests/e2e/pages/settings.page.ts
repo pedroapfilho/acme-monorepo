@@ -7,7 +7,6 @@ export class SettingsPage {
   private readonly saveNameButton: Locator;
   private readonly newEmailInput: Locator;
   private readonly updateEmailButton: Locator;
-  private readonly emailChangeUnavailable: Locator;
   private readonly emailConfirmationSent: Locator;
   private readonly currentPasswordInput: Locator;
   private readonly newPasswordInput: Locator;
@@ -25,9 +24,6 @@ export class SettingsPage {
     this.saveNameButton = page.getByRole("button", { name: "Save" });
     this.newEmailInput = page.getByLabel("New email");
     this.updateEmailButton = page.getByRole("button", { name: "Update email" });
-    this.emailChangeUnavailable = page.getByText(
-      "Email changes are unavailable until email delivery is configured.",
-    );
     this.emailConfirmationSent = page.getByRole("status").filter({ hasText: "Confirm the change" });
     this.currentPasswordInput = page.getByLabel("Current password");
     this.newPasswordInput = page.getByLabel("New password", { exact: true });
@@ -84,11 +80,6 @@ export class SettingsPage {
 
   expectSuccess = async (message: string) => {
     await expect(this.successToast).toContainText(message);
-  };
-
-  expectEmailChangeUnavailable = async () => {
-    await expect(this.emailChangeUnavailable).toBeVisible();
-    await expect(this.newEmailInput).toHaveCount(0);
   };
 
   expectEmailConfirmationSentTo = async (email: string) => {

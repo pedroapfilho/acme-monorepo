@@ -120,9 +120,10 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 - Passwords are 12 to 128 characters and names 3 to 32, enforced by `createAuth` as well as the forms. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
-- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup, wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.
+- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup, wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads none of `MAIL_TRANSPORT`, `RESEND_API_KEY` and `FROM_EMAIL`.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
-- `createAuth` takes an optional `email` (the mailer plus the web URLs its emails link to) and reports it as `auth.canSendEmail`. `web` builds it when `RESEND_API_KEY` is set; `packages/auth` knows no web route. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
+- `createAuth` requires `email`: the mailer plus the web URLs its emails link to. `web` builds it; `packages/auth` knows no web route. Email verification is always required.
+- Mail is a port. `createTransport` in `@repo/transactional/transport` returns the Resend transport, and throws without `RESEND_API_KEY`, unless `MAIL_TRANSPORT=outbox` selects the outbox, which writes each message to a file that `readOutbox` and the e2e `waitForEmail` helper read. Nothing else constructs a Resend client. `packages/transactional/src/transport.ts` is written by `standy sync`; change it in the standard.
 
 ### Routes
 
@@ -181,7 +182,7 @@ cp packages/db/.env.example packages/db/.env
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS`: comma-separated allowed origins
 - `WEB_APP_URL`: web origin; secure-cookie switch, Better Auth's base URL fallback, the base of auth email links and the web `metadataBase`, parsed only by `webAppUrl()` in `@repo/auth/env-config` (portless fills it in dev)
-- `RESEND_API_KEY` / `FROM_EMAIL`: web only; auth email is off while `RESEND_API_KEY` is unset
+- `MAIL_TRANSPORT` / `RESEND_API_KEY` / `FROM_EMAIL`: web only; `MAIL_TRANSPORT=outbox` for dev and e2e, otherwise `RESEND_API_KEY` is required at boot
 
 Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.
 

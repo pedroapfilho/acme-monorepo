@@ -2,7 +2,8 @@ import { envAuthConfig } from "@repo/auth/env-config";
 import { createAuth, prismaDatabase } from "@repo/auth/server";
 import type { Auth } from "@repo/auth/server";
 import { prisma } from "@repo/db";
-import { createResendMailer } from "@repo/transactional";
+import { createMailer } from "@repo/transactional";
+import { createTransport } from "@repo/transactional/transport";
 import { nextCookies } from "better-auth/next-js";
 
 import { getEnv } from "./env";
@@ -11,16 +12,15 @@ import { routes } from "./routes";
 const emailConfig = (webAppUrl: string | undefined) => {
   const env = getEnv();
 
-  if (env.RESEND_API_KEY === undefined) {
-    return undefined;
-  }
-
   if (webAppUrl === undefined) {
-    throw new Error("WEB_APP_URL is required with RESEND_API_KEY: auth emails link to the web app");
+    throw new Error("WEB_APP_URL is required: auth emails link to the web app");
   }
 
   return {
-    mailer: createResendMailer({ apiKey: env.RESEND_API_KEY, from: env.FROM_EMAIL }),
+    mailer: createMailer({
+      from: env.FROM_EMAIL,
+      transport: createTransport({ apiKey: env.RESEND_API_KEY, transport: env.MAIL_TRANSPORT }),
+    }),
     resetPasswordUrl: new URL(routes.recover.path, webAppUrl).href,
     signInUrl: new URL(routes.login.path, webAppUrl).href,
   };

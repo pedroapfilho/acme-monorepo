@@ -5,7 +5,7 @@ import { webUrl } from "../urls";
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test.describe("Sign-up with redirect context", { tag: "@email" }, () => {
+test.describe("Sign-up with redirect context", () => {
   test("?from= survives signup and the verification link lands there signed in", async ({
     browser,
     createAccount,

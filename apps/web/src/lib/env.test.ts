@@ -40,15 +40,10 @@ describe("getEnv", () => {
     expect(getEnv()).toBe(getEnv());
   });
 
-  it("treats RESEND_API_KEY as optional", async () => {
-    const getEnv = await loadGetEnv({ RESEND_API_KEY: undefined });
+  it("leaves RESEND_API_KEY out when mail goes to the outbox", async () => {
+    const getEnv = await loadGetEnv({ MAIL_TRANSPORT: "outbox", RESEND_API_KEY: undefined });
 
-    expect(getEnv().RESEND_API_KEY).toBeUndefined();
-  });
-
-  it("treats an empty RESEND_API_KEY as unset", async () => {
-    const getEnv = await loadGetEnv({ RESEND_API_KEY: "" });
-
+    expect(getEnv()).toMatchObject({ MAIL_TRANSPORT: "outbox" });
     expect(getEnv().RESEND_API_KEY).toBeUndefined();
   });
 

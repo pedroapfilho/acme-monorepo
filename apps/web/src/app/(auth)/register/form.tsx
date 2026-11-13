@@ -3,7 +3,6 @@
 import { name, newPassword } from "@repo/auth/policy";
 import { Field, FieldDescription } from "@repo/ui/components/field";
 import { AppForm, SubmitButton } from "@repo/ui/compositions/app-form";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AuthPageLink } from "@/app/(auth)/auth-page-link";
@@ -18,7 +17,6 @@ type Props = {
 };
 
 const RegisterForm = ({ searchParams }: Props) => {
-  const { push, refresh } = useRouter();
   const [sentToEmail, setSentToEmail] = useState<string | null>(null);
 
   const { form, submission } = useAuthForm({
@@ -34,16 +32,8 @@ const RegisterForm = ({ searchParams }: Props) => {
     },
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
     fallbackError: "Failed to register",
-    onSuccess: async (data, value) => {
-      if (data.token === null || data.token === "") {
-        setSentToEmail(value.email);
-
-        return;
-      }
-
-      const { from } = await searchParams;
-      push(safeRedirectPath(from));
-      refresh();
+    onSuccess: (_data, value) => {
+      setSentToEmail(value.email);
     },
     schema: registerSchema,
   });

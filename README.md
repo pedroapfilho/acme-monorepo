@@ -92,7 +92,7 @@ Then edit each file and set:
 
 - `BETTER_AUTH_SECRET`: any 32+ char random string, **identical** across `apps/api/.env` and `apps/web/.env` (both validate sessions against it). Generate with `openssl rand -base64 32`.
 - `DATABASE_URL`: replace the name and password placeholders.
-- `RESEND_API_KEY` (optional, `apps/web/.env` only): turns on auth email. Without it sign-up skips verification and email changes are unavailable.
+- `MAIL_TRANSPORT=outbox` (`apps/web/.env` only, the example's default): auth email is written to the `acme-outbox` directory under the system temp directory instead of being sent, one JSON file per message, so the newest file holds the verification or reset link. Remove it and set `RESEND_API_KEY` to send through Resend; web refuses to boot with neither.
 
 The URL variables (`WEB_APP_URL`, `CORS_ORIGINS`, `TRUSTED_ORIGINS`) are pre-set to the portless URLs and don't need changes for local dev.
 
@@ -144,6 +144,6 @@ branch fix-styles:    https://fix-styles.acme.web.localhost
 | `pnpm db:seed`      | Seed database                 |
 | `pnpm clean`        | Clean all build artifacts     |
 
-`pnpm test:e2e` builds the three apps, starts them on their loopback ports (or reuses the ones already listening there) and runs the suite. The Playwright config loads `apps/web/.env`, so the runner and the servers share one `DATABASE_URL` and one mail setting; a variable already exported in the shell wins. `DATABASE_URL` must be a `localhost` or `127.0.0.1` PostgreSQL URL of a disposable database with the schema pushed (`pnpm db:push`); the suite refuses any other host before it runs.
+`pnpm test:e2e` builds the three apps, starts them on their loopback ports (or reuses the ones already listening there) and runs the suite. The Playwright config loads `apps/web/.env`, so the runner and the servers share one `DATABASE_URL`; a variable already exported in the shell wins. The servers it starts always write mail to the outbox, where the specs read it. `DATABASE_URL` must be a `localhost` or `127.0.0.1` PostgreSQL URL of a disposable database with the schema pushed (`pnpm db:push`); the suite refuses any other host before it runs.
 
 Mutable account fixtures register unique identities and delete their recorded user IDs after each test, including signed-out, unverified, renamed and already-deleted accounts. The shared seeded user is reserved for read-only and login coverage; the Playwright setup project signs it in and creates it when it is missing, so no separate seed step is needed.

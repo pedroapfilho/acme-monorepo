@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createResendMailer } from "./mailer";
+import type { Transport } from "../transport";
+
+import { createMailer } from "./mailer";
 import type { TransactionalEmail } from "./mailer";
 
-const send = vi.fn<NonNullable<Parameters<typeof createResendMailer>[1]>>();
+const send = vi.fn<Transport>();
 
-const mailerFrom = (from: string) => createResendMailer({ apiKey: "re_test", from }, send);
+const mailerFrom = (from: string) => createMailer({ from, transport: send });
 
 const welcome: TransactionalEmail = {
   linkLifetimeHours: 1,
@@ -20,13 +22,13 @@ const sentPayload = () => {
   const payload = send.mock.calls[0]?.[0];
 
   if (payload === undefined) {
-    throw new Error("Resend was not called");
+    throw new Error("The transport was not called");
   }
 
   return payload;
 };
 
-describe("createResendMailer", () => {
+describe("createMailer", () => {
   beforeEach(() => {
     send.mockReset();
     send.mockResolvedValue({ data: { id: "test" }, error: null, headers: null });
@@ -132,7 +134,7 @@ describe("createResendMailer", () => {
     },
   );
 
-  it("reports a Resend rejection as a failed delivery", async () => {
+  it("reports a rejected message as a failed delivery", async () => {
     send.mockResolvedValue({
       data: null,
       error: { message: "quota", name: "rate_limit_exceeded", statusCode: 429 },
@@ -142,7 +144,7 @@ describe("createResendMailer", () => {
     const result = await mailerFrom("noreply@acme.com")(welcome);
 
     expect(result).toEqual({
-      error: "Resend failed to queue email: rate_limit_exceeded - quota",
+      error: "Failed to queue email: rate_limit_exceeded - quota",
       ok: false,
     });
   });

@@ -3,7 +3,7 @@ import { signIn } from "../fixtures/session";
 import { verificationLink } from "../fixtures/verification.fixture";
 import { DashboardPage } from "../pages/dashboard.page";
 
-test.describe("Sign-up email verification", { tag: "@email" }, () => {
+test.describe("Sign-up email verification", () => {
   test("verify email is sent, clicking the link signs in the clicking device", async ({
     browser,
     createAccount,

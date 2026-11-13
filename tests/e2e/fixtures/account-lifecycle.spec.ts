@@ -46,14 +46,11 @@ test("cleans up by ID after changing credentials", async ({ account }) => {
   await prisma.account.updateMany({ data: { password: "changed" }, where: { userId: account.id } });
 });
 
-test("cleans up an unverified signup without a session", async ({
-  createAccount,
-  emailDelivery,
-}) => {
+test("cleans up an unverified signup without a session", async ({ createAccount }) => {
   const account = await createAccount();
   const user = await prisma.user.findUniqueOrThrow({ where: { id: account.id } });
   expect(user.emailVerified).toBe(false);
-  expect(await prisma.session.count({ where: { userId: account.id } })).toBe(emailDelivery ? 0 : 1);
+  expect(await prisma.session.count({ where: { userId: account.id } })).toBe(0);
 });
 
 test("cleanup is idempotent and scoped to all allocated identities", async ({ createAccount }) => {

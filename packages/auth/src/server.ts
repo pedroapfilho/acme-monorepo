@@ -7,7 +7,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { getCookies } from "better-auth/cookies";
 import { bearer } from "better-auth/plugins/bearer";
-import type { BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
+import type { BetterAuthOptions, BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
 
 import { name, PASSWORD_LENGTH } from "./policy";
 
@@ -21,10 +21,9 @@ type EmailConfig = {
   signInUrl: string;
 };
 
-type AuthConfig = {
+type SessionConfig = {
   allowedHosts: Array<string>;
   database: DBAdapterInstance;
-  email?: EmailConfig;
   extraPlugins?: Array<BetterAuthPlugin>;
   rateLimitEnabled?: boolean;
   secret: string;
@@ -32,6 +31,8 @@ type AuthConfig = {
   useSecureCookies?: boolean;
   webAppUrl?: string;
 };
+
+type AuthConfig = SessionConfig & { email: EmailConfig };
 
 // Better Auth accepts any string as a name.
 const assertName = (value: string | undefined) => {
@@ -44,50 +45,17 @@ const assertName = (value: string | undefined) => {
 
 const prismaDatabase = (prisma: PrismaClient) => prismaAdapter(prisma, { provider: "postgresql" });
 
-const createAuth = (config: AuthConfig) => {
-  const {
-    allowedHosts,
-    database,
-    email,
-    extraPlugins = [],
-    rateLimitEnabled = false,
-    secret,
-    trustedOrigins = [],
-    useSecureCookies = false,
-    webAppUrl,
-  } = config;
-
-  const mailer = email?.mailer;
-
-  const deliver = async (
-    mail: TransactionalEmail,
-    onFailure: { message: string; mode: "log" | "throw" },
-  ) => {
-    if (!mailer) {
-      return;
-    }
-
-    const result = await mailer(mail);
-
-    if (result.ok) {
-      return;
-    }
-
-    if (onFailure.mode === "throw") {
-      throw new Error(`${onFailure.message}: ${result.error}`);
-    }
-
-    log.error({ error: result.error, message: onFailure.message });
-  };
-
-  const auth = betterAuth({
-    account: {
-      accountLinking: {
-        enabled: true,
-        trustedProviders: ["email"],
-      },
-    },
-
+const sessionOptions = ({
+  allowedHosts,
+  database,
+  extraPlugins = [],
+  rateLimitEnabled = false,
+  secret,
+  trustedOrigins = [],
+  useSecureCookies = false,
+  webAppUrl,
+}: SessionConfig) =>
+  ({
     advanced: {
       cookiePrefix: COOKIE_PREFIX,
       defaultCookieAttributes: {
@@ -106,6 +74,57 @@ const createAuth = (config: AuthConfig) => {
     },
 
     database,
+
+    plugins: [bearer(), ...extraPlugins],
+
+    rateLimit: {
+      enabled: rateLimitEnabled,
+      max: 100,
+      storage: "database",
+      window: 60,
+    },
+
+    secret,
+
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+      },
+      expiresIn: 60 * 60 * 24 * 7,
+      storeSessionInDatabase: true,
+      updateAge: 60 * 60 * 24,
+    },
+    trustedOrigins,
+  }) satisfies BetterAuthOptions;
+
+const createSessionReader = (config: SessionConfig) => {
+  const auth = betterAuth(sessionOptions(config));
+
+  return {
+    getSession: auth.api.getSession,
+    sessionCookieName: getCookies(auth.options).sessionToken.name,
+  };
+};
+
+const createAuth = ({ email, ...config }: AuthConfig) => {
+  const deliver = async (mail: TransactionalEmail, failure: string) => {
+    const result = await email.mailer(mail);
+
+    if (!result.ok) {
+      throw new Error(`${failure}: ${result.error}`);
+    }
+  };
+
+  const auth = betterAuth({
+    ...sessionOptions(config),
+
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["email"],
+      },
+    },
 
     databaseHooks: {
       user: {
@@ -131,22 +150,21 @@ const createAuth = (config: AuthConfig) => {
       maxPasswordLength: PASSWORD_LENGTH.max,
       minPasswordLength: PASSWORD_LENGTH.min,
       // A failed notice must not fail the sign-up: the generic response is what hides that the email is registered.
-      onExistingUserSignUp:
-        email &&
-        (async ({ user }) => {
-          await deliver(
-            {
-              name: user.name,
-              resetPasswordUrl: email.resetPasswordUrl,
-              signInUrl: email.signInUrl,
-              type: "sign-up-attempt",
-              userEmail: user.email,
-              userId: user.id,
-            },
-            { message: "Auth: failed to send sign-up attempt email", mode: "log" },
-          );
-        }),
-      requireEmailVerification: Boolean(mailer),
+      onExistingUserSignUp: async ({ user }) => {
+        const result = await email.mailer({
+          name: user.name,
+          resetPasswordUrl: email.resetPasswordUrl,
+          signInUrl: email.signInUrl,
+          type: "sign-up-attempt",
+          userEmail: user.email,
+          userId: user.id,
+        });
+
+        if (!result.ok) {
+          log.error({ error: result.error, message: "Auth: failed to send sign-up attempt email" });
+        }
+      },
+      requireEmailVerification: true,
       resetPasswordTokenExpiresIn: EMAIL_LINK_LIFETIME_HOURS * 60 * 60,
       sendResetPassword: async ({ url, user }) => {
         await deliver(
@@ -158,7 +176,7 @@ const createAuth = (config: AuthConfig) => {
             userEmail: user.email,
             userId: user.id,
           },
-          { message: "Failed to send password reset email", mode: "throw" },
+          "Failed to send password reset email",
         );
       },
     },
@@ -167,44 +185,21 @@ const createAuth = (config: AuthConfig) => {
       autoSignInAfterVerification: true,
       expiresIn: EMAIL_LINK_LIFETIME_HOURS * 60 * 60,
       sendOnSignIn: true,
-      sendVerificationEmail:
-        mailer &&
-        (async ({ url, user }) => {
-          await deliver(
-            {
-              linkLifetimeHours: EMAIL_LINK_LIFETIME_HOURS,
-              name: user.name,
-              type: "welcome",
-              userEmail: user.email,
-              userId: user.id,
-              verificationUrl: url,
-            },
-            { message: "Failed to send verification email", mode: "throw" },
-          );
-        }),
-    },
-
-    plugins: [bearer(), ...extraPlugins],
-
-    rateLimit: {
-      enabled: rateLimitEnabled,
-      max: 100,
-      storage: "database",
-      window: 60,
-    },
-
-    secret,
-
-    session: {
-      cookieCache: {
-        enabled: true,
-        maxAge: 5 * 60,
+      sendVerificationEmail: async ({ url, user }) => {
+        await deliver(
+          {
+            linkLifetimeHours: EMAIL_LINK_LIFETIME_HOURS,
+            name: user.name,
+            type: "welcome",
+            userEmail: user.email,
+            userId: user.id,
+            verificationUrl: url,
+          },
+          "Failed to send verification email",
+        );
       },
-      expiresIn: 60 * 60 * 24 * 7,
-      storeSessionInDatabase: true,
-      updateAge: 60 * 60 * 24,
     },
-    trustedOrigins,
+
     user: {
       changeEmail: {
         enabled: true,
@@ -219,7 +214,7 @@ const createAuth = (config: AuthConfig) => {
               type: "change-email-confirmation",
               userId: user.id,
             },
-            { message: "Failed to send change-email confirmation", mode: "throw" },
+            "Failed to send change-email confirmation",
           );
         },
       },
@@ -231,13 +226,12 @@ const createAuth = (config: AuthConfig) => {
 
   return {
     ...auth,
-    canSendEmail: mailer !== undefined,
     sessionCookieName: getCookies(auth.options).sessionToken.name,
   };
 };
 
 type Auth = ReturnType<typeof createAuth>;
 
-export { createAuth, prismaDatabase };
+export { createAuth, createSessionReader, prismaDatabase };
 
 export type { Auth, AuthConfig };
