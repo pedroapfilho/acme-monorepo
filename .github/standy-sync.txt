@@ -1,0 +1,12 @@
+.github/ci/ci.mjs
+.github/ci/plan.mjs
+.github/ci/report.mjs
+.github/workflows/check.yml
+.github/workflows/friction-log.yml
+.github/workflows/react-doctor.yml
+packages/auth/src/env-config.ts
+packages/config-typescript/base.json
+packages/config-typescript/library.json
+packages/config-typescript/nextjs.json
+packages/config-typescript/react-library.json
+packages/portless-env/src/index.ts
