@@ -1,8 +1,9 @@
+import { displayName } from "@repo/identity";
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 
 import { Logo } from "@/components/logo";
-import { SECTIONS, SITE_NAME } from "@/lib/site";
+import { SECTIONS } from "@/lib/site";
 import { webAppUrl } from "@/lib/urls";
 
 // oxlint-disable-next-line eslint/require-await typescript/require-await -- Next.js cache components must be async even when they do not await.
@@ -18,19 +19,19 @@ const Footer = async () => {
       <div className="mx-auto grid max-w-5xl gap-12 px-6 py-12 md:grid-cols-content-action md:px-8">
         <div>
           <Link
-            aria-label={`${SITE_NAME} homepage`}
+            aria-label={`${displayName} homepage`}
             className="flex w-fit items-center gap-2 text-base font-semibold tracking-tight"
             href="/"
           >
             <Logo className="size-5 shrink-0 text-primary" />
-            {SITE_NAME}
+            {displayName}
           </Link>
           <p className="mt-5 max-w-measure-summary text-base text-pretty text-muted-foreground sm:text-sm">
             A production-ready Next.js baseline for teams that want product work to start on day
             one.
           </p>
           <p className="mt-3 text-base text-muted-foreground sm:text-sm">
-            &copy; {copyrightYear} {SITE_NAME}. All rights reserved.
+            &copy; {copyrightYear} {displayName}. All rights reserved.
           </p>
         </div>
         <nav

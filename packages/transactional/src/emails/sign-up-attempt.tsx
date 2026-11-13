@@ -1,3 +1,4 @@
+import { contacts } from "@repo/identity";
 import { Heading, Link, Text } from "react-email";
 
 import { Button } from "../components/button";
@@ -63,7 +64,7 @@ const SignUpAttemptEmail = ({
           <li className="py-1">Confirm your email account is secure</li>
           <li className="py-1">Enable two-factor authentication on Acme</li>
           <li className="py-1">
-            <Link className="text-foreground underline" href="mailto:security@acme.com">
+            <Link className="text-foreground underline" href={`mailto:${contacts.security}`}>
               Let our security team know
             </Link>
           </li>

@@ -1,7 +1,6 @@
+import { origins } from "@repo/identity";
 import type { MetadataRoute } from "next";
 
-import { SITE_URL } from "@/lib/site";
-
-const sitemap = (): MetadataRoute.Sitemap => [{ url: `${SITE_URL}/` }];
+const sitemap = (): MetadataRoute.Sitemap => [{ url: `${origins.landing}/` }];
 
 export default sitemap;

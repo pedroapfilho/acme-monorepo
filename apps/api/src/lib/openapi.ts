@@ -1,20 +1,21 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { contacts, displayName, origins } from "@repo/identity";
 import { canonicalUrl } from "@repo/portless-env/apps";
 import type { Env } from "hono";
 
 const apiDocumentMetadata = {
   info: {
     contact: {
-      email: "support@acme.com",
+      email: contacts.support,
       name: "API Support",
     },
-    description: "Acme backend API.",
-    title: "Acme API",
+    description: `${displayName} backend API.`,
+    title: `${displayName} API`,
     version: "1.0.0",
   },
   servers: [
     { description: "Local development server", url: canonicalUrl("api") },
-    { description: "Production server", url: "https://api.acme.com" },
+    { description: "Production server", url: origins.api },
   ],
   tags: [
     { description: "Service health and readiness", name: "System" },
