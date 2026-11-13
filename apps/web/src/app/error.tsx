@@ -1,7 +1,7 @@
 "use client";
 
 import { RouteError } from "@repo/ui/compositions/route-error";
-import type { ErrorBoundaryProps } from "@repo/ui/compositions/route-error";
+import type { ErrorBoundaryProps } from "@repo/ui/hooks/use-error-report";
 
 import { reportError } from "@/lib/observability-client";
 

@@ -26,6 +26,8 @@ packages/ui/src/compositions/form-field-error.test.tsx
 packages/ui/src/compositions/form-field-error.tsx
 packages/ui/src/hooks/use-client-ready.test.tsx
 packages/ui/src/hooks/use-client-ready.ts
+packages/ui/src/hooks/use-error-report.test.tsx
+packages/ui/src/hooks/use-error-report.ts
 packages/ui/src/lib/focus-first-invalid-field.test.ts
 packages/ui/src/lib/focus-first-invalid-field.ts
 packages/ui/src/lib/utils.ts
