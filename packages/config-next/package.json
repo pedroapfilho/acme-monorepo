@@ -1,0 +1,20 @@
+{
+  "name": "@repo/config-next",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@repo/portless-env": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "next": "^16.4.6",
+    "typescript": "^7.0.2"
+  }
+}

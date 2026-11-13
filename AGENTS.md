@@ -45,6 +45,7 @@ packages/
   db/                  Prisma client singleton + schema (User, Session, Account, Verification)
   transactional/       React Email templates + Resend sender
   config-typescript/   Shared tsconfig bases (nextjs / server / react-library / vite)
+  config-next/         The base both Next configs spread (flags, security headers, dev origins)
   config-vitest/       Shared Vitest configs (react.ts, node.ts)
   portless-env/        App registry (./apps: names, loopback ports, URL defaults) + `portless get` lookup (applyPortlessUrls)
 docs/                  CONVENTIONS.md + superpowers specs
@@ -102,7 +103,7 @@ The api exposes `/openapi.json`, the Scalar UI at `/docs`, and a markdown export
 
 App configs call `applyPortlessUrls(["WEB_APP_URL", …])` from `@repo/portless-env` at the top of each `next.config.ts` / `tsdown.config.ts`. It runs `portless get` once per app and fills each env var only when it is unset or still holds its canonical default; a failed lookup throws. It is a no-op unless `PORTLESS_URL` is set, so CI and production keep their real values. Tests in `tests/e2e` import URLs from `tests/e2e/urls.ts`, which are the registry's loopback URLs everywhere: Playwright starts the built apps there itself, locally and in CI, and reuses servers already listening locally. `playwright.config.ts` loads `apps/web/.env` for the runner and the servers. Import the package by bare specifier: a relative path resolves from the process cwd and breaks `next start apps/web` from the repo root.
 
-The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must stay literal; `packages/portless-env/src/apps.test.ts` asserts they match the registry.
+The `dev` scripts and the e2e workflow's `WEB_APP_URL` must stay literal; `packages/portless-env/src/apps.test.ts` asserts they match the registry.
 
 ## Conventions & gotchas
 
@@ -133,7 +134,7 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 ### Root layouts
 
 - Both Next apps render `SkipLink` from `@repo/ui/compositions/skip-link`, put `MAIN_CONTENT_ID` from `@repo/ui/lib/main-content` on the element it jumps to, and re-export `viewport` from `@repo/ui/lib/viewport`.
-- The security headers and compiler flags stay literal in each app's `next.config.ts`: `standy` reads them there.
+- Both `next.config.ts` files spread `baseNextConfig("<app>")` from `@repo/config-next`, a synced package: the compiler and navigation flags, the security headers and the dev origins. An app's own `experimental` settings go in its second argument.
 
 ### Errors
 

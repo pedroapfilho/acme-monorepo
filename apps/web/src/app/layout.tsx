@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 
 import { webAppUrl } from "@repo/auth/env-config";
+import { displayName } from "@repo/identity";
 import { canonicalUrl } from "@repo/portless-env/apps";
 import { Toaster } from "@repo/ui/components/sonner";
 import { SkipLink } from "@repo/ui/compositions/skip-link";
@@ -10,7 +11,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
-import { LONG_DESCRIPTION, SHORT_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import { LONG_DESCRIPTION, SHORT_DESCRIPTION } from "@/lib/site";
 
 const inter = Inter({
   display: "swap",
@@ -23,32 +24,32 @@ export { viewport } from "@repo/ui/lib/viewport";
 const metadataBase = new URL(webAppUrl() ?? canonicalUrl("web"));
 
 export const metadata: Metadata = {
-  authors: [{ name: `${SITE_NAME} Team` }],
+  authors: [{ name: `${displayName} Team` }],
   category: "technology",
-  creator: SITE_NAME,
+  creator: displayName,
   description: LONG_DESCRIPTION,
   keywords: ["authentication", "security", "next.js", "better-auth", "login", "registration"],
   metadataBase,
   openGraph: {
     description: LONG_DESCRIPTION,
     locale: "en_US",
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
+    siteName: displayName,
+    title: `${displayName} - ${SHORT_DESCRIPTION}`,
     type: "website",
   },
-  publisher: SITE_NAME,
+  publisher: displayName,
   robots: {
     follow: false,
     index: false,
   },
   title: {
-    default: `${SITE_NAME} | ${SHORT_DESCRIPTION}`,
-    template: `%s · ${SITE_NAME}`,
+    default: `${displayName} | ${SHORT_DESCRIPTION}`,
+    template: `%s · ${displayName}`,
   },
   twitter: {
     card: "summary_large_image",
     description: LONG_DESCRIPTION,
-    title: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
+    title: `${displayName} - ${SHORT_DESCRIPTION}`,
   },
 };
 

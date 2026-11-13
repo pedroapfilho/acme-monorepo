@@ -2,7 +2,7 @@
 
 import { GlobalError } from "@repo/ui/compositions/global-error";
 import styles from "@repo/ui/compositions/global-error.module.css";
-import type { ErrorBoundaryProps } from "@repo/ui/compositions/route-error";
+import type { ErrorBoundaryProps } from "@repo/ui/hooks/use-error-report";
 
 import { reportError } from "@/lib/observability-client";
 

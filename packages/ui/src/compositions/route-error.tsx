@@ -1,21 +1,15 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { Button } from "../components/button";
+import { useErrorReport } from "../hooks/use-error-report";
+import type { ErrorBoundaryProps, ReportError } from "../hooks/use-error-report";
 import { cn } from "../lib/utils";
-
-type BoundaryError = Error & { digest?: string };
-
-type ErrorBoundaryProps = {
-  error: BoundaryError;
-  retry: () => void;
-};
 
 type ErrorReportProps = ErrorBoundaryProps & {
   description: string;
-  report: (error: BoundaryError) => void;
+  report: ReportError;
 };
 
 const RouteError = ({
@@ -25,12 +19,7 @@ const RouteError = ({
   report,
   retry,
 }: ErrorReportProps & { className?: string }) => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    report(error);
-    headingRef.current?.focus();
-  }, [error, report]);
+  const headingRef = useErrorReport(error, report);
 
   return (
     <section className={cn("flex flex-col items-center gap-6 px-6 text-center", className)}>
@@ -57,4 +46,4 @@ const RouteError = ({
 
 export { RouteError };
 
-export type { ErrorBoundaryProps, ErrorReportProps };
+export type { ErrorReportProps };

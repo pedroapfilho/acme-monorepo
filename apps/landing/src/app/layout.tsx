@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 
+import { displayName, origins } from "@repo/identity";
 import { SkipLink } from "@repo/ui/compositions/skip-link";
 import { MAIN_CONTENT_ID } from "@repo/ui/lib/main-content";
 import { cn } from "@repo/ui/lib/utils";
@@ -9,35 +10,29 @@ import { Geist as geistFont, Geist_Mono as geistMonoFont } from "next/font/googl
 
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import {
-  LONG_DESCRIPTION,
-  SHORT_DESCRIPTION,
-  SITE_NAME,
-  SITE_URL,
-  TWITTER_HANDLE,
-} from "@/lib/site";
+import { LONG_DESCRIPTION, SHORT_DESCRIPTION, TWITTER_HANDLE } from "@/lib/site";
 
 export { viewport } from "@repo/ui/lib/viewport";
 
 const metadata = {
   description: LONG_DESCRIPTION,
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(origins.landing),
   openGraph: {
     description: SHORT_DESCRIPTION,
     locale: "en_US",
-    siteName: SITE_NAME,
-    title: SITE_NAME,
+    siteName: displayName,
+    title: displayName,
     type: "website",
   },
   title: {
-    default: `${SITE_NAME} | ${SHORT_DESCRIPTION}`,
-    template: `%s · ${SITE_NAME}`,
+    default: `${displayName} | ${SHORT_DESCRIPTION}`,
+    template: `%s · ${displayName}`,
   },
   twitter: {
     card: "summary_large_image",
     description: SHORT_DESCRIPTION,
     site: `@${TWITTER_HANDLE}`,
-    title: `${SITE_NAME} - ${SHORT_DESCRIPTION}`,
+    title: `${displayName} - ${SHORT_DESCRIPTION}`,
   },
 } satisfies Metadata;
 

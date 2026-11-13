@@ -83,6 +83,9 @@ importers:
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@repo/identity':
+        specifier: workspace:*
+        version: link:../../packages/identity
       '@repo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -141,6 +144,12 @@ importers:
 
   apps/landing:
     dependencies:
+      '@repo/config-next':
+        specifier: workspace:*
+        version: link:../../packages/config-next
+      '@repo/identity':
+        specifier: workspace:*
+        version: link:../../packages/identity
       '@repo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -208,9 +217,15 @@ importers:
       '@repo/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@repo/config-next':
+        specifier: workspace:*
+        version: link:../../packages/config-next
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@repo/identity':
+        specifier: workspace:*
+        version: link:../../packages/identity
       '@repo/observability':
         specifier: workspace:*
         version: link:../../packages/observability
@@ -293,6 +308,9 @@ importers:
       '@repo/db':
         specifier: workspace:*
         version: link:../db
+      '@repo/identity':
+        specifier: workspace:*
+        version: link:../identity
       '@repo/observability':
         specifier: workspace:*
         version: link:../observability
@@ -330,6 +348,22 @@ importers:
       vitest:
         specifier: ^5.0.1
         version: 5.0.1(@types/node@26.6.2)(@vitest/coverage-v8@5.0.1)(jsdom@30.1.1(@noble/hashes@2.4.0))(vite@8.3.6(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+
+  packages/config-next:
+    dependencies:
+      '@repo/portless-env':
+        specifier: workspace:*
+        version: link:../portless-env
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../config-typescript
+      next:
+        specifier: ^16.4.6
+        version: 16.4.6(@babel/core@7.29.7)(@playwright/test@1.63.0)(@types/node@26.6.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
   packages/config-typescript: {}
 
@@ -400,6 +434,15 @@ importers:
       vitest:
         specifier: ^5.0.1
         version: 5.0.1(@types/node@26.6.2)(@vitest/coverage-v8@5.0.1)(jsdom@30.1.1(@noble/hashes@2.4.0))(vite@8.3.6(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+
+  packages/identity:
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../config-typescript
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
 
   packages/observability:
     dependencies:
@@ -489,6 +532,9 @@ importers:
 
   packages/transactional:
     dependencies:
+      '@repo/identity':
+        specifier: workspace:*
+        version: link:../identity
       resend:
         specifier: ^6.29.0
         version: 6.29.0(@react-email/render@2.1.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0))
