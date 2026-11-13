@@ -123,6 +123,11 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
 - `createAuth` takes an optional `email` (the mailer plus the web URLs its emails link to) and reports it as `auth.canSendEmail`. `web` builds it when `RESEND_API_KEY` is set; `packages/auth` knows no web route. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
 
+### Root layouts
+
+- Both Next apps render `SkipLink` from `@repo/ui/compositions/skip-link`, put `MAIN_CONTENT_ID` from `@repo/ui/lib/main-content` on the element it jumps to, and re-export `viewport` from `@repo/ui/lib/viewport`.
+- The security headers and compiler flags stay literal in each app's `next.config.ts`: `standy` reads them there.
+
 ### Errors
 
 - Log a caught error as `log.error({ error: serializeError(error), message })` with `serializeError` from `@repo/observability`: evlog writes an `Error` held in a field, or in another error's `cause`, as `{}`. Client code calls `reportError(error)` from the app's `lib/observability-client.ts`.

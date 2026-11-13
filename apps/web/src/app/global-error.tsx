@@ -7,7 +7,7 @@ import type { ErrorBoundaryProps } from "@repo/ui/compositions/route-error";
 import { reportError } from "@/lib/observability-client";
 
 const AppGlobalError = (props: ErrorBoundaryProps) => (
-  <html className={styles.document} lang="en">
+  <html className={styles.document} lang="en-US">
     <body className={styles.body}>
       <GlobalError
         {...props}

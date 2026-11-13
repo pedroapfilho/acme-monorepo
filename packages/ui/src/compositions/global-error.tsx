@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { MAIN_CONTENT_ID } from "../lib/main-content";
+
 import styles from "./global-error.module.css";
 import type { ErrorReportProps } from "./route-error";
 
@@ -17,7 +19,7 @@ const GlobalError = ({ description, error, report, retry }: ErrorReportProps) =>
   return (
     <>
       <title>Something went wrong</title>
-      <main className={styles.main} id="main-content">
+      <main className={styles.main} id={MAIN_CONTENT_ID}>
         <h1 className={styles.heading} ref={headingRef} tabIndex={-1}>
           Something went wrong
         </h1>

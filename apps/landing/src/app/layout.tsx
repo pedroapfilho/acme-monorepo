@@ -1,8 +1,10 @@
 import "@/styles/globals.css";
 
+import { SkipLink } from "@repo/ui/compositions/skip-link";
+import { MAIN_CONTENT_ID } from "@repo/ui/lib/main-content";
 import { cn } from "@repo/ui/lib/utils";
 import { Analytics } from "@vercel/analytics/react";
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Geist as geistFont, Geist_Mono as geistMonoFont } from "next/font/google";
 
 import { Footer } from "@/components/footer";
@@ -15,23 +17,14 @@ import {
   TWITTER_HANDLE,
 } from "@/lib/site";
 
-export const viewport: Viewport = {
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: [
-    { color: "white", media: "(prefers-color-scheme: light)" },
-    { color: "black", media: "(prefers-color-scheme: dark)" },
-  ],
-  userScalable: true,
-  width: "device-width",
-};
+export { viewport } from "@repo/ui/lib/viewport";
 
 const metadata = {
   description: LONG_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
   openGraph: {
     description: SHORT_DESCRIPTION,
-    locale: "en-US",
+    locale: "en_US",
     siteName: SITE_NAME,
     title: SITE_NAME,
     type: "website",
@@ -70,14 +63,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           geistMono.variable,
         )}
       >
-        <a
-          className="sr-only fixed top-2 left-2 z-50 rounded-md bg-background px-3 py-2 text-sm font-medium text-foreground ring-1 ring-ring focus:not-sr-only"
-          href="#main-content"
-        >
-          Skip to content
-        </a>
+        <SkipLink />
         <Header />
-        <main className="flex-1" id="main-content">
+        <main className="flex-1" id={MAIN_CONTENT_ID}>
           {children}
         </main>
         <Footer />
