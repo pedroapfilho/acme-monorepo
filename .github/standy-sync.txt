@@ -2,6 +2,7 @@
 .github/ci/plan.mjs
 .github/ci/report.mjs
 .github/workflows/check.yml
+.github/workflows/e2e.yml
 .github/workflows/friction-log.yml
 .github/workflows/react-doctor.yml
 packages/auth/src/env-config.ts
@@ -10,3 +11,7 @@ packages/config-typescript/library.json
 packages/config-typescript/nextjs.json
 packages/config-typescript/react-library.json
 packages/portless-env/src/index.ts
+packages/transactional/src/transport.ts
+tests/e2e/fixtures/verification.fixture.ts
+tests/e2e/helpers/mail.ts
+tests/e2e/helpers/test-email.ts
