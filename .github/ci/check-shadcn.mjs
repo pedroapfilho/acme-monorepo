@@ -26,9 +26,14 @@ if (manifests.length === 0) {
 for (const manifest of manifests) {
   const directory = dirname(join(root, manifest));
   const lock = JSON.parse(readFileSync(join(root, manifest), "utf8"));
+  const registries = Object.values(lock.registries ?? {});
 
-  if (lock.version !== 1 || !/^[a-f\d]{40}$/.test(lock.upstreamCommit)) {
-    failures.push(`${manifest}: invalid version or upstream revision.`);
+  if (
+    lock.version !== 2 ||
+    registries.length === 0 ||
+    !registries.every((registry) => /^[a-f\d]{40}$/.test(registry.upstreamCommit))
+  ) {
+    failures.push(`${manifest}: invalid version or upstream revisions.`);
     continue;
   }
 
@@ -54,6 +59,10 @@ for (const manifest of manifests) {
 
   for (const [file, expected] of Object.entries(lock.files)) {
     const location = relative(root, join(directory, file));
+
+    if (!Object.hasOwn(lock.registries, expected.registry.split("/")[0])) {
+      failures.push(`${location}: ${expected.registry} is not from a locked registry.`);
+    }
 
     try {
       const actual = createHash("sha256")
