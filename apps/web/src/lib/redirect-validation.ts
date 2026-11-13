@@ -1,11 +1,8 @@
-const HOME_PATH = "/dashboard";
-const ANCHOR_ORIGIN = "https://acme.invalid";
-const PASSWORD_RESET_NOTICE = "password-reset-success";
+import type { routes } from "./routes";
+import { HOME_PATH } from "./routes";
 
-/**
- * Validate a redirect value as an in-app relative path.
- * Returns the path unchanged when safe, otherwise "/dashboard".
- */
+const ANCHOR_ORIGIN = "https://acme.invalid";
+
 const safeRedirectPath = (value: string | null | undefined): string => {
   if (
     value === null ||
@@ -22,10 +19,14 @@ const safeRedirectPath = (value: string | null | undefined): string => {
   return value;
 };
 
-const authPageHref = (page: "/login" | "/register", from: string | null | undefined): string => {
+type AuthPage = typeof routes.login.path | typeof routes.register.path;
+
+const authPageHref = (page: AuthPage, from: string | null | undefined): string => {
   const destination = safeRedirectPath(from);
 
   return destination === HOME_PATH ? page : `${page}?from=${encodeURIComponent(destination)}`;
 };
 
-export { authPageHref, HOME_PATH, PASSWORD_RESET_NOTICE, safeRedirectPath };
+export { authPageHref, safeRedirectPath };
+
+export type { AuthPage };

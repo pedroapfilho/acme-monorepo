@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AuthActionButton } from "@/components/auth-action-button";
 import { authClient } from "@/lib/auth-client";
 import { authPageHref } from "@/lib/redirect-validation";
+import { routes } from "@/lib/routes";
 
 const RevokeSessionButton = ({ token }: { token: string }) => {
   const { refresh } = useRouter();
@@ -53,7 +54,7 @@ const ReauthenticateButton = () => {
       className="w-fit"
       fallbackError="Failed to sign out"
       onSuccess={() => {
-        push(authPageHref("/login", "/dashboard/settings"));
+        push(authPageHref(routes.login.path, routes.settings.path));
         refresh();
       }}
       pendingLabel="Signing out…"

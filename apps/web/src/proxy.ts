@@ -3,25 +3,26 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { getSession } from "@/lib/auth-helpers";
-import { authPageHref, HOME_PATH } from "@/lib/redirect-validation";
+import { authPageHref } from "@/lib/redirect-validation";
+import { HOME_PATH, routeAccess, routes } from "@/lib/routes";
 
-const protectedRoutes = ["/dashboard"];
+const redirectFor = (access: "entry" | "guest" | "signed-in", signedIn: boolean, from: string) => {
+  if (signedIn) {
+    return access === "signed-in" ? null : HOME_PATH;
+  }
 
-// /reset-password is deliberately absent: bouncing an authenticated visitor to the dashboard would
-// make a reset link unusable for anyone still holding a session.
-const authRoutes = new Set(["/login", "/register", "/recover"]);
+  if (access === "guest") {
+    return null;
+  }
+
+  return access === "entry" ? routes.login.path : authPageHref(routes.login.path, from);
+};
 
 export const createProxy = (lookup: typeof getSession) => async (request: NextRequest) => {
-  const pathname = request.nextUrl.pathname;
-  const isRoot = pathname === "/";
+  const { pathname, search } = request.nextUrl;
+  const access = pathname === "/" ? "entry" : routeAccess(pathname);
 
-  const isProtectedRoute = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
-
-  const isAuthRoute = authRoutes.has(pathname);
-
-  if (!isRoot && !isProtectedRoute && !isAuthRoute) {
+  if (access === "public") {
     return NextResponse.next();
   }
 
@@ -39,24 +40,11 @@ export const createProxy = (lookup: typeof getSession) => async (request: NextRe
     });
   }
 
-  if (isRoot) {
-    return NextResponse.redirect(new URL(session ? HOME_PATH : "/login", request.url));
-  }
+  const destination = redirectFor(access, Boolean(session), `${pathname}${search}`);
 
-  if (isProtectedRoute && !session) {
-    const url = new URL(
-      authPageHref("/login", `${pathname}${request.nextUrl.search}`),
-      request.url,
-    );
-
-    return NextResponse.redirect(url);
-  }
-
-  if (isAuthRoute && session) {
-    return NextResponse.redirect(new URL(HOME_PATH, request.url));
-  }
-
-  return NextResponse.next();
+  return destination === null
+    ? NextResponse.next()
+    : NextResponse.redirect(new URL(destination, request.url));
 };
 
 export const proxy = createProxy(getSession);

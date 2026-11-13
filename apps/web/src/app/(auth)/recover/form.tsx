@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { recoverSchema } from "@/lib/form-schemas";
+import { routes } from "@/lib/routes";
 
 const RecoverForm = () => {
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
@@ -16,7 +17,7 @@ const RecoverForm = () => {
     call: (value) =>
       authClient.requestPasswordReset({
         email: value.email,
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${window.location.origin}${routes.resetPassword.path}`,
       }),
     defaultValues: { email: "" },
     fallbackError: "Failed to send password reset email",
@@ -36,7 +37,7 @@ const RecoverForm = () => {
         </p>
         <p className="text-sm text-muted-foreground">
           Back to{" "}
-          <Link className="text-foreground underline underline-offset-4" href="/login">
+          <Link className="text-foreground underline underline-offset-4" href={routes.login.path}>
             sign in
           </Link>
           .
@@ -62,7 +63,7 @@ const RecoverForm = () => {
         <SubmitButton pendingLabel="Sending…">Send reset link</SubmitButton>
         <FieldDescription className="text-center">
           Remembered your password?{" "}
-          <Link className="text-foreground underline underline-offset-4" href="/login">
+          <Link className="text-foreground underline underline-offset-4" href={routes.login.path}>
             Sign in
           </Link>
         </FieldDescription>

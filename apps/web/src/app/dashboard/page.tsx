@@ -5,6 +5,7 @@ import { Suspense } from "react";
 
 import { SignOutButton } from "@/components/sign-out-button";
 import { requireSession } from "@/lib/auth-helpers";
+import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
@@ -12,7 +13,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 export const instant = true;
 
 const DashboardContent = async () => {
-  const session = await requireSession("/dashboard");
+  const session = await requireSession(routes.dashboard.path);
 
   return (
     <>
@@ -25,7 +26,7 @@ const DashboardContent = async () => {
         </div>
         <Link
           className="text-sm text-foreground underline underline-offset-4"
-          href="/dashboard/settings"
+          href={routes.settings.path}
         >
           Settings
         </Link>

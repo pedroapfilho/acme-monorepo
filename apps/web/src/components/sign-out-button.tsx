@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { AuthActionButton } from "@/components/auth-action-button";
 import { authClient } from "@/lib/auth-client";
+import { routes } from "@/lib/routes";
 
 const SignOutButton = () => {
   const { push } = useRouter();
@@ -14,7 +15,7 @@ const SignOutButton = () => {
       className="self-start"
       fallbackError="Failed to sign out"
       onSuccess={() => {
-        push("/login");
+        push(routes.login.path);
       }}
       pendingLabel="Signing out…"
       variant="outline"

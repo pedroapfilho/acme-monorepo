@@ -13,7 +13,7 @@ import { use } from "react";
 import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { resetPasswordSchema } from "@/lib/form-schemas";
-import { PASSWORD_RESET_NOTICE } from "@/lib/redirect-validation";
+import { PASSWORD_RESET_NOTICE, routes } from "@/lib/routes";
 
 type Props = {
   searchParams: Promise<{ error?: string; token?: string }>;
@@ -28,7 +28,7 @@ const InvalidResetLink = () => (
       <CardDescription>This password reset link is invalid or has expired.</CardDescription>
     </CardHeader>
     <CardContent>
-      <Link className={cn(buttonVariants(), "w-full")} href="/recover">
+      <Link className={cn(buttonVariants(), "w-full")} href={routes.recover.path}>
         Request a new link
       </Link>
     </CardContent>
@@ -44,7 +44,7 @@ const NewPasswordForm = ({ token }: { token: string }) => {
     fallbackError: "Failed to reset password",
     handledErrorCodes: ["INVALID_TOKEN"],
     onSuccess: () => {
-      push(`/login?message=${PASSWORD_RESET_NOTICE}`);
+      push(`${routes.login.path}?message=${PASSWORD_RESET_NOTICE}`);
     },
     schema: resetPasswordSchema,
   });
@@ -89,7 +89,10 @@ const NewPasswordForm = ({ token }: { token: string }) => {
             <SubmitButton pendingLabel="Resetting…">Reset password</SubmitButton>
             <FieldDescription className="text-center">
               Back to{" "}
-              <Link className="text-foreground underline underline-offset-4" href="/login">
+              <Link
+                className="text-foreground underline underline-offset-4"
+                href={routes.login.path}
+              >
                 sign in
               </Link>
             </FieldDescription>
