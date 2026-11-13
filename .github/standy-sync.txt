@@ -2,6 +2,9 @@
 .github/ci/ci.mjs
 .github/ci/plan.mjs
 .github/ci/report.mjs
+.github/workflows/check.yml
+.github/workflows/friction-log.yml
+.github/workflows/react-doctor.yml
 packages/auth/src/env-config.ts
 packages/config-typescript/base.json
 packages/config-typescript/library.json
