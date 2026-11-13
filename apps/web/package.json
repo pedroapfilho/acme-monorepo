@@ -17,6 +17,7 @@
   "dependencies": {
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
+    "@repo/identity": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/portless-env": "workspace:*",
     "@repo/social-image": "workspace:*",

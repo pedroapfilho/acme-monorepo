@@ -19,6 +19,7 @@
     "@hono/zod-openapi": "^1.6.3",
     "@repo/auth": "workspace:*",
     "@repo/db": "workspace:*",
+    "@repo/identity": "workspace:*",
     "@repo/observability": "workspace:*",
     "@repo/portless-env": "workspace:*",
     "@scalar/hono-api-reference": "^0.12.5",

@@ -1,5 +1,6 @@
 "use client";
 
+import { displayName } from "@repo/identity";
 import { buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { Menu } from "lucide-react";
@@ -7,7 +8,7 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { Logo } from "@/components/logo";
-import { SECTIONS, SITE_NAME } from "@/lib/site";
+import { SECTIONS } from "@/lib/site";
 import { webAppUrl } from "@/lib/urls";
 
 const Header = () => {
@@ -23,12 +24,12 @@ const Header = () => {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-5xl items-center gap-8 px-6 text-base md:px-8">
         <Link
-          aria-label={`${SITE_NAME} homepage`}
+          aria-label={`${displayName} homepage`}
           className="flex items-center gap-2 font-semibold tracking-tight"
           href="/"
         >
           <Logo className="size-5 shrink-0 text-primary" />
-          {SITE_NAME}
+          {displayName}
         </Link>
         <nav
           aria-label="Main"

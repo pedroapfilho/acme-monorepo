@@ -1,7 +1,7 @@
 import type { routes } from "./routes";
 import { HOME_PATH } from "./routes";
 
-const ANCHOR_ORIGIN = "https://acme.invalid";
+const ANCHOR_ORIGIN = "https://anchor.invalid";
 
 const safeRedirectPath = (value: string | null | undefined): string => {
   if (

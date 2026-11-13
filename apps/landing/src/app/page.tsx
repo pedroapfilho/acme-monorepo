@@ -1,16 +1,17 @@
+import { displayName } from "@repo/identity";
 import { buttonVariants } from "@repo/ui/components/button";
 import { cn } from "@repo/ui/lib/utils";
 import { ArrowUpRight, Database, KeyRound, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 
-import { SHORT_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import { SHORT_DESCRIPTION } from "@/lib/site";
 import type { SectionId } from "@/lib/site";
 import { webAppUrl } from "@/lib/urls";
 
 const metadata: Metadata = {
   description:
     "A Next.js monorepo baseline with Better Auth, Prisma, and shadcn/ui: configured, tested, and ready to fork.",
-  title: { absolute: `${SITE_NAME}: ${SHORT_DESCRIPTION}` },
+  title: { absolute: `${displayName}: ${SHORT_DESCRIPTION}` },
 };
 
 /** @public Next.js App Router consumes this route config through the module loader. */
@@ -60,7 +61,9 @@ const Page = () => {
     <>
       <section className="py-20 md:py-28">
         <div className="mx-auto flex max-w-5xl flex-col items-start gap-8 px-6 md:px-8">
-          <p className="font-mono text-sm tracking-wide text-primary uppercase">Acme template</p>
+          <p className="font-mono text-sm tracking-wide text-primary uppercase">
+            {displayName} template
+          </p>
           <div>
             <h1 className="max-w-measure-hero text-5xl font-semibold tracking-tight text-balance md:text-6xl">
               The one template to rule them all.

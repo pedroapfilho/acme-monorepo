@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@repo/db";
+import { slug } from "@repo/identity";
 import { log } from "@repo/observability";
 import { loopbackUrl } from "@repo/portless-env/apps";
 import type { Mailer, TransactionalEmail } from "@repo/transactional";
@@ -10,8 +11,6 @@ import { bearer } from "better-auth/plugins/bearer";
 import type { BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
 
 import { name, PASSWORD_LENGTH } from "./policy";
-
-const COOKIE_PREFIX = "acme";
 
 const EMAIL_LINK_LIFETIME_HOURS = 1;
 
@@ -89,7 +88,7 @@ const createAuth = (config: AuthConfig) => {
     },
 
     advanced: {
-      cookiePrefix: COOKIE_PREFIX,
+      cookiePrefix: slug,
       defaultCookieAttributes: {
         httpOnly: true,
         sameSite: "lax" as const,
