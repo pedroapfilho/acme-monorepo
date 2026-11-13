@@ -144,6 +144,6 @@ branch fix-styles:    https://fix-styles.acme.web.localhost
 | `pnpm db:seed`      | Seed database                 |
 | `pnpm clean`        | Clean all build artifacts     |
 
-Before `pnpm test:e2e`, export `DATABASE_URL` in the test runner's shell, pointing to the same disposable database used by web and api. It must be a `localhost` or `127.0.0.1` PostgreSQL URL; the suite refuses any other host before it runs. The root Playwright process does not load the packages' `.env` files. Set `RESEND_API_KEY` in that shell when the running web app has email delivery enabled.
+`pnpm test:e2e` builds the three apps, starts them on their loopback ports (or reuses the ones already listening there) and runs the suite. The Playwright config loads `apps/web/.env`, so the runner and the servers share one `DATABASE_URL` and one mail setting; a variable already exported in the shell wins. `DATABASE_URL` must be a `localhost` or `127.0.0.1` PostgreSQL URL of a disposable database with the schema pushed (`pnpm db:push`); the suite refuses any other host before it runs.
 
 Mutable account fixtures register unique identities and delete their recorded user IDs after each test, including signed-out, unverified, renamed and already-deleted accounts. The shared seeded user is reserved for read-only and login coverage; the Playwright setup project signs it in and creates it when it is missing, so no separate seed step is needed.

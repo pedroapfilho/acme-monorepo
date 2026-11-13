@@ -1,5 +1,7 @@
 /// <reference types="node" />
 
+import { existsSync } from "node:fs";
+
 import { defineConfig, devices } from "@playwright/test";
 import type { PlaywrightTestProject } from "@playwright/test";
 import { apps } from "@repo/portless-env/apps";
@@ -8,7 +10,31 @@ import type { SessionOptions } from "./tests/e2e/fixtures/session";
 import { TEST_USER_STATE } from "./tests/e2e/fixtures/test-user";
 import { apiUrl, landingUrl, webUrl } from "./tests/e2e/urls";
 
+const WEB_ENV_FILE = "apps/web/.env";
+
+// The runner and the servers it starts read the web app's environment, so they agree on the database and on mail delivery. Variables already set win.
+if (existsSync(WEB_ENV_FILE)) {
+  process.loadEnvFile(WEB_ENV_FILE);
+}
+
 const emailDelivery = Boolean(process.env.RESEND_API_KEY);
+
+const environment = process.env.CI ? "ci" : "local";
+
+const server = (service: "api" | "landing" | "web", command: string, url: string) => ({
+  command,
+  env: {
+    // shortcut: env-config only turns auth rate limiting off under CI, upgrade when the app has its own switch.
+    CI: "true",
+    PGAPPNAME: `acme:${environment}:${service}`,
+    WEB_APP_URL: webUrl,
+  },
+  reuseExistingServer: !process.env.CI,
+  stderr: "pipe" as const,
+  stdout: "pipe" as const,
+  timeout: 120_000,
+  url,
+});
 
 const browserProject = (
   name: string,
@@ -44,40 +70,30 @@ export default defineConfig<SessionOptions>({
     video: "retain-on-failure",
   },
 
-  webServer: process.env.CI
-    ? [
-        {
-          command: "node tests/e2e/support/resend-stub.ts",
-          stderr: "pipe",
-          stdout: "pipe",
-          url: `${process.env.RESEND_BASE_URL}/emails`,
-        },
-        {
-          command: `node_modules/.bin/next start apps/web --port ${apps.web.port}`,
-          env: { PGAPPNAME: "acme:ci:web" },
-          stderr: "pipe",
-          stdout: "pipe",
-          timeout: 120_000,
-          url: `${webUrl}/login`,
-        },
-        {
-          command: "node apps/api/dist/index.mjs",
-          env: { PGAPPNAME: "acme:ci:api" },
-          stderr: "pipe",
-          stdout: "pipe",
-          timeout: 120_000,
-          url: `${apiUrl}/healthz`,
-        },
-        {
-          command: `node_modules/.bin/next start apps/landing --port ${apps.landing.port}`,
-          env: { PGAPPNAME: "acme:ci:landing" },
-          stderr: "pipe",
-          stdout: "pipe",
-          timeout: 120_000,
-          url: landingUrl,
-        },
-      ]
-    : [],
+  webServer: [
+    ...(process.env.RESEND_BASE_URL === undefined
+      ? []
+      : [
+          {
+            command: "node tests/e2e/support/resend-stub.ts",
+            reuseExistingServer: !process.env.CI,
+            stderr: "pipe" as const,
+            stdout: "pipe" as const,
+            url: `${process.env.RESEND_BASE_URL}/emails`,
+          },
+        ]),
+    server(
+      "web",
+      `node_modules/.bin/next start apps/web --port ${apps.web.port}`,
+      `${webUrl}/login`,
+    ),
+    server("api", "node apps/api/dist/index.mjs", `${apiUrl}/healthz`),
+    server(
+      "landing",
+      `node_modules/.bin/next start apps/landing --port ${apps.landing.port}`,
+      landingUrl,
+    ),
+  ],
 
   workers: process.env.CI ? 1 : undefined,
 });
