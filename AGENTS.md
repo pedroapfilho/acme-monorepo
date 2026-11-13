@@ -152,6 +152,7 @@ The `dev` scripts and the e2e workflow's `WEB_APP_URL` must stay literal; `packa
 ### Prisma
 
 - `prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
+- `@repo/db` exports `createPrismaClient(databaseUrl)` and holds no client. `api` builds its client at module scope in `apps/api/src/lib/db.ts`; `web` builds it on first use behind `getPrisma()` in `apps/web/src/lib/db.ts`, because `next build` evaluates server modules without a database URL; the e2e runner builds its own in `tests/e2e/helpers/database.ts`.
 - `turbo.json` lists `^db:generate` and `db:generate` in the `dependsOn` of every task that reads source, so `prisma generate` finishes before any package that depends on `@repo/db` builds, typechecks, lints or tests.
 
 ### Tooling
@@ -177,12 +178,15 @@ cp apps/web/.env.example apps/web/.env
 cp packages/db/.env.example packages/db/.env
 ```
 
+Each app parses one env schema: `apps/api/src/lib/env.ts` as the process starts, `apps/web/src/lib/env.ts` on first use, which `instrumentation.ts` triggers at boot. Both spread `authEnv.shape` from `@repo/auth/env-config`, the variables the auth package owns, and hand the parsed values to `envAuthConfig(env)` and `createPrismaClient`. No module under `packages/*/src` reads `process.env`, except `packages/db/src/seed.ts`, a script, and the `NODE_ENV` default in the synced `packages/observability/src/config.ts`.
+
 `apps/landing` reads one build-time variable, `NEXT_PUBLIC_WEB_APP_URL`, and nothing at runtime. Key variables:
 
 - `DATABASE_URL`: PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`); `web` and `api` both refuse to boot without it
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS`: comma-separated allowed origins
-- `WEB_APP_URL`: web origin; secure-cookie switch, Better Auth's base URL fallback, the base of auth email links and the web `metadataBase`, parsed only by `webAppUrl()` in `@repo/auth/env-config` (portless fills it in dev)
+- `WEB_APP_URL`: web origin; secure-cookie switch, Better Auth's base URL fallback, the base of auth email links and the web `metadataBase`, validated by the `authEnv` fragment of `@repo/auth/env-config` in each app's env schema (portless fills it in dev)
+- `AUTH_RATE_LIMIT`: optional; `off` turns Better Auth's rate limiting off in a production build, which the e2e servers set
 - `MAIL_TRANSPORT` / `RESEND_API_KEY` / `FROM_EMAIL`: web only; `MAIL_TRANSPORT=outbox` for dev and e2e, otherwise `RESEND_API_KEY` is required at boot
 
 Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`.

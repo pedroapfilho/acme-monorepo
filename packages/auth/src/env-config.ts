@@ -1,8 +1,5 @@
 import { canonicalUrls, localHostPatterns, loopbackOrigins } from "@repo/portless-env/apps";
-
-// Also the fallback for the api's CORS allowlist; a zod `.default()` there would be invisible here,
-// leaving Hono and Better Auth disagreeing about which origins are allowed.
-const DEFAULT_CORS_ORIGINS = canonicalUrls("CORS_ORIGINS");
+import { z } from "zod";
 
 type EnvAuthConfigOptions = {
   additionalAllowedHosts?: Array<string>;
@@ -18,60 +15,56 @@ type EnvAuthConfig = {
   webAppUrl: string | undefined;
 };
 
-const parseEnvList = (value: string | undefined): Array<string> => {
-  if (value === undefined || value === "") {
-    return [];
-  }
+const list = (fallback: Array<string> = []) =>
+  z
+    .string()
+    .default(fallback.join(","))
+    .transform((value) =>
+      value
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0),
+    );
 
-  return value
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter((entry) => entry.length > 0);
-};
+const authEnv = z.object({
+  AUTH_ALLOWED_HOSTS: list(),
+  AUTH_RATE_LIMIT: z.enum(["", "off"]).optional(),
+  // Unset means the local defaults, empty means no origin; the api's CORS allowlist reads the same value.
+  CORS_ORIGINS: list(canonicalUrls("CORS_ORIGINS")),
+  NODE_ENV: z.string().optional(),
+  TRUSTED_ORIGINS: list(),
+  WEB_APP_URL: z
+    .string()
+    .optional()
+    .transform((value) => (value === "" ? undefined : value))
+    .refine((value) => value === undefined || URL.canParse(value), {
+      message: "WEB_APP_URL must be a valid URL",
+    }),
+});
 
-const webAppUrl = (): string | undefined => {
-  const value = process.env.WEB_APP_URL;
+type AuthEnv = z.output<typeof authEnv>;
 
-  if (value === undefined || value === "") {
-    return undefined;
-  }
-
-  if (!URL.canParse(value)) {
-    throw new Error("WEB_APP_URL must be a valid URL");
-  }
-
-  return value;
-};
-
-const envAuthConfig = (options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
-  const corsTrustedOrigins =
-    process.env.CORS_ORIGINS === undefined
-      ? DEFAULT_CORS_ORIGINS
-      : parseEnvList(process.env.CORS_ORIGINS).filter((origin) => origin !== "*");
-
-  const appUrl = webAppUrl();
-  const secureUrl = options.secureUrl ?? appUrl;
+const envAuthConfig = (env: AuthEnv, options: EnvAuthConfigOptions = {}): EnvAuthConfig => {
+  const secureUrl = options.secureUrl ?? env.WEB_APP_URL;
 
   return {
     allowedHosts: [
       ...localHostPatterns,
-      ...parseEnvList(process.env.AUTH_ALLOWED_HOSTS),
+      ...env.AUTH_ALLOWED_HOSTS,
       ...(options.additionalAllowedHosts ?? []),
     ],
-    rateLimitEnabled:
-      process.env.NODE_ENV === "production" &&
-      (process.env.CI === undefined || process.env.CI === ""),
+    rateLimitEnabled: env.NODE_ENV === "production" && env.AUTH_RATE_LIMIT !== "off",
     trustedOrigins: [
       ...loopbackOrigins,
-      ...corsTrustedOrigins,
-      ...parseEnvList(process.env.TRUSTED_ORIGINS),
+      ...env.CORS_ORIGINS.filter((origin) => origin !== "*"),
+      ...env.TRUSTED_ORIGINS,
       ...(options.additionalTrustedOrigins ?? []),
     ],
     useSecureCookies: secureUrl !== undefined && URL.parse(secureUrl)?.protocol === "https:",
-    webAppUrl: appUrl,
+    webAppUrl: env.WEB_APP_URL,
   };
 };
 
-export { DEFAULT_CORS_ORIGINS, envAuthConfig, parseEnvList, webAppUrl };
+export { authEnv, envAuthConfig };
 
-export type { EnvAuthConfig, EnvAuthConfigOptions };
+export type { AuthEnv, EnvAuthConfig, EnvAuthConfigOptions };

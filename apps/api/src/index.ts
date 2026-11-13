@@ -2,13 +2,12 @@ import "zod/compile";
 import "dotenv/config";
 
 import { serve } from "@hono/node-server";
-import { parseEnvList } from "@repo/auth/env-config";
-import { prisma } from "@repo/db";
 import { log } from "@repo/observability";
 import { initApiLogger } from "@repo/observability/hono";
 
 import { createApp } from "./app";
 import { sessions } from "./lib/auth";
+import { prisma } from "./lib/db";
 import { env } from "./lib/env";
 
 initApiLogger({ service: "api" });
@@ -17,7 +16,7 @@ const app = createApp({
   checkDatabase: async () => {
     await prisma.$queryRaw`SELECT 1`;
   },
-  corsOrigins: parseEnvList(env.CORS_ORIGINS),
+  corsOrigins: env.CORS_ORIGINS,
   getSession: sessions.getSession,
   isProduction: env.NODE_ENV === "production",
   sessionCookieName: sessions.sessionCookieName,

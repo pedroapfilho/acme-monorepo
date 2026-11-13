@@ -1,18 +1,17 @@
 import { envAuthConfig } from "@repo/auth/env-config";
 import { createAuth, prismaDatabase } from "@repo/auth/server";
 import type { Auth } from "@repo/auth/server";
-import { prisma } from "@repo/db";
 import { createMailer } from "@repo/transactional";
 import { createTransport } from "@repo/transactional/transport";
 import { nextCookies } from "better-auth/next-js";
 
+import { getPrisma } from "./db";
 import { getEnv } from "./env";
+import type { Env } from "./env";
 import { routes } from "./routes";
 
-const emailConfig = (webAppUrl: string | undefined) => {
-  const env = getEnv();
-
-  if (webAppUrl === undefined) {
+const emailConfig = (env: Env) => {
+  if (env.WEB_APP_URL === undefined) {
     throw new Error("WEB_APP_URL is required: auth emails link to the web app");
   }
 
@@ -21,8 +20,8 @@ const emailConfig = (webAppUrl: string | undefined) => {
       from: env.FROM_EMAIL,
       transport: createTransport({ apiKey: env.RESEND_API_KEY, transport: env.MAIL_TRANSPORT }),
     }),
-    resetPasswordUrl: new URL(routes.recover.path, webAppUrl).href,
-    signInUrl: new URL(routes.login.path, webAppUrl).href,
+    resetPasswordUrl: new URL(routes.recover.path, env.WEB_APP_URL).href,
+    signInUrl: new URL(routes.login.path, env.WEB_APP_URL).href,
   };
 };
 
@@ -30,14 +29,14 @@ let cachedAuth: Auth | undefined;
 
 const getAuth = (): Auth => {
   if (!cachedAuth) {
-    const config = envAuthConfig();
+    const env = getEnv();
 
     cachedAuth = createAuth({
-      ...config,
-      database: prismaDatabase(prisma),
-      email: emailConfig(config.webAppUrl),
+      ...envAuthConfig(env),
+      database: prismaDatabase(getPrisma()),
+      email: emailConfig(env),
       extraPlugins: [nextCookies()],
-      secret: getEnv().BETTER_AUTH_SECRET,
+      secret: env.BETTER_AUTH_SECRET,
     });
   }
 

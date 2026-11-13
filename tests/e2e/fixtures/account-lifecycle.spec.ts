@@ -1,4 +1,4 @@
-import { prisma } from "@repo/db";
+import { prisma } from "../helpers/database";
 
 import { expect, test as sessionTest } from "./auth.fixture";
 import { signOut, signUp } from "./session";
