@@ -1,9 +1,9 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 import { useAppForm } from "../hooks/use-app-form";
+import type { SubmissionFailure } from "../hooks/use-submission";
 
 import { AppForm, SubmitButton } from "./app-form";
 
@@ -20,43 +20,28 @@ const schema = z
     path: ["confirmPassword"],
   });
 
-type HarnessProps = {
-  isPending?: boolean;
-  onSubmit?: (values: Values) => Promise<void>;
-  validator?: typeof schema;
-};
+type Run = (values: Values) => Promise<SubmissionFailure | null>;
 
-const submitNothing = () => Promise.resolve();
+const succeed: Run = () => Promise.resolve(null);
+
+const onUnexpectedError = vi.fn<(cause: unknown) => void>();
 
 const Harness = ({
-  isPending = false,
-  onSubmit = submitNothing,
+  run = succeed,
   validator = schema,
-}: HarnessProps) => {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const { form, requiredFields } = useAppForm({
+}: {
+  run?: Run;
+  validator?: typeof schema;
+}) => {
+  const { errorCode, form, submission } = useAppForm({
     defaultValues: { confirmPassword: "", email: "", password: "" },
-    onChange: () => {
-      setErrorMessage(null);
-    },
-    onSubmit,
-    onValidatorError: (error) => {
-      setErrorMessage(error.message);
-    },
+    onUnexpectedError,
+    run,
     schema: validator,
   });
 
   return (
-    <AppForm
-      submission={{
-        errorMessage,
-        formId: form.formId,
-        isPending,
-        requiredFields,
-        submit: () => form.handleSubmit(),
-      }}
-    >
+    <AppForm submission={submission}>
       <form.AppField name="email">
         {(field) => <field.TextField autoComplete="email" label="Email" type="email" />}
       </form.AppField>
@@ -80,6 +65,7 @@ const Harness = ({
           />
         )}
       </form.AppField>
+      {errorCode !== null && <p>Code {errorCode}</p>}
       <SubmitButton pendingLabel="Saving…">Save</SubmitButton>
     </AppForm>
   );
@@ -89,24 +75,15 @@ const optionalSchema = z.object({ email: z.email(), name: z.string().optional() 
 const optionalDefaults: z.input<typeof optionalSchema> = { email: "", name: "" };
 
 const OptionalFieldHarness = () => {
-  const { form, requiredFields } = useAppForm({
+  const { form, submission } = useAppForm({
     defaultValues: optionalDefaults,
-    onChange: () => undefined,
-    onSubmit: submitNothing,
-    onValidatorError: () => undefined,
+    onUnexpectedError,
+    run: () => Promise.resolve(null),
     schema: optionalSchema,
   });
 
   return (
-    <AppForm
-      submission={{
-        errorMessage: null,
-        formId: form.formId,
-        isPending: false,
-        requiredFields,
-        submit: () => form.handleSubmit(),
-      }}
-    >
+    <AppForm submission={submission}>
       <form.AppField name="email">
         {(field) => <field.TextField autoComplete="email" label="Email" type="email" />}
       </form.AppField>
@@ -128,16 +105,32 @@ const type = (label: string, value: string) => {
   fireEvent.change(screen.getByLabelText(label), { target: { value } });
 };
 
-const submit = async () => {
-  const form = screen.getByRole("button", { name: "Save" }).closest("form");
+const fillValid = () => {
+  type("Email", "user@example.com");
+  type("Password", "correct-horse-battery");
+  type("Confirm password", "correct-horse-battery");
+};
+
+const submit = async (times = 1) => {
+  const button = await screen.findByRole("button", { name: "Save" });
+  const form = button.closest("form");
 
   if (form === null) {
     throw new Error("AppForm did not render a <form>");
   }
 
-  fireEvent.submit(form);
+  for (let attempt = 0; attempt < times; attempt += 1) {
+    fireEvent.submit(form);
+  }
+
   await settle();
 };
+
+const formAlertText = () => document.querySelector('[data-slot="form-alert"]')?.textContent ?? null;
+
+beforeEach(() => {
+  onUnexpectedError.mockReset();
+});
 
 describe("useAppForm", () => {
   it("derives required and optional accessibility states from the schema", () => {
@@ -166,8 +159,8 @@ describe("useAppForm", () => {
   });
 
   it("shows no error before submit, then revalidates every change after a failed submit", async () => {
-    const onSubmit = vi.fn<(values: Values) => Promise<void>>(() => Promise.resolve());
-    render(<Harness onSubmit={onSubmit} />);
+    const run = vi.fn<Run>(succeed);
+    render(<Harness run={run} />);
     type("Email", "not-an-email");
     fireEvent.blur(screen.getByLabelText("Email"));
     type("Password", "c");
@@ -183,7 +176,7 @@ describe("useAppForm", () => {
     expect(await screen.findByText("Invalid email")).not.toBeNull();
     expect(screen.getByText("Too short")).not.toBeNull();
     const email = screen.getByLabelText("Email");
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(run).not.toHaveBeenCalled();
     expect(email.getAttribute("aria-invalid")).toBe("true");
     expect(email.getAttribute("aria-describedby")).toBe("email-error");
     expect(screen.getByText("Invalid email").getAttribute("id")).toBe("email-error");
@@ -206,7 +199,7 @@ describe("useAppForm", () => {
 
     await submit();
     await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledExactlyOnceWith({
+      expect(run).toHaveBeenCalledExactlyOnceWith({
         confirmPassword: "correct-horse-staple",
         email: "user@example.com",
         password: "correct-horse-staple",
@@ -252,28 +245,111 @@ describe("useAppForm", () => {
     });
   });
 
-  it("hands a throwing validator to the caller instead of focusing a field", async () => {
-    const throwing = schema.clone();
-    render(<Harness validator={throwing} />);
-    vi.spyOn(throwing["~standard"], "validate").mockImplementationOnce(() => {
-      throw new Error("validator exploded");
+  it("reports a throwing validator and stays submittable", async () => {
+    const throwingOnce = schema.clone();
+    const run = vi.fn<Run>(succeed);
+    render(<Harness run={run} validator={throwingOnce} />);
+    fillValid();
+    await settle();
+    const thrown = new Error("validator exploded");
+    vi.spyOn(throwingOnce["~standard"], "validate").mockImplementationOnce(() => {
+      throw thrown;
     });
 
     await submit();
 
     await waitFor(() => {
-      expect(document.querySelector('[data-slot="form-alert"]')?.textContent).toBe(
-        "validator exploded",
-      );
+      expect(formAlertText()).toMatch(/try again/v);
+    });
+    expect(onUnexpectedError).toHaveBeenCalledWith(thrown);
+    expect(run).not.toHaveBeenCalled();
+
+    await submit();
+    await waitFor(() => {
+      expect(run).toHaveBeenCalledOnce();
     });
   });
 
-  it("disables the fields and shows the pending label while the submission is pending", () => {
-    render(<Harness isPending />);
+  it("runs once when submitted twice in the same frame", async () => {
+    const run = vi.fn<Run>(succeed);
+    render(<Harness run={run} />);
+    fillValid();
 
-    const button = screen.getByRole("button", { name: "Saving…" });
+    await submit(2);
+
+    await waitFor(() => {
+      expect(run).toHaveBeenCalledOnce();
+    });
+  });
+
+  it("disables the fields and shows the pending label while the run is pending", async () => {
+    const pending = Promise.withResolvers<SubmissionFailure | null>();
+    render(<Harness run={() => pending.promise} />);
+    fillValid();
+
+    await submit();
+
+    const button = await screen.findByRole("button", { name: "Saving…" });
     expect(button.matches(":disabled")).toBe(true);
     expect(button.getAttribute("aria-busy")).toBe("true");
     expect(screen.getByLabelText("Email").matches(":disabled")).toBe(true);
+
+    pending.resolve(null);
+    await settle();
+
+    const idleButton = await screen.findByRole("button", { name: "Save" });
+    expect(idleButton.matches(":disabled")).toBe(false);
+    expect(screen.getByLabelText("Email").matches(":disabled")).toBe(false);
+  });
+
+  it("shows a failure in the form alert, clears it on change, then retries", async () => {
+    const run = vi
+      .fn<Run>()
+      .mockResolvedValueOnce({ code: "TAKEN", message: "That email is taken" })
+      .mockResolvedValueOnce(null);
+
+    render(<Harness run={run} />);
+    fillValid();
+
+    await submit();
+
+    await waitFor(() => {
+      expect(formAlertText()).toBe("That email is taken");
+    });
+    expect(screen.getByText("Code TAKEN")).not.toBeNull();
+
+    type("Email", "other@example.com");
+    expect(formAlertText()).toBeNull();
+    expect(screen.queryByText("Code TAKEN")).toBeNull();
+
+    await submit();
+
+    await waitFor(() => {
+      expect(run).toHaveBeenCalledTimes(2);
+    });
+    expect(formAlertText()).toBeNull();
+  });
+
+  it("leaves a failure without a message to the caller", async () => {
+    render(<Harness run={() => Promise.resolve({ code: "UNVERIFIED", message: null })} />);
+    fillValid();
+
+    await submit();
+
+    expect(await screen.findByText("Code UNVERIFIED")).not.toBeNull();
+    expect(formAlertText()).toBeNull();
+  });
+
+  it("reports a thrown run with the generic message", async () => {
+    const thrown = new TypeError("Failed to fetch");
+    render(<Harness run={() => Promise.reject(thrown)} />);
+    fillValid();
+
+    await submit();
+
+    await waitFor(() => {
+      expect(formAlertText()).toMatch(/try again/v);
+    });
+    expect(onUnexpectedError).toHaveBeenCalledWith(thrown);
   });
 });

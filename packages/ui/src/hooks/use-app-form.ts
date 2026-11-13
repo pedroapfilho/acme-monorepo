@@ -8,6 +8,8 @@ import { TextField } from "../compositions/text-field";
 import { focusFirstInvalidField } from "../lib/focus-first-invalid-field";
 import { fieldContext, formContext } from "../lib/form-context";
 
+import { type SubmissionOptions, useSubmission } from "./use-submission";
+
 const { useAppForm: useBoundForm, withFieldGroup } = createFormHook({
   fieldComponents: { TextField },
   fieldContext,
@@ -18,21 +20,19 @@ const { useAppForm: useBoundForm, withFieldGroup } = createFormHook({
 type FormSchema<TValues> = StandardSchemaV1<TValues, unknown> &
   z.ZodObject<Record<string, z.ZodType>>;
 
-type AppFormOptions<TValues> = {
+type AppFormOptions<TValues> = Omit<SubmissionOptions<TValues>, "onError"> & {
   defaultValues: TValues;
-  onChange: () => void;
-  onSubmit: (values: TValues) => Promise<void>;
-  onValidatorError: (error: Error) => void;
   schema: FormSchema<TValues>;
 };
 
 const useAppForm = <TValues>({
   defaultValues,
-  onChange,
-  onSubmit,
-  onValidatorError,
   schema,
+  ...submissionOptions
 }: AppFormOptions<TValues>) => {
+  const { attempt, clearError, errorCode, errorMessage, isPending, perform, showUnexpectedError } =
+    useSubmission(submissionOptions);
+
   const requiredFields = useMemo(
     () =>
       Object.entries(schema.shape).flatMap(([name, fieldSchema]) =>
@@ -43,13 +43,13 @@ const useAppForm = <TValues>({
 
   const form = useBoundForm({
     defaultValues,
-    listeners: { onChange },
-    onSubmit: ({ value }) => onSubmit(value),
+    listeners: { onChange: clearError },
+    onSubmit: ({ value }) => perform(value),
     onSubmitInvalid: ({ formApi }) => {
       const error = formApi.state.errorMap.onDynamic;
 
       if (error instanceof Error) {
-        onValidatorError(error);
+        showUnexpectedError(error);
 
         return;
       }
@@ -61,7 +61,15 @@ const useAppForm = <TValues>({
     validators: { onDynamicAsync: schema },
   });
 
-  return { form, requiredFields };
+  const submission = {
+    errorMessage,
+    formId: form.formId,
+    isPending,
+    requiredFields,
+    submit: () => attempt(() => form.handleSubmit()),
+  };
+
+  return { errorCode, form, submission };
 };
 
 export { useAppForm, withFieldGroup };

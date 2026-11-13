@@ -2,9 +2,11 @@
 
 import { BusyButton, type BusyButtonProps } from "@repo/ui/compositions/busy-button";
 import { useClientReady } from "@repo/ui/hooks/use-client-ready";
+import { useSubmission } from "@repo/ui/hooks/use-submission";
 import { toast } from "sonner";
 
-import { type AuthRequestOptions, useAuthRequest } from "@/hooks/use-auth-form";
+import { type AuthRequestOptions, authRequest } from "@/lib/auth-request";
+import { reportError } from "@/lib/observability-client";
 
 const LiveRegion = ({ message }: { message: string | null }) => (
   <div aria-atomic="true" aria-live="polite" className="sr-only">
@@ -21,13 +23,12 @@ const AuthActionButton = <TData,>({
   onSuccess,
   ...props
 }: AuthActionButtonProps<TData>) => {
-  const { attempt, errorMessage, isPending, perform } = useAuthRequest({
-    call,
-    fallbackError,
+  const { attempt, errorMessage, isPending, perform } = useSubmission({
     onError: (message) => {
       toast.error(message);
     },
-    onSuccess,
+    onUnexpectedError: reportError,
+    run: authRequest({ call, fallbackError, onSuccess }),
   });
 
   const ready = useClientReady();
