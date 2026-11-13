@@ -9,7 +9,6 @@ export class RegisterPage {
   private readonly submitButton: Locator;
   private readonly signInLink: Locator;
   private readonly verificationSent: Locator;
-  private readonly rootError: Locator;
 
   constructor(private readonly page: Page) {
     this.nameInput = page.getByLabel(/name/iv);
@@ -19,7 +18,6 @@ export class RegisterPage {
     this.submitButton = page.getByRole("button", { name: /create account/iv });
     this.signInLink = page.getByRole("link", { name: /sign in/iv });
     this.verificationSent = page.getByRole("status").filter({ hasText: "Check your email" });
-    this.rootError = page.locator('[data-slot="form-alert"]');
   }
 
   goto = async (from?: string) => {
@@ -42,9 +40,5 @@ export class RegisterPage {
 
   expectVerificationSentTo = async (email: string) => {
     await expect(this.verificationSent).toContainText(email);
-  };
-
-  expectErrorVisible = async () => {
-    await expect(this.rootError).toBeVisible();
   };
 }

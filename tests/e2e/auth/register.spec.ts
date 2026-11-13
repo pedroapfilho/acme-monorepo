@@ -1,37 +1,6 @@
 import { test, expect } from "../fixtures/auth.fixture";
-import { TEST_USER } from "../fixtures/test-user";
 
 test.describe("Register", () => {
-  test(
-    "registers with valid data",
-    { tag: "@no-email" },
-    async ({ createAccount, dashboardPage, page, registerPage }) => {
-      await page.context().clearCookies();
-
-      await createAccount(async ({ email, name, password }) => {
-        await registerPage.goto();
-        await registerPage.register(name, email, password, password);
-        await page.waitForURL("/dashboard");
-      });
-      await dashboardPage.expectHeadingVisible();
-    },
-  );
-
-  test("shows error for existing email", { tag: "@no-email" }, async ({ page, registerPage }) => {
-    await page.context().clearCookies();
-
-    await registerPage.goto();
-    await registerPage.register(
-      "Duplicate User",
-      TEST_USER.email,
-      "SecurePassword1!",
-      "SecurePassword1!",
-    );
-
-    await registerPage.expectErrorVisible();
-    expect(page.url()).toContain("/register");
-  });
-
   test("shows error for short password", async ({ page, registerPage }) => {
     await page.context().clearCookies();
 

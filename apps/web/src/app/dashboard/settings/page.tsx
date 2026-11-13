@@ -50,7 +50,6 @@ const listSessions = async (headersList: Headers) => {
 
 const SettingsContent = async () => {
   const session = await requireSession(routes.settings.path);
-  const auth = getAuth();
   const sessions = await listSessions(await headers());
 
   const sortedSessions = sessions?.toSorted(
@@ -90,11 +89,7 @@ const SettingsContent = async () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <EmailForm
-            currentEmail={session.user.email}
-            emailVerified={session.user.emailVerified}
-            enabled={auth.canSendEmail}
-          />
+          <EmailForm currentEmail={session.user.email} />
         </CardContent>
       </Card>
 

@@ -15,8 +15,6 @@ type CreateAccount = (
   register?: (credentials: Credentials) => Promise<void>,
 ) => Promise<OwnedAccount>;
 
-type SessionOptions = { emailDelivery: boolean };
-
 const findSessionCookie = (cookies: Array<Cookie>) =>
   cookies.find(({ name }) => name.endsWith(".session_token"));
 
@@ -32,19 +30,17 @@ const signIn = (request: APIRequestContext, { email, password }: Omit<Credential
 
 const signOut = (request: APIRequestContext) => authPost(request, "sign-out", {});
 
-const test = base.extend<
-  { account: OwnedAccount; api: APIRequestContext; createAccount: CreateAccount },
-  SessionOptions
->({
-  account: async ({ context, createAccount, emailDelivery }, use) => {
+const test = base.extend<{
+  account: OwnedAccount;
+  api: APIRequestContext;
+  createAccount: CreateAccount;
+}>({
+  account: async ({ context, createAccount }, use) => {
     const sinceMs = Date.now();
     await context.clearCookies();
     const account = await createAccount();
-
-    if (emailDelivery) {
-      const link = await verificationLink({ sinceMs, subject: /verify/iv, to: account.email });
-      await expect(await context.request.get(link)).toBeOK();
-    }
+    const link = await verificationLink({ sinceMs, subject: /verify/iv, to: account.email });
+    await expect(await context.request.get(link)).toBeOK();
 
     await use(account);
   },
@@ -106,9 +102,6 @@ const test = base.extend<
     await use(api);
     await api.dispose();
   },
-  emailDelivery: [false, { option: true, scope: "worker" }],
 });
 
 export { findSessionCookie, signIn, signOut, signUp, test };
-
-export type { SessionOptions };

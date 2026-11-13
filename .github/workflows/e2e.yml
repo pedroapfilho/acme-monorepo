@@ -1,49 +1,37 @@
+# Written by `standy sync` from the saas template and `.github/ci/policy.json`. Change those, never this file.
 name: E2E Tests
-
 on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: 10 4 * * 1
-
+    - cron: 55 5 * * 1
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
   pull-requests: read
-
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     env:
-      CI: true
-      DATABASE_URL: postgresql://test:test@localhost:5432/test
-      PGAPPNAME: acme:ci:e2e
       BETTER_AUTH_SECRET: test-secret-minimum-32-characters-long-for-e2e
-      EXPOSE_TESTING_API: 1
-      # The web app's loopback URL from @repo/portless-env, which the Playwright
-      # baseURL also uses. 127.0.0.1, not localhost: mismatched hosts split
-      # cookie scope, producing 401s on every authed request from browser tests.
+      DATABASE_URL: postgresql://test:test@localhost:5432/test
+      EXPOSE_TESTING_API: "1"
+      FROM_EMAIL: Acme <noreply@email.acme.com>
+      PGAPPNAME: acme:ci:e2e
       WEB_APP_URL: http://127.0.0.1:3000
-      RESEND_API_KEY: re_e2e_stub
-      RESEND_BASE_URL: http://127.0.0.1:3999
-      FROM_EMAIL: "Acme <noreply@email.acme.com>"
     services:
       postgres:
         image: postgres:18-alpine
         env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
           POSTGRES_DB: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U test -d test"
-          --health-interval 1s
-          --health-timeout 5s
-          --health-retries 30
+        options: --health-cmd "pg_isready -U test -d test" --health-interval 1s --health-timeout 5s --health-retries 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -84,13 +72,11 @@ jobs:
       - name: Install Playwright browsers and system deps
         run: pnpm exec playwright install --with-deps chromium
       - run: node .github/ci/ci.mjs run e2e -- pnpm test:e2e
-      - name: Run the no-mailer specs
-        run: node .github/ci/ci.mjs run e2e -- pnpm test:e2e --grep @no-email
-        env:
-          RESEND_API_KEY: ""
-          PLAYWRIGHT_HTML_OUTPUT_DIR: playwright-report/no-email
+      # The organisation's artifact storage quota can run out, and a report that
+      # fails to upload should not turn a green suite red.
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: ${{ !cancelled() }}
+        continue-on-error: true
         with:
           name: playwright-report
           path: playwright-report/

@@ -1,5 +1,32 @@
 {
   "version": 1,
   "profile": "saas",
-  "mode": "affected"
+  "mode": "affected",
+  "e2e": {
+    "env": {
+      "DATABASE_URL": "postgresql://test:test@localhost:5432/test",
+      "PGAPPNAME": "acme:ci:e2e",
+      "BETTER_AUTH_SECRET": "test-secret-minimum-32-characters-long-for-e2e",
+      "EXPOSE_TESTING_API": "1",
+      "WEB_APP_URL": "http://127.0.0.1:3000",
+      "FROM_EMAIL": "Acme <noreply@email.acme.com>"
+    },
+    "services": {
+      "postgres": {
+        "image": "postgres:18-alpine",
+        "env": {
+          "POSTGRES_USER": "test",
+          "POSTGRES_PASSWORD": "test",
+          "POSTGRES_DB": "test"
+        },
+        "ports": ["5432:5432"],
+        "options": "--health-cmd \"pg_isready -U test -d test\" --health-interval 1s --health-timeout 5s --health-retries 30"
+      }
+    },
+    "setup": [
+      {
+        "run": "pnpm db:push"
+      }
+    ]
+  }
 }

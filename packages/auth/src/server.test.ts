@@ -25,11 +25,14 @@ const capturingMailer = (failing: Array<TransactionalEmail["type"]> = []): Captu
   return { mailer, sent };
 };
 
-const testAuth = ({ mailer, ...config }: Partial<AuthConfig> & { mailer?: Mailer } = {}) =>
+const testAuth = ({
+  mailer = capturingMailer().mailer,
+  ...config
+}: Partial<AuthConfig> & { mailer?: Mailer } = {}) =>
   createAuth({
     allowedHosts: ["**.localhost"],
     database: memoryAdapter({ account: [], session: [], user: [], verification: [] }),
-    email: mailer && {
+    email: {
       mailer,
       resetPasswordUrl: `${WEB_APP_URL}/recover`,
       signInUrl: `${WEB_APP_URL}/login`,
@@ -59,20 +62,27 @@ const signedInCookie = async (auth: Auth, email: string) => {
     .join("; ");
 };
 
-const verify = async (auth: Auth, welcome: { verificationUrl: string }) => {
+const verifiedAccount = async (config: Partial<AuthConfig> = {}) => {
+  const { mailer, sent } = capturingMailer();
+  const auth = testAuth({ mailer, ...config });
+  const { user } = await signUp(auth);
+  const [welcome] = sentOfType(sent, "welcome");
+
+  if (welcome === undefined) {
+    throw new Error("sign-up sent no verification email");
+  }
+
   const token = new URL(welcome.verificationUrl).searchParams.get("token") ?? "";
   await auth.api.verifyEmail({ query: { token } });
+
+  return { auth, sent, user };
 };
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("createAuth with a mailer", () => {
-  it("reports email delivery as available", () => {
-    expect(testAuth({ mailer: capturingMailer().mailer }).canSendEmail).toBe(true);
-  });
-
+describe("createAuth email", () => {
   it("emails a verification link on sign-up and withholds the session until it is used", async () => {
     const { mailer, sent } = capturingMailer();
     const auth = testAuth({ mailer });
@@ -171,16 +181,7 @@ describe("createAuth with a mailer", () => {
   });
 
   it("asks the current address to confirm an email change", async () => {
-    const { mailer, sent } = capturingMailer();
-    const auth = testAuth({ mailer });
-    const { user } = await signUp(auth);
-    const [welcome] = sentOfType(sent, "welcome");
-
-    if (welcome === undefined) {
-      throw new Error("sign-up sent no verification email");
-    }
-
-    await verify(auth, welcome);
+    const { auth, sent, user } = await verifiedAccount();
     const cookie = await signedInCookie(auth, "ada@acme.test");
 
     await auth.api.changeEmail({
@@ -204,27 +205,6 @@ describe("createAuth with a mailer", () => {
   });
 });
 
-describe("createAuth without a mailer", () => {
-  it("reports email delivery as unavailable", () => {
-    expect(testAuth().canSendEmail).toBe(false);
-  });
-
-  it("signs the user in on sign-up without asking for verification", async () => {
-    const result = await signUp(testAuth());
-
-    expect(result.token).toEqual(expect.any(String));
-  });
-
-  it("answers a password reset request without sending anything", async () => {
-    const auth = testAuth();
-    await signUp(auth);
-
-    await expect(
-      auth.api.requestPasswordReset({ body: { email: "ada@acme.test" } }),
-    ).resolves.toMatchObject({ status: true });
-  });
-});
-
 describe("createAuth credentials and sessions", () => {
   it.each(["Al", "A".repeat(33)])("rejects the sign-up name %s", async (name) => {
     const auth = testAuth();
@@ -235,8 +215,7 @@ describe("createAuth credentials and sessions", () => {
   });
 
   it("rejects a profile update to a name outside the policy and keeps the old one", async () => {
-    const auth = testAuth();
-    await signUp(auth);
+    const { auth } = await verifiedAccount();
     const headers = new Headers({ cookie: await signedInCookie(auth, "ada@acme.test") });
 
     await expect(auth.api.updateUser({ body: { name: "Al" }, headers })).rejects.toThrow(
@@ -254,8 +233,7 @@ describe("createAuth credentials and sessions", () => {
   });
 
   it("issues acme-prefixed session cookies that last 7 days", async () => {
-    const auth = testAuth();
-    await signUp(auth);
+    const { auth } = await verifiedAccount();
 
     const cookie = await signedInCookie(auth, "ada@acme.test");
     const session = await auth.api.getSession({ headers: new Headers({ cookie }) });
@@ -268,8 +246,7 @@ describe("createAuth credentials and sessions", () => {
   });
 
   it("prefixes cookies as secure when asked to", async () => {
-    const auth = testAuth({ useSecureCookies: true });
-    await signUp(auth);
+    const { auth } = await verifiedAccount({ useSecureCookies: true });
 
     const cookie = await signedInCookie(auth, "ada@acme.test");
 

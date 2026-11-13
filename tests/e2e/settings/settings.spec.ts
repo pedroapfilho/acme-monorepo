@@ -17,14 +17,6 @@ test.describe("Settings", () => {
     await dashboardPage.expectGreeting("Renamed Account");
   });
 
-  test(
-    "explains that email changes need email delivery",
-    { tag: "@no-email" },
-    async ({ settingsPage }) => {
-      await settingsPage.expectEmailChangeUnavailable();
-    },
-  );
-
   test("changes the password", async ({ account, request, settingsPage }) => {
     const newPassword = "ChangedPassword123!";
 

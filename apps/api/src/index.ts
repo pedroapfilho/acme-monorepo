@@ -8,7 +8,7 @@ import { log } from "@repo/observability";
 import { initApiLogger } from "@repo/observability/hono";
 
 import { createApp } from "./app";
-import { auth } from "./lib/auth";
+import { sessions } from "./lib/auth";
 import { env } from "./lib/env";
 
 initApiLogger({ service: "api" });
@@ -18,9 +18,9 @@ const app = createApp({
     await prisma.$queryRaw`SELECT 1`;
   },
   corsOrigins: parseEnvList(env.CORS_ORIGINS),
-  getSession: auth.api.getSession,
+  getSession: sessions.getSession,
   isProduction: env.NODE_ENV === "production",
-  sessionCookieName: auth.sessionCookieName,
+  sessionCookieName: sessions.sessionCookieName,
   trustedProxyHops: env.TRUSTED_PROXY_HOPS,
 });
 

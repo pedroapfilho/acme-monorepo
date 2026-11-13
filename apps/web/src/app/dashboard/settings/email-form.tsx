@@ -11,39 +11,29 @@ import { routes } from "@/lib/routes";
 
 type Props = {
   currentEmail: string;
-  emailVerified: boolean;
-  enabled: boolean;
 };
 
-const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
-  const [confirmationAddress, setConfirmationAddress] = useState<string | null>(null);
+const EmailForm = ({ currentEmail }: Props) => {
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   const { form, submission } = useAuthForm({
     call: (value) =>
       authClient.changeEmail({ callbackURL: routes.settings.path, newEmail: value.email }),
     defaultValues: { email: "" },
     fallbackError: "Failed to change email",
-    onSuccess: (_data, value) => {
-      setConfirmationAddress(emailVerified ? currentEmail : value.email);
+    onSuccess: () => {
+      setConfirmationSent(true);
     },
     schema: changeEmailSchema,
   });
 
-  if (!enabled) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        Email changes are unavailable until email delivery is configured.
-      </p>
-    );
-  }
-
-  if (confirmationAddress !== null) {
+  if (confirmationSent) {
     return (
       <output aria-live="polite" className="block space-y-1">
         <span className="block font-medium">Confirm the change</span>
         <span className="block text-sm text-muted-foreground">
-          We sent a confirmation link to <span className="font-medium">{confirmationAddress}</span>.
-          Click it to continue the email change.
+          We sent a confirmation link to <span className="font-medium">{currentEmail}</span>. Click
+          it to continue the email change.
         </span>
       </output>
     );

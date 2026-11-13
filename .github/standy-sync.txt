@@ -3,6 +3,7 @@
 .github/ci/plan.mjs
 .github/ci/report.mjs
 .github/workflows/check.yml
+.github/workflows/e2e.yml
 .github/workflows/friction-log.yml
 .github/workflows/react-doctor.yml
 packages/auth/src/env-config.ts
@@ -39,6 +40,7 @@ packages/social-image/src/index.test.ts
 packages/social-image/src/index.ts
 packages/social-image/tsconfig.json
 packages/social-image/vitest.config.ts
+packages/transactional/src/transport.ts
 packages/ui/src/compositions/client-ready-form.test.tsx
 packages/ui/src/compositions/client-ready-form.tsx
 packages/ui/src/compositions/form-alert.test.tsx
@@ -52,3 +54,6 @@ packages/ui/src/hooks/use-error-report.ts
 packages/ui/src/lib/focus-first-invalid-field.test.ts
 packages/ui/src/lib/focus-first-invalid-field.ts
 packages/ui/src/lib/utils.ts
+tests/e2e/fixtures/verification.fixture.ts
+tests/e2e/helpers/mail.ts
+tests/e2e/helpers/test-email.ts
