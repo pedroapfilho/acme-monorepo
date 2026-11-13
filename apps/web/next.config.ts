@@ -1,30 +1,14 @@
+import { baseNextConfig } from "@repo/config-next";
 import { applyPortlessUrls } from "@repo/portless-env";
 import type { NextConfig } from "next";
 
 applyPortlessUrls(["WEB_APP_URL"]);
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["acme.web.localhost", "*.acme.web.localhost", "*.vercel.app"],
-  cacheComponents: true,
-  experimental: {
+  ...baseNextConfig("web", {
     exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === "1",
     instantInsights: { validationLevel: "manual-warning" },
-    turbopackRustReactCompiler: true,
-  },
-  headers: () =>
-    Promise.resolve([
-      {
-        headers: [
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        ],
-        source: "/:path*",
-      },
-    ]),
-  partialPrefetching: true,
-  reactCompiler: true,
-  reactStrictMode: true,
+  }),
   serverExternalPackages: ["@prisma/client", "@repo/db"],
   transpilePackages: ["@repo/ui", "@repo/observability"],
   turbopack: {
