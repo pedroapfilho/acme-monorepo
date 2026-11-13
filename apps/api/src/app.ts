@@ -10,11 +10,10 @@ import { createErrorHandler, notFound } from "@/lib/api-error";
 import { apiDocumentMetadata, createRouter } from "@/lib/openapi";
 import { createSessionAuth } from "@/lib/session";
 import type { SessionLookup } from "@/lib/session";
-import type { UserStore } from "@/lib/users";
 import { createRateLimit, requestSizeLimit, securityHeaders } from "@/middleware/security";
 import { createHealthRoutes } from "@/routes/health";
 import type { CheckDatabase } from "@/routes/health";
-import { createV1UserRoutes } from "@/routes/v1/users";
+import { createV1MeRoutes } from "@/routes/v1/me";
 
 declare module "hono" {
   // oxlint-disable-next-line consistent-type-definitions -- declaration merging requires interface, not type
@@ -31,7 +30,6 @@ type AppDeps = {
   isProduction: boolean;
   sessionCookieName: string;
   trustedProxyHops: number;
-  users: UserStore;
 };
 
 const createApp = (deps: AppDeps) => {
@@ -81,7 +79,7 @@ const createApp = (deps: AppDeps) => {
   );
 
   app.route("/", createHealthRoutes(deps.checkDatabase));
-  app.route("/api/v1/users", createV1UserRoutes({ authenticated, users: deps.users }));
+  app.route("/api/v1/me", createV1MeRoutes(authenticated));
 
   let llmsMarkdown: string | undefined;
   app.get("/llms.txt", async (c) => {

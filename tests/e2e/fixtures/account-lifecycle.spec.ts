@@ -27,8 +27,8 @@ test.afterAll(async () => {
   });
 });
 
-test("cleans up after a failed assertion following mutation", async ({ account, api }) => {
-  await expect(await api.patch("/api/v1/users/me", { data: { name: "Before failure" } })).toBeOK();
+test("cleans up after a failed assertion following mutation", async ({ account }) => {
+  await prisma.user.update({ data: { name: "Before failure" }, where: { id: account.id } });
   test.fail();
   expect(account.name).toBe("deliberate assertion failure");
 });
