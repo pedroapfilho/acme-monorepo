@@ -143,7 +143,7 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 ### Prisma
 
 - `prisma.config.ts` uses `process.env.DATABASE_URL ?? ""` (not `env("DATABASE_URL")`) so `prisma generate` works in CI without database credentials.
-- `db:generate` is declared in `turbo.json` `build.dependsOn`, so `pnpm build` will regenerate the client before app builds.
+- `turbo.json` lists `^db:generate` and `db:generate` in the `dependsOn` of every task that reads source, so `prisma generate` finishes before any package that depends on `@repo/db` builds, typechecks, lints or tests.
 
 ### Tooling
 
@@ -187,6 +187,7 @@ Three workflows are checked in: `check.yml` (one job running the secret scan, fo
 - **acme is the template.** Sibling repos (localcine, collabtime, frow, easeia) inherit every shared standard from here. Change acme first, then propagate; see `~/dev/standy/standards.md`.
 - **Prisma client field** of `prisma.config.ts` deliberately falls back to `""` to keep CI green without secrets.
 - **pnpm 11 + Node 24** are the minimums (engines).
+- **Internal packages are source-only.** Every `packages/*` manifest exports `./src/*`; none has a `build` script, a `dist` or tsdown. Only the three apps build: the Next apps transpile the packages and `apps/api` bundles them with tsdown.
 - **No `@repo/tailwind-config` package.** Tailwind v4 reads tokens directly from `packages/ui/src/styles/globals.css` via the `@theme` directive; shared base styles also live there.
 - **base-ui (not Radix)** is the primitive layer. Wrappers in `@repo/ui` stay free of spurious `"use client"` directives.
 - **landings expose `lib/urls.ts`** with a `webAppUrl()` helper; never hardcode production URLs in marketing pages.

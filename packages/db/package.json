@@ -1,17 +1,11 @@
 {
   "name": "@repo/db",
-  "files": [
-    "dist/**",
-    "src/**"
-  ],
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "tsdown",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "dev": "tsdown --watch",
+    "clean": "rm -rf .turbo && rm -rf node_modules",
     "lint": "oxlint src",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -32,7 +26,6 @@
     "@types/node": "^26.6.2",
     "dotenv": "^17.4.2",
     "prisma": "^7.10.0",
-    "tsdown": "^0.23.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1"
