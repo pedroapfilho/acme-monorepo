@@ -1,9 +1,10 @@
+# Written by `standy sync` from the saas template and `.github/ci/policy.json`. Change those, never this file.
 name: Check
 on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: 0 4 * * 1
+    - cron: 55 4 * * 1
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
