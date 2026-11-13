@@ -21,8 +21,7 @@ const environment = process.env.CI ? "ci" : "local";
 const server = (service: "api" | "landing" | "web", command: string, url: string) => ({
   command,
   env: {
-    // shortcut: env-config only turns auth rate limiting off under CI, upgrade when the app has its own switch.
-    CI: "true",
+    AUTH_RATE_LIMIT: "off",
     MAIL_TRANSPORT: "outbox",
     PGAPPNAME: `acme:${environment}:${service}`,
     WEB_APP_URL: webUrl,

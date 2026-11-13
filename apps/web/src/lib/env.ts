@@ -1,6 +1,8 @@
+import { authEnv } from "@repo/auth/env-config";
 import { z } from "zod";
 
 const envSchema = z.object({
+  ...authEnv.shape,
   BETTER_AUTH_SECRET: z
     .string()
     .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
@@ -30,4 +32,9 @@ const getEnv = (): Env => {
   return cachedEnv;
 };
 
-export { getEnv };
+// The root layout reads this at build, where the secrets the schema requires are absent.
+const webAppUrl = () => authEnv.shape.WEB_APP_URL.parse(process.env.WEB_APP_URL);
+
+export { getEnv, webAppUrl };
+
+export type { Env };

@@ -1,7 +1,7 @@
 import { test as base, expect } from "@playwright/test";
 import type { APIRequestContext, Cookie } from "@playwright/test";
-import { prisma } from "@repo/db";
 
+import { prisma } from "../helpers/database";
 import { makeTestEmail } from "../helpers/test-email";
 import { apiUrl, webUrl } from "../urls";
 

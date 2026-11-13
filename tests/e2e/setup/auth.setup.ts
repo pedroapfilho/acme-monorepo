@@ -1,8 +1,8 @@
 import { expect, test as setup } from "@playwright/test";
-import { prisma } from "@repo/db";
 
 import { signIn, signUp } from "../fixtures/session";
 import { TEST_USER, TEST_USER_STATE } from "../fixtures/test-user";
+import { prisma } from "../helpers/database";
 
 setup("sign in the seeded test user", async ({ request }) => {
   const existing = await signIn(request, TEST_USER);

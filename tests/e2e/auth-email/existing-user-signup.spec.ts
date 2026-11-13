@@ -1,7 +1,6 @@
-import { prisma } from "@repo/db";
-
 import { expect, test } from "../fixtures/auth.fixture";
 import { signUp } from "../fixtures/session";
+import { prisma } from "../helpers/database";
 import { waitForEmail } from "../helpers/mail";
 
 test.describe("Sign-up for an existing email (enumeration prevention)", () => {

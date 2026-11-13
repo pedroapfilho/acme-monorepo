@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 
-import { webAppUrl } from "@repo/auth/env-config";
 import { displayName } from "@repo/identity";
 import { canonicalUrl } from "@repo/portless-env/apps";
 import { Toaster } from "@repo/ui/components/sonner";
@@ -11,6 +10,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { webAppUrl } from "@/lib/env";
 import { LONG_DESCRIPTION, SHORT_DESCRIPTION } from "@/lib/site";
 
 const inter = Inter({

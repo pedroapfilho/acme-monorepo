@@ -1,6 +1,8 @@
 import "dotenv/config";
 
-import { prisma } from "./client";
+import { createPrismaClient } from "./client";
+
+const prisma = createPrismaClient(process.env.DATABASE_URL ?? "");
 
 const DEFAULT_USERS = [
   {

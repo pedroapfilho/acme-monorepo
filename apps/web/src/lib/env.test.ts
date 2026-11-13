@@ -7,14 +7,18 @@ const VALID_ENV = {
   RESEND_API_KEY: "re_test",
 };
 
-const loadGetEnv = async (overrides: Record<string, string | undefined> = {}) => {
+const loadEnv = async (overrides: Record<string, string | undefined> = {}) => {
   vi.resetModules();
 
   for (const [key, value] of Object.entries({ ...VALID_ENV, ...overrides })) {
     vi.stubEnv(key, value);
   }
 
-  const { getEnv } = await import("./env");
+  return import("./env");
+};
+
+const loadGetEnv = async (overrides: Record<string, string | undefined> = {}) => {
+  const { getEnv } = await loadEnv(overrides);
 
   return getEnv;
 };
@@ -53,6 +57,24 @@ describe("getEnv", () => {
     expect(() => getEnv()).toThrow(/DATABASE_URL/v);
   });
 
+  it("parses the variables the auth package owns", async () => {
+    const getEnv = await loadGetEnv({
+      TRUSTED_ORIGINS: "https://a.example.com, https://b.example.com",
+      WEB_APP_URL: "https://web.example.com",
+    });
+
+    expect(getEnv()).toMatchObject({
+      TRUSTED_ORIGINS: ["https://a.example.com", "https://b.example.com"],
+      WEB_APP_URL: "https://web.example.com",
+    });
+  });
+
+  it("throws when WEB_APP_URL is not a URL", async () => {
+    const getEnv = await loadGetEnv({ WEB_APP_URL: "web.example.com" });
+
+    expect(() => getEnv()).toThrow(/WEB_APP_URL/v);
+  });
+
   it("throws when FROM_EMAIL is missing", async () => {
     const getEnv = await loadGetEnv({ FROM_EMAIL: undefined });
 
@@ -63,5 +85,27 @@ describe("getEnv", () => {
     const getEnv = await loadGetEnv({ BETTER_AUTH_SECRET: "short" });
 
     expect(() => getEnv()).toThrow(/BETTER_AUTH_SECRET/v);
+  });
+});
+
+describe("webAppUrl", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("reads WEB_APP_URL without the variables the app needs to boot", async () => {
+    const { webAppUrl } = await loadEnv({
+      BETTER_AUTH_SECRET: undefined,
+      DATABASE_URL: undefined,
+      WEB_APP_URL: "https://web.example.com",
+    });
+
+    expect(webAppUrl()).toBe("https://web.example.com");
+  });
+
+  it("is undefined when WEB_APP_URL is unset", async () => {
+    const { webAppUrl } = await loadEnv({ WEB_APP_URL: undefined });
+
+    expect(webAppUrl()).toBeUndefined();
   });
 });
