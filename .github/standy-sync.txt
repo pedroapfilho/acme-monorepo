@@ -34,6 +34,10 @@ packages/observability/tsconfig.json
 packages/observability/vitest.config.ts
 packages/portless-env/src/apps.ts
 packages/portless-env/src/index.ts
+packages/social-image/src/index.test.ts
+packages/social-image/src/index.ts
+packages/social-image/tsconfig.json
+packages/social-image/vitest.config.ts
 packages/ui/src/compositions/client-ready-form.test.tsx
 packages/ui/src/compositions/client-ready-form.tsx
 packages/ui/src/compositions/form-alert.test.tsx
