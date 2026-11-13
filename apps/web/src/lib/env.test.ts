@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const VALID_ENV = {
   BETTER_AUTH_SECRET: "a".repeat(32),
+  DATABASE_URL: "postgresql://acme:acme123@localhost:5432/acme",
   FROM_EMAIL: "noreply@acme.com",
   RESEND_API_KEY: "re_test",
 };
@@ -49,6 +50,12 @@ describe("getEnv", () => {
     const getEnv = await loadGetEnv({ RESEND_API_KEY: "" });
 
     expect(getEnv().RESEND_API_KEY).toBeUndefined();
+  });
+
+  it.each([undefined, ""])("throws when DATABASE_URL is %j", async (value) => {
+    const getEnv = await loadGetEnv({ DATABASE_URL: value });
+
+    expect(() => getEnv()).toThrow(/DATABASE_URL/v);
   });
 
   it("throws when FROM_EMAIL is missing", async () => {

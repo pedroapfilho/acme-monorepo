@@ -177,7 +177,7 @@ cp packages/db/.env.example packages/db/.env
 
 `apps/landing` reads one build-time variable, `NEXT_PUBLIC_WEB_APP_URL`, and nothing at runtime. Key variables:
 
-- `DATABASE_URL`: PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`)
+- `DATABASE_URL`: PostgreSQL connection string (matches `docker-compose.yml`: `postgres://acme:acme123@localhost:5432/acme`); `web` and `api` both refuse to boot without it
 - `BETTER_AUTH_SECRET`: min 32 chars; identical across api and web
 - `CORS_ORIGINS` / `TRUSTED_ORIGINS`: comma-separated allowed origins
 - `WEB_APP_URL`: web origin; secure-cookie switch, Better Auth's base URL fallback, the base of auth email links and the web `metadataBase`, parsed only by `webAppUrl()` in `@repo/auth/env-config` (portless fills it in dev)
