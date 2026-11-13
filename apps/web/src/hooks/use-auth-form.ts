@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppForm } from "@repo/ui/compositions/app-form";
+import { useAppForm } from "@repo/ui/hooks/use-app-form";
 import { useRef, useState, useTransition } from "react";
 
 import { reportError } from "@/lib/observability-client";

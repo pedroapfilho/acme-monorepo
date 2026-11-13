@@ -3,7 +3,9 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
-import { AppForm, SubmitButton, useAppForm } from "./app-form";
+import { useAppForm } from "../hooks/use-app-form";
+
+import { AppForm, SubmitButton } from "./app-form";
 
 type Values = { confirmPassword: string; email: string; password: string };
 
