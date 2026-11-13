@@ -18,7 +18,7 @@ const apiDocumentMetadata = {
   ],
   tags: [
     { description: "Service health and readiness", name: "System" },
-    { description: "User profile and management", name: "Users" },
+    { description: "The signed-in user", name: "Account" },
   ],
 };
 

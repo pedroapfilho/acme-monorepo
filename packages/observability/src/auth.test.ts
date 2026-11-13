@@ -5,7 +5,7 @@ import { identifyUser } from "./auth";
 
 describe("identifyUser", () => {
   it("puts the resolved session's user on the request's wide event", () => {
-    const log = createRequestLogger({ method: "GET", path: "/api/v1/users/me" });
+    const log = createRequestLogger({ method: "GET", path: "/api/v1/me" });
 
     const identified = identifyUser(log, {
       session: { id: "session-1" },

@@ -41,8 +41,6 @@ const requestSizeLimit = bodyLimit({
   },
 });
 
-const requestSizeLimitResponses = { 413: errorResponse("Request body too large") };
-
 const clientAddress = (c: Context, trustedProxyHops: number): string => {
   if (trustedProxyHops > 0) {
     const forwarded = c.req.header("x-forwarded-for")?.split(",") ?? [];
@@ -82,10 +80,4 @@ const createRateLimit =
 
 const rateLimitResponses = { 429: errorResponse("Rate limit exceeded") };
 
-export {
-  createRateLimit,
-  rateLimitResponses,
-  requestSizeLimit,
-  requestSizeLimitResponses,
-  securityHeaders,
-};
+export { createRateLimit, rateLimitResponses, requestSizeLimit, securityHeaders };

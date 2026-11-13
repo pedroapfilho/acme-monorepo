@@ -1,13 +1,7 @@
 import { z } from "@hono/zod-openapi";
-import type { Prisma } from "@repo/db";
-import { isAPIError } from "better-auth/api";
 import type { ErrorHandler, NotFoundHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type {
-  ClientErrorStatusCode,
-  ContentfulStatusCode,
-  ServerErrorStatusCode,
-} from "hono/utils/http-status";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { ZodError } from "zod";
 
 const errorDetailSchema = z.object({ field: z.string(), message: z.string() });
@@ -48,23 +42,7 @@ const errorResponse = (description: string) => ({
 
 const errorBody = (code: string, message: string): ErrorBody => ({ error: { code, message } });
 
-const isPrismaKnownError = (
-  err: Error,
-): err is InstanceType<typeof Prisma.PrismaClientKnownRequestError> =>
-  "code" in err && "clientVersion" in err;
-
 type KnownError = { code: string; message: string; status: ContentfulStatusCode };
-
-const isErrorStatus = (status: number): status is ClientErrorStatusCode | ServerErrorStatusCode =>
-  status >= 400 && status < 600;
-
-const PRISMA_ERRORS = new Map<string, KnownError>([
-  [
-    "P2002",
-    { code: "DUPLICATE_ENTRY", message: "A record with this value already exists", status: 409 },
-  ],
-  ["P2025", { code: "NOT_FOUND", message: "Record not found", status: 404 }],
-]);
 
 const toKnownError = (err: Error): KnownError | undefined => {
   if (err instanceof AppError) {
@@ -77,18 +55,6 @@ const toKnownError = (err: Error): KnownError | undefined => {
       message: err.message,
       status: err.status,
     };
-  }
-
-  if (isAPIError(err)) {
-    return {
-      code: err.body?.code ?? String(err.status),
-      message: err.body?.message ?? err.message,
-      status: isErrorStatus(err.statusCode) ? err.statusCode : 500,
-    };
-  }
-
-  if (isPrismaKnownError(err)) {
-    return PRISMA_ERRORS.get(err.code);
   }
 
   return undefined;

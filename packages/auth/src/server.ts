@@ -7,10 +7,9 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { getCookies } from "better-auth/cookies";
 import { bearer } from "better-auth/plugins/bearer";
-import { username } from "better-auth/plugins/username";
 import type { BetterAuthPlugin, DBAdapterInstance } from "better-auth/types";
 
-import { name, PASSWORD_LENGTH, USERNAME_LENGTH } from "./policy";
+import { name, PASSWORD_LENGTH } from "./policy";
 
 const COOKIE_PREFIX = "acme";
 
@@ -185,11 +184,7 @@ const createAuth = (config: AuthConfig) => {
         }),
     },
 
-    plugins: [
-      username({ maxUsernameLength: USERNAME_LENGTH.max, minUsernameLength: USERNAME_LENGTH.min }),
-      bearer(),
-      ...extraPlugins,
-    ],
+    plugins: [bearer(), ...extraPlugins],
 
     rateLimit: {
       enabled: rateLimitEnabled,
@@ -211,13 +206,6 @@ const createAuth = (config: AuthConfig) => {
     },
     trustedOrigins,
     user: {
-      additionalFields: {
-        displayName: {
-          defaultValue: null,
-          required: false,
-          type: "string",
-        },
-      },
       changeEmail: {
         enabled: true,
         sendChangeEmailConfirmation: async ({ newEmail, url, user }) => {

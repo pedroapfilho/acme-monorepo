@@ -5,7 +5,7 @@ This document records the defaults used across the acme monorepo. New code shoul
 ## API responses
 
 - Success with a body: `{ data: ... }`. The envelope makes it easy to add `meta` later without breaking clients.
-- Success with no body: `204 No Content`. Used by `DELETE /api/v1/users/me` and other operations that have no useful payload.
+- Success with no body: `204 No Content`, for operations that have no useful payload.
 - Errors: `{ error: { code, message, details? } }`, produced exclusively by the central error handler in `apps/api/src/lib/api-error.ts`. Route handlers and middleware throw `AppError` with a distinct `code`, or let Zod, Better Auth and Prisma errors propagate; they never return error-shaped JSON directly. Routers come from `createRouter()` in `apps/api/src/lib/openapi.ts`, whose `defaultHook` sends request validation failures to the same handler.
 
 ## Errors
@@ -60,5 +60,5 @@ This document records the defaults used across the acme monorepo. New code shoul
 
 ## Routes
 
-- API versioned under `/api/v1/*`, with health at `/healthz` and `/readyz`. Better Auth is served by `web` at `/api/auth/*`; `api` only consumes its session and user APIs.
+- API versioned under `/api/v1/*`, with health at `/healthz` and `/readyz`. Better Auth is served by `web` at `/api/auth/*`; `api` only looks sessions up.
 - Path alias: `@/*` maps to `src/*` in every app and package.

@@ -10,7 +10,6 @@ import { initApiLogger } from "@repo/observability/hono";
 import { createApp } from "./app";
 import { auth } from "./lib/auth";
 import { env } from "./lib/env";
-import { createUserStore } from "./lib/users";
 
 initApiLogger({ service: "api" });
 
@@ -23,7 +22,6 @@ const app = createApp({
   isProduction: env.NODE_ENV === "production",
   sessionCookieName: auth.sessionCookieName,
   trustedProxyHops: env.TRUSTED_PROXY_HOPS,
-  users: createUserStore(auth, prisma),
 });
 
 log.info({

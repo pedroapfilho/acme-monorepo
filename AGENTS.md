@@ -116,11 +116,11 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 
 ### Auth
 
-- `@repo/auth/policy` owns the field rules as zod schemas: `email`, `name`, `newPassword`, `existingPassword` and `username`, each rule's helper text in its `.description`. Web form schemas, api bodies and `createAuth` read them; no form or route retypes a length or its copy. `existingPassword` only requires a value, so raising the minimum never locks an account out at a form.
+- `@repo/auth/policy` owns the field rules as zod schemas: `email`, `name`, `newPassword`, `existingPassword` and `username`, each rule's helper text in its `.description`. Web form schemas, api bodies and `createAuth` read them. `username` is opt-in: `createAuth` loads no username plugin, so a repo that wants usernames passes `username()` with `USERNAME_LENGTH` in `extraPlugins` and adds the plugin's columns; no form or route retypes a length or its copy. `existingPassword` only requires a value, so raising the minimum never locks an account out at a form.
 - Passwords are 12 to 128 characters and names 3 to 32, enforced by `createAuth` as well as the forms. Sessions expire after 7 days.
 - The Better Auth handler is mounted in `web` at `apps/web/src/app/api/auth/[...all]/route.ts` (`basePath: "/api/auth"` in `packages/auth/src/server.ts`).
 - `web` uses `@repo/auth/client` → calls same-origin `/api/auth`. `landing` has no auth integration.
-- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup and user writes, both wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.
+- `api` consumes the auth instance from `@repo/auth/server` (Prisma adapter from `@repo/db`) for session lookup, wired into `createApp` in `apps/api/src/app.ts`; it does not serve the auth routes and sends no email, so it reads neither `RESEND_API_KEY` nor `FROM_EMAIL`.
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
 - `createAuth` takes an optional `email` (the mailer plus the web URLs its emails link to) and reports it as `auth.canSendEmail`. `web` builds it when `RESEND_API_KEY` is set; `packages/auth` knows no web route. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
 
@@ -138,6 +138,7 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 ### API
 
 - Routes versioned under `/api/v1/*`. Health at `/healthz`, `/readyz`.
+- The api is health plus one authenticated example, `GET /api/v1/me` in `apps/api/src/routes/v1/me.ts`. No app calls the api: `web` does every account operation through `authClient`. Copy the example for a new resource instead of restating a Better Auth endpoint.
 - Hono app uses `@repo/observability` (evlog) for logging + `@hono/zod-openapi`.
 - Build via **tsdown** (NOT tsc); outputs to `dist/`.
 
