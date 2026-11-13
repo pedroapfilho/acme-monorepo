@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const MAIL_ENV = {
   BETTER_AUTH_SECRET: "a".repeat(32),
+  DATABASE_URL: "postgresql://acme:acme123@localhost:5432/acme",
   FROM_EMAIL: "Acme <noreply@acme.com>",
   RESEND_API_KEY: "re_test",
   WEB_APP_URL: "https://acme.web.localhost",

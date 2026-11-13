@@ -4,6 +4,7 @@ const envSchema = z.object({
   BETTER_AUTH_SECRET: z
     .string()
     .min(32, "BETTER_AUTH_SECRET must be at least 32 characters (openssl rand -base64 32)"),
+  DATABASE_URL: z.string().min(1, "DATABASE_URL is required: web reads sessions and users from it"),
   FROM_EMAIL: z.string(),
   RESEND_API_KEY: z
     .string()
