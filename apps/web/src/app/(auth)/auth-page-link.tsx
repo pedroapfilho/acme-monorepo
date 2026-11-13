@@ -4,11 +4,11 @@ import Link from "next/link";
 import { Suspense, use } from "react";
 import type { ReactNode } from "react";
 
-import { authPageHref } from "@/lib/redirect-validation";
+import { type AuthPage, authPageHref } from "@/lib/redirect-validation";
 
 type Props = {
   children: ReactNode;
-  page: "/login" | "/register";
+  page: AuthPage;
   searchParams: Promise<{ from?: string }>;
 };
 

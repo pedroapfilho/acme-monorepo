@@ -11,6 +11,7 @@ import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { registerSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
+import { routes } from "@/lib/routes";
 
 type Props = {
   searchParams: Promise<{ from?: string }>;
@@ -93,7 +94,7 @@ const RegisterForm = ({ searchParams }: Props) => {
         <SubmitButton pendingLabel="Creating account…">Create account</SubmitButton>
         <FieldDescription className="text-center">
           Already have an account?{" "}
-          <AuthPageLink page="/login" searchParams={searchParams}>
+          <AuthPageLink page={routes.login.path} searchParams={searchParams}>
             Sign in
           </AuthPageLink>
         </FieldDescription>

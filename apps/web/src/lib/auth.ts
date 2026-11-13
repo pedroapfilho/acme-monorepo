@@ -6,6 +6,7 @@ import { createResendMailer } from "@repo/transactional";
 import { nextCookies } from "better-auth/next-js";
 
 import { getEnv } from "./env";
+import { routes } from "./routes";
 
 const emailConfig = (webAppUrl: string | undefined) => {
   const env = getEnv();
@@ -20,8 +21,8 @@ const emailConfig = (webAppUrl: string | undefined) => {
 
   return {
     mailer: createResendMailer({ apiKey: env.RESEND_API_KEY, from: env.FROM_EMAIL }),
-    resetPasswordUrl: new URL("/recover", webAppUrl).href,
-    signInUrl: new URL("/login", webAppUrl).href,
+    resetPasswordUrl: new URL(routes.recover.path, webAppUrl).href,
+    signInUrl: new URL(routes.login.path, webAppUrl).href,
   };
 };
 

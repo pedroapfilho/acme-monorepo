@@ -124,6 +124,11 @@ The `dev` scripts, `allowedDevOrigins` and the e2e workflow's `WEB_APP_URL` must
 - `BETTER_AUTH_SECRET` must be **identical** across `apps/api/.env` and `apps/web/.env`; both validate sessions against it.
 - `createAuth` takes an optional `email` (the mailer plus the web URLs its emails link to) and reports it as `auth.canSendEmail`. `web` builds it when `RESEND_API_KEY` is set; `packages/auth` knows no web route. `requireEmailVerification` and the settings email-change form follow that capability (no bare `true`).
 
+### Routes
+
+- `apps/web/src/lib/routes.ts` lists every web path with its access: `guest` (signed-in visitors are sent home), `signed-in` (the path and everything under it need a session) or `public`. The proxy, links, redirects, `requireSession` call sites and the URLs in auth emails read it; add a page there, not as a string literal.
+- `/reset-password` is `public`, never `guest`: a reset link has to open for someone who still holds a session.
+
 ### Root layouts
 
 - Both Next apps render `SkipLink` from `@repo/ui/compositions/skip-link`, put `MAIN_CONTENT_ID` from `@repo/ui/lib/main-content` on the element it jumps to, and re-export `viewport` from `@repo/ui/lib/viewport`.

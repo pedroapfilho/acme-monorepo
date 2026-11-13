@@ -10,6 +10,7 @@ import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { loginSchema } from "@/lib/form-schemas";
 import { safeRedirectPath } from "@/lib/redirect-validation";
+import { routes } from "@/lib/routes";
 
 type Props = {
   searchParams: Promise<{ from?: string; message?: string }>;
@@ -52,7 +53,7 @@ const LoginForm = ({ searchParams }: Props) => {
             labelAction={
               <Link
                 className="ml-auto text-sm text-foreground underline underline-offset-4"
-                href="/recover"
+                href={routes.recover.path}
               >
                 Forgot your password?
               </Link>
@@ -72,7 +73,7 @@ const LoginForm = ({ searchParams }: Props) => {
         <SubmitButton pendingLabel="Signing in…">Sign in</SubmitButton>
         <FieldDescription className="text-center">
           Don&apos;t have an account?{" "}
-          <AuthPageLink page="/register" searchParams={searchParams}>
+          <AuthPageLink page={routes.register.path} searchParams={searchParams}>
             Sign up
           </AuthPageLink>
         </FieldDescription>

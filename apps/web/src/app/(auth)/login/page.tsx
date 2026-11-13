@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import LoginForm from "@/app/(auth)/login/form";
-import { PASSWORD_RESET_NOTICE } from "@/lib/redirect-validation";
+import { PASSWORD_RESET_NOTICE } from "@/lib/routes";
 
 const metadata: Metadata = {
   description: "Sign in to your Acme account to access your dashboard and manage your profile.",

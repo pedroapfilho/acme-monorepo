@@ -14,6 +14,7 @@ import { Suspense } from "react";
 
 import { getAuth } from "@/lib/auth";
 import { requireSession } from "@/lib/auth-helpers";
+import { routes } from "@/lib/routes";
 
 import { DeleteAccountForm } from "./delete-account-form";
 import { EmailForm } from "./email-form";
@@ -48,7 +49,7 @@ const listSessions = async (headersList: Headers) => {
 };
 
 const SettingsContent = async () => {
-  const session = await requireSession("/dashboard/settings");
+  const session = await requireSession(routes.settings.path);
   const auth = getAuth();
   const sessions = await listSessions(await headers());
 
@@ -200,7 +201,7 @@ const SettingsSkeleton = () => (
 const Settings = () => (
   <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-12">
     <p className="text-sm">
-      <Link className="text-foreground underline underline-offset-4" href="/dashboard">
+      <Link className="text-foreground underline underline-offset-4" href={routes.dashboard.path}>
         ← Back to dashboard
       </Link>
     </p>

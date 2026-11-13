@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useAuthForm } from "@/hooks/use-auth-form";
 import { authClient } from "@/lib/auth-client";
 import { changeEmailSchema } from "@/lib/form-schemas";
+import { routes } from "@/lib/routes";
 
 type Props = {
   currentEmail: string;
@@ -19,7 +20,7 @@ const EmailForm = ({ currentEmail, emailVerified, enabled }: Props) => {
 
   const { form, submission } = useAuthForm({
     call: (value) =>
-      authClient.changeEmail({ callbackURL: "/dashboard/settings", newEmail: value.email }),
+      authClient.changeEmail({ callbackURL: routes.settings.path, newEmail: value.email }),
     defaultValues: { email: "" },
     fallbackError: "Failed to change email",
     onSuccess: (_data, value) => {
