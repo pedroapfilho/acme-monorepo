@@ -11,6 +11,7 @@ type WelcomeEmailProps = {
   name?: string;
   userEmail: string;
   verificationUrl: string;
+  year: number;
 };
 
 const WelcomeEmail = ({
@@ -18,9 +19,10 @@ const WelcomeEmail = ({
   name,
   userEmail,
   verificationUrl,
+  year,
 }: WelcomeEmailProps) => {
   return (
-    <BaseLayout preview="Welcome to Acme. Verify your email to get started.">
+    <BaseLayout preview="Welcome to Acme. Verify your email to get started." year={year}>
       <Heading className="mt-0 mb-4 text-2xl font-semibold tracking-tight text-balance break-words text-foreground">
         Welcome to Acme.
       </Heading>
@@ -70,6 +72,7 @@ WelcomeEmail.PreviewProps = {
   name: "Ada Lovelace",
   userEmail: "ada@example.com",
   verificationUrl: "https://acme.web.localhost/api/auth/verify-email?token=preview",
+  year: 2026,
 } satisfies WelcomeEmailProps;
 
 export { WelcomeEmail };

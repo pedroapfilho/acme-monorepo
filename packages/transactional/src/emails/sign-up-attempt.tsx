@@ -12,6 +12,7 @@ type SignUpAttemptEmailProps = {
   resetPasswordUrl: string;
   signInUrl: string;
   userEmail: string;
+  year: number;
 };
 
 const SignUpAttemptEmail = ({
@@ -19,9 +20,10 @@ const SignUpAttemptEmail = ({
   resetPasswordUrl,
   signInUrl,
   userEmail,
+  year,
 }: SignUpAttemptEmailProps) => {
   return (
-    <BaseLayout preview="A sign-up attempt was made with your Acme account email">
+    <BaseLayout preview="A sign-up attempt was made with your Acme account email" year={year}>
       <Heading className="mt-0 mb-4 text-2xl font-semibold tracking-tight text-balance break-words text-foreground">
         Did you try to sign up?
       </Heading>
@@ -89,6 +91,7 @@ SignUpAttemptEmail.PreviewProps = {
   resetPasswordUrl: "https://acme.web.localhost/recover",
   signInUrl: "https://acme.web.localhost/login",
   userEmail: "ada@example.com",
+  year: 2026,
 } satisfies SignUpAttemptEmailProps;
 
 export { SignUpAttemptEmail };

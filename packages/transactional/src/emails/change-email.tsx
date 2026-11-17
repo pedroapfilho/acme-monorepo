@@ -12,6 +12,7 @@ type ChangeEmailProps = {
   linkLifetimeHours: number;
   name?: string;
   newEmail: string;
+  year: number;
 };
 
 const ChangeEmail = ({
@@ -20,9 +21,10 @@ const ChangeEmail = ({
   linkLifetimeHours,
   name,
   newEmail,
+  year,
 }: ChangeEmailProps) => {
   return (
-    <BaseLayout preview="Confirm your new Acme account email address.">
+    <BaseLayout preview="Confirm your new Acme account email address." year={year}>
       <Heading className="mt-0 mb-4 text-2xl font-semibold tracking-tight text-balance break-words text-foreground">
         Confirm your new email
       </Heading>
@@ -64,6 +66,7 @@ ChangeEmail.PreviewProps = {
   linkLifetimeHours: 1,
   name: "Ada Lovelace",
   newEmail: "lovelace@example.com",
+  year: 2026,
 } satisfies ChangeEmailProps;
 
 export { ChangeEmail };
