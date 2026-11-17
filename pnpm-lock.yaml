@@ -31,7 +31,7 @@ importers:
         version: link:packages/transactional
       '@shadcn/lint':
         specifier: 0.2.0
-        version: 0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))
+        version: 0.2.0(eslint@10.8.0(jiti@2.7.0))
       '@types/node':
         specifier: ^26.6.2
         version: 26.6.2
@@ -51,8 +51,8 @@ importers:
         specifier: ^1.94.0
         version: 1.94.0(oxlint-tsgolint@7.0.2007)
       oxlint-config-awesomeness:
-        specifier: ^4.9.0
-        version: 4.9.0(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint-tsgolint@7.0.2007)(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))(typescript@7.0.2)
+        specifier: ^5.0.0
+        version: 5.0.0(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))(tsrs@0.25.0-ts7.1.0-beta)(typescript@7.0.2)
       oxlint-plugin-react-doctor:
         specifier: ^0.9.14
         version: 0.9.14
@@ -2995,31 +2995,14 @@ packages:
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
-  '@typescript-eslint/parser@8.70.0':
-    resolution: {integrity: sha512-zYvrmj9Yxd63UGaXw+kdt6A0F0s0qveJyuatIM77bYC2DE4pgmg7a50u8LR7PRtXd0x+h+Tl3eXabGm06SWd3Q==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: '>=4.8.4 <6.1.0'
-
   '@typescript-eslint/project-service@8.66.0':
     resolution: {integrity: sha512-7MthGPTt4BP69lSryqpqq8HQqxuzynssckL/jyDyk3+TNMQ3y2jFWkptCrktWvBrP+EH787Nl5N5Qpw7WZg+5g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/project-service@8.70.0':
-    resolution: {integrity: sha512-hFHbTNqhU9G+2eKFXCBVb1tjFT/LceiJ4+HfLO4pTpDI0KHi6iajpcFFkaSQ9gXmCh7n82A0PthaayEdN6mspQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
-
   '@typescript-eslint/scope-manager@8.66.0':
     resolution: {integrity: sha512-8TGcH25j9zqJ/IULB/ppyhRvxA8QYfFEZ7nfbg6/BN9spDgb8fPWQXlE5l8TWBL50EtUx007uZ1o9VOwrq2/9g==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/scope-manager@8.70.0':
-    resolution: {integrity: sha512-8nP3Kwh5hlgZ4FicGvmznAmJe8UL4sdU8tLukrPaMuQmDuk4Y8xYfzu/aYZW4xT2JCgc7H/TpDI5cGlxcWJSqQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript-eslint/tsconfig-utils@8.66.0':
@@ -3048,12 +3031,6 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/typescript-estree@8.70.0':
-    resolution: {integrity: sha512-d9NmHMPEKQ7QCLLm1jI3zmoQBwT5KwFYjXBJ9ymZfKCUU+5rmTRykKAFvH5Qn/ZCds3CEAFS9OC9M/jkl0X2bA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
-
   '@typescript-eslint/utils@8.66.0':
     resolution: {integrity: sha512-jasearZPolBw5NJNYGMwxzHMF83niVWmMU1VdHzG1CyfI2VS7f7nZltnKtHcg20hW+7Uo5GfK4MeDPoU3qI8EA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -3063,10 +3040,6 @@ packages:
 
   '@typescript-eslint/visitor-keys@8.66.0':
     resolution: {integrity: sha512-dkKR8q+lKciskj1Y3vthHktl+3cMLWGyVUP23bRiPZ5O9BRT++4EqDDV+TVeIKBL1VXVEqrJlz8MYbcnvJcAlg==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/visitor-keys@8.70.0':
-    resolution: {integrity: sha512-BoC8PiO4Hkdo0TVJh9Ntxr5MxPDI7/oFsrygN5ADelFSeXG/qgNuucIGA+L5Z6JpPTE/uRfcTWtscjbUaufepQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript/typescript-aix-ppc64@7.0.2':
@@ -5478,22 +5451,31 @@ packages:
       vite-plus:
         optional: true
 
-  oxlint-config-awesomeness@4.9.0:
-    resolution: {integrity: sha512-NIrLIuDrOvcsGSv6tGtlr6tHI1lXqRj8lEDJEokhguwy6v2dhSvuOHuXNZtLV9ZH7e+QQiMvJpRMpwfTkZK28w==}
+  oxlint-config-awesomeness@5.0.0:
+    resolution: {integrity: sha512-jhaB+iHmOvAhCT1DHGGFi2UVUByBJxLdphrT0b+P050NHYe+MNlkMaiE2/jpgNPuWq2WRHegD5q84xjchGyrTQ==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
       '@nkzw/eslint-plugin': ^2.0.0
       '@shadcn/lint': '>=0.1.0 <0.3.0'
+      '@typescript-eslint/parser': ^8.70.1
+      '@typescript/typescript6': ^6.0.2
+      astro-eslint-parser: ^3.2.0
       eslint: ^10.0.0
       eslint-plugin-no-only-tests: ^3.4.0
       eslint-plugin-perfectionist: ^5.10.1
-      oxlint: ^1.82.0
+      oxlint: ^1.94.0
       oxlint-plugin-react-doctor: ^0.9.13
-      oxlint-tsgolint: '>=7.0.2001 <8.0.0'
+      tsrs: '>=0.25.0-ts7.1.0-beta <8.0.0'
       typescript: '>=7.0.0 <8.0.0'
     peerDependenciesMeta:
       '@shadcn/lint':
+        optional: true
+      '@typescript-eslint/parser':
+        optional: true
+      '@typescript/typescript6':
+        optional: true
+      astro-eslint-parser:
         optional: true
 
   oxlint-plugin-react-doctor@0.9.14:
@@ -8280,12 +8262,11 @@ snapshots:
       domhandler: 5.0.3
       selderee: 0.11.0
 
-  '@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))':
+  '@shadcn/lint@0.2.0(eslint@10.8.0(jiti@2.7.0))':
     dependencies:
       '@eslint/core': 0.17.0
       cn: 0.3.2
     optionalDependencies:
-      '@typescript-eslint/parser': 8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2)
       eslint: 10.8.0(jiti@2.7.0)
       oxc-parser: 0.148.0
 
@@ -8622,19 +8603,6 @@ snapshots:
     dependencies:
       '@types/node': 26.6.2
 
-  '@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2)':
-    dependencies:
-      '@typescript-eslint/scope-manager': 8.70.0
-      '@typescript-eslint/types': 8.70.0
-      '@typescript-eslint/typescript-estree': 8.70.0(typescript@7.0.2)
-      '@typescript-eslint/visitor-keys': 8.70.0
-      debug: 4.4.3
-      eslint: 10.8.0(jiti@2.7.0)
-      typescript: 7.0.2
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   '@typescript-eslint/project-service@8.66.0(typescript@7.0.2)':
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.70.0(typescript@7.0.2)
@@ -8644,26 +8612,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.70.0(typescript@7.0.2)':
-    dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.70.0(typescript@7.0.2)
-      '@typescript-eslint/types': 8.70.0
-      debug: 4.4.3
-      typescript: 7.0.2
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   '@typescript-eslint/scope-manager@8.66.0':
     dependencies:
       '@typescript-eslint/types': 8.66.0
       '@typescript-eslint/visitor-keys': 8.66.0
-
-  '@typescript-eslint/scope-manager@8.70.0':
-    dependencies:
-      '@typescript-eslint/types': 8.70.0
-      '@typescript-eslint/visitor-keys': 8.70.0
-    optional: true
 
   '@typescript-eslint/tsconfig-utils@8.66.0(typescript@7.0.2)':
     dependencies:
@@ -8692,22 +8644,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/typescript-estree@8.70.0(typescript@7.0.2)':
-    dependencies:
-      '@typescript-eslint/project-service': 8.70.0(typescript@7.0.2)
-      '@typescript-eslint/tsconfig-utils': 8.70.0(typescript@7.0.2)
-      '@typescript-eslint/types': 8.70.0
-      '@typescript-eslint/visitor-keys': 8.70.0
-      debug: 4.4.3
-      minimatch: 10.2.6
-      semver: 7.8.5
-      tinyglobby: 0.2.17
-      ts-api-utils: 2.5.0(typescript@7.0.2)
-      typescript: 7.0.2
-    transitivePeerDependencies:
-      - supports-color
-    optional: true
-
   '@typescript-eslint/utils@8.66.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.8.0(jiti@2.7.0))
@@ -8723,12 +8659,6 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.66.0
       eslint-visitor-keys: 5.0.1
-
-  '@typescript-eslint/visitor-keys@8.70.0':
-    dependencies:
-      '@typescript-eslint/types': 8.70.0
-      eslint-visitor-keys: 5.0.1
-    optional: true
 
   '@typescript/typescript-aix-ppc64@7.0.2':
     optional: true
@@ -11214,7 +11144,7 @@ snapshots:
       '@oxfmt/binding-win32-ia32-msvc': 0.70.0
       '@oxfmt/binding-win32-x64-msvc': 0.70.0
 
-  oxlint-config-awesomeness@4.9.0(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint-tsgolint@7.0.2007)(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))(typescript@7.0.2):
+  oxlint-config-awesomeness@5.0.0(@nkzw/eslint-plugin@2.0.0(eslint@10.8.0(jiti@2.7.0)))(@shadcn/lint@0.2.0(eslint@10.8.0(jiti@2.7.0)))(eslint-plugin-no-only-tests@3.4.0)(eslint-plugin-perfectionist@5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))(oxlint-plugin-react-doctor@0.9.14)(oxlint@1.94.0(oxlint-tsgolint@7.0.2007))(tsrs@0.25.0-ts7.1.0-beta)(typescript@7.0.2):
     dependencies:
       '@nkzw/eslint-plugin': 2.0.0(eslint@10.8.0(jiti@2.7.0))
       '@oxlint/plugins': 1.85.0
@@ -11223,10 +11153,10 @@ snapshots:
       eslint-plugin-perfectionist: 5.10.1(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2)
       oxlint: 1.94.0(oxlint-tsgolint@7.0.2007)
       oxlint-plugin-react-doctor: 0.9.14
-      oxlint-tsgolint: 7.0.2007
+      tsrs: 0.25.0-ts7.1.0-beta
       typescript: 7.0.2
     optionalDependencies:
-      '@shadcn/lint': 0.2.0(@typescript-eslint/parser@8.70.0(eslint@10.8.0(jiti@2.7.0))(typescript@7.0.2))(eslint@10.8.0(jiti@2.7.0))
+      '@shadcn/lint': 0.2.0(eslint@10.8.0(jiti@2.7.0))
 
   oxlint-plugin-react-doctor@0.9.14:
     dependencies:
@@ -11245,6 +11175,7 @@ snapshots:
       '@oxlint-tsgolint/linux-x64': 7.0.2007
       '@oxlint-tsgolint/win32-arm64': 7.0.2007
       '@oxlint-tsgolint/win32-x64': 7.0.2007
+    optional: true
 
   oxlint@1.94.0(oxlint-tsgolint@7.0.2007):
     optionalDependencies:
