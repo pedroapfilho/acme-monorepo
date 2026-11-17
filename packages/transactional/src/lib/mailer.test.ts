@@ -119,6 +119,18 @@ describe("createMailer", () => {
     expect(sentPayload().subject).toBe("Welcome to Acme! Please verify your email");
   });
 
+  it("stamps the footer with the year the email is sent", async () => {
+    vi.useFakeTimers({ now: new Date("2031-03-01T00:00:00Z"), toFake: ["Date"] });
+
+    try {
+      await mailerFrom("noreply@acme.com")(welcome);
+    } finally {
+      vi.useRealTimers();
+    }
+
+    expect(sentPayload().text).toContain("© 2031");
+  });
+
   it.each(["Acme <noreply@acme.com>", "noreply@acme.com"])("sends from %s", async (from) => {
     await mailerFrom(from)(welcome);
 

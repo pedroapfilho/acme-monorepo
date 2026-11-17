@@ -8,11 +8,10 @@ import { tailwindConfig } from "../styles/theme";
 type BaseLayoutProps = {
   children: React.ReactNode;
   preview: string;
+  year: number;
 };
 
-const BaseLayout = ({ children, preview }: BaseLayoutProps) => {
-  const currentYear = new Date().getFullYear();
-
+const BaseLayout = ({ children, preview, year }: BaseLayoutProps) => {
   return (
     <Html>
       <Tailwind config={tailwindConfig}>
@@ -50,7 +49,7 @@ const BaseLayout = ({ children, preview }: BaseLayoutProps) => {
               </Text>
 
               <Text className="m-0 text-xs text-muted-foreground">
-                © {currentYear}
+                © {year}
                 {` ${displayName}. All rights reserved.`}
               </Text>
             </Section>

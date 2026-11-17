@@ -12,6 +12,7 @@ type PasswordResetEmailProps = {
   name?: string;
   resetUrl: string;
   userEmail: string;
+  year: number;
 };
 
 const PasswordResetEmail = ({
@@ -19,9 +20,10 @@ const PasswordResetEmail = ({
   name,
   resetUrl,
   userEmail,
+  year,
 }: PasswordResetEmailProps) => {
   return (
-    <BaseLayout preview="Reset your Acme password">
+    <BaseLayout preview="Reset your Acme password" year={year}>
       <Heading className="mt-0 mb-4 text-2xl font-semibold tracking-tight text-balance break-words text-foreground">
         Reset your password
       </Heading>
@@ -71,6 +73,7 @@ PasswordResetEmail.PreviewProps = {
   name: "Ada Lovelace",
   resetUrl: "https://acme.web.localhost/api/auth/reset-password/preview",
   userEmail: "ada@example.com",
+  year: 2026,
 } satisfies PasswordResetEmailProps;
 
 export { PasswordResetEmail };
